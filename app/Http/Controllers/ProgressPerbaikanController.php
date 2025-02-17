@@ -11,4 +11,9 @@ class ProgressPerbaikanController extends Controller
     {
         return view('pages.admin.progress-perbaikan.index');
     }
+
+    public function detail()
+    {
+        return view('pages.admin.progress-perbaikan.detail');
+    }
 }

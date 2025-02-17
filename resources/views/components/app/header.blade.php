@@ -1,17 +1,7 @@
 <header class="sticky top-0 before:absolute before:inset-0 before:backdrop-blur-md max-lg:before:bg-white/90 dark:max-lg:before:bg-gray-800/90 before:-z-10 z-30 {{ $variant === 'v2' || $variant === 'v3' ? 'before:bg-white after:absolute after:h-px after:inset-x-0 after:top-full after:bg-gray-200 dark:after:bg-gray-700/60 after:-z-10' : 'max-lg:shadow-xs lg:before:bg-gray-100/90 dark:lg:before:bg-gray-900/90' }} {{ $variant === 'v2' ? 'dark:before:bg-gray-800' : '' }} {{ $variant === 'v3' ? 'dark:before:bg-gray-900' : '' }}">
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 {{ $variant === 'v2' || $variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60' }}">
-
-            <!-- Header: Left side -->
-            @php
-                $role = auth()->user()->roles->first()->name ?? 'user';
-            @endphp
-
-            <div class="flex">
-                @if($role === 'user')
-                    <!-- Tampilkan Logo jika role adalah 'user' -->
-                    <img src="{{ asset('images/LOGO-AVI-OFFICIAL.png') }}" alt="Logo" class="w-24 h-24 object-contain">
-                @else
+            <div class="flex">               
                     <!-- Hamburger button untuk role admin, EHS, PIC, Manajer -->
                     <button
                         class="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
@@ -26,7 +16,6 @@
                             <rect x="4" y="17" width="16" height="2" />
                         </svg>
                     </button>
-                @endif
             </div>
 
 

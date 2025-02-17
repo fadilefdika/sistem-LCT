@@ -30,6 +30,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/laporan-lct', [LaporanLCTController::class, 'index'])->name('admin.laporan-lct');
     Route::get('/laporan-lct/detail', [LaporanLCTController::class, 'detail'])->name('admin.laporan-lct.detail');
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
+    Route::get('/progress-perbaikan/detail', [ProgressPerbaikanController::class, 'detail'])->name('admin.progress-perbaikan.detail');
     Route::get('/riwayat-lct', [RiwayatLCTController::class, 'index'])->name('admin.riwayat-lct');
 
     Route::get('/users', [UserController::class, 'index'])->name('users');

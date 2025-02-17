@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="grid md:grid-cols-2 gap-3 justify-center p-3">
         <!-- Card Laporan dari Pelapor -->
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+        <div class="max-w-max mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
             <div class="bg-primary text-black text-center py-6">
                 <h5 class="text-2xl font-semibold">Laporan dari Pelapor</h5>
             </div>
@@ -23,7 +23,7 @@
         
     
         <!-- Form Laporan Temuan -->
-        <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-md overflow-hidden max-h-max">
+        <div class="max-w-max mx-auto bg-white shadow-lg rounded-md overflow-hidden max-h-max">
             <div class="bg-primary text-black text-center py-4 px-7">
                 <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Ketidaksesuaian ke PIC</h5>
             </div>
@@ -35,6 +35,15 @@
                         <div class="mb-4">
                             <label for="area_temuan" class="block text-sm font-medium text-gray-700">Area Temuan</label>
                             <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="departemen" class="block text-sm font-medium text-gray-700">Departemen</label>
+                            <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="departemen" name="departemen" required>
+                                <option value="">Pilih Departemen</option>
+                                <option value="produksi">Produksi</option>
+                                <option value="keamanan">Keamanan</option>
+                                <option value="lingkungan">Lingkungan</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">Tanggal Temuan</label>
@@ -50,13 +59,8 @@
                             </select>
                         </div>
                         <div class="mb-4">
-                            <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700">Tingkat Bahaya</label>
-                            <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tingkat_bahaya" name="tingkat_bahaya" required>
-                                <option value="">Pilih Tingkat Bahaya</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </select>
+                            <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700">Temuan Ketidaksesuaian</label>
+                            <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
                         </div>
                         <div class="mb-4">
                             <label for="kategori_temuan" class="block text-sm font-medium text-gray-700">Kategori Temuan</label>
@@ -68,18 +72,17 @@
                             </select>
                         </div>
                         <div class="mb-4">
-                            <label for="departemen" class="block text-sm font-medium text-gray-700">Departemen</label>
-                            <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="departemen" name="departemen" required>
-                                <option value="">Pilih Departemen</option>
-                                <option value="produksi">Produksi</option>
-                                <option value="keamanan">Keamanan</option>
-                                <option value="lingkungan">Lingkungan</option>
+                            <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700">Tingkat Bahaya</label>
+                            <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tingkat_bahaya" name="tingkat_bahaya" required>
+                                <option value="">Pilih Tingkat Bahaya</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700">Temuan Ketidaksesuaian</label>
-                            <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
-                        </div>
+                        
+                        
+                        
                         <div class="mb-4">
                             <label for="batas_waktu" class="block text-sm font-medium text-gray-700">Batas Waktu Perbaikan</label>
                             <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
