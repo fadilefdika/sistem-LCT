@@ -9,7 +9,7 @@
                     <img class="hidden dark:block" src="{{ asset('images/404-illustration-dark.svg') }}" width="176" height="176" alt="404 illustration dark" />                        
                 </div>
                 <div class="mb-6">Hmm...this page doesn't exist. Try searching for something else!</div>
-                <a href="{{ route('dashboard') }}" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">Back To Dashboard</a>
+                <a href="{{ route('admin.dashboard') }}" class="btn bg-indigo-500 hover:bg-indigo-600 text-white">Back To Dashboard</a>
             </div>
 
         </div>

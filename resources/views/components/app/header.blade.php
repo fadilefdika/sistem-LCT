@@ -3,24 +3,32 @@
         <div class="flex items-center justify-between h-16 {{ $variant === 'v2' || $variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60' }}">
 
             <!-- Header: Left side -->
-            <div class="flex">
-                
-                <!-- Hamburger button -->
-                <button
-                    class="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
-                    @click.stop="sidebarOpen = !sidebarOpen"
-                    aria-controls="sidebar"
-                    :aria-expanded="sidebarOpen"
-                >
-                    <span class="sr-only">Open sidebar</span>
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="4" y="5" width="16" height="2" />
-                        <rect x="4" y="11" width="16" height="2" />
-                        <rect x="4" y="17" width="16" height="2" />
-                    </svg>
-                </button>
+            @php
+                $role = auth()->user()->roles->first()->name ?? 'user';
+            @endphp
 
+            <div class="flex">
+                @if($role === 'user')
+                    <!-- Tampilkan Logo jika role adalah 'user' -->
+                    <img src="{{ asset('images/LOGO-AVI-OFFICIAL.png') }}" alt="Logo" class="w-24 h-24 object-contain">
+                @else
+                    <!-- Hamburger button untuk role admin, EHS, PIC, Manajer -->
+                    <button
+                        class="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
+                        @click.stop="sidebarOpen = !sidebarOpen"
+                        aria-controls="sidebar"
+                        :aria-expanded="sidebarOpen"
+                    >
+                        <span class="sr-only">Open sidebar</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="5" width="16" height="2" />
+                            <rect x="4" y="11" width="16" height="2" />
+                            <rect x="4" y="17" width="16" height="2" />
+                        </svg>
+                    </button>
+                @endif
             </div>
+
 
             <!-- Header: Right side -->
             <div class="flex items-center space-x-3">

@@ -15,6 +15,11 @@
             </div>
 
             <div>
+                <x-label for="role">{{ __('Role') }} <span class="text-red-500">*</span></x-label>
+                <x-input id="role" type="text" name="role" :value="old('role')" required autofocus autocomplete="role" />
+            </div>
+
+            <div>
                 <x-label for="password" value="{{ __('Password') }}" />
                 <x-input id="password" type="password" name="password" required autocomplete="new-password" />
             </div>
