@@ -19,7 +19,7 @@
         <!-- Sidebar header -->
         <div class="flex justify-between mb-10 pr-3 sm:px-2">
             <!-- Close button -->
-            <button class="lg:hidden text-gray-500 hover:text-gray-400" @click.stop="sidebarOpen = !sidebarOpen" aria-controls="sidebar" :aria-expanded="sidebarOpen">
+            <button class="lg:hidden text-gray-900 hover:text-gray-400" @click.stop="sidebarOpen = !sidebarOpen" aria-controls="sidebar" :aria-expanded="sidebarOpen">
                 <span class="sr-only">Close sidebar</span>
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z" />
@@ -37,7 +37,7 @@
         <div class="space-y-8">
             <!-- Pages group -->
             <div>
-                <h3 class="text-xs uppercase text-gray-400 dark:text-gray-500 font-semibold pl-3">
+                <h3 class="text-xs uppercase text-gray-400 dark:text-gray-900 font-semibold pl-3">
                     <span class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-center w-6" aria-hidden="true">•••</span>
                     <span class="lg:hidden lg:sidebar-expanded:block 2xl:block">Pages</span>
                 </h3>
@@ -47,7 +47,7 @@
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('dashboard')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.dashboard') }}">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <svg class="shrink-0 fill-current @if(Request::is('dashboard')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-500' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                    <svg class="shrink-0 fill-current @if(Request::is('dashboard')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                                         <path d="M5.936.278A7.983 7.983 0 0 1 8 0a8 8 0 1 1-8 8c0-.722.104-1.413.278-2.064a1 1 0 1 1 1.932.516A5.99 5.99 0 0 0 2 8a6 6 0 1 0 6-6c-.53 0-1.045.076-1.548.21A1 1 0 1 1 5.936.278Z" />
                                         <path d="M6.068 7.482A2.003 2.003 0 0 0 8 10a2 2 0 1 0-.518-3.932L3.707 2.293a1 1 0 0 0-1.414 1.414l3.775 3.775Z" />
                                     </svg>
@@ -61,7 +61,7 @@
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('laporan-lct')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('laporan-lct')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.laporan-lct') }}">
                             <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('laporan-lct')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-500' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <svg class="shrink-0 fill-current @if(Request::is('laporan-lct')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
                                 </svg>
                                 
@@ -74,7 +74,7 @@
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('progress-perbaikan')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('progress-perbaikan')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.progress-perbaikan') }}">
                             <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('progress-perbaikan')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-500' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <svg class="shrink-0 fill-current @if(Request::is('progress-perbaikan')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
                                 </svg>                                
                                 <span class="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Progress Perbaikan</span>
@@ -86,7 +86,7 @@
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('riwayat-lct')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('riwayat-lct')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.riwayat-lct') }}">
                             <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('riwayat-lct')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-500' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                <svg class="shrink-0 fill-current @if(Request::is('riwayat-lct')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M12 8v5h5v-2h-3V8h-2zM12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
                                 </svg>                                
                                 <span class="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Riwayat LCT</span>
