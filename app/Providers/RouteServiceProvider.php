@@ -5,22 +5,34 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * The path to your application's "home" route.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
+     * Get the default home path based on the authenticated user's role.
      */
-    public const HOME = '/dashboard';
+    public static function home(): string
+    {
+        $user = Auth::user(); // Ambil user yang sedang login
+
+        if (!$user) {
+            return '/login';
+        }
+
+        if ($user->roleLct->contains('nama_role', 'ehs')) {
+            return '/dashboard';
+        } elseif ($user->roleLct->contains('nama_role', 'user')) {
+            return '/users';
+        }
+
+        return '/login';
+    }
 
     /**
-     * Define your route model bindings, pattern filters, and other route configuration.
+     * Define route model bindings, pattern filters, and other route configurations.
      */
     public function boot(): void
     {

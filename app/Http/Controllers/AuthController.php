@@ -28,11 +28,14 @@ class AuthController extends Controller
         // 🔥 Debug: Cek apakah user memiliki role
         // dd(Auth::user()->roleLct);
 
-        if ($user->roleLct->nama_role === 'ehs') {
+        $role = $user->roleLct->pluck('nama_role')->first();
+
+        if ($role === 'ehs') {
             return redirect('/dashboard')->with('success', 'Selamat datang Admin EHS!');
         } else {
             return redirect('/users')->with('success', 'Selamat datang User!');
         }
+
     }
 
     

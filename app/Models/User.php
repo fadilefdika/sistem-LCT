@@ -15,43 +15,36 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasApiTokens;
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-
-    use HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     protected $table = 'users';
-
-    protected $guard_name = 'web';
-
-    public function username()
-    {
-        return 'npk'; // Laravel akan pakai npk untuk login
-    }
-
 
     protected $fillable = [
         'npk',
         'password',
     ];
 
-     // Relasi ke tabel user_roles_lct
-    public function useRoleLct()
+    public function username()
+    {
+        return 'npk'; // Login menggunakan NPK
+    }
+
+    // Relasi ke UserRoleLct (Mengambil satu peran utama)
+    public function userRoleLct()
     {
         return $this->hasOne(UserRoleLct::class, 'user_id');
     }
 
+    // Relasi ke RoleLct melalui UserRoleLct
     public function roleLct()
     {
         return $this->belongsToMany(RoleLct::class, 'user_roles_lct', 'user_id', 'role_lct_id');
     }
 
-      // Ambil nama role langsung dari user_role_lct
+    // Ambil nama role utama atau default sebagai "user"
     public function getRoleNameAttribute()
     {
         return $this->userRoleLct?->role->nama_role ?? 'user';
     }
 }
+
