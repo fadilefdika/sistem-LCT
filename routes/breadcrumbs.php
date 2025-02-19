@@ -10,17 +10,22 @@ use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 // Dashboard
 Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
-    $trail->push('dashboard', route('admin.dashboard'));
+    $trail->push('Dashboard', route('admin.dashboard'));
 });
 
 // Home > Blog
 Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('laporan-lct', route('admin.laporan-lct'));
+    $trail->push('Laporan LCT', route('admin.laporan-lct'));
 });
 
-// Home > Blog > [Category]
-Breadcrumbs::for('category', function (BreadcrumbTrail $trail, $category) {
-    $trail->parent('blog');
-    $trail->push($category->title, route('category', $category));
+Breadcrumbs::for('laporan-lct.detail', function (BreadcrumbTrail $trail) {
+    $trail->parent('laporan-lct');
+    $trail->push('Detail Laporan LCT #1233', route('admin.laporan-lct.detail'));
 });
+
+// // Home > Blog > [Category]
+// Breadcrumbs::for('category', function (BreadcrumbTrail $trail, $category) {
+//     $trail->parent('blog');
+//     $trail->push($category->title, route('category', $category));
+// });

@@ -124,23 +124,6 @@
                         </div>
                     </div>
 
-                    <!-- Temuan Ketidaksesuaian -->
-                    <div class="mb-4">
-                        <label for="temuan" class="block text-sm font-medium text-gray-700">
-                            Temuan Ketidaksesuaian <span class="text-red-500">*</span>
-                        </label>
-                        <textarea 
-                            id="temuan" 
-                            name="temuan" 
-                            class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
-                            rows="4" 
-                            required
-                        ></textarea>
-                        
-                        <!-- Deskripsi kecil -->
-                        <p class="text-xs text-gray-500 mt-1">Deskripsikan temuan ketidaksesuaian yang ditemukan di area LCT. Jelaskan secara rinci agar dapat segera ditindaklanjuti.</p>
-                    </div>
-
                     <!-- Unggah Foto -->
                     <div class="mb-4">
                         <label for="foto_temuan" class="block text-sm font-medium text-gray-700">
@@ -164,7 +147,7 @@
                     </div>
 
                     <!-- Kategori -->
-                        <div class="mb-4 flex flex-col">
+                    <div class="mb-4 flex flex-col">
                             <label for="kategori" class="block text-sm font-medium text-gray-700">
                                 Kategori Temuan <span class="text-red-500">*</span>
                             </label>
@@ -239,7 +222,24 @@
                                     </div>
                                 </div>
                                 <p class="text-xs text-gray-500 mt-1">Pilih kategori yang sesuai dengan temuan LCT Anda. Misalnya, apakah ini berkaitan dengan kondisi atau tindakan yang tidak aman, atau masalah lainnya.</p>
-                        </div>
+                    </div>
+
+                      <!-- Temuan Ketidaksesuaian -->
+                      <div class="mb-4">
+                        <label for="temuan" class="block text-sm font-medium text-gray-700">
+                            Temuan Ketidaksesuaian <span class="text-red-500">*</span>
+                        </label>
+                        <textarea 
+                            id="temuan" 
+                            name="temuan" 
+                            class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                            rows="4" 
+                            required
+                        ></textarea>
+                        
+                        <!-- Deskripsi kecil -->
+                        <p class="text-xs text-gray-500 mt-1">Deskripsikan temuan ketidaksesuaian yang ditemukan di area LCT. Jelaskan secara rinci agar dapat segera ditindaklanjuti.</p>
+                    </div>
 
                     <!-- Rekomendasi Safety -->
                     <div class="mb-4">

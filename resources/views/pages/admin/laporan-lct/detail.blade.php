@@ -1,4 +1,5 @@
 <x-app-layout>
+    {{ Breadcrumbs::render('laporan-lct.detail') }}
     <div class="max-h-screen flex justify-center items-center">
         <div class="grid md:grid-cols-2 justify-center w-full">
             <!-- Card Laporan dari Pelapor -->
@@ -93,7 +94,7 @@
                     </div>
 
                     <!-- Card Gambar Temuan -->
-                    <div class="bg-white p-4 rounded-lg border border-gray-300 mt-3">
+                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                         <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
                         <div class="relative mt-2">
                             <img src="{{ asset('images/user-36-05.jpg') }}" 
@@ -107,8 +108,8 @@
 
             
         
-                <!-- Form Laporan Temuan -->
-                <div class="max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 h-[487px] overflow-y-auto [&::-webkit-scrollbar]:w-1
+            <!-- Form Laporan Temuan -->
+            <div class="max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 h-[487px] overflow-y-auto [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
                 [&::-webkit-scrollbar-thumb]:rounded-full
