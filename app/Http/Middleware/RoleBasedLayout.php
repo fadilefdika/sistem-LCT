@@ -19,12 +19,10 @@ class RoleBasedLayout
         $user = auth()->user();
 
         if ($user) {
-            // Cek role user
-            $role = $user->roles->first()->name ?? 'user';
-            
-            // Simpan dalam session untuk digunakan di layout
-            session(['layout' => ($role === 'user') ? 'layouts.user' : 'layouts.admin']);
+            // TANPA MENGECEK ROLE
+            session(['layout' => 'layouts.user']);
         }
-        return $next($request);
+
+    return $next($request);
     }
 }

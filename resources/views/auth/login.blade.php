@@ -10,9 +10,9 @@
         @csrf
         <div class="space-y-4">
             <div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" type="email" name="email" :value="old('email')" required autofocus />                
-            </div>
+                <x-label for="npk" value="{{ __('NPK') }}" />
+                <x-input id="npk" type="text" name="npk" :value="old('npk')" required autofocus />
+            </div>            
             <div>
                 <x-label for="password" value="{{ __('Password') }}" />
                 <x-input id="password" type="password" name="password" required autocomplete="current-password" />                

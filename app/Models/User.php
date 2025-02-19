@@ -14,11 +14,11 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    // use HasApiTokens;
-    // use HasFactory;
-    // use HasProfilePhoto;
-    // use Notifiable;
-    // use TwoFactorAuthenticatable;
+    use HasApiTokens;
+    use HasFactory;
+    use HasProfilePhoto;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
     use HasRoles;
 
@@ -26,4 +26,14 @@ class User extends Authenticatable
 
     protected $guard_name = 'web';
 
+    public function username()
+    {
+        return 'npk'; // Laravel akan pakai npk untuk login
+    }
+
+
+    protected $fillable = [
+        'npk',
+        'password',
+    ];
 }
