@@ -1,4 +1,5 @@
 <x-app-layout>
+    {{ Breadcrumbs::render('progress-perbaikan.detail') }}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 justify-center">
         <!-- Card 1: Laporan dari Pelapor -->
         <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
@@ -32,7 +33,7 @@
 
                     <p><strong>Temuan Ketidaksesuaian:</strong><br>Mesin rusak dan bocor oli</p>
                     <p><strong>Nama PIC:</strong><br>Jane Smith</p>
-                    <p><strong>Status Bahaya:</strong><br> <span class="bg-red-500 text-white px-2 py-1 rounded-full text-sm">Tinggi ⚠️</span></p>
+                    <p><strong>Tingkat Bahaya:</strong><br> <span class="bg-red-500 text-white px-2 py-1 rounded-full text-sm">Tinggi ⚠️</span></p>
                     <p><strong>Batas Waktu Perbaikan:</strong><br>2025-02-15</p>
                     <p><strong>Status LCT:</strong><br> <span class="bg-blue-500 text-white px-2 py-1 rounded-full text-sm">Dalam Proses</span></p>
                     <p><strong>Kategori Temuan:</strong><br>Kerusakan Mesin</p>

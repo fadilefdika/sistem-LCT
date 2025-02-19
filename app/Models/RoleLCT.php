@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class RoleLCT extends Role
+class RoleLct extends Model
 {
+    use HasFactory;
+
     protected $table = 'roles_lct'; 
-    protected $primaryKey = 'id'; // Pastikan sesuai dengan struktur database
 
-    protected $fillable = ['name', 'guard_name'];
+    protected $fillable = [
+        'nama_role',
+        'deskripsi' 
+    ];
 
-    // Override atribut default Spatie
-    public function getNameAttribute()
+    public function users()
     {
-        return $this->attributes['name'];
+        return $this->belongsToMany(User::class, 'user_roles_lct', 'role_lct_id', 'user_id');
     }
 
-    public function setNameAttribute($value)
-    {
-        $this->attributes['name'] = $value;
-    }
 }

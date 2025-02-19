@@ -81,9 +81,19 @@
                                 class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
                                 x-cloak
                             >
-                                <li @click="selected = 'Area 1'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Area 1</li>
-                                <li @click="selected = 'Area 2'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Area 2</li>
-                                <li @click="selected = 'Area 3'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Area 3</li>
+                                <li @click="selected = 'Office Lantai 1'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Office Lantai 1</li>
+                                <li @click="selected = 'Office Lantai 2'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Office Lantai 2</li>
+                                <li @click="selected = 'FA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">FA</li>
+                                <li @click="selected = 'SMT'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">SMT</li>
+                                <li @click="selected = 'Changing Room'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Changing Room</li>
+                                <li @click="selected = 'Gudang B3'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Gudang B3</li>
+                                <li @click="selected = 'Gudang GA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Gudang GA</li>
+                                <li @click="selected = 'Lab AVI'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Lab AVI</li>
+                                <li @click="selected = 'Ruang E-Comp'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang E-Comp</li>
+                                <li @click="selected = 'Ruang Panel'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Panel</li>
+                                <li @click="selected = 'Ruang Server'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Server</li>
+                                <li @click="selected = 'Ruang Sparepart'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Sparepart</li>
+                                <li @click="selected = 'Ruang Kompressor'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Kompressor</li>
                             </ul>
                         </div>
                         
@@ -118,7 +128,7 @@
                         >
                             <div class="p-2">
                                 <p class="font-semibold mt-2">Contoh Pengisian:</p>
-                                <p class="text-sm text-gray-600">Gedung A ruang B</p>
+                                <p class="text-sm text-gray-600">Mis: FA Line 2 - CLuster Assy</p>
                             </div>
                             
                         </div>

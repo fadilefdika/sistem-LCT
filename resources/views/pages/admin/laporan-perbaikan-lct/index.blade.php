@@ -1,5 +1,5 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('progress-perbaikan.detail') }}
+    {{ Breadcrumbs::render('laporan-perbaikan-lct.detail') }}
     <section class="dark:bg-gray-900 p-3 sm:p-5">
         <div class="mx-auto max-w-screen-2xl">
             <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -8,10 +8,10 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-4 py-3">Temuan Ketidaksesuaian</th>
-                                <th scope="col" class="px-4 py-3">Nama PIC</th>
+                                <th scope="col" class="px-4 py-3">Detail Area</th>
                                 <th scope="col" class="px-4 py-3">Tingkat Bahaya</th>
-                                <th scope="col" class="px-4 py-3">Status Progress</th>
                                 <th scope="col" class="px-4 py-3">Tenggat Waktu</th>
+                                <th scope="col" class="px-4 py-3">Status Progress</th>
                                 <th scope="col" class="px-4 py-3">Tanggal Selesai</th>
                                 <th scope="col" class="px-4 py-3">Action</th>
                             </tr>
@@ -22,17 +22,17 @@
                                     Kerusakan Tempat Sampah
                                 </th>
                                 
-                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">John Doe</td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">Gudang A</td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">Low</td>
+                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">25-05-2025</td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     Sedang Dikerjakan
                                 </td>
-                                <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">25-05-2025</td>
                                 <td class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     -
                                 </td>
                                 <td class="flex items-center justify-center px-4 py-3">
-                                    <a href="{{ route('admin.progress-perbaikan.detail') }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
+                                    <a href="{{ route('admin.laporan-perbaikan-lct.detail') }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
                                     <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
                                 </td>
                             </tr>

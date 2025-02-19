@@ -17,23 +17,26 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Cari user berdasarkan NPK
         $user = User::where('npk', $request->npk)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'NPK atau password salah!'], 401);
+            return back()->with('error', 'NPK atau password salah!');
         }
 
-        // Buat token untuk autentikasi
-        $token = $user->createToken('auth_token')->plainTextToken;
+        Auth::login($user);
 
-        return response()->json([
-            'message' => 'Login berhasil',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ]);
+        // 🔥 Debug: Cek apakah user memiliki role
+        // dd(Auth::user()->roleLct);
+
+        if ($user->roleLct->nama_role === 'ehs') {
+            return redirect('/dashboard')->with('success', 'Selamat datang Admin EHS!');
+        } else {
+            return redirect('/users')->with('success', 'Selamat datang User!');
+        }
     }
+
+    
+
 
     public function logout(Request $request)
     {

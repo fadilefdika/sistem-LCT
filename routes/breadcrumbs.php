@@ -13,7 +13,7 @@ Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
     $trail->push('Dashboard', route('admin.dashboard'));
 });
 
-// Home > Blog
+// laporan lct
 Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Laporan LCT', route('admin.laporan-lct'));
@@ -29,3 +29,27 @@ Breadcrumbs::for('laporan-lct.detail', function (BreadcrumbTrail $trail) {
 //     $trail->parent('blog');
 //     $trail->push($category->title, route('category', $category));
 // });
+
+// progress perbaikan
+Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Progress Perbaikan', route('admin.progress-perbaikan'));
+});
+
+// progress perbaikan detail 
+Breadcrumbs::for('progress-perbaikan.detail', function (BreadcrumbTrail $trail) {
+    $trail->parent('progress-perbaikan');
+    $trail->push('Detail Progress Perbaikan #1233', route('admin.progress-perbaikan.detail'));
+});
+
+// laporan perbaikan lct
+Breadcrumbs::for('laporan-perbaikan-lct', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Laporan Perbaikan LCT', route('admin.laporan-perbaikan-lct'));
+});
+
+// laporan perbaikan lct detail
+Breadcrumbs::for('laporan-perbaikan-lct.detail', function (BreadcrumbTrail $trail) {
+    $trail->parent('laporan-perbaikan-lct');
+    $trail->push('Detail Laporan Perbaikan LCT #1233', route('admin.laporan-perbaikan-lct.detail'));
+});
