@@ -128,10 +128,14 @@
                                 <div class="space-y-6">
                                     <!-- Form fields -->
                                     <div class="mb-4">
+                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
+                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
+                                    </div>
+                                    <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
                                         <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
                                     </div>
-                                    <div class="mb-4">
+                                    {{-- <div class="mb-4">
                                         <label for="departemen" class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
                                         <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="departemen" name="departemen" required>
                                             <option value="">Pilih Departemen</option>
@@ -139,7 +143,7 @@
                                             <option value="keamanan">Keamanan</option>
                                             <option value="lingkungan">Lingkungan</option>
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="mb-4">
                                         <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Temuan</label>
                                         <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tanggal_temuan" name="tanggal_temuan" required>
@@ -153,10 +157,7 @@
                                             <option value="pic3">PIC 3</option>
                                         </select>
                                     </div>
-                                    <div class="mb-4">
-                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
-                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
-                                    </div>
+                                    
                                     <div class="mb-4">
                                         <label for="kategori_temuan" class="block text-sm font-medium text-gray-700 mb-1">Kategori Temuan</label>
                                         <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="kategori_temuan" name="kategori_temuan" required>
