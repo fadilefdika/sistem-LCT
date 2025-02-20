@@ -2,7 +2,7 @@
     {{ Breadcrumbs::render('laporan-perbaikan-lct.detail') }}
     <div class="max-h-screen flex justify-center items-center">
         <div class="grid md:grid-cols-2 justify-center w-full">
-            <!-- Card Laporan dari Pelapor -->
+            <!-- Card Laporan dari EHS -->
             <div class="max-w-full mx-auto bg-[#F3F4F6] overflow-hidden h-[487px] overflow-y-auto 
                         [&::-webkit-scrollbar]:w-1
                         [&::-webkit-scrollbar-track]:rounded-full
@@ -18,7 +18,7 @@
                     <div class="bg-white p-5 rounded-xl shadow-md border ">
                         <!-- Header -->
                         <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                            📝 Laporan dari Pelapor
+                            📝 Laporan dari EHS
                         </h5>
                         
                         <!-- Garis Pemisah -->
@@ -32,16 +32,16 @@
                     </div>
 
 
-                    <!-- Card Informasi Pelapor -->
-                    <div class="bg-white p-5 rounded-xl shadow-md mt-3 flex flex-row justify-around items-center">
+                    <!-- Card Informasi dari EHS -->
+                    <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-row justify-around items-center">
                         
-                        <!-- Nama Pelapor -->
+                        <!-- Nama PIC -->
                         <div class="flex flex-col items-start">
                             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
-                                <p>Nama Pelapor</p>
+                                <p>Nama PIC</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Aziz</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">Asep</p>
                         </div>
 
                         <!-- Garis Pemisah -->
@@ -63,13 +63,30 @@
                         <div class="flex flex-col items-start">
                             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                                 <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                                <p>Area Temuan</p>
+                                <p>Detail Area Temuan</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Gudang A</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">FA Line 2 - CLuster Assy</p>
                         </div>
 
                     </div>
 
+                    <div x-data="{ dueDate: '2024-01-22', today: new Date().toISOString().split('T')[0] }"
+                        :class="new Date(dueDate) < new Date(today) ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
+                        class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col items-start">
+
+                        <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
+                            <i class="fas fa-calendar-alt text-lg"
+                                :class="new Date(dueDate) < new Date(today) ? 'text-red-500' : 'text-green-500'"></i>
+                            <p class="font-medium">Due Date</p>
+                        </div>
+
+                        <p class="text-sm font-semibold mt-1"
+                            :class="new Date(dueDate) < new Date(today) ? 'text-red-600' : 'text-gray-900'">
+                            <span x-text="dueDate"></span>
+                        </p>
+                    </div>
+
+                    
                     <!-- Card Kategori Temuan -->
                     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                         <div class="flex items-center space-x-2">
@@ -79,6 +96,24 @@
                         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">Kondisi Tidak Aman</p>
                     </div>
 
+                   <!-- Card Tingkat Bahaya -->
+                    <div x-data="{ level: 'high' }" class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+                        <div class="flex items-center space-x-2">
+                            <i :class="{
+                                'text-green-500 fa-check-circle': level === 'low',
+                                'text-yellow-500 fa-exclamation-triangle': level === 'medium',
+                                'text-red-500 fa-skull-crossbones': level === 'high'
+                            }" class="fa-solid text-lg"></i>
+                            <p class="text-gray-500 text-xs">Tingkat Bahaya</p>
+                        </div>
+                        <p :class="{
+                            'bg-green-100 text-green-900 hover:bg-green-200': level === 'low',
+                            'bg-yellow-100 text-yellow-900 hover:bg-yellow-200': level === 'medium',
+                            'bg-red-100 text-red-900 hover:bg-red-200': level === 'high'
+                        }" class="text-gray-900 font-semibold mt-2 p-2 rounded-lg transition-all duration-200 ease-in-out">
+                            <span x-text="level === 'low' ? 'Rendah' : level === 'medium' ? 'Sedang' : 'Tinggi'"></span>
+                        </p>
+                    </div>
 
                     <!-- Card Rekomendasi Safety -->
                     <div class="bg-white p-4 rounded-lg border-gray-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
@@ -118,7 +153,7 @@
                 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                     <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
                         <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
-                            <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Ketidaksesuaian ke PIC</h5>
+                            <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Perbaikan ke EHS</h5>
                         </div>
 
                         <div class="w-full h-[2px] bg-gray-200 px-3"></div>
@@ -132,69 +167,48 @@
                                         <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
                                         <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
                                     </div>
-                                    <div class="mb-4">
-                                        <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
-                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="departemen" class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="departemen" name="departemen" required>
-                                            <option value="">Pilih Departemen</option>
-                                            <option value="manufacturing">Manufacturing</option>
-                                            <option value="ame">AME</option>
-                                            <option value="purchasing">Purchasing</option>
-                                            <option value="ppic">PPIC</option>
-                                            <option value="quality">Quality</option>
-                                            <option value="maintenance">Maintenance</option>
-                                            <option value="pme">Product Mechanical Engineering</option>
-                                            <option value="pe">Process Engineering</option>
-                                            <option value="opexandpdca">OPEX dan PDCA</option>
-                                            <option value="accounting">Accounting</option>
-                                            <option value="hr">HR</option>
-                                            <option value="gaehs">GA EHS</option>
-                                        </select>
-                                    </div>
+                                    
+                                    {{-- Nama PIC --}}
                                     <div class="mb-4">
                                         <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" required>
-                                            <option value="">Pilih PIC</option>
-                                            <option value="pic1">PIC 1</option>
-                                            <option value="pic2">PIC 2</option>
-                                            <option value="pic3">PIC 3</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Temuan</label>
-                                        <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tanggal_temuan" name="tanggal_temuan" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="kategori_temuan" class="block text-sm font-medium text-gray-700 mb-1">Kategori Temuan</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="kategori_temuan" name="kategori_temuan" required>
-                                            <option value="">Pilih Kategori Temuan</option>
-                                            <option value="produksi">Produksi</option>
-                                            <option value="keamanan">Keamanan</option>
-                                            <option value="lingkungan">Lingkungan</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700 mb-1">Tingkat Bahaya</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tingkat_bahaya" name="tingkat_bahaya" required>
-                                            <option value="">Pilih Tingkat Bahaya</option>
-                                            <option value="low">Low</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="high">High</option>
-                                        </select>
+                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
                                     </div>
 
+                                    {{-- Batas Waktu Perbaikan --}}
                                     <div class="mb-4">
                                         <label for="batas_waktu" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Perbaikan</label>
                                         <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
                                     </div>
 
-                                    <!-- Rekomendasi -->
+                                    {{-- Nama PIC --}}
                                     <div class="mb-4">
-                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi</label>
-                                        <textarea class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
+                                        <label for="status_" class="block text-sm font-medium text-gray-700 mb-1">Status LCT</label>
+                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
+                                    </div>
+
+                                    {{-- Date of Completion --}}
+                                    <div class="mb-4">
+                                        <label for="batas_waktu" class="block text-sm font-medium text-gray-700 mb-1">Date of Completion</label>
+                                        <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
+                                    </div>
+                                    
+                                    <!-- Unggah Foto Closed-->
+                                    <div class="mb-4">
+                                        <label for="foto_temuan" class="block text-sm font-medium text-gray-700">
+                                            Unggah Bukti Foto Closed
+                                        </label>
+                                        <div class="flex items-center justify-center w-full sm:w-2/3 mt-2">
+                                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                                    </svg>
+                                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 1MB)</p>
+                                                </div>
+                                                <input id="dropzone-file" type="file" class="hidden" />
+                                            </label>
+                                        </div> 
                                     </div>
 
                                     <!-- Submit button -->

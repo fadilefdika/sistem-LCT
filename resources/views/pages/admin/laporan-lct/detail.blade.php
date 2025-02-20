@@ -132,49 +132,91 @@
                                     {{-- Area Temuan --}}
                                     <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
-                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" required>
                                     </div>
 
-                                    {{-- Kategori Temuan --}}
-                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
-                                        <label for="kategori_temuan" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Kategori Temuan
-                                        </label>
-                                        
-                                        <!-- Tombol Dropdown -->
-                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
-                                            <span x-text="selected || 'Pilih Kategori Temuan'"></span>
+                                    <!-- Kategori Temuan -->
+                            <div class="mb-4 flex flex-col">
+                                <label for="kategori" class="block text-sm font-medium text-gray-700">
+                                    Kategori Temuan 
+                                </label>
+                                    <div class="relative inline-flex" x-data="{ open: false, selected: '' }">
+                                        <button 
+                                            type="button" 
+                                            class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white"
+                                            @click.prevent="open = !open" 
+                                            :aria-expanded="open" 
+                                            aria-haspopup="true"
+                                        >
+                                        <div class="flex justify-between items-center">
+
+                                            <span x-text="selected || 'Pilih Kategori'"></span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M6 9l6 6 6-6"></path>
                                             </svg>
                                         </div>
-                                    
-                                        <!-- Dropdown List -->
-                                        <ul 
-                                            x-show="open" 
+                                        </button>
+                                        
+
+                                        <!-- Dropdown Menu -->
+                                        <div 
+                                            class="origin-top-right z-10 absolute top-full left-0 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 overflow-hidden"
+                                            x-show="open"
                                             x-transition:enter="transition ease-out duration-200 transform"
                                             x-transition:enter-start="opacity-0 -translate-y-2"
                                             x-transition:enter-end="opacity-100 translate-y-0"
                                             x-transition:leave="transition ease-out duration-200"
                                             x-transition:leave-start="opacity-100"
                                             x-transition:leave-end="opacity-0"
-                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
                                             x-cloak
-                                        >
-                                            <li @click="selected = 'Produksi'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Produksi</li>
-                                            <li @click="selected = 'Keamanan'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Keamanan</li>
-                                            <li @click="selected = 'Lingkungan'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Lingkungan</li>
-                                        </ul>
-                                    
-                                        <!-- Input Hidden untuk Submit Form -->
-                                        <input type="hidden" name="kategori_temuan" x-model="selected">
+                                            >
+                                                <ul class="text-sm">
+                                                    <li>
+                                                        <button 
+                                                            type="button" 
+                                                            class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                                            @click="selected = 'Kondisi Tidak Aman (Unsafe Condition)'; open = false"
+                                                        >
+                                                            Kondisi Tidak Aman (Unsafe Condition)
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button 
+                                                            type="button" 
+                                                            class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                                            @click="selected = 'Tindakan Tidak Aman (Unsafe Act)'; open = false"
+                                                        >
+                                                            Tindakan Tidak Aman (Unsafe Act)
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button 
+                                                            type="button" 
+                                                            class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                                            @click="selected = '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)'; open = false"
+                                                        >
+                                                            5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button 
+                                                            type="button" 
+                                                            class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                                            @click="selected = 'Near miss'; open = false"
+                                                        >
+                                                            Near miss
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                     
 
                                     {{-- Tanggal Temuan --}}
                                     <div class="mb-4">
                                         <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Temuan</label>
-                                        <input type="date" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tanggal_temuan" name="tanggal_temuan" required>
+                                        <input type="date" id="tanggal_temuan" name="tanggal_temuan" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
                                     </div>
 
                                     {{-- Departemen --}}
@@ -184,12 +226,18 @@
                                         </label>
                                         
                                         <!-- Tombol Dropdown -->
-                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <button 
+                                            type="button"
+                                            @click="open = !open" 
+                                            class="flex justify-between w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left"
+                                            :aria-expanded="open"
+                                            aria-haspopup="true"
+                                        >
                                             <span x-text="selected || 'Pilih Departemen'"></span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M6 9l6 6 6-6"></path>
                                             </svg>
-                                        </div>
+                                        </button>
                                     
                                         <!-- Dropdown List -->
                                         <ul 
@@ -200,26 +248,20 @@
                                             x-transition:leave="transition ease-out duration-200"
                                             x-transition:leave-start="opacity-100"
                                             x-transition:leave-end="opacity-0"
-                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                            class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
                                             x-cloak
                                         >
-                                            <li @click="selected = 'Manufacturing'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Manufacturing</li>
-                                            <li @click="selected = 'AME'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">AME</li>
-                                            <li @click="selected = 'Purchasing'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Purchasing</li>
-                                            <li @click="selected = 'PPIC'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">PPIC</li>
-                                            <li @click="selected = 'Quality'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Quality</li>
-                                            <li @click="selected = 'Maintenance'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Maintenance</li>
-                                            <li @click="selected = 'Product Mechanical Engineering'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Product Mechanical Engineering</li>
-                                            <li @click="selected = 'Process Engineering'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Process Engineering</li>
-                                            <li @click="selected = 'OPEX dan PDCA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">OPEX dan PDCA</li>
-                                            <li @click="selected = 'Accounting'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Accounting</li>
-                                            <li @click="selected = 'HR'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">HR</li>
-                                            <li @click="selected = 'GA EHS'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">GA EHS</li>
+                                            <template x-for="dept in ['Manufacturing', 'AME', 'Purchasing', 'PPIC', 'Quality', 'Maintenance', 'Product Mechanical Engineering', 'Process Engineering', 'OPEX dan PDCA', 'Accounting', 'HR', 'GA EHS']">
+                                                <li @click="selected = dept; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">
+                                                    <span x-text="dept"></span>
+                                                </li>
+                                            </template>
                                         </ul>
                                     
                                         <!-- Input Hidden untuk Submit Form -->
                                         <input type="hidden" name="departemen" x-model="selected">
                                     </div>
+                                    
                                     
 
                                     {{-- Nama PIC --}}
@@ -229,12 +271,18 @@
                                         </label>
                                         
                                         <!-- Tombol Dropdown -->
-                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <button 
+                                            type="button"
+                                            @click="open = !open" 
+                                            class="flex justify-between w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left"
+                                            :aria-expanded="open"
+                                            aria-haspopup="true"
+                                        >
                                             <span x-text="selected || 'Pilih PIC'"></span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M6 9l6 6 6-6"></path>
                                             </svg>
-                                        </div>
+                                        </button>
                                     
                                         <!-- Dropdown List -->
                                         <ul 
@@ -261,7 +309,7 @@
                                     {{-- Temuan Ketidaksesuaian --}}
                                     <div class="mb-4">
                                         <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
-                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
                                     </div>
 
                                     {{-- Tingkat Bahaya --}}
@@ -271,12 +319,21 @@
                                         </label>
                                         
                                         <!-- Tombol Dropdown -->
-                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                        <button 
+                                            type="button" 
+                                            class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white"
+                                            @click.prevent="open = !open" 
+                                            :aria-expanded="open" 
+                                            aria-haspopup="true"
+                                        >
+                                        <div class="flex justify-between items-center">
+
                                             <span x-text="selected || 'Pilih Tingkat Bahaya'"></span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M6 9l6 6 6-6"></path>
                                             </svg>
                                         </div>
+                                        </button>
                                     
                                         <!-- Dropdown List -->
                                         <ul 
@@ -302,13 +359,13 @@
                                      <!-- Rekomendasi -->
                                      <div class="mb-4">
                                         <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi</label>
-                                        <textarea class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
+                                        <textarea class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
                                     </div>
 
                                     <!-- Batas Waktu Perbaikan -->
                                     <div class="mb-4">
                                         <label for="batas_waktu" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Perbaikan</label>
-                                        <input type="date" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
+                                        <input type="date" id="batas_waktu" name="batas_waktu" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
                                     </div>
 
                                     <!-- Submit button -->

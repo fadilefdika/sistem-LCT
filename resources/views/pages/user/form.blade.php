@@ -1,7 +1,7 @@
 @extends('layouts.user-layout')
 
 @section('content')
-<div class="container mx-auto px-4 sm:px-6 md:px-8 mt-3 mb-6">
+<div class="container mx-auto pt-5 pb-4 sm:pb-6 md:pb-2 px-4 sm:px-6 md:px-8 mb-6">
     <div class="flex justify-center">
         <div class="w-full max-w-md md:max-w-lg lg:max-w-2xl">
 
@@ -26,12 +26,6 @@
                 <form action="#" method="POST" enctype="multipart/form-data">
                     @csrf
 
-                    <!-- Nama -->
-                    <div class="mb-4">
-                        <label for="nama" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                        <input type="text" id="nama" name="nama" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-
                     <!-- NPK -->
                     <div class="mb-4">
                         <label for="no_npk" class="block text-sm font-medium text-gray-700">NPK <span class="text-red-500">*</span></label>
@@ -46,8 +40,13 @@
                             style="-moz-appearance: textfield; -webkit-appearance: none;" 
                         >
                     </div>
-                    
 
+                    <!-- Nama -->
+                    <div class="mb-4">
+                        <label for="nama" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
+                        <input type="text" id="nama" name="nama" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
                     <!-- Tanggal Temuan -->
                     <div class="mb-4">
                         <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">Tanggal Temuan <span class="text-red-500">*</span></label>
@@ -156,7 +155,7 @@
                         <p class="text-xs text-gray-500 mt-1">Unggah foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                     </div>
 
-                    <!-- Kategori -->
+                    <!-- Kategori Temuan -->
                     <div class="mb-4 flex flex-col">
                             <label for="kategori" class="block text-sm font-medium text-gray-700">
                                 Kategori Temuan <span class="text-red-500">*</span>
