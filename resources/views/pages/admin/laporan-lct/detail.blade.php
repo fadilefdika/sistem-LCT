@@ -128,73 +128,187 @@
                                 @csrf
                                 <div class="space-y-6">
                                     <!-- Form fields -->
-                                    <div class="mb-4">
-                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
-                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
-                                    </div>
+
+                                    {{-- Area Temuan --}}
                                     <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
-                                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="area_temuan" name="area_temuan" required>
                                     </div>
-                                    <div class="mb-4">
-                                        <label for="departemen" class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="departemen" name="departemen" required>
-                                            <option value="">Pilih Departemen</option>
-                                            <option value="manufacturing">Manufacturing</option>
-                                            <option value="ame">AME</option>
-                                            <option value="purchasing">Purchasing</option>
-                                            <option value="ppic">PPIC</option>
-                                            <option value="quality">Quality</option>
-                                            <option value="maintenance">Maintenance</option>
-                                            <option value="pme">Product Mechanical Engineering</option>
-                                            <option value="pe">Process Engineering</option>
-                                            <option value="opexandpdca">OPEX dan PDCA</option>
-                                            <option value="accounting">Accounting</option>
-                                            <option value="hr">HR</option>
-                                            <option value="gaehs">GA EHS</option>
-                                        </select>
+
+                                    {{-- Kategori Temuan --}}
+                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
+                                        <label for="kategori_temuan" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Kategori Temuan
+                                        </label>
+                                        
+                                        <!-- Tombol Dropdown -->
+                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <span x-text="selected || 'Pilih Kategori Temuan'"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M6 9l6 6 6-6"></path>
+                                            </svg>
+                                        </div>
+                                    
+                                        <!-- Dropdown List -->
+                                        <ul 
+                                            x-show="open" 
+                                            x-transition:enter="transition ease-out duration-200 transform"
+                                            x-transition:enter-start="opacity-0 -translate-y-2"
+                                            x-transition:enter-end="opacity-100 translate-y-0"
+                                            x-transition:leave="transition ease-out duration-200"
+                                            x-transition:leave-start="opacity-100"
+                                            x-transition:leave-end="opacity-0"
+                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                            x-cloak
+                                        >
+                                            <li @click="selected = 'Produksi'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Produksi</li>
+                                            <li @click="selected = 'Keamanan'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Keamanan</li>
+                                            <li @click="selected = 'Lingkungan'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Lingkungan</li>
+                                        </ul>
+                                    
+                                        <!-- Input Hidden untuk Submit Form -->
+                                        <input type="hidden" name="kategori_temuan" x-model="selected">
                                     </div>
-                                    <div class="mb-4">
-                                        <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" required>
-                                            <option value="">Pilih PIC</option>
-                                            <option value="pic1">PIC 1</option>
-                                            <option value="pic2">PIC 2</option>
-                                            <option value="pic3">PIC 3</option>
-                                        </select>
-                                    </div>
+                                    
+
+                                    {{-- Tanggal Temuan --}}
                                     <div class="mb-4">
                                         <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Temuan</label>
-                                        <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tanggal_temuan" name="tanggal_temuan" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="kategori_temuan" class="block text-sm font-medium text-gray-700 mb-1">Kategori Temuan</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="kategori_temuan" name="kategori_temuan" required>
-                                            <option value="">Pilih Kategori Temuan</option>
-                                            <option value="produksi">Produksi</option>
-                                            <option value="keamanan">Keamanan</option>
-                                            <option value="lingkungan">Lingkungan</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700 mb-1">Tingkat Bahaya</label>
-                                        <select class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tingkat_bahaya" name="tingkat_bahaya" required>
-                                            <option value="">Pilih Tingkat Bahaya</option>
-                                            <option value="low">Low</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="high">High</option>
-                                        </select>
+                                        <input type="date" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="tanggal_temuan" name="tanggal_temuan" required>
                                     </div>
 
+                                    {{-- Departemen --}}
+                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
+                                        <label for="departemen" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Departemen
+                                        </label>
+                                        
+                                        <!-- Tombol Dropdown -->
+                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <span x-text="selected || 'Pilih Departemen'"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M6 9l6 6 6-6"></path>
+                                            </svg>
+                                        </div>
+                                    
+                                        <!-- Dropdown List -->
+                                        <ul 
+                                            x-show="open" 
+                                            x-transition:enter="transition ease-out duration-200 transform"
+                                            x-transition:enter-start="opacity-0 -translate-y-2"
+                                            x-transition:enter-end="opacity-100 translate-y-0"
+                                            x-transition:leave="transition ease-out duration-200"
+                                            x-transition:leave-start="opacity-100"
+                                            x-transition:leave-end="opacity-0"
+                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                            x-cloak
+                                        >
+                                            <li @click="selected = 'Manufacturing'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Manufacturing</li>
+                                            <li @click="selected = 'AME'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">AME</li>
+                                            <li @click="selected = 'Purchasing'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Purchasing</li>
+                                            <li @click="selected = 'PPIC'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">PPIC</li>
+                                            <li @click="selected = 'Quality'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Quality</li>
+                                            <li @click="selected = 'Maintenance'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Maintenance</li>
+                                            <li @click="selected = 'Product Mechanical Engineering'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Product Mechanical Engineering</li>
+                                            <li @click="selected = 'Process Engineering'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Process Engineering</li>
+                                            <li @click="selected = 'OPEX dan PDCA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">OPEX dan PDCA</li>
+                                            <li @click="selected = 'Accounting'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Accounting</li>
+                                            <li @click="selected = 'HR'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">HR</li>
+                                            <li @click="selected = 'GA EHS'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">GA EHS</li>
+                                        </ul>
+                                    
+                                        <!-- Input Hidden untuk Submit Form -->
+                                        <input type="hidden" name="departemen" x-model="selected">
+                                    </div>
+                                    
+
+                                    {{-- Nama PIC --}}
+                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
+                                        <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Nama PIC
+                                        </label>
+                                        
+                                        <!-- Tombol Dropdown -->
+                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <span x-text="selected || 'Pilih PIC'"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M6 9l6 6 6-6"></path>
+                                            </svg>
+                                        </div>
+                                    
+                                        <!-- Dropdown List -->
+                                        <ul 
+                                            x-show="open" 
+                                            x-transition:enter="transition ease-out duration-200 transform"
+                                            x-transition:enter-start="opacity-0 -translate-y-2"
+                                            x-transition:enter-end="opacity-100 translate-y-0"
+                                            x-transition:leave="transition ease-out duration-200"
+                                            x-transition:leave-start="opacity-100"
+                                            x-transition:leave-end="opacity-0"
+                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                            x-cloak
+                                        >
+                                            <li @click="selected = 'PIC 1'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">PIC 1</li>
+                                            <li @click="selected = 'PIC 2'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">PIC 2</li>
+                                            <li @click="selected = 'PIC 3'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">PIC 3</li>
+                                        </ul>
+                                    
+                                        <!-- Input Hidden untuk Submit Form -->
+                                        <input type="hidden" name="nama_pic" x-model="selected">
+                                    </div>
+                                    
+                                    
+                                    {{-- Temuan Ketidaksesuaian --}}
+                                    <div class="mb-4">
+                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
+                                    </div>
+
+                                    {{-- Tingkat Bahaya --}}
+                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
+                                        <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Tingkat Bahaya
+                                        </label>
+                                        
+                                        <!-- Tombol Dropdown -->
+                                        <div @click="open = !open" class="flex justify-between w-full p-3 border border-gray-800 rounded-md cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-primary">
+                                            <span x-text="selected || 'Pilih Tingkat Bahaya'"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M6 9l6 6 6-6"></path>
+                                            </svg>
+                                        </div>
+                                    
+                                        <!-- Dropdown List -->
+                                        <ul 
+                                            x-show="open" 
+                                            x-transition:enter="transition ease-out duration-200 transform"
+                                            x-transition:enter-start="opacity-0 -translate-y-2"
+                                            x-transition:enter-end="opacity-100 translate-y-0"
+                                            x-transition:leave="transition ease-out duration-200"
+                                            x-transition:leave-start="opacity-100"
+                                            x-transition:leave-end="opacity-0"
+                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                            x-cloak
+                                        >
+                                            <li @click="selected = 'Low'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Low</li>
+                                            <li @click="selected = 'Medium'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Medium</li>
+                                            <li @click="selected = 'High'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">High</li>
+                                        </ul>
+                                    
+                                        <!-- Input Hidden untuk Submit Form -->
+                                        <input type="hidden" name="tingkat_bahaya" x-model="selected">
+                                    </div>
+                                    
+                                     <!-- Rekomendasi -->
+                                     <div class="mb-4">
+                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi</label>
+                                        <textarea class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
+                                    </div>
+
+                                    <!-- Batas Waktu Perbaikan -->
                                     <div class="mb-4">
                                         <label for="batas_waktu" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Perbaikan</label>
-                                        <input type="date" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
-                                    </div>
-
-                                    <!-- Rekomendasi -->
-                                    <div class="mb-4">
-                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi</label>
-                                        <textarea class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
+                                        <input type="date" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="batas_waktu" name="batas_waktu" required>
                                     </div>
 
                                     <!-- Submit button -->
