@@ -8,11 +8,11 @@ class LaporanPerbaikanLCTController extends Controller
 {
     public function index()
     {
-        return view('pages.admin.laporan-perbaikan-lct.index');
+        return view('pages.admin.manajemen-lct.index');
     }
 
     public function detail()
     {
-        return view('pages.admin.laporan-perbaikan-lct.detail');
+        return view('pages.admin.manajemen-lct.detail');
     }
 }

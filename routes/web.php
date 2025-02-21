@@ -31,8 +31,8 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
     Route::get('/laporan-lct', [LaporanLCTController::class, 'index'])->name('admin.laporan-lct');
     Route::get('/laporan-lct/detail', [LaporanLCTController::class, 'detail'])->name('admin.laporan-lct.detail');
 
-    Route::get('/laporan-perbaikan-lct', [LaporanPerbaikanLCTController::class, 'index'])->name('admin.laporan-perbaikan-lct');
-    Route::get('/laporan-perbaikan-lct/detail', [LaporanPerbaikanLCTController::class, 'detail'])->name('admin.laporan-perbaikan-lct.detail');
+    Route::get('/manajemen-lct', [LaporanPerbaikanLCTController::class, 'index'])->name('admin.manajemen-lct');
+    Route::get('/manajemen-lct/detail', [LaporanPerbaikanLCTController::class, 'detail'])->name('admin.manajemen-lct.detail');
 
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
     Route::get('/progress-perbaikan/detail', [ProgressPerbaikanController::class, 'detail'])->name('admin.progress-perbaikan.detail');

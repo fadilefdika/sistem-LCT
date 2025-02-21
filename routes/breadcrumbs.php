@@ -43,15 +43,15 @@ Breadcrumbs::for('progress-perbaikan.detail', function (BreadcrumbTrail $trail) 
 });
 
 // laporan perbaikan lct
-Breadcrumbs::for('laporan-perbaikan-lct', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Laporan Perbaikan LCT', route('admin.laporan-perbaikan-lct'));
+    $trail->push('Manajemen LCT', route('admin.manajemen-lct'));
 });
 
 // laporan perbaikan lct detail
-Breadcrumbs::for('laporan-perbaikan-lct.detail', function (BreadcrumbTrail $trail) {
-    $trail->parent('laporan-perbaikan-lct');
-    $trail->push('Detail Laporan Perbaikan LCT #1233', route('admin.laporan-perbaikan-lct.detail'));
+Breadcrumbs::for('manajemen-lct.detail', function (BreadcrumbTrail $trail) {
+    $trail->parent('manajemen-lct');
+    $trail->push('Detail Manajemen LCT #1233', route('admin.manajemen-lct.detail'));
 });
 
 // laporan riwayat lct

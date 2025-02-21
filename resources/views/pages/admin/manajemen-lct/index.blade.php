@@ -1,5 +1,5 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('laporan-perbaikan-lct') }}
+    {{ Breadcrumbs::render('manajemen-lct') }}
     <section class="dark:bg-gray-900 p-3 sm:p-5">
         <div class="mx-auto max-w-screen-2xl">
             <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
@@ -34,7 +34,10 @@
                                     -
                                 </td>
                                 <td class="flex items-center justify-center px-4 py-3">
-                                    <a href="{{ route('admin.laporan-perbaikan-lct.detail') }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
+                                    <a href="{{ route('admin.manajemen-lct.detail', ['tab' => 'laporan']) }}"
+                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline ms-3">
+                                        Detail
+                                    </a>
                                     <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
                                 </td>
                             </tr>

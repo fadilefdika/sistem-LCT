@@ -37,7 +37,8 @@
                                     <a href="{{ route('admin.progress-perbaikan.detail', ['tab' => 'user']) }}"
                                         class="font-medium text-blue-600 dark:text-blue-500 hover:underline ms-3">
                                         Detail
-                                    </a><a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
+                                    </a>
+                                    <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
                                 </td>
                             </tr>
                         </tbody>
