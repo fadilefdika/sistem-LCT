@@ -7,6 +7,7 @@
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
+                                <th scope="col" class="px-4 py-3">No</th>
                                 <th scope="col" class="px-4 py-3">Temuan Ketidaksesuaian</th>
                                 <th scope="col" class="px-4 py-3">Detail Area</th>
                                 <th scope="col" class="px-4 py-3">Tingkat Bahaya</th>
@@ -18,6 +19,7 @@
                         </thead>
                         <tbody>
                             <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="px-4 py-3">1</td>
                                 <th scope="row" class="flex items-center px-4 py-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     Kerusakan Tempat Sampah
                                 </th>

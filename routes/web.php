@@ -8,6 +8,7 @@ use App\Http\Controllers\DataFeedController;
 use App\Http\Controllers\LaporanLCTController;
 use App\Http\Controllers\RiwayatLCTController;
 use App\Http\Controllers\LaporanPerbaikanLCTController;
+use App\Http\Controllers\ManajemenPICController;
 use App\Http\Controllers\ProgressPerbaikanController;
 
 /*
@@ -37,6 +38,8 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
     Route::get('/progress-perbaikan/detail', [ProgressPerbaikanController::class, 'detail'])->name('admin.progress-perbaikan.detail');
 
     Route::get('/riwayat-lct', [RiwayatLCTController::class, 'index'])->name('admin.riwayat-lct');
+
+    Route::get('/manajemen-pic', [ManajemenPICController::class, 'index'])->name('admin.manajemen-pic');
     
     // Route for getting the data feed
     Route::get('/json-data-feed', [DataFeedController::class, 'getDataFeed'])->name('json_data_feed');

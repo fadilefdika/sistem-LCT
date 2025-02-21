@@ -53,3 +53,15 @@ Breadcrumbs::for('laporan-perbaikan-lct.detail', function (BreadcrumbTrail $trai
     $trail->parent('laporan-perbaikan-lct');
     $trail->push('Detail Laporan Perbaikan LCT #1233', route('admin.laporan-perbaikan-lct.detail'));
 });
+
+// laporan riwayat lct
+Breadcrumbs::for('riwayat-lct', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Riwayat LCT', route('admin.riwayat-lct'));
+});
+
+// laporan manajemen pic
+Breadcrumbs::for('manajemen-pic', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Manajemen PIC', route('admin.manajemen-pic'));
+});
