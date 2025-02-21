@@ -18,7 +18,7 @@
                     </button>
 
                     <!-- Breadcrumbs -->
-                <div class="hidden lg:block">
+                <div class="block">
                     @if (Route::currentRouteName() === 'admin.dashboard')
                         {{ Breadcrumbs::render('dashboard') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct')

@@ -1,19 +1,19 @@
 @unless ($breadcrumbs->isEmpty())
-    <div class="bg-gray-100 px-4 mt-3 rounded-lg ">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+    <div class="bg-white lg:bg-gray-100 px-4 mt-0 lg:mt-3 rounded-lg ">
+        <h2 class="text-md md:text-lg font-semibold text-gray-800 dark:text-white">
             {{ $breadcrumbs->last()->title }}
         </h2>
 
         <nav class="flex items-center" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-2 rtl:space-x-reverse">
+            <ol class="inline-flex items-center space-x-1 md:space-x-2">
                 @foreach ($breadcrumbs as $breadcrumb)
                     <li class="inline-flex items-center">
                         @if ($breadcrumb->url && !$loop->last)
-                            <a href="{{ $breadcrumb->url }}" class="text-xs font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                            <a href="{{ $breadcrumb->url }}" class="text-[9px] md:text-xs font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
                                 {{ $breadcrumb->title }}
                             </a>
                         @else
-                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            <span class="text-[9px] md:text-xs font-medium text-gray-500 dark:text-gray-400">
                                 {{ $breadcrumb->title }}
                             </span>
                         @endif
