@@ -16,23 +16,36 @@
                             <rect x="4" y="17" width="16" height="2" />
                         </svg>
                     </button>
+
+                    <!-- Breadcrumbs -->
+                <div class="hidden lg:block">
+                    @if (Route::currentRouteName() === 'admin.dashboard')
+                        {{ Breadcrumbs::render('dashboard') }}
+                    @elseif (Route::currentRouteName() === 'admin.laporan-lct')
+                        {{ Breadcrumbs::render('laporan-lct') }}
+                    @elseif (Route::currentRouteName() === 'admin.laporan-lct.detail')
+                        {{ Breadcrumbs::render('laporan-lct.detail') }}
+                    @elseif (Route::currentRouteName() === 'admin.manajemen-lct')
+                        {{ Breadcrumbs::render('manajemen-lct') }}
+                    @elseif (Route::currentRouteName() === 'admin.manajemen-lct.detail')
+                        {{ Breadcrumbs::render('manajemen-lct.detail') }}
+                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan')
+                        {{ Breadcrumbs::render('progress-perbaikan') }}
+                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.detail')
+                        {{ Breadcrumbs::render('progress-perbaikan.detail') }}
+                    @elseif(Route::currentRouteName() === 'admin.riwayat-lct')
+                        {{ Breadcrumbs::render('riwayat-lct') }}
+                    @endif
+
+                </div>
             </div>
 
 
             <!-- Header: Right side -->
             <div class="flex items-center space-x-3">
 
-                <!-- Search Button with Modal -->
-                <x-modal-search />
-
                 <!-- Notifications button -->
-                <x-dropdown-notifications align="right" />
-
-                <!-- Info button -->
-                <x-dropdown-help align="right" />
-
-                <!-- Dark mode toggle -->
-                <x-theme-toggle />                
+                <x-dropdown-notifications align="right" />            
 
                 <!-- Divider -->
                 <hr class="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />

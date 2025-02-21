@@ -1,5 +1,4 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('progress-perbaikan.detail') }}
     <section class="dark:bg-gray-900 p-3 sm:p-5">
         <div class="mx-auto max-w-screen-2xl">
             <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">

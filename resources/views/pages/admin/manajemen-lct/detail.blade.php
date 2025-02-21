@@ -1,6 +1,4 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('manajemen-lct.detail') }}
-    
 
     <div x-data="{activeTab: 'laporan'}" class="px-5 pt-2 pb-8">
         <!-- Tabs -->

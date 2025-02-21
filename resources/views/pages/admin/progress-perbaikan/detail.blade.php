@@ -1,6 +1,4 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('progress-perbaikan.detail') }}
-
     <div x-data="{ activeTab: 'user' }" class="px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">

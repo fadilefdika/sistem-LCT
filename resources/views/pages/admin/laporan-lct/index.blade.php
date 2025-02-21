@@ -1,7 +1,5 @@
 <x-app-layout>
     
-    {{ Breadcrumbs::render('laporan-lct') }}
-
     <section class="dark:bg-gray-900 p-3 sm:p-5">
         <div class="mx-auto max-w-screen-xl">
             <!-- Start coding here -->
@@ -49,12 +47,11 @@
                                     <img src="{{ asset('images/user-36-06.jpg') }}" alt="User Image" class="w-20 h-20 object-cover">
                                 </td>
                                 <td class="px-4 py-3">Kondisi Tidak Aman</td>
-                                <td class="flex items-center justify-center px-4 py-3">
+                                <td class="px-4 py-3 mt-5 flex items-center justify-center gap-4">
                                     <a href="{{ route('admin.laporan-lct.detail') }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Detail</a>
-                                    <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
-                                </td>
+                                    <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline">Remove</a>
+                                </td>                                                                                            
                             </tr>
-                            
                         </tbody>
                     </table>
                 </div>

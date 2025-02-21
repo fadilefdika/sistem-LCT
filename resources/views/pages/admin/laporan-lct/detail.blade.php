@@ -1,5 +1,4 @@
 <x-app-layout>
-    {{ Breadcrumbs::render('laporan-lct.detail') }}
     <div class="max-h-screen flex justify-center items-center">
         <div class="grid md:grid-cols-2 justify-center w-full">
             <!-- Card Laporan dari Pelapor -->

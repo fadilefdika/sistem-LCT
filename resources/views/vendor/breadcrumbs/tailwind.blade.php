@@ -1,10 +1,10 @@
 @unless ($breadcrumbs->isEmpty())
-    <div class="bg-gray-100 px-4 mt-1 rounded-lg ">
+    <div class="bg-gray-100 px-4 mt-3 rounded-lg ">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
             {{ $breadcrumbs->last()->title }}
         </h2>
 
-        <nav class="flex items-center mt-2" aria-label="Breadcrumb">
+        <nav class="flex items-center" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-2 rtl:space-x-reverse">
                 @foreach ($breadcrumbs as $breadcrumb)
                     <li class="inline-flex items-center">
