@@ -6,7 +6,7 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionLCT extends Permission
 {
-    protected $table = 'permissions_lct';
+    protected $table = 'lct_permissions';
     protected $primaryKey = 'id'; // Pastikan sesuai dengan struktur database
 
     protected $fillable = ['name', 'guard_name'];

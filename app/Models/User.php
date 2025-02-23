@@ -38,7 +38,7 @@ class User extends Authenticatable
     // Relasi ke RoleLct melalui UserRoleLct
     public function roleLct()
     {
-        return $this->belongsToMany(RoleLct::class, 'user_roles_lct', 'user_id', 'role_lct_id');
+        return $this->belongsToMany(RoleLct::class, 'lct_user_roles', 'user_id', 'role_lct_id');
     }
 
     // Ambil nama role utama atau default sebagai "user"

@@ -1,5 +1,9 @@
 @extends('layouts.user-layout')
 
+@php
+    $user = Auth::user(); // Mengambil user yang sedang login
+@endphp
+
 @section('content')
 <div class="w-full pt-5 pb-4 sm:pb-6 md:pb-2 px-4 sm:px-0 md:px-8 mb-6">
     <div class="flex justify-center">
@@ -23,31 +27,43 @@
 
             <!-- Card Form -->
             <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 w-full">
-                <form action="#" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('laporan-lct.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- NPK -->
                         <div>
-                            <label for="no_npk" class="block text-sm font-medium text-gray-700">NPK <span class="text-red-500">*</span></label>
+                            <label for="no_npk" class="block text-sm font-medium text-gray-700">
+                                NPK <span class="text-red-500">*</span>
+                            </label>
                             <input 
                                 type="number" 
                                 id="no_npk" 
-                                name="no_npk" 
-                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                                name="no_npk"
+                                value="{{ $user->npk }}"
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
                                 required 
-                                min="0" 
-                                oninput="this.value = Math.max(this.value, 0)"  
-                                style="-moz-appearance: textfield; -webkit-appearance: none;" 
+                                disabled
                             >
                         </div>
-
+                    
                         <!-- Nama -->
                         <div>
-                            <label for="nama" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                            <input type="text" id="nama" name="nama" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                            <label for="nama" class="block text-sm font-medium text-gray-700">
+                                Nama <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nama" 
+                                name="nama" 
+                                value="{{ $user->fullname }}" 
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                                required 
+                                disabled
+                            >
                         </div>
                     </div>
+                    
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                         <!-- Tanggal Temuan -->
@@ -98,6 +114,8 @@
                                     <li @click="selected = 'Ruang Kompressor'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Kompressor</li>
                                 </ul>
                             </div>
+                            <!-- Hidden Input untuk menyimpan nilai -->
+                            <input type="hidden" name="area" x-ref="area" x-model="selected">
                             
                             <p class="text-xs text-gray-500 mt-1">Pilih area tempat temuan LCT ditemukan.</p> <!-- Deskripsi -->
                         </div>
@@ -106,16 +124,20 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                         <!-- Detail Area -->
                         <div class="order-1 md:order-2 flex flex-col relative" x-data="{ open: false }">
-                            <label for="detail-area" class="block text-sm font-medium text-gray-700">
+                            <label for="detail_area" class="block text-sm font-medium text-gray-700">
                                 Detail Area <span class="text-red-500">*</span>
                                 <button type="button" @click.prevent="open = !open" class="text-gray-500 hover:text-gray-700 focus:outline-none">
                                     <img src="{{ asset('images/question-mark-circle-svgrepo-com.svg') }}" alt="question-mark" class="w-4 h-4">
                                 </button>
                             </label>
-                    
-                            <input type="text" id="detail-area" name="detail-area" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+
+                            <!-- Input utama -->
+                            <input type="text" id="detail_area" name="detail_area" 
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                                required x-model="detailArea">
+
                             <p class="text-xs text-gray-500 mt-1">Masukkan detail lokasi atau area tempat temuan LCT. Untuk contoh: klik ikon tanda tanya.</p>    
-                    
+
                             <!-- Dropdown untuk contoh -->
                             <div
                                 class="origin-top-right z-10 absolute left-28 min-w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
@@ -132,10 +154,11 @@
                             >
                                 <div class="p-2">
                                     <p class="font-semibold mt-2">Contoh Pengisian:</p>
-                                    <p class="text-sm text-gray-600">Mis: FA Line 2 - CLuster Assy</p>
+                                    <p class="text-sm text-gray-600">Mis: FA Line 2 - Cluster Assy</p>
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- Unggah Foto -->
                         <div class="order-2 md:order-1">
@@ -164,12 +187,15 @@
                     
                     
                     <div class="flex flex-col md:flex-row gap-6 mt-4">
-                        <!-- Kategori Temuan -->
+                       <!-- Kategori Temuan -->
                         <div class="w-full md:w-1/2 flex flex-col">
                             <label for="kategori" class="block text-sm font-medium text-gray-700">
                                 Kategori Temuan <span class="text-red-500">*</span>
                             </label>
                             <div class="relative inline-flex" x-data="{ open: false, selected: '' }">
+                                <!-- Input Hidden untuk mengirimkan kategori ke backend -->
+                                <input type="hidden" name="kategori_temuan" x-model="selected">
+
                                 <button 
                                     type="button" 
                                     class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white"
@@ -184,7 +210,7 @@
                                         </svg>
                                     </div>
                                 </button>
-                    
+
                                 <!-- Dropdown Menu -->
                                 <div 
                                     class="origin-top-right z-10 absolute top-full left-0 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 overflow-hidden"
@@ -239,15 +265,16 @@
                             </div>
                             <p class="text-xs text-gray-500 mt-1">Pilih kategori yang sesuai dengan temuan LCT Anda. Misalnya, apakah ini berkaitan dengan kondisi atau tindakan yang tidak aman, atau masalah lainnya.</p>
                         </div>
+
                     
                         <!-- Temuan Ketidaksesuaian -->
                         <div class="w-full md:w-1/2">
-                            <label for="temuan" class="block text-sm font-medium text-gray-700">
+                            <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700">
                                 Temuan Ketidaksesuaian <span class="text-red-500">*</span>
                             </label>
                             <textarea 
-                                id="temuan" 
-                                name="temuan" 
+                                id="temuan_ketidaksesuaian" 
+                                name="temuan_ketidaksesuaian" 
                                 class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
                                 rows="4" 
                                 required
@@ -261,8 +288,8 @@
 
                     <!-- Rekomendasi Safety -->
                     <div class="mb-4">
-                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700">Rekomendasi Safety <span class="text-red-500">*</span></label>
-                        <textarea id="rekomendasi" name="rekomendasi" rows="4" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required></textarea>
+                        <label for="rekomendasi_safety" class="block text-sm font-medium text-gray-700">Rekomendasi Safety <span class="text-red-500">*</span></label>
+                        <textarea id="rekomendasi_safety" name="rekomendasi_safety" rows="4" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required></textarea>
                         <p class="text-xs text-gray-500">Masukkan rekomendasi untuk memperbaiki kondisi atau tindakan yang tidak aman. Berikan saran yang dapat membantu meningkatkan keselamatan di area tersebut.</p>
                     </div>
 

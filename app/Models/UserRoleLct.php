@@ -10,7 +10,7 @@ class UserRoleLct extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_roles_lct'; // Nama tabel
+    protected $table = 'lct_user_roles'; // Nama tabel
 
     protected $fillable = [
         'user_id', 

@@ -48,6 +48,9 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 // Middleware untuk User
 Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
+
+    Route::post('/laporan-lct/store', [LaporanLCTController::class, 'store'])->name('laporan-lct.store');
+
 });  
 
 // Cek Koneksi Database

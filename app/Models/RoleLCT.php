@@ -9,7 +9,7 @@ class RoleLct extends Model
 {
     use HasFactory;
 
-    protected $table = 'roles_lct'; 
+    protected $table = 'lct_roles'; 
 
     protected $fillable = [
         'nama_role',
@@ -18,7 +18,7 @@ class RoleLct extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_roles_lct', 'role_lct_id', 'user_id');
+        return $this->belongsToMany(User::class, 'lct_user_roles', 'role_lct_id', 'user_id');
     }
 
 }
