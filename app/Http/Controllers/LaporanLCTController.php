@@ -16,11 +16,20 @@ class LaporanLCTController extends Controller
         return view('pages.admin.laporan-lct.index');
     }
 
-    public function show($id)
-    {
-        $laporan = LaporanLCT::with('user')->findOrFail($id);
-        return view('laporan.detail', compact('laporan'));
-    }
+    public function show($id_laporan_lct)
+        {
+
+            $laporan = LaporanLCT::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+
+            if (!$laporan) {
+                abort(404, 'Laporan tidak ditemukan.');
+            }
+
+            return view('pages.admin.laporan-lct.show', compact('laporan'));
+        }
+
+
+
 
     public function store(Request $request)
     { 

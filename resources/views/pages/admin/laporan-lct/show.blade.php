@@ -1,17 +1,17 @@
-<x-app-layout>
-    <div class="max-h-screen flex justify-center items-center">
-        <div class="grid md:grid-cols-2 justify-center w-full">
+<x-app-layout class="h-screen overflow-hidden">
+    <div class="h-full">
+        <div class="grid md:grid-cols-2 justify-center w-full h-full">
             <!-- Card Laporan dari Pelapor -->
-            <div class="max-w-full mx-auto bg-[#F3F4F6] overflow-hidden h-[487px] overflow-y-auto 
-                        [&::-webkit-scrollbar]:w-1
-                        [&::-webkit-scrollbar-track]:rounded-full
-                        [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
-                        [&::-webkit-scrollbar-thumb]:bg-gray-300
-                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+            <div class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 h-full pb-20 max-h-[calc(100vh)] overflow-y-auto [&::-webkit-scrollbar]:w-1
+                [&::-webkit-scrollbar-track]:rounded-full
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+
                 
-                <div class="m-3 max-h-min rounded-lg">
+                <div class="max-h-min rounded-lg">
 
                     <!-- Card Laporan -->
                     <div class="bg-white p-5 rounded-xl shadow-md border ">
@@ -26,7 +26,7 @@
                         <!-- Isi Laporan -->
                         <div class="flex flex-col space-y-1 mt-4">
                             <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
-                            <p class="text-gray-900 font-semibold text-lg">Kerusakan Tempat Sampah</p>
+                            <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
                         </div>
                     </div>
 
@@ -40,7 +40,7 @@
                                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
                                 <p>Nama Pelapor</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->user->name}}</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->user->fullname}}</p>
                         </div>
 
                         <!-- Garis Pemisah -->
@@ -105,7 +105,7 @@
             
         
             <!-- Form Laporan Temuan -->
-            <div class="max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 h-[487px] overflow-y-auto [&::-webkit-scrollbar]:w-1
+            <div class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 pb-20 max-h-[calc(100vh)] overflow-y-auto [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
                 [&::-webkit-scrollbar-thumb]:rounded-full

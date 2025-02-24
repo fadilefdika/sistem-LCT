@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/laporan-lct', [LaporanLCTController::class, 'index'])->name('admin.laporan-lct');
-    Route::get('/laporan-lct/{id}', [LaporanLCTController::class, 'show'])->name('admin.laporan-lct.show');
+    Route::get('/laporan-lct/{id_laporan_lct}', [LaporanLCTController::class, 'show'])->name('admin.laporan-lct.show');
 
     Route::get('/manajemen-lct', [LaporanPerbaikanLCTController::class, 'index'])->name('admin.manajemen-lct');
     Route::get('/manajemen-lct/detail', [LaporanPerbaikanLCTController::class, 'detail'])->name('admin.manajemen-lct.detail');

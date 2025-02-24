@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class LaporanLCT extends Model
 {
     protected $table = 'lct_laporan'; // Pastikan sesuai dengan tabel di database
-    protected $primaryKey = 'id_laporan_lct';
+    protected $primaryKey = 'id';
      protected $fillable = [
         'id_laporan_lct',
         'user_id', 
@@ -45,6 +45,11 @@ class LaporanLCT extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id','id');
+    }
+
+    public static function findByLCTId($idLCT)
+    {
+        return self::where('id_laporan_lct', $idLCT)->first();
     }
 }
