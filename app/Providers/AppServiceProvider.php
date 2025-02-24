@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\LaporanLCT;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,8 +20,19 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        //
-    }
+    public function boot()
+{
+    View::composer('components.app.header', function ($view) {
+        $route = Route::current();
+        $laporan = null;
+
+        // Cek jika rute adalah admin.laporan-lct.show dan memiliki parameter id
+        if ($route && $route->getName() === 'admin.laporan-lct.show') {
+            $id_laporan_lct = $route->parameter('id_laporan_lct');
+            $laporan = LaporanLCT::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+        }
+
+        $view->with('laporan', $laporan);
+    });
+}
 }

@@ -1,5 +1,6 @@
 <?php // routes/breadcrumbs.php
 
+use App\Models\LaporanLCT;
 // Note: Laravel will automatically resolve `Breadcrumbs::` without
 // this import. This is nice for IDE syntax and refactoring.
 use Diglactic\Breadcrumbs\Breadcrumbs;
@@ -19,10 +20,11 @@ Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->push('Laporan LCT', route('admin.laporan-lct'));
 });
 
-Breadcrumbs::for('laporan-lct.detail', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('laporan-lct');
-    $trail->push('Detail Laporan LCT #1233', route('admin.laporan-lct.detail'));
+    $trail->push("Detail Laporan LCT #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
 });
+
 
 // // Home > Blog > [Category]
 // Breadcrumbs::for('category', function (BreadcrumbTrail $trail, $category) {

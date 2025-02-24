@@ -23,8 +23,8 @@
                         {{ Breadcrumbs::render('dashboard') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct')
                         {{ Breadcrumbs::render('laporan-lct') }}
-                    @elseif (Route::currentRouteName() === 'admin.laporan-lct.detail')
-                        {{ Breadcrumbs::render('laporan-lct.detail') }}
+                    @elseif (Route::currentRouteName() === 'admin.laporan-lct.show')
+                        {{ Breadcrumbs::render('laporan-lct.show', $laporan) }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct')
                         {{ Breadcrumbs::render('manajemen-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.detail')
