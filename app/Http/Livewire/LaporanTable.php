@@ -11,7 +11,7 @@ class LaporanTable extends Component
 
     public $search = '';
     public $filterKategori = '';
-    public $perPage = 10;
+    public $perPage = 10; // Default 10
 
     protected $paginationTheme = 'tailwind';
 
@@ -23,6 +23,11 @@ class LaporanTable extends Component
     public function updatingFilterKategori()
     {
         $this->resetPage();
+    }
+
+    public function updatingPerPage()
+    {
+        $this->resetPage(); // Reset pagination saat user mengubah jumlah per halaman
     }
 
     public function render()

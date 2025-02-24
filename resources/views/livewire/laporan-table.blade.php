@@ -5,6 +5,8 @@
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-3 p-2.5 focus:border-blue-500 focus:ring focus:ring-blue-300"
                 placeholder="Cari laporan..." />
         </div>
+
+        <!-- Dropdown untuk memilih kategori -->
         <div>
             <select wire:model="filterKategori"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:border-blue-500 focus:ring focus:ring-blue-300">
@@ -12,6 +14,17 @@
                 @foreach($kategoriOptions as $kategori)
                     <option value="{{ $kategori }}">{{ $kategori }}</option>
                 @endforeach
+            </select>
+        </div>
+
+        <!-- Dropdown untuk memilih jumlah baris per halaman -->
+        <div>
+            <select wire:model="perPage"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-1 pr-6">
+                <option value="5">5 Baris</option>
+                <option value="10">10 Baris</option>
+                <option value="25">25 Baris</option>
+                <option value="50">50 Baris</option>
             </select>
         </div>
     </div>
