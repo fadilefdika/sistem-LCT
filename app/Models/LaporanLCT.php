@@ -28,17 +28,20 @@ class LaporanLCT extends Model
         $bulan = Carbon::now()->format('m');
         $tahun = Carbon::now()->format('y');
 
-        // Ambil ID terbesar dalam bulan dan tahun ini
+        // Ambil ID terbesar dalam bulan dan tahun ini, pastikan ID yang diambil sudah dalam format angka
         $lastId = self::whereMonth('created_at', $bulan)
             ->whereYear('created_at', Carbon::now()->year)
-            ->max(DB::raw("TRY_CAST(id_laporan_lct AS INT)")); // Ganti UNSIGNED dengan TRY_CAST
+            ->max(DB::raw('CAST(SUBSTRING(id_laporan_lct, 1, 4) AS INT)')); // Ganti UNSIGNED dengan INT
 
+        // Increment ID, jika tidak ada ID maka mulai dari 1
         $nextId = $lastId ? ($lastId + 1) : 1;
+
+        // Format ID agar menjadi 4 digit, dengan padding 0 di depan
         $kodeUrut = str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
+        // Kembalikan format ID LCT
         return "{$kodeUrut}{$bulan}{$tahun}";
     }
-
 
     public function user()
     {

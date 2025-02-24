@@ -32,8 +32,8 @@ class LaporanLCTController extends Controller
 
     public function store(Request $request)
     { 
-        // dd($request->all());
-            // Ambil user yang sedang login
+            try{
+                // Ambil user yang sedang login
             $user = Auth::user();
     
             // Validasi input (tanpa nama & no_npk karena otomatis diambil)
@@ -45,9 +45,6 @@ class LaporanLCTController extends Controller
                 'temuan_ketidaksesuaian' => 'required|string',
                 'rekomendasi_safety' => 'required|string',
             ]);
-            
-    
-            // dd("ini validate",$validatedData);
 
             // Buat ID unik untuk laporan
             $idLCT = LaporanLCT::generateLCTId();
@@ -63,18 +60,6 @@ class LaporanLCTController extends Controller
                 // Simpan file dengan nama yang lebih bermakna
                 $buktiFotoPath = $file->storeAs('bukti_temuan', $filename, 'public');
             }
-
-            // dd('check',[
-            //     'id_laporan_lct' => $idLCT,
-            //     'user_id' => $user->id,
-            //     'tanggal_temuan' => $validatedData['tanggal_temuan'],
-            //     'area' => $validatedData['area'],
-            //     'detail_area' => $validatedData['detail_area'],
-            //     'kategori_temuan' => $validatedData['kategori_temuan'],
-            //     'temuan_ketidaksesuaian' => $validatedData['temuan_ketidaksesuaian'],
-            //     'rekomendasi_safety' => $validatedData['rekomendasi_safety'],
-            //     'bukti_temuan' => $buktiFotoPath,
-            // ]);
     
             // Simpan data ke database
             LaporanLCT::create([
@@ -90,6 +75,9 @@ class LaporanLCTController extends Controller
             ]);
 
             return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
+            }catch (\Exception $e){
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
     
 }
