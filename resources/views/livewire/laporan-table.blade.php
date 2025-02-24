@@ -43,6 +43,7 @@
                     <th scope="col" class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
+            
             <tbody>
                 @foreach($laporans as $index => $laporan)
                 <tr class="border-b hover:bg-gray-100">
@@ -70,6 +71,7 @@
                 @endforeach
             </tbody>
         </table>
+        
     </div>
 
     <div class="flex justify-between items-center my-4 px-4">

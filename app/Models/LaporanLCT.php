@@ -21,6 +21,10 @@ class LaporanLCT extends Model
         'rekomendasi_safety', 
         'bukti_temuan'
     ];
+    protected $casts = [
+        'visibility_role' => 'array'
+    ];
+
     public $timestamps = true;
 
     public static function generateLCTId()

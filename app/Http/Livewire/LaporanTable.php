@@ -26,6 +26,7 @@ class LaporanTable extends Component
         $this->resetPage();
     }
 
+
     public function updatingPerPage()
     {
         $this->resetPage();
