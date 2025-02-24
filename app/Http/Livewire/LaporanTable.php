@@ -27,7 +27,7 @@ class LaporanTable extends Component
 
     public function render()
     {
-        $query = LaporanLCT::query();
+        $query = LaporanLCT::with('user');
 
         if ($this->search) {
             $query->where('nama_pelapor', 'like', '%' . $this->search . '%')
