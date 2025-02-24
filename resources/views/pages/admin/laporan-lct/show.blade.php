@@ -40,7 +40,7 @@
                                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
                                 <p>Nama Pelapor</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Aziz</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->user->name}}</p>
                         </div>
 
                         <!-- Garis Pemisah -->
@@ -52,7 +52,7 @@
                                 <i class="fas fa-calendar-alt text-green-500"></i> <!-- Ikon Kalender -->
                                 <p>Tanggal Temuan</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">22-01-2024</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->tanggal_temuan}}</p>
                         </div>
 
                         <!-- Garis Pemisah -->
@@ -64,7 +64,7 @@
                                 <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
                                 <p>Area Temuan</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Gudang A</p>
+                            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
                         </div>
 
                     </div>
@@ -75,7 +75,7 @@
                             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
                             <p class="text-gray-500 text-xs">Kategori Temuan</p>
                         </div>
-                        <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">Kondisi Tidak Aman</p>
+                        <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">{{$laporan->kategori_temuan}}</p>
                     </div>
 
 
@@ -86,9 +86,7 @@
                             <p class="text-gray-500 text-xs">Rekomendasi Safety</p>
                         </div>
                         <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
-                            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Expedita voluptates, maxime assumenda 
-                            voluptatibus, iste quidem natus dignissimos nesciunt vero voluptate omnis officiis commodi fuga vel. 
-                            Mollitia earum, ipsum deserunt tempore in reiciendis ipsa obcaecati expedita!
+                            {{$laporan->rekomendasi_safety}}
                         </p>
                     </div>
 

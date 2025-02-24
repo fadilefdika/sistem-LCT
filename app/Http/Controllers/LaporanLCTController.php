@@ -13,21 +13,13 @@ class LaporanLCTController extends Controller
 {
     public function index()
     {
-        if (request()->ajax()) {
-            $users = User::select(['id', 'fullname', 'email', 'created_at']);
-
-            // dd($users);
-
-            return DataTables::of($users)
-                ->addIndexColumn() // Tambahkan nomor urut otomatis
-                ->make(true);
-        }
         return view('pages.admin.laporan-lct.index');
     }
 
-    public function detail()
+    public function show($id)
     {
-        return view('pages.admin.laporan-lct.detail');
+        $laporan = LaporanLCT::with('user')->findOrFail($id);
+        return view('laporan.detail', compact('laporan'));
     }
 
     public function store(Request $request)

@@ -1,7 +1,7 @@
 <x-app-layout>
     <section class="p-5">
         <div class="max-w-screen-xl mx-auto">
-            @livewire(\App\Http\Livewire\LaporanTable::class)
+            <livewire:laporan-table />
         </div>
     </section>
 </x-app-layout>

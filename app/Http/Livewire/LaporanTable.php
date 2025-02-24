@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Livewire;
 
 use Livewire\Component;
@@ -11,7 +12,7 @@ class LaporanTable extends Component
 
     public $search = '';
     public $filterKategori = '';
-    public $perPage = 10; // Default 10
+    public $perPage = 10;
 
     protected $paginationTheme = 'tailwind';
 
@@ -27,7 +28,7 @@ class LaporanTable extends Component
 
     public function updatingPerPage()
     {
-        $this->resetPage(); // Reset pagination saat user mengubah jumlah per halaman
+        $this->resetPage();
     }
 
     public function render()
