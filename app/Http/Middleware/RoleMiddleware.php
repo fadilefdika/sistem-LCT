@@ -19,12 +19,6 @@ class RoleMiddleware
         $user = Auth::user();
         $userRoles = $user->roleLct->pluck('nama_role')->toArray();
 
-        // Log::info('Middleware: Cek role user', [
-        //     'User ID' => $user->id,
-        //     'Roles dari User' => $userRoles,
-        //     'Roles yang Dibutuhkan' => $roles
-        // ]);
-
         if (!array_intersect($roles, $userRoles)) {
             // Log::info('Middleware: Akses ditolak untuk user ini');
             return redirect('/unauthorized')->with('error', 'Anda tidak memiliki izin untuk mengakses halaman ini.');

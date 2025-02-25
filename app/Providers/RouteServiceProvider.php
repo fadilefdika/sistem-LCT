@@ -17,14 +17,17 @@ class RouteServiceProvider extends ServiceProvider
     public static function home(): string
     {
         $user = Auth::user(); // Ambil user yang sedang login
-
+        // dd($user);
         if (!$user) {
             return '/login';
         }
 
         if ($user->roleLct->contains('nama_role', 'ehs')) {
             return '/dashboard';
-        } elseif ($user->roleLct->contains('nama_role', 'user')) {
+        }elseif ($user->roleLct->contains('nama_role', 'pic')) {
+            return '/dashboard';
+        } 
+        elseif ($user->roleLct->contains('nama_role', 'user')) {
             return '/users';
         }
 

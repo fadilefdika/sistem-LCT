@@ -25,7 +25,7 @@ use App\Http\Controllers\ProgressPerbaikanController;
 Route::redirect('/', 'login');
 
 // Middleware untuk Admin (EHS)
-Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:ehs,pic'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/laporan-lct', [LaporanLCTController::class, 'index'])->name('admin.laporan-lct');

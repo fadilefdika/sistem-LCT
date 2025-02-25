@@ -10,33 +10,45 @@ use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        $request->validate([
-            'npk' => 'required|string',
-            'password' => 'required|string',
-        ]);
+    // public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'npk' => 'required|string',
+    //         'password' => 'required|string',
+    //     ]);
 
-        $user = User::where('npk', $request->npk)->first();
+    //     // Ambil user berdasarkan NPK
+    //     $user = User::where('npk', $request->npk)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()->with('error', 'NPK atau password salah!');
-        }
+    //     // Jika user tidak ditemukan atau password salah, kembalikan error
+    //     if (!$user || !Hash::check($request->password, $user->password)) {
+    //         return back()->withInput()->withErrors(['npk' => 'NPK atau password salah!']);
+    //     } 
 
-        Auth::login($user);
+    //     // Login user
+    //     Auth::login($user);
+    //     dd(Auth::user());
+    //     // Cek apakah user memiliki role
+    //     $role = $user->roleLct->pluck('nama_role')->first();
+    //     dd($role);
 
-        // 🔥 Debug: Cek apakah user memiliki role
-        // dd(Auth::user()->roleLct);
+    //     if (!$role) {
+    //         Auth::logout(); // Logout user jika tidak ada role
+    //         return back()->withErrors(['npk' => 'Akun Anda belum memiliki role yang valid. Hubungi admin.']);
+    //     }
 
-        $role = $user->roleLct->pluck('nama_role')->first();
+    //     dd($role);
 
-        if ($role === 'ehs') {
-            return redirect('/dashboard')->with('success', 'Selamat datang Admin EHS!');
-        } else {
-            return redirect('/users')->with('success', 'Selamat datang User!');
-        }
+    //     // Redirect berdasarkan role
+    //     if ($role === 'ehs') {
+    //         return redirect()->intended('/dashboard')->with('success', 'Selamat datang EHS!');
+    //     } elseif ($role === 'pic') {
+    //         return redirect()->intended('/dashboard')->with('success', 'Selamat datang PIC!');
+    //     } else {
+    //         return redirect()->intended('/users')->with('success', 'Selamat datang User!');
+    //     }
+    // }
 
-    }
 
     
 
