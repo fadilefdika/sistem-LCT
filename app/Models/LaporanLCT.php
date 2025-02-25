@@ -10,7 +10,7 @@ class LaporanLCT extends Model
 {
     protected $table = 'lct_laporan'; // Pastikan sesuai dengan tabel di database
     protected $primaryKey = 'id';
-     protected $fillable = [
+    protected $fillable = [
         'id_laporan_lct',
         'user_id', 
         'tanggal_temuan', 
@@ -19,11 +19,20 @@ class LaporanLCT extends Model
         'kategori_temuan', 
         'temuan_ketidaksesuaian', 
         'rekomendasi_safety', 
-        'bukti_temuan'
+        'bukti_temuan',
+        'pic_id',   // Tambahkan ini
+        'departemen_id',   // Tambahkan ini
+        'tingkat_bahaya',  // Tambahkan ini
+        'rekomendasi',  // Tambahkan ini
+        'due_date',  // Tambahkan ini
+        'status_lct',  // Tambahkan ini
+        'visibility_role',  // Tambahkan ini
+        'role_last_updated',  // Tambahkan ini
     ];
+    
     protected $casts = [
-        'visibility_role' => 'array'
-    ];
+        'visibility_role' => 'array',
+    ];    
 
     public $timestamps = true;
 

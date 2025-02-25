@@ -120,7 +120,7 @@
                         <div class="w-full h-[2px] bg-gray-200 px-3"></div>
 
                         <div class="p-6">
-                            <form action="#{{-- route('laporan.store') --}}" method="POST">
+                            <form action="{{ route('admin.laporan-lct.assignToPic', ['id_laporan_lct' => $laporan->id_laporan_lct]); }}" method="POST">
                                 @csrf
                                 <div class="space-y-6">
                                     <!-- Form fields -->
@@ -227,7 +227,7 @@
                                                 </template>
                                             </ul>
                                             
-                                            <input type="hidden" name="departemen" x-model="selectedDept">
+                                            <input type="hidden" name="departemen_id" x-model="selectedDept">
                                         </div>
                                         
                                         <!-- Dropdown PIC -->
@@ -239,7 +239,7 @@
                                                 class="flex justify-between items-center w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left"
                                                 :disabled="filteredPics.length === 0"
                                             >
-                                                <span x-text="selectedPic ? filteredPics.find(pic => pic.user.id == selectedPic).user.fullname : 'Pilih PIC'"></span>
+                                                <span x-text="selectedPic ? filteredPics.find(pic => pic.id == selectedPic).user.fullname : 'Pilih PIC'"></span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                     :class="{'rotate-180': openPic}">
                                                     <path d="M6 9l6 6 6-6"></path>
@@ -251,17 +251,16 @@
                                                 @click.away="openPic = false"
                                                 class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
                                             >
-                                                <template x-for="pic in filteredPics" :key="pic.user.id">
-                                                    <li @click="selectedPic = pic.user.id; openPic = false" 
+                                                <template x-for="pic in filteredPics" :key="pic.id">
+                                                    <li @click="selectedPic = pic.id; openPic = false" 
                                                         class="px-4 py-2 cursor-pointer hover:bg-blue-100">
                                                         <span x-text="pic.user.fullname"></span>
                                                     </li>
                                                 </template>
                                             </ul>
                                             
-                                            <input type="hidden" name="nama_pic" x-model="selectedPic">
+                                            <input type="hidden" name="pic_id" x-model="selectedPic">
                                         </div>
-
                                         
                                     
                                     {{-- Temuan Ketidaksesuaian --}}
@@ -322,8 +321,8 @@
 
                                     <!-- Batas Waktu Perbaikan -->
                                     <div class="mb-4">
-                                        <label for="batas_waktu" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Perbaikan</label>
-                                        <input type="date" id="batas_waktu" name="batas_waktu" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
+                                        <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu Perbaikan</label>
+                                        <input type="date" id="due_date" name="due_date" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
                                     </div>
 
                                     <!-- Submit button -->
@@ -365,4 +364,15 @@
         });
         </script>
         
+        @if (session('success'))
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            </script>
+        @endif
 </x-app-layout>

@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 
     Route::get('/laporan-lct', [LaporanLCTController::class, 'index'])->name('admin.laporan-lct');
     Route::get('/laporan-lct/{id_laporan_lct}', [LaporanLCTController::class, 'show'])->name('admin.laporan-lct.show');
+    Route::post('/laporan-lct/{id_laporan_lct}/assign', [LaporanLCTController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
 
     Route::get('/manajemen-lct', [LaporanPerbaikanLCTController::class, 'index'])->name('admin.manajemen-lct');
     Route::get('/manajemen-lct/detail', [LaporanPerbaikanLCTController::class, 'detail'])->name('admin.manajemen-lct.detail');
