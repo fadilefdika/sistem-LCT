@@ -4,7 +4,7 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\LaporanLct;
+use App\Models\LaporanLCT;
 use Illuminate\Support\Facades\Auth;
 
 class LaporanTable extends Component
@@ -34,18 +34,13 @@ class LaporanTable extends Component
 
     public function render()
     {
-        $user = Auth::user(); // Ambil user yang sedang login
-
-        // Ambil laporan yang sesuai dengan departemen PIC
-        $query = LaporanLct::where('status_lct', 'in_progress')
-            ->where('departemen_id', $user->departemen_id)
-            ->with('user');
+        $query = LaporanLct::query(); // Menggunakan Query Builder langsung
 
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('nama_pelapor', 'like', '%' . $this->search . '%')
-                  ->orWhere('kategori_temuan', 'like', '%' . $this->search . '%')
-                  ->orWhere('area', 'like', '%' . $this->search . '%');
+                ->orWhere('kategori_temuan', 'like', '%' . $this->search . '%')
+                ->orWhere('area', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -53,11 +48,13 @@ class LaporanTable extends Component
             $query->where('kategori_temuan', $this->filterKategori);
         }
 
+        // Pastikan kita pakai paginate sebelum return
         $laporans = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.laporan-table', [
             'laporans' => $laporans,
             'kategoriOptions' => LaporanLct::select('kategori_temuan')->distinct()->pluck('kategori_temuan'),
         ]);
+
     }
 }

@@ -52,7 +52,11 @@
             <x-app.sidebar :variant="$attributes['sidebarVariant']" />
 
             <!-- Content area -->
-            <div class="relative flex flex-col flex-1 overflow-hidden @if($attributes['background']){{ $attributes['background'] }}@endif" x-ref="contentarea">
+            <div class="relative flex flex-col flex-1" 
+                :class="{ 'overflow-hidden': page === 'admin.laporan-lct.show', 'overflow-y-auto': page === 'admin.laporan-lct' }" 
+                x-data="{ page: '' }"
+                x-init="page = '{{ Route::currentRouteName() }}'"
+                x-ref="contentarea">
 
                 <x-app.header :variant="$attributes['headerVariant']" />
 
@@ -61,6 +65,7 @@
                 </main>
 
             </div>
+
 
         </div>
 
