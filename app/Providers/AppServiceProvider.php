@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\LaporanLCT;
+use App\Models\LaporanLct;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         // Cek jika rute adalah admin.laporan-lct.show dan memiliki parameter id
         if ($route && $route->getName() === 'admin.laporan-lct.show') {
             $id_laporan_lct = $route->parameter('id_laporan_lct');
-            $laporan = LaporanLCT::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
         }
 
         $view->with('laporan', $laporan);

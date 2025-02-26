@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class RiwayatLCTController extends Controller
+class RiwayatLctController extends Controller
 {
     public function index()
     {

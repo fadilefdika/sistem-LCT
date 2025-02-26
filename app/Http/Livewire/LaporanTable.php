@@ -4,7 +4,7 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\LaporanLCT;
+use App\Models\LaporanLct;
 use Illuminate\Support\Facades\Auth;
 
 class LaporanTable extends Component
@@ -37,7 +37,7 @@ class LaporanTable extends Component
         $user = Auth::user(); // Ambil user yang sedang login
 
         // Ambil laporan yang sesuai dengan departemen PIC
-        $query = LaporanLCT::where('status_lct', 'in_progress')
+        $query = LaporanLct::where('status_lct', 'in_progress')
             ->where('departemen_id', $user->departemen_id)
             ->with('user');
 
@@ -57,7 +57,7 @@ class LaporanTable extends Component
 
         return view('livewire.laporan-table', [
             'laporans' => $laporans,
-            'kategoriOptions' => LaporanLCT::select('kategori_temuan')->distinct()->pluck('kategori_temuan'),
+            'kategoriOptions' => LaporanLct::select('kategori_temuan')->distinct()->pluck('kategori_temuan'),
         ]);
     }
 }

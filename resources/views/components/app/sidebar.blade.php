@@ -13,8 +13,7 @@
         class="flex lg:flex! flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-[100dvh] overflow-y-scroll lg:overflow-y-auto no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:w-64! shrink-0 bg-white dark:bg-gray-800 p-4 transition-all duration-200 ease-in-out shadow-md {{ $variant === 'v2' ? 'border-r border-gray-200 dark:border-gray-700/60' : 'rounded-r-2xl shadow-xs' }}"
         :class="sidebarOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-64'"
         @click.outside="sidebarOpen = false"
-        @keydown.escape.window="sidebarOpen = false"
-    >
+        @keydown.escape.window="sidebarOpen = false">
 
         <!-- Sidebar header -->
         <div class="flex justify-between mb-10 pr-3 sm:px-2">
@@ -71,6 +70,7 @@
                     </li>
 
                     <!-- Manajemen LCT -->
+                    @role('pic')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.manajemen-lct') }}">
                             <div class="flex items-center">
@@ -82,6 +82,7 @@
                             </div>
                         </a>
                     </li>
+                    @endrole
 
                     <!-- Progress Perbaikan -->
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">

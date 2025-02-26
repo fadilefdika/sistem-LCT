@@ -18,7 +18,7 @@ class RoleLct extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'lct_user_roles', 'role_lct_id', 'user_id');
+        return $this->belongsToMany(User::class, 'lct_user_roles', 'user_id', 'role_lct_id');
     }
 
 }

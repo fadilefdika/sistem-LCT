@@ -3,7 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
-use App\Models\LaporanLCT;
+use App\Models\LaporanLct;
 use Livewire\WithPagination;
 
 class ManajemenLCTTable extends Component
@@ -26,7 +26,7 @@ class ManajemenLCTTable extends Component
 
     public function render()
     {
-        $laporans = LaporanLCT::orderBy('created_at', 'desc')->paginate(10);
+        $laporans = LaporanLct::orderBy('created_at', 'desc')->paginate(10);
 
         return view('livewire.manajemen-lct-table',[
             'laporans' => $laporans,

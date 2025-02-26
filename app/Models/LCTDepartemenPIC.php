@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\LCTDepartement;
+use App\Models\LctDepartement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class LCTDepartemenPIC extends Model
+class LctDepartemenPic extends Model
 {
     use HasFactory;
 
@@ -18,7 +18,7 @@ class LCTDepartemenPIC extends Model
     // Relasi ke Departemen
     public function departemen()
     {
-        return $this->belongsTo(LCTDepartement::class, 'departemen_id');
+        return $this->belongsTo(LctDepartement::class, 'departemen_id');
     }
 
     // Relasi ke PIC (User)

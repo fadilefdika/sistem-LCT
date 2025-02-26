@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class LaporanLCT extends Model
+class LaporanLct extends Model
 {
     protected $table = 'lct_laporan'; // Pastikan sesuai dengan tabel di database
     protected $primaryKey = 'id';

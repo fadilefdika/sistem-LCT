@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PIC;
+use App\Models\Pic;
 use App\Models\User;
 
-use App\Models\LaporanLCT;
+use App\Models\LaporanLct;
 use Illuminate\Http\Request;
-use App\Models\LCTDepartement;
-use App\Models\LCTDepartemenPIC;
+use App\Models\LctDepartement;
+use App\Models\LctDepartemenPic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -18,7 +18,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\AssignToPicRequest;
 use App\Http\Requests\StoreLaporanRequest;
 
-class LaporanLCTController extends Controller
+class LaporanLctController extends Controller
 {
     public function index()
     {
@@ -28,9 +28,9 @@ class LaporanLCTController extends Controller
     //untuk di show detail laporan lct tampilan ehs 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLCT::with('user')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+        $laporan = LaporanLct::with('user')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
         $departemen = LctDepartement::all();
-        $picDepartemen=LCTDepartemenPIC::with(['departemen','pic.user'])->get();
+        $picDepartemen=LctDepartemenPic::with(['departemen','pic.user'])->get();
 
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen'));
     }
@@ -46,7 +46,7 @@ class LaporanLCTController extends Controller
             $user = Auth::user();
 
             // Buat ID unik untuk laporan
-            $idLCT = LaporanLCT::generateLCTId();
+            $idLCT = LaporanLct::generateLCTId();
 
             // Simpan gambar hanya jika diunggah
             $buktiFotoPath = null;
@@ -61,7 +61,7 @@ class LaporanLCTController extends Controller
             }
 
             // Simpan data ke database
-            LaporanLCT::create([
+            LaporanLct::create([
                 'id_laporan_lct' => $idLCT,
                 'user_id' => $user->id,
                 'tanggal_temuan' => $request->tanggal_temuan,

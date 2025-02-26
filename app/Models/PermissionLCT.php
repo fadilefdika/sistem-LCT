@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Spatie\Permission\Models\Permission;
 
-class PermissionLCT extends Permission
+class PermissionLct extends Permission
 {
     protected $table = 'lct_permissions';
     protected $primaryKey = 'id'; // Pastikan sesuai dengan struktur database

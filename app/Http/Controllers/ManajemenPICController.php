@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ManajemenPICController extends Controller
+class ManajemenPicController extends Controller
 {
     
     public function index()
