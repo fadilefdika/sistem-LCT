@@ -2,23 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Models\Role as SpatieRole;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
-class RoleLct extends Model
+
+class RoleLct extends SpatieRole
 {
-    use HasFactory;
-
     protected $table = 'lct_roles'; 
 
     protected $fillable = [
-        'nama_role',
-        'deskripsi' 
+        'name',  // Sesuai dengan nama kolom di tabel
+        'deskripsi',
+        'guard_name',
     ];
 
-    public function users()
+    public function getNameAttribute()
     {
-        return $this->belongsToMany(User::class, 'lct_user_roles', 'user_id', 'role_lct_id');
+        return $this->attributes['name'] ?? null;
     }
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+    }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PIC extends Model
+class Pic extends Model
 {
     use HasFactory;
     protected $table = 'lct_pic';

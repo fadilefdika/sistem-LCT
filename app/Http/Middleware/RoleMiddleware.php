@@ -17,7 +17,7 @@ class RoleMiddleware
         }
 
         $user = Auth::user();
-        $userRoles = $user->roleLct->pluck('nama_role')->toArray();
+        $userRoles = $user->roleLct->pluck('name')->toArray();
 
         if (!array_intersect($roles, $userRoles)) {
             // Log::info('Middleware: Akses ditolak untuk user ini');

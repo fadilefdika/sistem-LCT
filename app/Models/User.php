@@ -18,6 +18,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
     protected $table = 'users';
+    protected $guard_name = 'web';
 
     protected $fillable = [
         'npk',
@@ -38,13 +39,13 @@ class User extends Authenticatable
     // Relasi ke RoleLct melalui UserRoleLct
     public function roleLct()
     {
-        return $this->belongsToMany(RoleLct::class, 'lct_user_roles', 'user_id', 'role_lct_id');
+        return $this->belongsToMany(RoleLct::class, 'lct_user_roles', 'user_id', 'role_id');
     }
 
     // Ambil nama role utama atau default sebagai "user"
     public function getRoleNameAttribute()
     {
-        return $this->userRoleLct?->role->nama_role ?? 'user';
+        return $this->userRoleLct?->role->name ?? 'user';
     }
 }
 

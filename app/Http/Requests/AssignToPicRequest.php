@@ -8,7 +8,7 @@ class AssignToPicRequest extends FormRequest
 {
     public function authorize()
     {
-        return in_array('ehs', $this->user()->roleLct->pluck('nama_role')->toArray());
+        return in_array('ehs', $this->user()->roleLct->pluck('name')->toArray());
     }
     public function rules()
     {

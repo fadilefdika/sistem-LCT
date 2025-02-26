@@ -3,15 +3,16 @@
 namespace App\Models;
 
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
 
 class PermissionLct extends Permission
 {
     protected $table = 'lct_permissions';
-    protected $primaryKey = 'id'; // Pastikan sesuai dengan struktur database
 
     protected $fillable = ['name', 'guard_name'];
 
-    // Override atribut default Spatie
+    // Override atribut default Spatie agar tetap kompatibel
     public function getNameAttribute()
     {
         return $this->attributes['name'];

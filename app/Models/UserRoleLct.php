@@ -14,7 +14,7 @@ class UserRoleLct extends Model
 
     protected $fillable = [
         'user_id', 
-        'role_lct_id'
+        'role_id'
     ];
 
     // Relasi ke User
@@ -26,6 +26,6 @@ class UserRoleLct extends Model
     // Relasi ke RoleLct (Tabel roles_lct)
     public function role()
     {
-        return $this->belongsTo(RoleLct::class, 'role_lct_id');
+        return $this->belongsTo(RoleLct::class, 'role_id');
     }
 }

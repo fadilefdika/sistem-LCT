@@ -29,7 +29,7 @@ class AuthController extends Controller
     //     Auth::login($user);
     //     dd(Auth::user());
     //     // Cek apakah user memiliki role
-    //     $role = $user->roleLct->pluck('nama_role')->first();
+    //     $role = $user->roleLct->pluck('name')->first();
     //     dd($role);
 
     //     if (!$role) {

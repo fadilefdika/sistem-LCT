@@ -27,12 +27,12 @@ class AssignDefaultRole
         $existingRole = DB::table('lct_user_roles')->where('user_id', $user->id)->first();
 
         if (!$existingRole) {
-            $defaultRole = DB::table('roles_lct')->where('nama_role', 'user')->first();
+            $defaultRole = DB::table('roles_lct')->where('name', 'user')->first();
 
             if ($defaultRole) {
                 DB::table('lct_user_roles')->insert([
                     'user_id' => $user->id,
-                    'role_lct_id' => $defaultRole->id,
+                    'role_id' => $defaultRole->id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

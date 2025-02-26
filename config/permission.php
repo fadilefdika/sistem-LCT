@@ -7,15 +7,15 @@ return [
     ],
     
     'table_names' => [
-        'roles' => 'roles_lct', 
-        'permissions' => 'permissions_lct', 
-        'model_has_roles' => 'lct_user_roles', 
-        'model_has_permissions' => 'model_has_permissions_lct', 
-        'role_has_permissions' => 'roles_has_permissions_lct',
+        'roles' => 'lct_roles',
+        'permissions' => 'lct_permissions',
+        'model_has_permissions' => 'lct_user_permissions',
+        'model_has_roles' => 'lct_user_roles', // Ini yang penting!
+        'role_has_permissions' => 'lct_role_permissions',
     ],
-
     'column_names' => [
         'model_morph_key' => 'model_id',
     ],
+
 ];
 

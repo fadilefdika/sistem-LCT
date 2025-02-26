@@ -22,12 +22,12 @@ class RouteServiceProvider extends ServiceProvider
             return '/login';
         }
 
-        if ($user->roleLct->contains('nama_role', 'ehs')) {
+        if ($user->roleLct->contains('name', 'ehs')) {
             return '/dashboard';
-        }elseif ($user->roleLct->contains('nama_role', 'pic')) {
+        }elseif ($user->roleLct->contains('name', 'pic')) {
             return '/dashboard';
         } 
-        elseif ($user->roleLct->contains('nama_role', 'user')) {
+        elseif ($user->roleLct->contains('name', 'user')) {
             return '/users';
         }
 
