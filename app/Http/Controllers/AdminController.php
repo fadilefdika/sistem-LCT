@@ -9,9 +9,8 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $dataFeed = new DataFeed();
 
-        return view('pages/admin/dashboard', compact('dataFeed'))->with('layout', 'layouts.admin');
+        return view('pages/admin/dashboard')->with('layout', 'layouts.admin');
     }
 
 }

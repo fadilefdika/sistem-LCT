@@ -57,6 +57,7 @@
                     </li>
 
                     <!-- Laporan LCT -->
+                    @role('ehs')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('laporan-lct') || Request::is('laporan-lct/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('laporan-lct') || Request::is('laporan-lct/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.laporan-lct') }}">
                             <div class="flex items-center">
@@ -68,6 +69,7 @@
                             </div>
                         </a>
                     </li>
+                    @endrole
 
                     <!-- Manajemen LCT -->
                     @role('pic')
@@ -85,6 +87,7 @@
                     @endrole
 
                     <!-- Progress Perbaikan -->
+                    @role('ehs')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.progress-perbaikan') }}">
                             <div class="flex items-center">
@@ -95,20 +98,25 @@
                             </div>
                         </a>
                     </li>
+                    @endrole
 
                     <!-- Riwayat LCT -->
+                    @hasanyrole('pic|ehs') 
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('riwayat-lct')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('riwayat-lct')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.riwayat-lct') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 fill-current @if(Request::is('riwayat-lct')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                    <path d="M12 8v5h5v-2h-3V8h-2zM12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                                    <path d="M12 8v5h5v-2h-3V8h-2zM12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 0 0 1-8 8z"/>
                                 </svg>                                
                                 <span class="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Riwayat LCT for both</span>
                             </div>
                         </a>
                     </li>
+                    @endhasanyrole
+
 
                     <!-- Manajemen PIC -->
+                    @role('ehs')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('manajemen-pic')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('manajemen-pic')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.manajemen-pic') }}">
                             <div class="flex items-center">
@@ -118,6 +126,7 @@
                             </div>
                         </a>
                     </li>
+                    @endrole
 
                 </ul>
             </div>

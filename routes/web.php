@@ -23,10 +23,12 @@ use App\Http\Controllers\ProgressPerbaikanController;
 */
 
 Route::redirect('/', 'login');
+Route::middleware(['auth','verified', 'role:ehs,pic'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
 
 // Middleware untuk Admin (EHS)
 Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/laporan-lct', [LaporanLctController::class, 'index'])->name('admin.laporan-lct');
     Route::get('/laporan-lct/{id_laporan_lct}', [LaporanLctController::class, 'show'])->name('admin.laporan-lct.show');
