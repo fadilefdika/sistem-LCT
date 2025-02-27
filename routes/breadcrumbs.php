@@ -51,9 +51,9 @@ Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
 });
 
 // laporan perbaikan lct detail
-Breadcrumbs::for('manajemen-lct.detail', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('manajemen-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('manajemen-lct');
-    $trail->push('Detail Manajemen LCT #1233', route('admin.manajemen-lct.detail'));
+    $trail->push("Detail Laporan LCT #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
 });
 
 // laporan riwayat lct

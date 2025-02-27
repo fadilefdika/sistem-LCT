@@ -39,7 +39,7 @@
                         </td>
                         <td class="px-4 py-3">
                             
-                        <a href="#" class="text-blue-600 hover:underline">Detail</a>
+                            <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
                         </td>
                     </tr>
                 @endforeach
