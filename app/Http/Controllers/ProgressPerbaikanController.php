@@ -13,12 +13,15 @@ class ProgressPerbaikanController extends Controller
         return view('pages.admin.progress-perbaikan.index');
     }
 
-    public function detail()
+    public function show($id_laporan_lct)
     {
-        // $laporan = LaporanLct::with('user','picUser')->where('id_laporan_lct', $id_laporan_lct)->first();
-        // // dd($laporan);
+        $laporan = LaporanLct::with('user','picUser')->where('id_laporan_lct', $id_laporan_lct)->first();
 
+        if (!$laporan) {
+            return abort(404, 'Laporan tidak ditemukan');
+        }
 
-        return view('pages.admin.progress-perbaikan.detail');
+        return view('pages.admin.progress-perbaikan.show', compact('laporan'));
     }
+
 }

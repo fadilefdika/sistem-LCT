@@ -68,7 +68,7 @@
     
                 <!-- Tombol Aksi -->
                 <td class="px-6 py-4">
-                    <a href="{{ route('admin.progress-perbaikan.detail', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" 
+                    <a href="{{ route('admin.progress-perbaikan.show', $laporan->id_laporan_lct) }}" 
                         class="text-blue-600 hover:underline">
                         Detail
                     </a>                     

@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LaporanLctController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
 
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
-    Route::get('/progress-perbaikan/detail', [ProgressPerbaikanController::class, 'detail'])->name('admin.progress-perbaikan.detail');
+    Route::get('/progress-perbaikan/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('admin.progress-perbaikan.show');
 
     Route::get('/manajemen-pic', [ManajemenPicController::class, 'index'])->name('admin.manajemen-pic');
 });

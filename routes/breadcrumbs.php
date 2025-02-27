@@ -39,10 +39,11 @@ Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
 });
 
 // progress perbaikan detail 
-Breadcrumbs::for('progress-perbaikan.detail', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push('Detail Progress Perbaikan #1233', route('admin.progress-perbaikan.detail'));
+    $trail->push("Detail Progress Perbaikan #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
+
 
 // laporan perbaikan lct
 Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {

@@ -58,7 +58,7 @@
                 x-ref="contentarea"
                 :class="{ 
                     'overflow-hidden': page === 'admin.laporan-lct.show', 
-                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.detail'].includes(page) 
+                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.show'].includes(page) 
                 }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />
