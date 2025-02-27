@@ -17,76 +17,61 @@
             {{-- Laporan dari User --}}
             <div x-show="activeTab === 'user'">
                 <h2 class="text-lg font-semibold">Laporan dari User</h2>
-                <div class="my-3 max-h-min rounded-lg">
-
-                    <!-- Card Laporan -->
-                    <div class="bg-white p-5 rounded-xl shadow-md border ">
-                        <!-- Header -->
+                <div class="my-3 max-h-min rounded-lg grid grid-cols-2 gap-4">
+    
+                    <!-- Laporan dari Pelapor (Full Width) -->
+                    <div class="col-span-2 bg-white p-5 rounded-xl shadow-md border">
                         <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                             📝 Laporan dari Pelapor
                         </h5>
-                        
-                        <!-- Garis Pemisah -->
                         <div class="w-full h-[2px] bg-gray-200 my-3"></div>
-
-                        <!-- Isi Laporan -->
                         <div class="flex flex-col space-y-1 mt-4">
                             <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
                             <p class="text-gray-900 font-semibold text-lg">Kerusakan Tempat Sampah</p>
                         </div>
                     </div>
-
-
-                    <!-- Card Informasi Pelapor -->
-                    <div class="bg-white p-5 rounded-xl shadow-md mt-3 flex flex-row justify-around items-center">
-                        
-                        <!-- Nama Pelapor -->
-                        <div class="flex flex-col items-start">
-                            <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                                <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
-                                <p>Nama Pelapor</p>
+                
+                    <!-- Informasi Pelapor -->
+                    <div class="bg-white p-5 rounded-xl shadow-md flex flex-col gap-3">
+                        <h6 class="text-gray-500 text-xs uppercase tracking-wide">Informasi Pelapor</h6>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col items-start">
+                                <div class="flex flex-row items-center gap-1">
+                                    <i class="fas fa-user text-blue-500 text-xs"></i>
+                                    <p class="text-gray-500 text-xs">Nama Pelapor</p>
+                                </div>
+                                <p class="text-gray-900 font-semibold text-sm mt-1">Aziz</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Aziz</p>
-                        </div>
-
-                        <!-- Garis Pemisah -->
-                        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-
-                        <!-- Tanggal Temuan -->
-                        <div class="flex flex-col items-start">
-                            <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                                <i class="fas fa-calendar-alt text-green-500"></i> <!-- Ikon Kalender -->
-                                <p>Tanggal Temuan</p>
+                            <div class="flex flex-col items-start">
+                                <div class="flex flex-row items-center gap-1">
+                                    <i class="fas fa-calendar-alt text-green-500 text-xs"></i>
+                                    <p class="text-gray-500 text-xs">Tanggal Temuan</p>
+                                </div>
+                                <p class="text-gray-900 font-semibold text-sm mt-1">22-01-2024</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">22-01-2024</p>
-                        </div>
-
-                        <!-- Garis Pemisah -->
-                        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-
-                        <!-- Area Temuan -->
-                        <div class="flex flex-col items-start">
-                            <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                                <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                                <p>Area Temuan</p>
+                            <div class="flex flex-col items-start">
+                                <div class="flex flex-row items-center gap-1">
+                                    <i class="fas fa-map-marker-alt text-red-500 text-xs"></i>
+                                    <p class="text-gray-500 text-xs">Area Temuan</p>
+                                </div>
+                                <p class="text-gray-900 font-semibold text-sm mt-1">Gudang A</p>
                             </div>
-                            <p class="text-gray-900 font-semibold text-sm mt-1">Gudang A</p>
                         </div>
-
                     </div>
-
-                    <!-- Card Kategori Temuan -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+                
+                    <!-- Kategori Temuan -->
+                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
                         <div class="flex items-center space-x-2">
                             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
                             <p class="text-gray-500 text-xs">Kategori Temuan</p>
                         </div>
-                        <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">Kondisi Tidak Aman</p>
+                        <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">
+                            Kondisi Tidak Aman
+                        </p>
                     </div>
-
-
-                    <!-- Card Rekomendasi Safety -->
-                    <div class="bg-white p-4 rounded-lg border-gray-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+                
+                    <!-- Rekomendasi Safety -->
+                    <div class="bg-white p-4 rounded-lg border-gray-300 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2">
                         <div class="flex items-center space-x-2 mb-2">
                             <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
                             <p class="text-gray-500 text-xs">Rekomendasi Safety</p>
@@ -97,27 +82,28 @@
                             Mollitia earum, ipsum deserunt tempore in reiciendis ipsa obcaecati expedita!
                         </p>
                     </div>
-
-                    <!-- Card Gambar Temuan -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+                
+                    <!-- Gambar Temuan -->
+                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
                         <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
                         <div class="relative mt-2">
                             <img src="{{ asset('images/user-36-05.jpg') }}" 
-                                class="w-20 h-20 rounded-md shadow-md object-cover" 
+                                class="w-40 h-40 rounded-md shadow-md object-cover" 
                                 alt="Gambar Temuan">
                         </div>
                     </div>
-
+                
                 </div>
+                
             </div>
 
 
             {{-- Laporan dari PIC --}}
-            <div x-show="activeTab === 'pic'">
+            <div x-show="activeTab === 'pic'" class="oveflow-hidden">
                 <h2 class="text-lg font-semibold">Laporan dari PIC</h2>
                 <div class="grid md:grid-cols-2 justify-center w-full">
                     <!-- Card Laporan dari EHS -->
-                    <div class="w-full bg-[#F3F4F6] overflow-hidden h-[487px] overflow-y-auto 
+                    <div class="w-full bg-[#F3F4F6] overflow-hidden max-h-[calc(100vh)] overflow-y-auto 
                                 [&::-webkit-scrollbar]:w-1
                                 [&::-webkit-scrollbar-track]:rounded-full
                                 [&::-webkit-scrollbar-track]:bg-gray-100

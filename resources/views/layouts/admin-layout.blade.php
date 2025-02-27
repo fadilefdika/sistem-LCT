@@ -53,10 +53,13 @@
 
             <!-- Content area -->
             <div class="relative flex flex-col flex-1" 
-                :class="{ 'overflow-hidden': page === 'admin.laporan-lct.show', 'overflow-y-auto': page === 'admin.laporan-lct' }" 
                 x-data="{ page: '' }"
                 x-init="page = '{{ Route::currentRouteName() }}'"
-                x-ref="contentarea">
+                x-ref="contentarea"
+                :class="{ 
+                    'overflow-hidden': page === 'admin.laporan-lct.show', 
+                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.detail'].includes(page) 
+                }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />
 
@@ -65,6 +68,7 @@
                 </main>
 
             </div>
+
 
 
         </div>

@@ -13,17 +13,15 @@ class ProgressPerbaikanTable extends Component
 
     public function render()
     {
-        $user = Auth::user();
-        $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
-
-        // Ambil laporan yang sedang dalam perbaikan
-        $laporans = LaporanLct::where('status_lct', 'in_progress')
-            ->where('pic_id', $picId)
+        // Query laporan yang sedang dalam perbaikan
+        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        // dd($laporans);
         return view('livewire.progress-perbaikan-table', [
             'laporans' => $laporans
         ]);
     }
+
 }
