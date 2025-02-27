@@ -25,6 +25,8 @@ use App\Http\Controllers\ProgressPerbaikanController;
 Route::redirect('/', 'login');
 Route::middleware(['auth','verified', 'role:ehs,pic'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/riwayat-lct', [RiwayatLctController::class, 'index'])->name('admin.riwayat-lct');
 });
 
 // Middleware untuk Admin (EHS)
@@ -36,8 +38,6 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
     Route::get('/progress-perbaikan/detail', [ProgressPerbaikanController::class, 'detail'])->name('admin.progress-perbaikan.detail');
-
-    Route::get('/riwayat-lct', [RiwayatLctController::class, 'index'])->name('admin.riwayat-lct');
 
     Route::get('/manajemen-pic', [ManajemenPicController::class, 'index'])->name('admin.manajemen-pic');
 });

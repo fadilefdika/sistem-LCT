@@ -30,8 +30,8 @@
                         <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('d M Y') }}</td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded-full text-white text-xs font-semibold
-                                {{ $laporan->status_progress === 'Selesai' ? 'bg-green-500' : ($laporan->status_progress === 'Proses' ? 'bg-yellow-500' : 'bg-gray-500') }}">
-                                {{ $laporan->status_progress }}
+                                {{ $laporan->progress_status === 'Selesai' ? 'bg-green-500' : ($laporan->status_progress === 'Proses' ? 'bg-yellow-500' : 'bg-gray-500') }}">
+                                {{ $laporan->progress_status }}
                             </span>
                         </td>
                         <td class="px-4 py-3">

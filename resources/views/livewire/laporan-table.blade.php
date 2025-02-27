@@ -30,49 +30,58 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-700 border-collapse">
-            <thead class="text-xs text-black uppercase">
-                <tr>
-                    <th scope="col" class="px-4 py-3">No</th>
-                    <th scope="col" class="px-4 py-3">Nama Pelapor</th>
-                    <th scope="col" class="px-4 py-3">Temuan Ketidaksesuaian</th>
-                    <th scope="col" class="px-4 py-3">Tanggal</th>
-                    <th scope="col" class="px-4 py-3">Area</th>
-                    <th scope="col" class="px-4 py-3">Foto</th>
-                    <th scope="col" class="px-4 py-3">Kategori</th>
-                    <th scope="col" class="px-4 py-3">Actions</th>
-                </tr>
-            </thead>
-            
-            <tbody>
-                @foreach($laporans as $index => $laporan)
-                <tr class="border-b hover:bg-gray-100">
-                    <td class="px-4 py-3">{{ $laporans->firstItem() + $index }}</td>
-                    <td class="px-4 py-3">{{ $laporan->user->fullname }}</td>
-                    <td class="px-4 py-3 max-w-xs truncate cursor-pointer relative group">
-                        <span class="temuan-clamp" title="{{ $laporan->temuan_ketidaksesuaian }}">
-                            {{ $laporan->temuan_ketidaksesuaian }}
-                        </span>
-                        <span class="absolute hidden group-hover:block bg-black text-white text-xs rounded p-1 left-0 top-full w-auto max-w-sm">
-                            {{ $laporan->temuan_ketidaksesuaian }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('id')->translatedFormat('d F Y') }}</td>
-                    <td class="px-4 py-3">{{ $laporan->area }}</td>
-                    <td class="px-4 py-3">
-                        <img src="{{ asset('storage/' . $laporan->foto_temuan) }}" class="w-20 h-20 object-cover rounded-lg shadow">
-                    </td>
-                    <td class="px-4 py-3">{{ $laporan->kategori_temuan }}</td>
-                    <td class="px-4 py-3 flex items-center gap-2">
-                        <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
-                        <button wire:click="delete({{ $laporan->id }})" class="text-red-600 hover:underline">Hapus</button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        
+        @if(count($laporans) === 0)
+            <div class="p-4 bg-yellow-100 text-yellow-800 rounded-md text-center">
+                Tidak ada laporan yang tersedia.
+            </div>
+        @else
+            <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                <thead class="text-xs text-black uppercase">
+                    <tr>
+                        <th scope="col" class="px-4 py-3">No</th>
+                        <th scope="col" class="px-4 py-3">Nama Pelapor</th>
+                        <th scope="col" class="px-4 py-3">Temuan Ketidaksesuaian</th>
+                        <th scope="col" class="px-4 py-3">Tanggal</th>
+                        <th scope="col" class="px-4 py-3">Area</th>
+                        <th scope="col" class="px-4 py-3">Foto</th>
+                        <th scope="col" class="px-4 py-3">Kategori</th>
+                        <th scope="col" class="px-4 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($laporans as $index => $laporan)
+                    <tr class="border-b hover:bg-gray-100">
+                        <td class="px-4 py-3">{{ $laporans->firstItem() + $index }}</td>
+                        <td class="px-4 py-3">{{ $laporan->user->fullname }}</td>
+                        <td class="px-4 py-3 max-w-xs truncate cursor-pointer relative group">
+                            <span class="temuan-clamp" title="{{ $laporan->temuan_ketidaksesuaian }}">
+                                {{ $laporan->temuan_ketidaksesuaian }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('id')->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3">{{ $laporan->area }}</td>
+                        <td class="px-4 py-3">
+                            <img src="{{ asset('storage/' . $laporan->foto_temuan) }}" class="w-20 h-20 object-cover rounded-lg shadow">
+                        </td>
+                        <td class="px-4 py-3">{{ $laporan->kategori_temuan }}</td>
+                        <td class="px-4 py-3 flex items-center gap-2">
+                            <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
+                            <button wire:click="delete({{ $laporan->id }})" class="text-red-600 hover:underline">Hapus</button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
+
+    <p>cek</p> <!-- Ini harus selalu muncul -->
+
+    @if(isset($message))
+        <div class="p-4 bg-yellow-100 text-yellow-800 rounded-md">
+            {{ $message }}
+        </div>
+    @endif
 
     <div class="flex justify-between items-center my-4 px-4">
         <div>
