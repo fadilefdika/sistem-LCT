@@ -29,13 +29,33 @@
                         </td>
                         <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('d M Y') }}</td>
                         <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded-full text-white text-xs font-semibold
-                                {{ $laporan->progress_status === 'Selesai' ? 'bg-green-500' : ($laporan->status_progress === 'Proses' ? 'bg-yellow-500' : 'bg-gray-500') }}">
-                                {{ $laporan->progress_status }}
+                            @php
+                                $statusColors = [
+                                    'in_progress' => 'bg-gray-500', // Abu-abu untuk belum dibuka
+                                    'progress_work' => 'bg-blue-500', // Biru untuk sedang dikerjakan
+                                    'waiting_approval' => 'bg-yellow-500', // Kuning untuk menunggu persetujuan
+                                    'approved' => 'bg-green-500', // Hijau untuk disetujui
+                                    'closed' => 'bg-purple-500', // Ungu untuk laporan selesai
+                                    'rejected' => 'bg-red-500', // Merah untuk ditolak
+                                ];
+                        
+                                $statusLabels = [
+                                    'in_progress' => 'Belum Diproses',
+                                    'progress_work' => 'Sedang Dikerjakan',
+                                    'waiting_approval' => 'Menunggu Persetujuan',
+                                    'approved' => 'Disetujui',
+                                    'closed' => 'Selesai',
+                                    'rejected' => 'Ditolak',
+                                ];
+                            @endphp
+                        
+                            <span class="px-2 py-1 rounded-full text-white text-xs font-semibold {{ $statusColors[$laporan->status_lct] ?? 'bg-gray-300' }}">
+                                {{ $statusLabels[$laporan->status_lct] ?? 'Tidak Diketahui' }}
                             </span>
                         </td>
+                        
                         <td class="px-4 py-3">
-                            {{ $laporan->tanggal_selesai ? \Carbon\Carbon::parse($laporan->tanggal_selesai)->format('d M Y') : '-' }}
+                            {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('d M Y') : '-' }}
                         </td>
                         <td class="px-4 py-3">
                             

@@ -25,6 +25,7 @@ class LaporanLct extends Model
         'tingkat_bahaya',  // Tambahkan ini
         'rekomendasi',  // Tambahkan ini
         'due_date',  // Tambahkan ini
+        'date_completion',  // Tambahkan ini
         'status_lct',  // Tambahkan ini
         'visibility_role',  // Tambahkan ini
         'role_last_updated',  // Tambahkan ini

@@ -50,6 +50,12 @@ class LaporanPerbaikanLctController extends Controller
                 $buktiPerbaikan = Storage::putFileAs('bukti_perbaikan', $file, $filename);
             }
 
+            // dd([
+            //     'date_completion' => $request->date_completion,
+            //     'status_lct' => 'waiting_approval',
+            //     'bukti_perbaikan' => $buktiPerbaikan,
+            // ]);
+
             // Update laporan dengan data terbaru
             $laporan->update([
                 'date_completion' => $request->date_completion,
@@ -59,7 +65,7 @@ class LaporanPerbaikanLctController extends Controller
 
             DB::commit(); 
 
-            return redirect()->back()->with('success', 'Hasil perbaikan telah dikirim ke EHS.');
+            return redirect()->route('admin.manajemen-lct')->with('success', 'Hasil perbaikan telah dikirim ke EHS.');
         } catch (\Exception $e) {
             // dd("gagal");
             DB::rollBack(); // Batalkan transaksi jika ada error
