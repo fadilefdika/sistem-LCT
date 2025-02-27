@@ -116,20 +116,6 @@ class LaporanLctController extends Controller
         }
     }
 
-    //laporan dari user ke ehs 
-    public function submitPerbaikan(Request $request, $id)
-    {
-        $laporan = LaporanLct::findOrFail($id);
-        
-        $laporan->update([
-            'status_lct' => 'completed',
-            'visibility_role' => json_encode(['ehs']), // Hanya EHS bisa lihat
-            'role_last_updated' => 'pic'
-        ]);
-
-        return redirect()->back()->with('success', 'Hasil perbaikan dikirim ke EHS.');
-    }
-
     public function approveOrReject(Request $request, $id)
     {
         $laporan = LaporanLct::findOrFail($id);

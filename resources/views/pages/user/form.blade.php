@@ -43,7 +43,7 @@
                                 value="{{ $user->npk }}"
                                 class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
                                 required 
-                                disabled
+                                readonly
                             >
                         </div>
                     
@@ -59,7 +59,7 @@
                                 value="{{ $user->fullname }}" 
                                 class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
                                 required 
-                                disabled
+                                readonly
                             >
                         </div>
                     </div>

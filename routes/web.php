@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
     Route::get('/manajemen-lct', [LaporanPerbaikanLctController::class, 'index'])->name('admin.manajemen-lct');
     Route::get('/manajemen-lct/{id_laporan_lct}', [LaporanPerbaikanLctController::class, 'show'])->name('admin.manajemen-lct.show');
+    Route::post('/manajemen-lct/{id_laporan_lct}/store', [LaporanPerbaikanLctController::class, 'store'])->name('admin.manajemen-lct.store');
 });
 
 // Middleware untuk User

@@ -61,6 +61,17 @@ class LaporanLct extends Model
         return $this->belongsTo(User::class, 'user_id','id');
     }
 
+    public function pic()
+    {
+        return $this->belongsTo(User::class, 'pic_id', 'id');
+    }
+
+    // Relasi ke users melalui lct_pic
+    public function picUser()
+    {
+        return $this->hasOneThrough(User::class, Pic::class, 'id', 'id', 'pic_id', 'user_id');
+    }
+
     public static function findByLCTId($idLCT)
     {
         return self::where('id_laporan_lct', $idLCT)->first();

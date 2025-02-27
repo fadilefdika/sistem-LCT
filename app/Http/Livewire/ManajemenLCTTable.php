@@ -34,7 +34,7 @@ class ManajemenLCTTable extends Component
         $picId = Pic::where('user_id', $user->id)->value('id');
 
         // Query untuk mengambil laporan yang hanya sesuai dengan PIC dan Departemennya
-        $laporans = LaporanLct::where('status_lct', 'in_progress') // Hanya yang dikirim EHS
+        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work']) // Hanya yang dikirim EHS
             ->where('pic_id', $picId) // Hanya laporan yang ditugaskan ke PIC ini
             ->orderBy('created_at', 'desc')
             ->paginate(10);

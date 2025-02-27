@@ -128,7 +128,7 @@
                                     {{-- Area Temuan --}}
                                     <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
-                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" disabled>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" readonly>
                                     </div>
 
                                     <!-- Kategori Temuan -->
@@ -194,7 +194,7 @@
                                             id="tanggal_temuan" 
                                             name="tanggal_temuan" 
                                             class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
-                                            disabled>
+                                            readonly>
                                     </div>     
                                 
                                         <!-- Dropdown Departemen -->
@@ -266,7 +266,7 @@
                                     {{-- Temuan Ketidaksesuaian --}}
                                     <div class="mb-4">
                                         <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
-                                        <input type="text" value="{{$laporan->temuan_ketidaksesuaian}}" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" disabled>
+                                        <input type="text" value="{{$laporan->temuan_ketidaksesuaian}}" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" readonly>
                                     </div>
 
                                     {{-- Tingkat Bahaya --}}
@@ -326,7 +326,7 @@
                                     </div>
 
                                     <!-- Submit button -->
-                                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 cursor-pointer">
                                         Kirim Laporan
                                     </button>
                                 </div>
