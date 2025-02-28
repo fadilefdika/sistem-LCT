@@ -38,6 +38,9 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
     Route::get('/progress-perbaikan/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('admin.progress-perbaikan.show');
+    Route::post('/progress-perbaikan/{id_laporan_lct}/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('admin.progress-perbaikan.approve');
+    Route::post('/progress-perbaikan/{id_laporan_lct}/reject', [ProgressPerbaikanController::class, 'rejectLaporan'])->name('admin.progress-perbaikan.reject');
+    Route::post('/progress-perbaikan/{id_laporan_lct}/close', [ProgressPerbaikanController::class, 'closeLaporan'])->name('admin.progress-perbaikan.close');
 
     Route::get('/manajemen-pic', [ManajemenPicController::class, 'index'])->name('admin.manajemen-pic');
 });

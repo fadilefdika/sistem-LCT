@@ -41,7 +41,7 @@ Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Detail Progress Perbaikan #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Detail Progress Perbaikan LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
 
 
