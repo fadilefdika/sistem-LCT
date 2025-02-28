@@ -75,8 +75,6 @@
         @endif
     </div>
 
-    <p>cek</p> <!-- Ini harus selalu muncul -->
-
     @if(isset($message))
         <div class="p-4 bg-yellow-100 text-yellow-800 rounded-md">
             {{ $message }}

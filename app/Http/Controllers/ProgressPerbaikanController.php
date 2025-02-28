@@ -40,7 +40,7 @@ class ProgressPerbaikanController extends Controller
         // dd($laporan->status_lct);
         $laporan->save();
 
-        return redirect()->back()->with('approve', 'Laporan berhasil disetujui.');
+        return redirect()->back()->with('approve', 'Laporan perbaikan berhasil diapprove.');
     }
 
 
@@ -84,7 +84,7 @@ class ProgressPerbaikanController extends Controller
         $laporan->status_lct = 'closed';
         $laporan->save();
 
-        return response()->json(['message' => 'Laporan telah ditutup.']);
+        return redirect()->back()->with('closed', 'Laporan perbaikan berhasil diapprove.');
     }
 
 

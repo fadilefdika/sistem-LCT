@@ -91,6 +91,33 @@
                 });
             </script>
         @endif
+        @if (session('approve'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: '{{ session('approve') }}',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+            </script>
+        @endif
+        @if (session('closed'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'info', // Bisa diganti ke 'success' jika ingin warna hijau
+                        title: 'Laporan Closed!',
+                        text: '{{ session('closed') }}',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+            </script>
+        @endif
+
 
     </body>
 </html>

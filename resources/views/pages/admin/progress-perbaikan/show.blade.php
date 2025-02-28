@@ -230,6 +230,7 @@
                     
                 
                     <!-- Form Laporan Temuan -->
+                    
                     <div class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-1 pb-20 max-h-[calc(100vh)] overflow-y-auto [&::-webkit-scrollbar]:w-1
                         [&::-webkit-scrollbar-track]:rounded-full
                         [&::-webkit-scrollbar-track]:bg-gray-100
@@ -255,7 +256,7 @@
                                         <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                                             @csrf
                                             <button type="submit"
-                                                class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer">
+                                                class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer @if($laporan->date_completion)::disabled @endif">
                                                 Approve
                                             </button>
                                         </form>
@@ -305,32 +306,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Tambahkan SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // SweetAlert untuk status 'approve'
-            if(session('approve'))
-                Swal.fire({
-                    title: "Berhasil Disetujui!",
-                    text: "{{ session('approve') }}",
-                    icon: "success",
-                    confirmButtonText: "OK"
-                });
-        
-
-            // SweetAlert untuk error
-            if(session('error'))
-                Swal.fire({
-                    title: "Gagal!",
-                    text: "{{ session('error') }}",
-                    icon: "error",
-                    confirmButtonText: "Coba Lagi"
-                });
-        });
-    </script>
-
 
 </x-app-layout>
