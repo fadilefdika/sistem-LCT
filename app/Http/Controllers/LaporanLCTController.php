@@ -105,7 +105,7 @@ class LaporanLctController extends Controller
             ]);
             
             // dd("siap dikirim");
-            return redirect()->back()->with('success', 'Laporan berhasil dikirim ke PIC.');
+            return redirect('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('Gagal assign laporan ke PIC: Laporan tidak ditemukan', ['id_laporan_lct' => $id_laporan_lct]);
@@ -113,28 +113,6 @@ class LaporanLctController extends Controller
         } catch (\Exception $e) {
             Log::error('Gagal assign laporan ke PIC: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim laporan.');
-        }
-    }
-
-    public function approveOrReject(Request $request, $id)
-    {
-        $laporan = LaporanLct::findOrFail($id);
-        
-        if ($request->status == 'approved') {
-            $laporan->update([
-                'status_lct' => 'closed',
-                'visibility_role' => json_encode(['user', 'ehs', 'pic']), // Semua bisa lihat
-                'role_last_updated' => 'ehs'
-            ]);
-            return redirect()->back()->with('success', 'Laporan disetujui dan ditutup.');
-        } else {
-            $laporan->update([
-                'status_lct' => 'rejected',
-                'visibility_role' => json_encode(['ehs', 'pic']), // PIC masih bisa lihat untuk revisi
-                'catatan_ehs' => $request->catatan_ehs,
-                'role_last_updated' => 'ehs'
-            ]);
-            return redirect()->back()->with('error', 'Laporan dikembalikan ke PIC untuk revisi.');
         }
     }
 

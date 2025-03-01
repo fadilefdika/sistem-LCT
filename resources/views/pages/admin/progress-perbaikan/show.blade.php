@@ -141,65 +141,85 @@
 
                         
                             <!-- Card Informasi Pelapor -->
-                            <div class="bg-white p-5 rounded-xl shadow-md flex flex-wrap justify-around items-center space-y-3 sm:space-y-0">
-                        
-                                <!-- Nama Pelapor -->
-                                <div class="flex flex-col">
-                                    <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                                        <i class="fas fa-user text-blue-500"></i>
-                                        <p>Nama PIC</p>
+                            @php
+                                $dueDate = \Carbon\Carbon::parse($laporan->due_date);
+                                $now = \Carbon\Carbon::now();
+                                $diffInHours = $now->diffInHours($dueDate, false);
+                                $diffInDays = floor($diffInHours / 24);
+                                $remainingHours = $diffInHours % 24;
+
+                                $borderClass = 'border-green-500';
+                                if ($diffInDays < 0) {
+                                    $borderClass = 'border-red-500';
+                                } elseif ($diffInDays === 0 && $remainingHours < 24) {
+                                    $borderClass = 'border-yellow-500';
+                                }
+                            @endphp
+                            <div class="bg-white p-5 rounded-xl shadow-md border-l-4 
+                                {{ $diffInDays < 0 ? 'border-red-500' : ($diffInDays === 0 && $remainingHours < 24 ? 'border-yellow-500' : 'border-green-500') }}">
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-2 items-center">
+                                    
+                                    <!-- Nama Pelapor -->
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
+                                            <i class="fas fa-user text-blue-500"></i>
+                                            <p>Nama PIC</p>
+                                        </div>
+                                        <p class="text-gray-900 font-semibold text-sm mt-1">
+                                            {{ $laporan->picUser->fullname }}
+                                        </p>
                                     </div>
-                                    <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->picUser->fullname}}</p>
-                                </div>
-                        
-                                <!-- Garis Pemisah -->
-                                <div class="hidden sm:block w-[2px] bg-gray-300 h-10 rounded-full"></div>
-                        
-                                <!-- Due Date -->
-                                <div class="flex flex-col">
-                                    <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
-                                        <i class="fas fa-hourglass-half text-blue-500"></i>
-                                        <p>Due Date</p>
+
+                                    <!-- Garis Pemisah (Hanya Muncul di Layar Lebar) -->
+                                    <div class="hidden sm:flex justify-center">
+                                        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
                                     </div>
-                                    <p class="text-gray-900 font-semibold text-sm mt-1">
-                                        {{ \Carbon\Carbon::parse($laporan->due_date)->translatedFormat('d F Y') }}
-                                    </p>
+
+                                    <!-- Due Date -->
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
+                                            <i class="fas fa-hourglass-half text-blue-500"></i>
+                                            <p>Due Date</p>
+                                        </div>
+                                        <p class="text-gray-900 font-semibold text-sm mt-1">
+                                            {{ $dueDate->translatedFormat('d F Y') }}
+                                        </p>
+
+                                        <!-- Status -->
+                                        <p class="text-xs mt-1 font-semibold 
+                                            {{ $diffInDays < 0 ? 'text-red-500' : ($diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500') }}">
+                                            @if($diffInDays < 0)
+                                                ⚠️ Melewati batas waktu
+                                            @elseif($diffInDays === 0 && $remainingHours < 24)
+                                                ⏳ Batas waktu hampir habis
+                                            @else
+                                                ✅ Masih dalam batas waktu
+                                            @endif
+                                        </p>
+                                    </div>
+
                                 </div>
-                        
                             </div>
+
                         
                             <!-- Card Tanggal Selesai -->
-                            <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
+                            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 
+                                {{ $laporan->date_completion == null ? 'border-red-500' : 'border-green-500' }}">
                                 <div class="flex flex-col">
                                     <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
-                                        <i class="fas fa-calendar-alt text-green-500"></i>
+                                        <i class="fas fa-calendar-alt 
+                                            {{ $laporan->date_completion == null ? 'text-red-500' : 'text-green-500' }}"></i>
                                         <p>Tanggal Selesai</p>
                                     </div>
+                                    
                                     @if($laporan->date_completion == null)
-                                        <p class="text-gray-900 font-semibold text-sm mt-1">-</p>
+                                        <!-- Belum selesai -->
+                                        <p class="text-red-500 font-semibold text-sm mt-1">Belum selesai</p>
                                     @else
-                                        @php
-                                            $completionDate = \Carbon\Carbon::parse($laporan->date_completion);
-                                            $now = \Carbon\Carbon::now();
-                                            $diffInDays = $now->diffInDays($completionDate, false);
-                                            $diffInHours = $now->diffInHours($completionDate, false) % 24;
-                                        @endphp
-                                        <p class="text-gray-900 font-semibold text-sm mt-1">
-                                            {{ $completionDate->translatedFormat('d F Y') }}
-                                        </p>
-                                        @php
-                                            $completionDate = \Carbon\Carbon::parse($laporan->date_completion);
-                                            $now = \Carbon\Carbon::now();
-                                            $diffInHours = $now->diffInHours($completionDate, false);
-                                            $diffInDays = floor($diffInHours / 24); // Membulatkan ke bawah
-                                            $remainingHours = $diffInHours % 24; // Sisa jam setelah hari dihitung
-                                        @endphp
-                                        <p class="text-xs mt-1 {{ $diffInDays < 0 ? 'text-red-500 font-bold' : 'text-gray-500' }}">
-                                            @if($diffInDays < 0)
-                                                ⚠️ Terlambat {{ abs($diffInDays) }} hari {{ abs($remainingHours) }} jam
-                                            @else
-                                                ⏳ Sisa {{ $diffInDays }} hari {{ $remainingHours }} jam
-                                            @endif
+                                        <!-- Sudah selesai -->
+                                        <p class="text-green-500 font-semibold text-sm mt-1">
+                                            {{ \Carbon\Carbon::parse($laporan->date_completion)->translatedFormat('d F Y') }}
                                         </p>
                                     @endif
                                 </div>

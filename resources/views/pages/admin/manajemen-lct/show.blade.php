@@ -107,35 +107,36 @@
                                     rawDueDate: '{{$laporan->due_date}}', 
                                     today: new Date(), 
                                     formattedDueDate: '', 
-                                    daysLeft: 0 
-                                    }"
-                                    x-init="
-                                        let due = new Date(rawDueDate);
-                                        if (!isNaN(due)) {
-                                            formattedDueDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(due);
-                                            let diffTime = due - today;
-                                            daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                        } else {
-                                            formattedDueDate = 'Tanggal tidak valid';
-                                            daysLeft = null;
-                                        }
-                                    "
-                                    :class="daysLeft !== null && daysLeft < 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
-                                    class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col items-start">
-
+                                    daysLeft: 0, 
+                                    isApproved: ['approved', 'closed'].includes('{{ $laporan->status_lct }}')
+                                }"
+                                x-init="
+                                    let due = new Date(rawDueDate);
+                                    if (!isNaN(due)) {
+                                        formattedDueDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(due);
+                                        let diffTime = due - today;
+                                        daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                    } else {
+                                        formattedDueDate = 'Tanggal tidak valid';
+                                        daysLeft = null;
+                                    }
+                                "
+                                :class="daysLeft !== null && daysLeft < 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
+                                class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col items-start">
+                                
                                     <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
                                         <i class="fas fa-calendar-alt text-lg"
                                             :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'"></i>
                                         <p class="font-medium">Due Date</p>
                                     </div>
-
+                                
                                     <p class="text-sm font-semibold mt-1"
                                         :class="daysLeft !== null && daysLeft < 0 ? 'text-red-600' : 'text-gray-900'">
                                         <span x-text="formattedDueDate"></span>
                                     </p>
-
+                                
                                     <!-- Bagian Hitungan Mundur -->
-                                    <p class="text-xs font-medium mt-2"
+                                    <p x-show="!isApproved" class="text-xs font-medium mt-2"
                                         :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'">
                                         <template x-if="daysLeft !== null && daysLeft < 0">
                                             <span>Overdue sejak <span x-text="Math.abs(daysLeft)"></span> hari yang lalu</span>
@@ -148,6 +149,7 @@
                                         </template>
                                     </p>
                                 </div>
+                                
 
 
                             

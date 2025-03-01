@@ -30,18 +30,18 @@ class ProgressPerbaikanController extends Controller
 
     public function approveLaporan($id_laporan_lct)
     {
-        $laporan = LaporanLct::where('id_laporan_lct',$id_laporan_lct)->first();
+        $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
 
         if (!$laporan) {
             return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
         }
 
         $laporan->status_lct = 'approved';
-        // dd($laporan->status_lct);
         $laporan->save();
 
         return redirect()->back()->with('approve', 'Laporan perbaikan berhasil diapprove.');
     }
+
 
 
 
@@ -84,7 +84,7 @@ class ProgressPerbaikanController extends Controller
         $laporan->status_lct = 'closed';
         $laporan->save();
 
-        return redirect()->back()->with('closed', 'Laporan perbaikan berhasil diapprove.');
+        return redirect()->route('admin.progress-perbaikan')->with('closed', 'Laporan perbaikan berhasil diapprove.');
     }
 
 

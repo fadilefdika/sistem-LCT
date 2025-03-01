@@ -20,15 +20,15 @@ class LaporanLct extends Model
         'temuan_ketidaksesuaian', 
         'rekomendasi_safety', 
         'bukti_temuan',
-        'pic_id',   // Tambahkan ini
-        'departemen_id',   // Tambahkan ini
-        'tingkat_bahaya',  // Tambahkan ini
-        'rekomendasi',  // Tambahkan ini
-        'due_date',  // Tambahkan ini
-        'date_completion',  // Tambahkan ini
-        'status_lct',  // Tambahkan ini
-        'visibility_role',  // Tambahkan ini
-        'role_last_updated',  // Tambahkan ini
+        'pic_id',   
+        'departemen_id',   
+        'tingkat_bahaya',  
+        'rekomendasi',  
+        'due_date',  
+        'date_completion',  
+        'status_lct',  
+        'visibility_role',  
+        'role_last_updated',  
     ];
     
     protected $casts = [
