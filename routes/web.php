@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DataFeedController;
 use App\Http\Controllers\LaporanLctController;
 use App\Http\Controllers\RiwayatLctController;
-use App\Http\Controllers\LaporanPerbaikanLctController;
+use App\Http\Controllers\ManajemenLctController;
 use App\Http\Controllers\ManajemenPicController;
 use App\Http\Controllers\ProgressPerbaikanController;
 
@@ -47,9 +47,9 @@ Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
 
 // Middleware untuk PIC
 Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
-    Route::get('/manajemen-lct', [LaporanPerbaikanLctController::class, 'index'])->name('admin.manajemen-lct');
-    Route::get('/manajemen-lct/{id_laporan_lct}', [LaporanPerbaikanLctController::class, 'show'])->name('admin.manajemen-lct.show');
-    Route::post('/manajemen-lct/{id_laporan_lct}/store', [LaporanPerbaikanLctController::class, 'store'])->name('admin.manajemen-lct.store');
+    Route::get('/manajemen-lct', [ManajemenLctController::class, 'index'])->name('admin.manajemen-lct');
+    Route::get('/manajemen-lct/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('admin.manajemen-lct.show');
+    Route::post('/manajemen-lct/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('admin.manajemen-lct.store');
 });
 
 // Middleware untuk User

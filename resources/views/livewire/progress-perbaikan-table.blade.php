@@ -29,7 +29,7 @@
                 <!-- Tingkat Bahaya dengan Badge Warna -->
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 text-xs font-semibold text-white rounded-full 
-                        {{ $laporan->tingkat_bahaya === 'Tinggi' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Sedang' ? 'bg-yellow-500' : 'bg-green-500') }}">
+                        {{ $laporan->tingkat_bahaya === 'High' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Medium' ? 'bg-yellow-500' : 'bg-green-500') }}">
                         {{ $laporan->tingkat_bahaya }}
                     </span>
                 </td>

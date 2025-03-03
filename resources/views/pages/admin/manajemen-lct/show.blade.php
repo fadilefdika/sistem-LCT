@@ -7,19 +7,20 @@
                 class="px-4 py-2 focus:outline-none cursor-pointer">
                 Laporan LCT
             </button>
-            @if(in_array($laporan->tingkat_bahaya, ['High', 'Medium']))
-                <button @click="activeTab = 'task-and-timeline'" 
+            <!-- Menampilkan tombol Task & Timeline hanya jika status LCT adalah 'approved' dan tingkat bahaya Medium atau High -->
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && $laporan->status_lct === 'approved')
+            <button @click="activeTab = 'task-and-timeline'" 
                     :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                     class="px-4 py-2 focus:outline-none cursor-pointer">
-                    Task & Timeline
-                </button>
+                Task & Timeline
+            </button>
             @endif
         </div>
 
         <!-- Tab Content -->
         <div class="mt-1">
             <!-- Laporan -->
-            <div x-show="activeTab === 'laporan'">
+            <div x-show="activeTab === 'laporan'" >
                 <div class="max-h-screen flex justify-center items-center">
                     <div class="grid md:grid-cols-2 justify-center w-full">
                         <!-- Card Laporan dari EHS -->
@@ -276,11 +277,21 @@
                             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                                 <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
                                     <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
-                                        @if($laporan->status_lct === 'rejected')
-                                        <h5 class="text-xl font-bold">Formulir Revisi Perbaikan ke EHS</h5>
-                                        @else
-                                        <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Perbaikan ke EHS</h5>
-                                        @endif
+                                        @php
+                                            $formTitle = '';
+
+                                            if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                                                if ($laporan->status_lct === 'rejected') {
+                                                    $formTitle = 'Formulir Revisi Perbaikan Sementara ke EHS';
+                                                } else {
+                                                    $formTitle = 'Formulir Laporan Perbaikan Sementara ke EHS';
+                                                }
+                                            } elseif ($laporan->status_lct === 'rejected' && $laporan->tingkat_bahaya === 'Low') {
+                                                $formTitle = 'Formulir Revisi Perbaikan ke EHS';
+                                            }
+                                        @endphp
+
+                                        <h5 class="text-xl font-bold">{{ $formTitle }}</h5>
                                     </div>
                 
                                     <div class="w-full h-[2px] bg-gray-200 px-3"></div>
@@ -343,86 +354,148 @@
                 </div>
             </div>
 
-            <div x-show="activeTab === 'task-and-timeline'">
-                <div class="max-w-full bg-[#F3F4F6]">
-                    <div class="container mx-auto p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-bold">Task List LCT</h2>
-                            <button onclick="openTaskModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
-                                + Tambah Task & Timeline
-                            </button>
+            <div x-show="activeTab === 'task-and-timeline'" >
+                <div class="w-full mx-auto bg-[#F3F4F6] overflow-hidden max-h-[calc(100vh)] pb-36 pt-3 overflow-y-auto 
+                [&::-webkit-scrollbar]:w-1
+                [&::-webkit-scrollbar-track]:rounded-full
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">Pengajuan Anggaran untuk Perbaikan LCT</h2>
+            
+                    <!-- Form Pengajuan Anggaran -->
+                    <form action="{{-- route('submit-budget') --}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-6">
+                            <div x-data="{
+                                formattedAmount: '',
+                                formatAmount(value) {
+                                    // Menghapus semua karakter yang bukan angka
+                                    value = value.replace(/\D/g, '');
+                                    
+                                    // Menambahkan titik setiap 3 digit
+                                    this.formattedAmount = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                }
+                            }">
+                                <label for="budget_amount" class="block text-sm font-medium text-gray-700">Budget Amount</label>
+                                <input 
+                                    type="text" 
+                                    name="budget_amount" 
+                                    id="budget_amount" 
+                                    x-model="formattedAmount"
+                                    x-on:input="formatAmount($event.target.value)" 
+                                    required 
+                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md" 
+                                    placeholder="Enter amount"
+                                >
+                            </div>
                         </div>
+
+                        <div class="mb-6">
+                            <label for="budget_description" class="block text-sm font-medium text-gray-700">Deskripsi Anggaran</label>
+                            <textarea name="budget_description" id="budget_description" rows="4" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
+                        </div>
+
+                        <!-- Lampiran Bukti Pembayaran -->
+                        <div class="mb-6">
+                            <label for="payment_proof" class="block text-sm font-medium text-gray-700">Lampiran Bukti Pembayaran</label>
+                            
+                            <input 
+                                type="file" 
+                                name="payment_proof" 
+                                id="payment_proof" 
+                                accept="image/*,application/pdf" 
+                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <p class="text-sm text-gray-500 mt-2">Pilih file gambar atau PDF untuk bukti pembayaran.</p>
+                        </div>
+
+
+                        <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200">Ajukan Anggaran</button>
+                    </form>
+
                     
-                        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                            <table class="w-full border-collapse">
-                                <thead class="bg-gray-200">
-                                    <tr class="text-left">
-                                        <th class="p-3">No</th>
-                                        <th class="p-3">Nama Task</th>
-                                        <th class="p-3">Status</th>
-                                        <th class="p-3">Due Date</th>
-                                        <th class="p-3">Komentar</th>
-                                        <th class="p-3 text-center">Approve</th>
+                    <!-- After Approval -->
+                    @if($laporan->budget_approval == 'approved')
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold mb-4">Tugas dan Timeline</h3>
+            
+                        <!-- Task Form -->
+                        <form action="{{-- route('submit-task') --}}" method="POST">
+                            @csrf
+                            <div class="mb-4">
+                                <label for="task_name" class="block text-sm font-medium text-gray-700">Nama Tugas</label>
+                                <input type="text" name="task_name" id="task_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+            
+                            <div class="mb-4">
+                                <label for="task_description" class="block text-sm font-medium text-gray-700">Deskripsi Tugas</label>
+                                <textarea name="task_description" id="task_description" rows="3" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            </div>
+            
+                            <div class="mb-4">
+                                <label for="due_date" class="block text-sm font-medium text-gray-700">Tanggal Tenggat</label>
+                                <input type="date" name="due_date" id="due_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            </div>
+            
+                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Buat Tugas</button>
+                        </form>
+            
+                        <!-- Task Timeline -->
+                        <div class="mt-6">
+                            <h4 class="text-lg font-semibold mb-4">Progress Pengerjaan</h4>
+            
+                            <!-- Task Status Table -->
+                            <table class="min-w-full table-auto">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-2 border-b">Nama Tugas</th>
+                                        <th class="px-4 py-2 border-b">Status</th>
+                                        <th class="px-4 py-2 border-b">Tanggal Tenggat</th>
+                                        <th class="px-4 py-2 border-b">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php
-                                        $tasks = [
-                                            ['id' => 1, 'name' => 'Perbaikan Mesin A', 'status' => 'Belum Dimulai', 'timeline' => '2025-03-10'],
-                                            ['id' => 2, 'name' => 'Inspeksi Gudang', 'status' => 'Sedang Dikerjakan', 'timeline' => '2025-03-15'],
-                                            ['id' => 3, 'name' => 'Audit Keselamatan', 'status' => 'Menunggu Persetujuan', 'timeline' => '2025-03-20'],
-                                            ['id' => 4, 'name' => 'Pemasangan Rambu', 'status' => 'Selesai', 'timeline' => '2025-03-25'],
-                                        ];
-                                    @endphp
-                    
-                                    @foreach ($tasks as $index => $task)
-                                        <tr class="border-b hover:bg-gray-100 transition">
-                                            <td class="p-3">{{ $index + 1 }}</td>
-                                            <td class="p-3">{{ $task['name'] }}</td>
-                                            <td class="p-3">
-                                                <select class="border p-2 rounded-md bg-white" onchange="updateStatus({{ $task['id'] }}, this.value)">
-                                                    <option value="Belum Dimulai" {{ $task['status'] == 'Belum Dimulai' ? 'selected' : '' }}>Belum Dimulai</option>
-                                                    <option value="Sedang Dikerjakan" {{ $task['status'] == 'Sedang Dikerjakan' ? 'selected' : '' }}>Sedang Dikerjakan</option>
-                                                    <option value="Menunggu Persetujuan" {{ $task['status'] == 'Menunggu Persetujuan' ? 'selected' : '' }}>Menunggu Persetujuan</option>
-                                                    <option value="Selesai" {{ $task['status'] == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                                    @foreach($tasks as $task)
+                                    <tr>
+                                        <td class="px-4 py-2 border-b">{{ $task->task_name }}</td>
+                                        <td class="px-4 py-2 border-b">
+                                            <span :class="{
+                                                'text-green-500': '{{ $task->status }}' === 'completed',
+                                                'text-yellow-500': '{{ $task->status }}' === 'in_progress',
+                                                'text-red-500': '{{ $task->status }}' === 'pending'
+                                            }">{{ $task->status }}</span>
+                                        </td>
+                                        <td class="px-4 py-2 border-b">{{ $task->due_date }}</td>
+                                        <td class="px-4 py-2 border-b">
+                                            <!-- Change Status Button -->
+                                            <form action="{{ route('update-task-status', $task->id) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <select name="status" onchange="this.form.submit()" class="px-2 py-1 border border-gray-300 rounded-md">
+                                                    <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                    <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                                    <option value="completed" {{ $task->status === 'completed' ? 'selected' : '' }}>Completed</option>
                                                 </select>
-                                            </td>
-                                            <td class="p-3">{{ $task['timeline'] }}</td>
-                                            <td class="p-3">
-                                                <span class="cursor-pointer text-blue-500 hover:text-blue-700" onclick="showComments({{ $task['id'] }})">
-                                                    💬
-                                                </span>
-                                            </td>
-                                            <td class="p-3 text-center">
-                                                <input 
-                                                    type="checkbox" 
-                                                    class="h-5 w-5 text-green-500 border-gray-300 rounded" 
-                                                    {{ auth()->user()->role == 'pic' ? 'disabled' : '' }}
-                                                    onchange="approveTask({{ $task['id'] }}, this.checked)">
-                                            </td>
-                                        </tr>
+                                            </form>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
-
+            </div>
         </div>
     </div>
 
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                showConfirmButton: false,
-                timer: 2000
-            });
-        </script>
-    @endif
 </x-app-layout>
 
 

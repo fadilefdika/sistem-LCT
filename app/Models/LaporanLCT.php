@@ -27,6 +27,8 @@ class LaporanLct extends Model
         'due_date',  
         'date_completion',  
         'status_lct',  
+        'budget_approval',
+        'bukti_perbaikan',
     ];
     
   

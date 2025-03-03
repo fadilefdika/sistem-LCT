@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AssignToEhsRequest;
 
-class LaporanPerbaikanLctController extends Controller
+class ManajemenLctController extends Controller
 {
     public function index()
     {
