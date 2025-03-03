@@ -2,15 +2,27 @@
     <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'rejected']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
-            <button @click="activeTab = 'user'" :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none cursor-pointer">
+            <button @click="activeTab = 'user'" 
+                    :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                    class="px-4 py-2 focus:outline-none cursor-pointer">
                 User
             </button>
-            <button @click="activeTab = 'pic'" :class="activeTab === 'pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none cursor-pointer">
+        
+            <button @click="activeTab = 'pic'" 
+                    :class="activeTab === 'pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                    class="px-4 py-2 focus:outline-none cursor-pointer">
                 PIC
             </button>
+        
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && $laporan->status_lct === 'approved')
+                <button @click="activeTab = 'task-pic'" 
+                        :class="activeTab === 'task-pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                        class="px-4 py-2 focus:outline-none cursor-pointer">
+                    Task PIC
+                </button>
+            @endif
         </div>
+        
 
         <!-- Tab Content -->
         <div class="mt-4">
@@ -291,14 +303,14 @@
                                             Approve
                                         </button>
                                     </form>
-
-                                    <!-- Reject Button -->
+                                
                                     <button type="button" @click="rejected = true"
-                                        class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer">
+                                        class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
+                                        @if($laporan->status_lct === 'approved') disabled @endif>
                                         Reject
                                     </button>
                                 </div>
-
+                                
                                 <!-- Alasan Penolakan -->
                                 <div x-show="rejected" class="mt-4">
                                     <form @submit="rejected = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
@@ -322,17 +334,20 @@
 
                                 <!-- Status Laporan -->
                                 @if($laporan->status_lct === "approved")
-                                    <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
-                                        <p class="text-green-800 font-semibold">✅ Laporan telah disetujui.</p>
-                                        <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" @click="closed = true"
-                                                class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
-                                                Close
-                                            </button>
-                                        </form>
-                                    </div>
+                                    @if($laporan->tingkat_bahaya === 'Low')
+                                        <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
+                                            <p class="text-green-800 font-semibold">✅ Laporan telah disetujui.</p>
+                                            <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" @click="closed = true"
+                                                        class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
+                                                    Close
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
                                 @endif
+
 
                                 @if($laporan->rejectLaporan->isNotEmpty())
                                 <div class="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
@@ -370,6 +385,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {{-- Task dari PIC --}}
+            <div x-show="activeTab === 'task-pic'">
+                <p>ini buat mantau</p>
             </div>
         </div>
     </div>
