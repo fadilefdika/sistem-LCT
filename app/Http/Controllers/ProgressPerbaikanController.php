@@ -47,31 +47,37 @@ class ProgressPerbaikanController extends Controller
 
     public function rejectLaporan(Request $request, $id_laporan_lct)
     {
-        // dd("masuk reject");
         $request->validate([
             'alasan_reject' => 'required|string|max:255',
         ]);
-
+    
         DB::beginTransaction(); // Mulai transaksi database
         try {
-            $laporan = LaporanLct::findOrFail($id_laporan_lct);
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
+            if (!$laporan) {
+                return response()->json(['error' => 'Laporan tidak ditemukan'], 404);
+            }
+    
             $laporan->status_lct = 'rejected';
             $laporan->save();
-
+    
             // Simpan alasan ke tabel lct_laporan_reject
             RejectLaporan::create([
                 'id_laporan_lct' => $id_laporan_lct,
                 'alasan_reject' => $request->alasan_reject,
             ]);
-
-            DB::commit(); // Simpan perubahan jika tidak ada error
-            return response()->json(['message' => 'Laporan ditolak dengan alasan: ' . $request->alasan_reject], 200);
+    
+            DB::commit(); // ✅ Simpan perubahan ke database sebelum redirect
+    
+            // dd("sebelum redirect"); // ✅ Cek apakah kode sampai sini
+    
+            return redirect()->back()->with('reject', 'Laporan revisi berhasil dikirim ke PIC.');
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan semua perubahan jika ada error
-            return response()->json(['error' => 'Terjadi kesalahan saat menolak laporan.'], 500);
+            return response()->json(['error' => 'Terjadi kesalahan saat menolak laporan.', 'message' => $e->getMessage()], 500);
         }
     }
-
+    
 
     public function closeLaporan($id_laporan_lct)
     {

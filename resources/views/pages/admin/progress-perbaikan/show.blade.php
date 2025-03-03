@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: 'user' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ $laporan->status_lct === 'approved' ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
@@ -177,13 +177,6 @@
                                     </div>
 
                                     <!-- Due Date -->
-                                    @php
-                                        // Simulasi due date agar sudah lewat 3 hari
-                                        $dueDate = now()->subDays(3);
-                                        $diffInDays = now()->diffInDays($dueDate, false);
-                                        $remainingHours = now()->diffInHours($dueDate, false);
-                                    @endphp
-
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
                                             <i class="fas fa-hourglass-half text-blue-500"></i>
@@ -309,17 +302,20 @@
                                 
                                     <!-- Alasan Penolakan -->
                                     <div x-show="rejected" class="mt-4">
-                                        <form action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                        <form x-on:submit="console.log('Form dikirim'); rejected = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
                                             @csrf
                                             <label class="block text-gray-700 font-semibold">Alasan Penolakan:</label>
-                                            <textarea x-model="reason" rows="3"
+                                            <textarea x-model="reason" name="alasan_reject" rows="3"
                                                 class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
-                                            <button type="submit" @click="rejected = false"
+
+                                            <button type="submit"
                                                 class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
-                                                Kirim Penolakan
+                                                Kirim Revisi
                                             </button>
                                         </form>
                                     </div>
+
+
                                 
                                     <!-- Menampilkan status jika laporan telah disetujui -->
                                     @if($laporan->status_lct == "approved")

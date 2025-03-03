@@ -117,6 +117,19 @@
                 });
             </script>
         @endif
+        @if (session('reject'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Revisi!',
+                        text: '{{ session('reject') }}',
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+                });
+            </script>
+        @endif
 
 
     </body>

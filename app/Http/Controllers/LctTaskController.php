@@ -45,16 +45,23 @@ class LctTaskController extends Controller
 
 
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id_laporan_lct)
     {
-        $task = LctTask::findOrFail($id);
+        $task = LctTask::where('id_laporan_lct',$id_laporan_lct)->first();
+        if (!$task) {
+            return response()->json(['error' => 'Laporan tidak ditemukan'], 404);
+        }
+
         $task->update(['status' => $request->status]);
         return response()->json(['message' => 'Status berhasil diperbarui']);
     }
 
-    public function approve($id)
+    public function approve($id_laporan_lct)
     {
-        $task = LctTask::findOrFail($id);
+        $task = LctTask::where('id_laporan_lct',$id_laporan_lct)->first();
+        if (!$task) {
+            return response()->json(['error' => 'Laporan tidak ditemukan'], 404);
+        }
         $task->update(['status' => 'Selesai']);
         return response()->json(['message' => 'Task berhasil disetujui']);
     }
