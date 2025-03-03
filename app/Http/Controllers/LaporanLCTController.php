@@ -70,9 +70,8 @@ class LaporanLctController extends Controller
                 'kategori_temuan' => $request->kategori_temuan,
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'rekomendasi_safety' => $request->rekomendasi_safety,
-                'bukti_temuan' => $buktiFotoPath, // Bisa null
-                'status_lct' => 'open', // Status default ke open
-                'role_last_updated' => 'user',
+                'bukti_temuan' => $buktiFotoPath, 
+                'status_lct' => 'open', 
             ]);
 
             DB::commit(); // Simpan perubahan
@@ -82,7 +81,7 @@ class LaporanLctController extends Controller
             DB::rollBack(); // Batalkan jika ada error
 
             Log::error('Gagal menyimpan laporan LCT: ' . $e->getMessage()); // Logging error
-
+            
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
     }
@@ -91,8 +90,14 @@ class LaporanLctController extends Controller
     public function assignToPic(AssignToPicRequest $request, $id_laporan_lct)
     {
         try {
-            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
-            
+
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
+
+            if (!$laporan) {
+                abort(404, 'Data laporan tidak ditemukan');
+            }
+
+
             $laporan->update([
                 'pic_id' => $request->pic_id,
                 'departemen_id' => $request->departemen_id,
@@ -100,18 +105,15 @@ class LaporanLctController extends Controller
                 'rekomendasi' => $request->rekomendasi,
                 'due_date' => $request->due_date,
                 'status_lct' => 'in_progress',
-                'visibility_role' => json_encode(['ehs', 'pic']),
-                'role_last_updated' => 'ehs',
             ]);
             
-            // dd("siap dikirim");
-            return redirect('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
+            return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('Gagal assign laporan ke PIC: Laporan tidak ditemukan', ['id_laporan_lct' => $id_laporan_lct]);
+            // dd($e);
             return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
         } catch (\Exception $e) {
-            Log::error('Gagal assign laporan ke PIC: ' . $e->getMessage());
+            // dd($e);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim laporan.');
         }
     }

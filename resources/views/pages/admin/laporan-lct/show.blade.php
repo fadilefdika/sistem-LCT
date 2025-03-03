@@ -128,7 +128,7 @@
                                     {{-- Area Temuan --}}
                                     <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
-                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" readonly>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" readonly required>
                                     </div>
 
                                     <!-- Kategori Temuan -->
@@ -153,7 +153,7 @@
                                             </button>
                                     
                                             <!-- Hidden Input -->
-                                            <input type="hidden" name="kategori_temuan" x-model="selected">
+                                            <input type="hidden" name="kategori_temuan" x-model="selected" required>
                                     
                                             <!-- Dropdown Menu -->
                                             <div 
@@ -227,7 +227,7 @@
                                                 </template>
                                             </ul>
                                             
-                                            <input type="hidden" name="departemen_id" x-model="selectedDept">
+                                            <input type="hidden" name="departemen_id" x-model="selectedDept" required>
                                         </div>
                                         
                                         <!-- Dropdown PIC -->
@@ -259,7 +259,7 @@
                                                 </template>
                                             </ul>
                                             
-                                            <input type="hidden" name="pic_id" x-model="selectedPic">
+                                            <input type="hidden" name="pic_id" x-model="selectedPic" required>
                                         </div>
                                         
                                     
@@ -310,7 +310,7 @@
                                         </ul>
                                     
                                         <!-- Input Hidden untuk Submit Form -->
-                                        <input type="hidden" name="tingkat_bahaya" x-model="selected">
+                                        <input type="hidden" name="tingkat_bahaya" x-model="selected" required>
                                     </div>
                                     
                                      <!-- Rekomendasi -->
@@ -364,7 +364,7 @@
         });
         </script>
         
-        @if (session('success'))
+        {{-- @if (session('success'))
             <script>
                 Swal.fire({
                     icon: 'success',
@@ -374,5 +374,5 @@
                     timer: 2000
                 });
             </script>
-        @endif
+        @endif --}}
 </x-app-layout>

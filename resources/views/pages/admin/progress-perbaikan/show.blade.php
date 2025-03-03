@@ -177,6 +177,13 @@
                                     </div>
 
                                     <!-- Due Date -->
+                                    @php
+                                        // Simulasi due date agar sudah lewat 3 hari
+                                        $dueDate = now()->subDays(3);
+                                        $diffInDays = now()->diffInDays($dueDate, false);
+                                        $remainingHours = now()->diffInHours($dueDate, false);
+                                    @endphp
+
                                     <div class="flex flex-col">
                                         <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
                                             <i class="fas fa-hourglass-half text-blue-500"></i>
@@ -212,18 +219,30 @@
                                             {{ $laporan->date_completion == null ? 'text-red-500' : 'text-green-500' }}"></i>
                                         <p>Tanggal Selesai</p>
                                     </div>
-                                    
+
                                     @if($laporan->date_completion == null)
-                                        <!-- Belum selesai -->
+                                        <!-- Jika belum selesai -->
                                         <p class="text-red-500 font-semibold text-sm mt-1">Belum selesai</p>
                                     @else
-                                        <!-- Sudah selesai -->
-                                        <p class="text-green-500 font-semibold text-sm mt-1">
-                                            {{ \Carbon\Carbon::parse($laporan->date_completion)->translatedFormat('d F Y') }}
+                                        @php
+                                            $dueDate = \Carbon\Carbon::parse($laporan->due_date); // Ambil due date
+                                            $completionDate = \Carbon\Carbon::parse($laporan->date_completion); // Ambil tanggal selesai
+                                            $isLate = $completionDate->greaterThan($dueDate); // Cek apakah terlambat
+                                        @endphp
+
+                                        <!-- Jika sudah selesai -->
+                                        <p class="text-gray-900 font-semibold text-sm mt-1">
+                                            {{ $completionDate->translatedFormat('d F Y') }}
                                         </p>
+
+                                        @if($isLate)
+                                            <!-- Jika terlambat -->
+                                            <p class="text-xs text-red-500 font-medium mt-1">⚠️ Terlambat {{ $completionDate->diffInDays($dueDate) }} hari</p>
+                                        @endif
                                     @endif
                                 </div>
                             </div>
+
                         
                             <!-- Card Area Temuan -->
                             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">

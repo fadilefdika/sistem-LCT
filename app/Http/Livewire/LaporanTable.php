@@ -34,7 +34,7 @@ class LaporanTable extends Component
 
     public function render()
     {
-        $query = LaporanLct::query(); // Menggunakan Query Builder langsung
+        $query = LaporanLct::where('status_lct', 'open');
 
         if ($this->search) {
             $query->where(function ($q) {

@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pic;
+use App\Models\LctTask;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AssignToEhsRequest;
 
 class LaporanPerbaikanLctController extends Controller
@@ -20,14 +21,25 @@ class LaporanPerbaikanLctController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with('picUser')->where('id_laporan_lct', $id_laporan_lct)->first();
+        // Ambil laporan beserta PIC
+        $laporan = LaporanLct::with('picUser')
+            ->where('id_laporan_lct', $id_laporan_lct)
+            ->firstOrFail();
 
-        if($laporan->status_lct === 'in_progress') {
+        // Perbarui status jika masih 'in_progress'
+        if ($laporan->status_lct === 'in_progress') {
             $laporan->update(['status_lct' => 'progress_work']);
         }
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan'));
+        // Ambil semua task terkait laporan ini
+        $tasks = LctTask::with('pic')
+            ->where('id_laporan_lct', $id_laporan_lct)
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks'));
     }
+
 
     public function store(AssignToEhsRequest $request, $id_laporan_lct)
     {

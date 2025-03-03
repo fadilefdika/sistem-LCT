@@ -281,7 +281,67 @@
 
             <div x-show="activeTab === 'task-and-timeline'">
                 <div class="max-w-full bg-[#F3F4F6]">
-                    ini buat task 
+                    <div class="container mx-auto p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold">Task List LCT</h2>
+                            <button onclick="openTaskModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
+                                + Tambah Task & Timeline
+                            </button>
+                        </div>
+                    
+                        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                            <table class="w-full border-collapse">
+                                <thead class="bg-gray-200">
+                                    <tr class="text-left">
+                                        <th class="p-3">No</th>
+                                        <th class="p-3">Nama Task</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Due Date</th>
+                                        <th class="p-3">Komentar</th>
+                                        <th class="p-3 text-center">Approve</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $tasks = [
+                                            ['id' => 1, 'name' => 'Perbaikan Mesin A', 'status' => 'Belum Dimulai', 'timeline' => '2025-03-10'],
+                                            ['id' => 2, 'name' => 'Inspeksi Gudang', 'status' => 'Sedang Dikerjakan', 'timeline' => '2025-03-15'],
+                                            ['id' => 3, 'name' => 'Audit Keselamatan', 'status' => 'Menunggu Persetujuan', 'timeline' => '2025-03-20'],
+                                            ['id' => 4, 'name' => 'Pemasangan Rambu', 'status' => 'Selesai', 'timeline' => '2025-03-25'],
+                                        ];
+                                    @endphp
+                    
+                                    @foreach ($tasks as $index => $task)
+                                        <tr class="border-b hover:bg-gray-100 transition">
+                                            <td class="p-3">{{ $index + 1 }}</td>
+                                            <td class="p-3">{{ $task['name'] }}</td>
+                                            <td class="p-3">
+                                                <select class="border p-2 rounded-md bg-white" onchange="updateStatus({{ $task['id'] }}, this.value)">
+                                                    <option value="Belum Dimulai" {{ $task['status'] == 'Belum Dimulai' ? 'selected' : '' }}>Belum Dimulai</option>
+                                                    <option value="Sedang Dikerjakan" {{ $task['status'] == 'Sedang Dikerjakan' ? 'selected' : '' }}>Sedang Dikerjakan</option>
+                                                    <option value="Menunggu Persetujuan" {{ $task['status'] == 'Menunggu Persetujuan' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                                                    <option value="Selesai" {{ $task['status'] == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-3">{{ $task['timeline'] }}</td>
+                                            <td class="p-3">
+                                                <span class="cursor-pointer text-blue-500 hover:text-blue-700" onclick="showComments({{ $task['id'] }})">
+                                                    💬
+                                                </span>
+                                            </td>
+                                            <td class="p-3 text-center">
+                                                <input 
+                                                    type="checkbox" 
+                                                    class="h-5 w-5 text-green-500 border-gray-300 rounded" 
+                                                    {{ auth()->user()->role == 'pic' ? 'disabled' : '' }}
+                                                    onchange="approveTask({{ $task['id'] }}, this.checked)">
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 

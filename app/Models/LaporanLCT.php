@@ -27,13 +27,9 @@ class LaporanLct extends Model
         'due_date',  
         'date_completion',  
         'status_lct',  
-        'visibility_role',  
-        'role_last_updated',  
     ];
     
-    protected $casts = [
-        'visibility_role' => 'array',
-    ];    
+  
 
     public $timestamps = true;
 

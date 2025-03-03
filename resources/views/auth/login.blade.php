@@ -19,24 +19,19 @@
             </div>
         </div>
         <div class="flex items-center justify-between mt-6">
-            @if (Route::has('password.request'))
-                <div class="mr-1">
-                    <a class="text-sm underline hover:no-underline" href="{{ route('password.request') }}">
-                        {{ __('Forgot Password?') }}
-                    </a>
-                </div>
-            @endif            
-            <x-button class="ml-3">
+            <div></div> <!-- Elemen kosong agar tombol tetap di kanan -->
+            <x-button class="ml-3 cursor-pointer">
                 {{ __('Sign in') }}
-            </x-button>            
+            </x-button>
         </div>
+        
     </form>
     <x-validation-errors class="mt-4" />   
     <!-- Footer -->
-    <div class="pt-5 mt-6 border-t border-gray-100 dark:border-gray-700/60">
+    {{-- <div class="pt-5 mt-6 border-t border-gray-100 dark:border-gray-700/60">
         <div class="text-sm">
             {{ __('Don\'t you have an account?') }} <a class="font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-400" href="{{ route('register') }}">{{ __('Sign Up') }}</a>
         </div>
        
-    </div>
+    </div> --}}
 </x-authentication-layout>

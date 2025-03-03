@@ -20,7 +20,7 @@
                     <tr class="border-b hover:bg-gray-100">
                         <td class="px-4 py-3">{{ $index + 1 }}</td>
                         <td class="px-4 py-3">{{ $laporan->temuan_ketidaksesuaian }}</td>
-                        <td class="px-4 py-3">{{ $laporan->detail_area }}</td>
+                        <td class="px-4 py-3"> {{$laporan->area}} - {{ $laporan->detail_area }}</td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded-full text-white text-xs font-semibold
                                 {{ $laporan->tingkat_bahaya === 'Tinggi' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Sedang' ? 'bg-yellow-500' : 'bg-green-500') }}">

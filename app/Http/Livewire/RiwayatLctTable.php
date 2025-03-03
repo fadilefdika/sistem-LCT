@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\LaporanLct;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class RiwayatLctTable extends Component
@@ -13,17 +14,30 @@ class RiwayatLctTable extends Component
 
     public function render()
     {
-        $user = Auth::user();
-        $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+        // Mengambil user dengan relasi roleLct
+        $user = User::with('roleLct')->find(Auth::id());
 
-        // Ambil laporan yang sudah selesai atau ditolak
-        $laporans = LaporanLct::whereIn('status_lct', ['closed', 'rejected'])
-            ->where('pic_id', $picId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Ambil satu role jika roleLct hasMany
+        $role = optional($user->roleLct->first())->name;
+
+        if ($role === 'ehs') {
+            // Jika role-nya "ehs", ambil semua laporan dengan status "closed"
+            $laporans = LaporanLct::where('status_lct', 'closed')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else {
+            // Jika bukan "ehs", ambil laporan berdasarkan pic_id masing-masing
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+
+            $laporans = LaporanLct::where('status_lct', 'closed')
+                ->where('pic_id', $picId)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
 
         return view('livewire.riwayat-lct-table', [
-            'laporans' => $laporans
+            'laporans' => $laporans,
+            'role' => $role
         ]);
     }
 }
