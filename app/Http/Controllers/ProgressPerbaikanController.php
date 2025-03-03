@@ -19,14 +19,18 @@ class ProgressPerbaikanController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with('user','picUser')->where('id_laporan_lct', $id_laporan_lct)->first();
+        $laporan = LaporanLct::with(['user', 'picUser', 'rejectLaporan'])
+            ->where('id_laporan_lct', $id_laporan_lct)
+            ->first();
 
         if (!$laporan) {
             return abort(404, 'Laporan tidak ditemukan');
         }
+        
 
         return view('pages.admin.progress-perbaikan.show', compact('laporan'));
     }
+
 
     public function approveLaporan($id_laporan_lct)
     {

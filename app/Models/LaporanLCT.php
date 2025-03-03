@@ -73,4 +73,13 @@ class LaporanLct extends Model
     {
         return self::where('id_laporan_lct', $idLCT)->first();
     }
+
+    public function rejectLaporan()
+    {
+        return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
+    }
+
+
+
+
 }

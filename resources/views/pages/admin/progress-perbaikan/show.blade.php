@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: '{{ $laporan->status_lct === 'approved' ? 'pic' : 'user' }}' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ $laporan->status_lct === '[approved, rejected]' ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
@@ -263,79 +263,111 @@
                 
                     <!-- Form Laporan Temuan -->
                     
-                    <div class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-1 pb-20 max-h-[calc(100vh)] overflow-y-auto [&::-webkit-scrollbar]:w-1
-                        [&::-webkit-scrollbar-track]:rounded-full
-                        [&::-webkit-scrollbar-track]:bg-gray-100
-                        [&::-webkit-scrollbar-thumb]:rounded-full
-                        [&::-webkit-scrollbar-thumb]:bg-gray-300
-                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                        dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                    <div class="relative max-w-full bg-gray-100 overflow-hidden shadow-md p-1 pb-20 max-h-[calc(100vh)] overflow-y-auto 
+                        [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100
+                        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300
+                        dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                        
                         <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl mx-auto">
-                            <!-- Header -->
-                            <div class="bg-white ">
-                                <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                    Approval Laporan Perbaikan LCT 
-                                </h5>
-                            </div>
                             
+                            <!-- Header -->
+                            <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                Approval Laporan Perbaikan LCT 
+                            </h5>
+
                             <!-- Garis Pemisah -->
                             <div class="w-full h-[2px] bg-gray-200 my-3"></div>
-                                <p class="text-gray-700 font-semibold mb-2">Setujui laporan ini?</p>
-                            
-                                <div x-data="{ rejected: false, reason: '', closed: false }">
-                                    <div class="flex space-x-4">
-                                        <!-- Approve Button -->
-                                        <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
-                                            @csrf
-                                            <button type="submit"
-                                                class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer @if($laporan->date_completion)::disabled @endif">
-                                                Approve
-                                            </button>
-                                        </form>
-                                
-                                        <!-- Reject Button -->
-                                        <button type="button" @click="rejected = true"
-                                            class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer">
-                                            Reject
-                                        </button>
-                                    </div>
-                                
-                                    <!-- Alasan Penolakan -->
-                                    <div x-show="rejected" class="mt-4">
-                                        <form x-on:submit="console.log('Form dikirim'); rejected = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
-                                            @csrf
-                                            <label class="block text-gray-700 font-semibold">Alasan Penolakan:</label>
-                                            <textarea x-model="reason" name="alasan_reject" rows="3"
-                                                class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
 
+                            <p class="text-gray-700 font-semibold mb-2">Setujui laporan ini?</p>
+
+                            <div x-data="{ rejected: false, reason: '', closed: false }">
+                                <div class="flex space-x-4">
+                                    <!-- Approve Button -->
+                                    <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer"
+                                            @if($laporan->status_lct === 'approved') disabled @endif>
+                                            Approve
+                                        </button>
+                                    </form>
+
+                                    <!-- Reject Button -->
+                                    <button type="button" @click="rejected = true"
+                                        class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer">
+                                        Reject
+                                    </button>
+                                </div>
+
+                                <!-- Alasan Penolakan -->
+                                <div x-show="rejected" class="mt-4">
+                                    <form @submit="rejected = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                        @csrf
+                                        <label class="block text-gray-700 font-semibold">Alasan Penolakan:</label>
+                                        <textarea x-model="reason" name="alasan_reject" rows="3"
+                                            class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+
+                                        <div class="flex mt-3 space-x-2">
                                             <button type="submit"
-                                                class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
                                                 Kirim Revisi
                                             </button>
+                                            <button type="button" @click="rejected = false"
+                                                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer">
+                                                Batal
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Status Laporan -->
+                                @if($laporan->status_lct === "approved")
+                                    <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
+                                        <p class="text-green-800 font-semibold">✅ Laporan telah disetujui.</p>
+                                        <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" @click="closed = true"
+                                                class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
+                                                Close
+                                            </button>
                                         </form>
                                     </div>
+                                @endif
 
-
-                                
-                                    <!-- Menampilkan status jika laporan telah disetujui -->
-                                    @if($laporan->status_lct == "approved")
-                                        <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
-                                            <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
-                                                @csrf
-                                                <p class="text-green-800 font-semibold">✅ Laporan telah disetujui.</p>
-                                                <button type="submit" @click="closed = true"
-                                                    class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
-                                                    Close
-                                                </button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                
-                                    <!-- Notifikasi Laporan Ditutup -->
-                                    <div x-show="closed" class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                                        <p class="text-gray-700 font-semibold">🔒 Laporan telah ditutup.</p>
+                                @if($laporan->rejectLaporan->isNotEmpty())
+                                <div class="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="text-red-500 text-xl">❌</span>
+                                        <p class="text-red-800 font-semibold text-lg">Laporan Ditolak</p>
                                     </div>
+                                    <table class="w-full border-collapse">
+                                        <thead>
+                                            <tr class="bg-red-200 text-red-800 text-sm font-semibold">
+                                                <th class="p-2 text-left">Alasan</th>
+                                                <th class="p-2 text-left">Tanggal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($laporan->rejectLaporan as $reject)
+                                                <tr class="border-t border-red-300 text-gray-700">
+                                                    <td class="p-2">{{ $reject->alasan_reject }}</td>
+                                                    <td class="p-2">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y H:i') }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
+                            @endif
+                            
+
+
+
+                                <!-- Notifikasi Laporan Ditutup -->
+                                <div x-show="closed" class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
+                                    <p class="text-gray-700 font-semibold">🔒 Laporan telah ditutup.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
