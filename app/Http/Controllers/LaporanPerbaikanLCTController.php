@@ -21,10 +21,14 @@ class LaporanPerbaikanLctController extends Controller
 
     public function show($id_laporan_lct)
     {
-        // Ambil laporan beserta PIC
-        $laporan = LaporanLct::with('picUser')
+        $laporan = LaporanLct::with(['picUser', 'rejectLaporan'])
             ->where('id_laporan_lct', $id_laporan_lct)
-            ->firstOrFail();
+            ->first();
+
+            // dd($laporan);
+        if (!$laporan) {
+            abort(404, 'Laporan tidak ditemukan');
+        }
 
         // Perbarui status jika masih 'in_progress'
         if ($laporan->status_lct === 'in_progress') {
@@ -61,12 +65,6 @@ class LaporanPerbaikanLctController extends Controller
                 // Simpan file di storage
                 $buktiPerbaikan = Storage::putFileAs('bukti_perbaikan', $file, $filename);
             }
-
-            // dd([
-            //     'date_completion' => $request->date_completion,
-            //     'status_lct' => 'waiting_approval',
-            //     'bukti_perbaikan' => $buktiPerbaikan,
-            // ]);
 
             // Update laporan dengan data terbaru
             $laporan->update([

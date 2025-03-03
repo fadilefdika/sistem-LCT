@@ -4,13 +4,16 @@
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'laporan'" :class="activeTab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none">
+                class="px-4 py-2 focus:outline-none cursor-pointer">
                 Laporan LCT
             </button>
-            <button @click="activeTab = 'task-and-timeline'" :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                class="px-4 py-2 focus:outline-none">
-                Task & Timeline
-            </button>
+            @if(in_array($laporan->tingkat_bahaya, ['High', 'Medium']))
+                <button @click="activeTab = 'task-and-timeline'" 
+                    :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                    class="px-4 py-2 focus:outline-none cursor-pointer">
+                    Task & Timeline
+                </button>
+            @endif
         </div>
 
         <!-- Tab Content -->
@@ -34,9 +37,31 @@
                                 <!-- Card Laporan -->
                                 <div class="bg-white p-5 rounded-xl shadow-md border ">
                                     <!-- Header -->
-                                    <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                        📝 Laporan dari EHS
-                                    </h5>
+                                    <div class="flex justify-between items-center bg-white rounded-lg">
+                                        <!-- Judul -->
+                                        <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                            📝 Laporan dari EHS
+                                        </h5>
+                                    
+                                        <!-- Status Laporan -->
+                                        <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
+                                            @if($laporan->status_lct === 'approved') bg-green-100 text-green-700 border border-green-400 
+                                            @elseif($laporan->status_lct === 'rejected') bg-red-100 text-red-700 border border-red-400 
+                                            @else bg-yellow-100 text-yellow-700 border border-yellow-400 @endif">
+                                            
+                                            <!-- Ikon Status -->
+                                            @if($laporan->status_lct === 'approved')
+                                                <i class="fas fa-check-circle text-green-500"></i>
+                                                <span>Disetujui</span>
+                                            @elseif($laporan->status_lct === 'rejected')
+                                                <i class="fas fa-times-circle text-red-500"></i>
+                                                <span>Ditolak</span>
+                                            @else
+                                                <i class="fas fa-hourglass-half text-yellow-500"></i>
+                                                <span>Menunggu Persetujuan</span>
+                                            @endif
+                                        </div>
+                                    </div>                                    
                                     
                                     <!-- Garis Pemisah -->
                                     <div class="w-full h-[2px] bg-gray-200 my-3"></div>
@@ -177,20 +202,55 @@
                                         'bg-yellow-100 text-yellow-900 hover:bg-yellow-200': level === 'Medium',
                                         'bg-red-100 text-red-900 hover:bg-red-200': level === 'High'
                                     }" class="text-gray-900 font-semibold mt-2 p-2 rounded-lg transition-all duration-200 ease-in-out">
-                                        <span x-text="level === 'Low' ? 'Rendah' : level === 'Medium' ? 'Sedang' : 'Tinggi'"></span>
+                                        <span x-text="level === 'Low' ? 'Low' : level === 'Medium' ? 'Medium' : 'High'"></span>
                                     </p>
                                 </div>
                 
-                                <!-- Card Rekomendasi Safety -->
-                                <div class="bg-white p-4 rounded-lg border-gray-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+                                @if($laporan->status_lct === 'rejected') 
+                                <!-- Card Laporan Ditolak -->
+                                <div class="bg-white p-4 rounded-lg border border-red-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <i class="fa-solid fa-exclamation-circle text-red-500 text-lg"></i>
+                                        <p class="text-gray-500 text-xs font-semibold">Laporan Ditolak</p>
+                                    </div>
+
+                                    @if ($laporan->rejectLaporan->isNotEmpty())
+                                        @foreach ($laporan->rejectLaporan as $reject)
+                                            <div class="bg-red-50 p-3 rounded-lg mb-2">
+                                                <p class="text-red-700 text-sm"><strong>Alasan:</strong> {{ $reject->alasan_reject }}</p>
+                                                <p class="text-gray-500 text-xs">{{ $reject->created_at->format('d M Y H:i') }}</p>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <p class="text-gray-500 text-sm">Belum ada alasan penolakan yang dicatat.</p>
+                                    @endif
+                                </div>
+
+                                <!-- Card Revisi PIC (Hanya tampil jika ada revisi) -->
+                                @if (!empty($laporan->revisi_pic))
+                                    <div class="bg-white p-4 rounded-lg border border-blue-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <i class="fa-solid fa-edit text-blue-500 text-lg"></i>
+                                            <p class="text-gray-500 text-xs font-semibold">Revisi Diterima oleh PIC</p>
+                                        </div>
+                                        <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
+                                            {{ $laporan->revisi_pic }}
+                                        </p>
+                                    </div>
+                                @endif
+                            @else
+                                <!-- Card Rekomendasi Safety (Jika status_lct bukan rejected) -->
+                                <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
                                     <div class="flex items-center space-x-2 mb-2">
                                         <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
-                                        <p class="text-gray-500 text-xs">Rekomendasi Safety</p>
+                                        <p class="text-gray-500 text-xs font-semibold">Rekomendasi Safety</p>
                                     </div>
                                     <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
-                                        {{$laporan->rekomendasi_safety}}</p>
+                                        {{ $laporan->rekomendasi_safety ?? 'Tidak ada rekomendasi safety' }}
+                                    </p>
                                 </div>
-                
+                            @endif
+
                                 <!-- Card Gambar Temuan -->
                                 <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                                     <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
@@ -216,7 +276,11 @@
                             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
                                 <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
                                     <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
+                                        @if($laporan->status_lct === 'rejected')
+                                        <h5 class="text-xl font-bold">Formulir Revisi Perbaikan ke EHS</h5>
+                                        @else
                                         <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Perbaikan ke EHS</h5>
+                                        @endif
                                     </div>
                 
                                     <div class="w-full h-[2px] bg-gray-200 px-3"></div>

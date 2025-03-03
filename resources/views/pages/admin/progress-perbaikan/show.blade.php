@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: '{{ $laporan->status_lct === '[approved, rejected]' ? 'pic' : 'user' }}' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'rejected']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
@@ -350,8 +350,8 @@
                                         <tbody>
                                             @foreach ($laporan->rejectLaporan as $reject)
                                                 <tr class="border-t border-red-300 text-gray-700">
-                                                    <td class="p-2">{{ $reject->alasan_reject }}</td>
-                                                    <td class="p-2">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y H:i') }}</td>
+                                                    <td class="p-2 text-sm">{{ $reject->alasan_reject }}</td>
+                                                    <td class="p-2 text-sm">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y H:i') }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
