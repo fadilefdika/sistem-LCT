@@ -26,22 +26,22 @@ Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan)
 });
 
 
-// progress perbaikan
+// budget approval
 Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Budget Approval', route('admin.budget-approval'));
+});
+
+// budget approval detail
+Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('budget-approval');
+    $trail->push("Detail Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Progress Perbaikan', route('admin.progress-perbaikan'));
-});
-
-// progress perbaikan detail 
-Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $laporan) {
-    $trail->parent('budget-approval');
-    $trail->push("Detail Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
 // progress perbaikan detail 

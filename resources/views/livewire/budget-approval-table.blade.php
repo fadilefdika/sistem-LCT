@@ -13,40 +13,44 @@
         </select>
     </div>
 
-    <!-- Tabel -->
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead class="bg-gray-100 text-gray-700">
-                <tr class="text-left">
-                    <th wire:click="sortBy('nama')" class="cursor-pointer px-4 py-3">Nama PIC</th>
-                    <th wire:click="sortBy('deskripsi')" class="cursor-pointer px-4 py-3">Deskripsi</th>
-                    <th wire:click="sortBy('jumlah')" class="cursor-pointer px-4 py-3">Jumlah</th>
-                    <th wire:click="sortBy('created_at')" class="cursor-pointer px-4 py-3">Tanggal</th>
-                    <th class="px-4 py-3">Aksi</th>
-                </tr>
+    <!-- Tabel (Notion-style) -->
+    <div class="overflow-hidden rounded-lg border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr class="text-left text-sm font-semibold text-gray-600">
+                    <th class="px-4 py-3">PIC Name</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Amount</th>
+                    <th class="px-4 py-3">Submission Date</th>
+                    <th class="px-4 py-3">Description</th>
+                    <th class="px-4 py-3 text-center">Actions</th>
+                </tr>                
             </thead>
-            <tbody class="divide-y divide-gray-200">
+            <tbody class="divide-y divide-gray-100 bg-white">
                 @forelse($budgets as $budget)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3">{{ $budget->pic->user->fullname ?? '-' }}</td>
-                        <td class="px-4 py-3">{{ $budget->deskripsi }}</td>
-                        <td class="px-4 py-3">Rp {{ number_format($budget->jumlah, 0, ',', '.') }}</td>
-                        <td class="px-4 py-3">{{ $budget->created_at->format('d-m-Y') }}</td>
-                        <td class="px-4 py-3 flex space-x-2">
-                            <button wire:click="approve({{ $budget->id }})"
-                                class="px-3 py-1 bg-green-500 text-white rounded-lg flex items-center space-x-1 hover:bg-green-600 transition"
-                            >
-                                ✅ <span>Approve</span>
-                            </button>
-                            <button wire:click="reject({{ $budget->id }})"
-                                class="px-3 py-1 bg-red-500 text-white rounded-lg flex items-center space-x-1 hover:bg-red-600 transition"
-                            >
-                                ❌ <span>Reject</span>
-                            </button>
+                    <tr class="hover:bg-gray-100 transition">
+                        <td class="px-4 py-4 text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
+                        <td class="px-4 py-4 text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
+                        <td class="px-4 py-4 text-gray-900 font-medium">
+                            Rp {{ number_format($budget->jumlah, 0, ',', '.') }}
+                        </td>
+                        <td class="px-4 py-4 text-gray-600">
+                            {{ $budget->created_at->format('d-m-Y') }}
+                        </td>
+                        <td class="px-4 py-4">
+                            <p class="truncate block max-w-xs"
+                                title="{{ $budget->deskripsi }}">
+                                {{ Str::limit($budget->deskripsi, 50) }}
+                            </p>
+                        </td>
+                        <td class="px-4 py-4 text-center">
+                            <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}" 
+                                class="text-blue-500 hover:text-blue-700 font-medium hover:underline ">
+                                Detail
+                            </a>
                         </td>
                     </tr>
                 @empty
-                    <!-- Jika Tidak Ada Data -->
                     <tr>
                         <td colspan="5" class="text-center py-6 text-gray-500">
                             <div class="flex flex-col items-center">

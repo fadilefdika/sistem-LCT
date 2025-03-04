@@ -20,7 +20,7 @@ class RiwayatLctTable extends Component
         // Ambil satu role jika roleLct hasMany
         $role = optional($user->roleLct->first())->name;
 
-        if ($role === 'ehs') {
+        if ($role === 'ehs' || $role === 'manajer') {
             // Jika role-nya "ehs", ambil semua laporan dengan status "closed"
             $laporans = LaporanLct::where('status_lct', 'closed')
                 ->orderBy('created_at', 'desc')

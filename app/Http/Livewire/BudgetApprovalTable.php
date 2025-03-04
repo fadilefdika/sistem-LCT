@@ -32,35 +32,18 @@ class BudgetApprovalTable extends Component
 
     public function render()
     {
-        $budgets = BudgetApproval::where('status', 'Pending') // Filter request dari PIC
-        ->whereHas('pic.user', function ($query) { // Cari berdasarkan nama di tabel users
-            $query->where('fullname', 'like', '%' . $this->search . '%'); 
+        $budgets = BudgetApproval::with('laporanLct')
+        ->where('status_budget', 'Pending')
+        ->where(function ($query) {
+            $query->whereHas('pic.user', function ($subQuery) {
+                $subQuery->where('fullname', 'like', '%' . $this->search . '%');
+            })
+            ->orWhere('deskripsi', 'like', '%' . $this->search . '%');
         })
-        ->orWhere('deskripsi', 'like', '%' . $this->search . '%')
         ->orderBy($this->sortField, $this->sortDirection)
         ->paginate($this->perPage);
 
-
-
         return view('livewire.budget-approval-table', compact('budgets'));
-    }
-
-    public function approve($id)
-    {
-        $budget = BudgetApproval::findOrFail($id);
-        $budget->status = 'approved';
-        $budget->save();
-
-        session()->flash('message', 'Budget request telah disetujui.');
-    }
-
-    public function reject($id)
-    {
-        $budget = BudgetApproval::findOrFail($id);
-        $budget->status = 'rejected';
-        $budget->save();
-
-        session()->flash('message', 'Budget request telah ditolak.');
     }
 
 }

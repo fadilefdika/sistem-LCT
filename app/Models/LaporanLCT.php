@@ -81,7 +81,10 @@ class LaporanLct extends Model
         return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
-
+    public function budget()
+    {
+        return $this->hasOne(BudgetApproval::class, 'id_laporan_lct', 'id_laporan_lct');
+    }
 
 
 }

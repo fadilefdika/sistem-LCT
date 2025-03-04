@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Pic;
+use App\Models\LaporanLct;
 use Illuminate\Database\Eloquent\Model;
 
 class BudgetApproval extends Model
@@ -24,4 +26,13 @@ class BudgetApproval extends Model
         return $this->belongsTo(Pic::class, 'pic_id');
     }
 
+    public function laporanLct()
+    {
+        return $this->belongsTo(LaporanLct::class, 'id_laporan_lct', 'id_laporan_lct');
+    }
+
+    public function rejects()
+    {
+        return $this->hasMany(RejectLaporan::class, 'id_budget_approval');
+    }
 }
