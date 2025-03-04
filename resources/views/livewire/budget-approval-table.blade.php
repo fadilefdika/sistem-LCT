@@ -26,7 +26,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                @foreach($budgets as $budget)
+                @forelse($budgets as $budget)
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3">{{ $budget->pic->user->fullname ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $budget->deskripsi }}</td>
@@ -45,13 +45,27 @@
                             </button>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <!-- Jika Tidak Ada Data -->
+                    <tr>
+                        <td colspan="5" class="text-center py-6 text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
+                                </svg>
+                                <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
-    <div class="mt-4 flex justify-end">
-        {{ $budgets->links() }}
-    </div>
+    @if($budgets->count() > 0)
+        <div class="mt-4 flex justify-end">
+            {{ $budgets->links() }}
+        </div>
+    @endif
 </div>

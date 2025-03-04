@@ -354,144 +354,136 @@
                 </div>
             </div>
 
-            <div x-show="activeTab === 'task-and-timeline'" >
-                <div class="w-full mx-auto bg-[#F3F4F6] overflow-hidden max-h-[calc(100vh)] pb-36 pt-3 overflow-y-auto 
-                [&::-webkit-scrollbar]:w-1
-                [&::-webkit-scrollbar-track]:rounded-full
-                [&::-webkit-scrollbar-track]:bg-gray-100
-                [&::-webkit-scrollbar-thumb]:rounded-full
-                [&::-webkit-scrollbar-thumb]:bg-gray-300
-                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-xl font-semibold mb-4">Pengajuan Anggaran untuk Perbaikan LCT</h2>
-            
-                    <!-- Form Pengajuan Anggaran -->
-                    <form action="{{-- route('submit-budget') --}}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-6">
-                            <div x-data="{
-                                formattedAmount: '',
-                                formatAmount(value) {
-                                    // Menghapus semua karakter yang bukan angka
-                                    value = value.replace(/\D/g, '');
-                                    
-                                    // Menambahkan titik setiap 3 digit
-                                    this.formattedAmount = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                                }
-                            }">
-                                <label for="budget_amount" class="block text-sm font-medium text-gray-700">Budget Amount</label>
-                                <input 
-                                    type="text" 
-                                    name="budget_amount" 
-                                    id="budget_amount" 
-                                    x-model="formattedAmount"
-                                    x-on:input="formatAmount($event.target.value)" 
-                                    required 
-                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md" 
-                                    placeholder="Enter amount"
-                                >
-                            </div>
-                        </div>
-
-                        <div class="mb-6">
-                            <label for="budget_description" class="block text-sm font-medium text-gray-700">Deskripsi Anggaran</label>
-                            <textarea name="budget_description" id="budget_description" rows="4" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
-                        </div>
-
-                        <!-- Lampiran Bukti Pembayaran -->
-                        <div class="mb-6">
-                            <label for="payment_proof" class="block text-sm font-medium text-gray-700">Lampiran Bukti Pembayaran</label>
-                            
-                            <input 
-                                type="file" 
-                                name="payment_proof" 
-                                id="payment_proof" 
-                                accept="image/*,application/pdf" 
-                                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
-                                required
-                            >
-                            <p class="text-sm text-gray-500 mt-2">Pilih file gambar atau PDF untuk bukti pembayaran.</p>
-                        </div>
-
-
-                        <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200">Ajukan Anggaran</button>
-                    </form>
-
-                    
-                    <!-- After Approval -->
-                    @if($laporan->budget_approval == 'approved')
-                    <div class="mt-6">
-                        <h3 class="text-lg font-semibold mb-4">Tugas dan Timeline</h3>
-            
-                        <!-- Task Form -->
-                        <form action="{{-- route('submit-task') --}}" method="POST">
+            <div x-show="activeTab === 'task-and-timeline'">
+                <div class="w-full mx-auto bg-[#F3F4F6] overflow-hidden max-h-[calc(100vh)] pb-36 pt-3">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">Budget Submission for LCT Repairs</h2>
+                        <form action="{{ route('admin.manajemen-lct.submitBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <div class="mb-4">
-                                <label for="task_name" class="block text-sm font-medium text-gray-700">Nama Tugas</label>
-                                <input type="text" name="task_name" id="task_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <div class="mb-6">
+                                <div x-data="{
+                                    formattedAmount: '',
+                                    formatAmount(value) {
+                                        value = value.replace(/\D/g, '');
+                                        this.formattedAmount = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    }
+                                }">
+                                    <label for="budget_amount" class="block text-sm font-medium text-gray-700">Budget Amount <span class="text-red-500">*</span></label>
+                                    <input 
+                                        type="text" 
+                                        name="budget_amount" 
+                                        id="budget_amount" 
+                                        x-model="formattedAmount"
+                                        x-on:input="formatAmount($event.target.value)" 
+                                        required 
+                                        class="mt-1 block w-full p-2 border border-gray-300 rounded-md" 
+                                        placeholder="Enter amount"
+                                    >
+                                </div>
+                                <p class="text-xs text-gray-500">Enter the amount in Indonesian Rupiah without symbols (e.g., 1.500.000)</p>
                             </div>
             
-                            <div class="mb-4">
-                                <label for="task_description" class="block text-sm font-medium text-gray-700">Deskripsi Tugas</label>
-                                <textarea name="task_description" id="task_description" rows="3" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
+                            <div class="mb-6">
+                                <label for="budget_description" class="block text-sm font-medium text-gray-700">Budget Description <span class="text-red-500">*</span></label>
+                                <textarea name="budget_description" id="budget_description" rows="4" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
                             </div>
             
-                            <div class="mb-4">
-                                <label for="due_date" class="block text-sm font-medium text-gray-700">Tanggal Tenggat</label>
-                                <input type="date" name="due_date" id="due_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                            <!-- Payment Proof Attachment -->
+                            <div class="mb-6">
+                                <label for="payment_proof" class="block text-sm font-medium text-gray-700">Payment Proof Attachment <span class="text-red-500">*</span></label>
+                                
+                                <input 
+                                    type="file" 
+                                    name="payment_proof" 
+                                    id="payment_proof" 
+                                    accept="image/*,application/pdf" 
+                                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                                >
+                                <p class="text-sm text-gray-500 mt-2">Upload an image or PDF file as proof of payment.</p>
                             </div>
             
-                            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Buat Tugas</button>
+                            <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 cursor-pointer">
+                                Submit Budget Request
+                            </button>
                         </form>
             
-                        <!-- Task Timeline -->
+                        <!-- After Approval -->
+                        @if($laporan->budget_approval == 'approved')
                         <div class="mt-6">
-                            <h4 class="text-lg font-semibold mb-4">Progress Pengerjaan</h4>
+                            <h3 class="text-lg font-semibold mb-4">Tasks and Timeline</h3>
             
-                            <!-- Task Status Table -->
-                            <table class="min-w-full table-auto">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2 border-b">Nama Tugas</th>
-                                        <th class="px-4 py-2 border-b">Status</th>
-                                        <th class="px-4 py-2 border-b">Tanggal Tenggat</th>
-                                        <th class="px-4 py-2 border-b">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($tasks as $task)
-                                    <tr>
-                                        <td class="px-4 py-2 border-b">{{ $task->task_name }}</td>
-                                        <td class="px-4 py-2 border-b">
-                                            <span :class="{
-                                                'text-green-500': '{{ $task->status }}' === 'completed',
-                                                'text-yellow-500': '{{ $task->status }}' === 'in_progress',
-                                                'text-red-500': '{{ $task->status }}' === 'pending'
-                                            }">{{ $task->status }}</span>
-                                        </td>
-                                        <td class="px-4 py-2 border-b">{{ $task->due_date }}</td>
-                                        <td class="px-4 py-2 border-b">
-                                            <!-- Change Status Button -->
-                                            <form action="{{ route('update-task-status', $task->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <select name="status" onchange="this.form.submit()" class="px-2 py-1 border border-gray-300 rounded-md">
-                                                    <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                                                    <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                                    <option value="completed" {{ $task->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                                                </select>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <!-- Task Creation Form -->
+                            <form action="{{-- route('submit-task') --}}" method="POST">
+                                @csrf
+                                <div class="mb-4">
+                                    <label for="task_name" class="block text-sm font-medium text-gray-700">Task Name</label>
+                                    <input type="text" name="task_name" id="task_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                                </div>
+            
+                                <div class="mb-4">
+                                    <label for="task_description" class="block text-sm font-medium text-gray-700">Task Description</label>
+                                    <textarea name="task_description" id="task_description" rows="3" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md"></textarea>
+                                </div>
+            
+                                <div class="mb-4">
+                                    <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
+                                    <input type="date" name="due_date" id="due_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                                </div>
+            
+                                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                                    Create Task
+                                </button>
+                            </form>
+            
+                            <!-- Task Timeline -->
+                            <div class="mt-6">
+                                <h4 class="text-lg font-semibold mb-4">Task Progress</h4>
+            
+                                <!-- Task Status Table -->
+                                <table class="min-w-full table-auto">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-4 py-2 border-b">Task Name</th>
+                                            <th class="px-4 py-2 border-b">Status</th>
+                                            <th class="px-4 py-2 border-b">Due Date</th>
+                                            <th class="px-4 py-2 border-b">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($tasks as $task)
+                                        <tr>
+                                            <td class="px-4 py-2 border-b">{{ $task->task_name }}</td>
+                                            <td class="px-4 py-2 border-b">
+                                                <span :class="{
+                                                    'text-green-500': '{{ $task->status }}' === 'completed',
+                                                    'text-yellow-500': '{{ $task->status }}' === 'in_progress',
+                                                    'text-red-500': '{{ $task->status }}' === 'pending'
+                                                }">{{ $task->status }}</span>
+                                            </td>
+                                            <td class="px-4 py-2 border-b">{{ $task->due_date }}</td>
+                                            <td class="px-4 py-2 border-b">
+                                                <!-- Change Status Button -->
+                                                <form action="{{ route('update-task-status', $task->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <select name="status" onchange="this.form.submit()" class="px-2 py-1 border border-gray-300 rounded-md">
+                                                        <option value="pending" {{ $task->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                        <option value="in_progress" {{ $task->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                                        <option value="completed" {{ $task->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                                    </select>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
             </div>
+            
             </div>
         </div>
     </div>
