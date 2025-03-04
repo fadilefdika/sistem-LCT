@@ -33,6 +33,10 @@
                         {{ Breadcrumbs::render('progress-perbaikan') }}
                     @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.show')
                         {{ Breadcrumbs::render('progress-perbaikan.show', $laporan) }}
+                    @elseif(Route::currentRouteName() === 'admin.budget-approval')
+                        {{ Breadcrumbs::render('budget-approval') }}
+                    @elseif(Route::currentRouteName() === 'admin.budget-approval.show')
+                        {{ Breadcrumbs::render('budget-approval.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.riwayat-lct')
                         {{ Breadcrumbs::render('riwayat-lct') }}
                     @endif
