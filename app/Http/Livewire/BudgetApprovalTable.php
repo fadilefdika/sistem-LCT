@@ -33,7 +33,7 @@ class BudgetApprovalTable extends Component
     public function render()
     {
         $budgets = BudgetApproval::with('laporanLct')
-        ->where('status_budget', 'Pending')
+        ->whereIn('status_budget', ['pending', 'rejected'])
         ->where(function ($query) {
             $query->whereHas('pic.user', function ($subQuery) {
                 $subQuery->where('fullname', 'like', '%' . $this->search . '%');

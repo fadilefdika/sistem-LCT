@@ -33,6 +33,6 @@ class BudgetApproval extends Model
 
     public function rejects()
     {
-        return $this->hasMany(RejectLaporan::class, 'id_budget_approval');
+        return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 }

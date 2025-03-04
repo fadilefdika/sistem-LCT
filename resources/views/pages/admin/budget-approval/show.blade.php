@@ -36,7 +36,7 @@
         
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800">Danger Level</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Risk Level</h3>
                         <span class="inline-block px-3 py-1 text-sm font-medium text-white rounded-lg
                             {{ $budget->laporanLct->tingkat_bahaya == 'High' ? 'bg-red-500' : 'bg-yellow-500' }}">
                             {{ ucfirst($budget->laporanLct->tingkat_bahaya) }}
@@ -64,11 +64,7 @@
                     <div class="flex space-x-2 mt-2">
                         @if (!empty($budget->attachments) && count($budget->attachments) > 0)
                             @foreach ($budget->attachments as $attachment)
-                                @if (Str::endsWith($attachment->file_path, ['.jpg', '.jpeg', '.png']))
-                                    <img src="{{ asset('storage/' . $attachment->file_path) }}" 
-                                        class="w-24 h-24 rounded-lg shadow-sm" 
-                                        alt="Attachment Image">
-                                @elseif (Str::endsWith($attachment->file_path, ['.pdf']))
+                                @if (Str::endsWith($attachment->file_path, ['.pdf']))
                                     <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank" 
                                         class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition">
                                         View PDF
@@ -76,10 +72,11 @@
                                 @endif
                             @endforeach
                         @else
-                            <p class="text-gray-500 italic">No attachments available.</p>
+                            <p class="text-gray-500 italic">No PDF attachments available.</p>
                         @endif
                     </div>
                 </div>
+
 
         
                 <!-- Approval Status & Notes -->
@@ -120,17 +117,36 @@
                 @csrf
                 <input type="hidden" name="budget_id" value="{{ $budget->id }}">
 
-                <textarea name="reason" rows="3" 
+                <textarea name="alasan_reject" rows="3" 
                 class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
                 placeholder="Masukkan alasan penolakan..." required></textarea>
             
 
-                <button type="submit" formaction="{{ route('admin.budget-approval.reject', $budget->id) }}" 
-                    class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition">
+                <button type="submit" formaction="{{ route('admin.budget-approval.reject', $budget->id_laporan_lct) }}" 
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition cursor-pointer">
                     Submit Reject
                 </button>
             </form>
         </div>
+        <div class="max-w-2xl mx-auto bg-white shadow-md rounded-xl p-6 mt-5 space-y-6">
+            <!-- Reject History Card -->
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Reject History</h3>
+                <div class="space-y-4">
+                    @foreach ($budget->rejects as $reject)
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-red-500">
+                            <p class="text-sm text-gray-600">
+                                <strong class="text-gray-800">Rejected on:</strong> 
+                                <span class="font-medium">{{ $reject->created_at->format('F j, Y') }}</span>
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                <strong class="text-gray-800">Reason:</strong> 
+                                <span class="font-medium">{{ $reject->alasan_reject }}</span>
+                            </p>
+                        </div>
+                    @endforeach
+            </div>
+        </div>
+        
         
     </section>
 

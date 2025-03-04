@@ -9,7 +9,7 @@ class RejectLaporan extends Model
 {
     use HasFactory;
     protected $table = 'lct_laporan_reject';
-    protected $fillable = ['id_laporan_lct', 'alasan_reject'];
+    protected $fillable = ['id_laporan_lct', 'alasan_reject', 'tipe_reject'];
 
     public function laporanLct()
     {
@@ -18,7 +18,7 @@ class RejectLaporan extends Model
 
     public function budgetApproval()
     {
-        return $this->belongsTo(BudgetApproval::class, 'id_budget_approval');
+        return $this->belongsTo(BudgetApproval::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
 }

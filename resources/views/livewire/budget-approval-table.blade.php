@@ -18,29 +18,28 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
-                    <th class="px-4 py-3">PIC Name</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3">Amount</th>
-                    <th class="px-4 py-3">Submission Date</th>
-                    <th class="px-4 py-3">Description</th>
-                    <th class="px-4 py-3 text-center">Actions</th>
+                    <th class="px-4 py-3">PIC Name</th> 
+                    <th class="px-4 py-3">Risk Level</th> 
+                    <th class="px-4 py-3">Total Amount</th> 
+                    <th class="px-4 py-3">Submission Date</th> 
+                    <th class="px-4 py-3">Budget Status</th> 
+                    <th class="px-4 py-3 text-center">Actions</th> 
                 </tr>                
-            </thead>
+            </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
                 @forelse($budgets as $budget)
                     <tr class="hover:bg-gray-100 transition">
                         <td class="px-4 py-4 text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
                         <td class="px-4 py-4 text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
-                            Rp {{ number_format($budget->jumlah, 0, ',', '.') }}
+                            Rp {{ number_format($budget->budget, 0, ',', '.') }}
                         </td>
                         <td class="px-4 py-4 text-gray-600">
-                            {{ $budget->created_at->format('d-m-Y') }}
-                        </td>
+                            {{ $budget->created_at->translatedFormat('d F Y') }}
+                        </td>                        
                         <td class="px-4 py-4">
-                            <p class="truncate block max-w-xs"
-                                title="{{ $budget->deskripsi }}">
-                                {{ Str::limit($budget->deskripsi, 50) }}
+                            <p class="truncate block max-w-xs">
+                                {{$budget->status_budget}}
                             </p>
                         </td>
                         <td class="px-4 py-4 text-center">
