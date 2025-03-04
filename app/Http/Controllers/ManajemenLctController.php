@@ -43,7 +43,9 @@ class ManajemenLctController extends Controller
             ->orderBy('due_date', 'asc')
             ->get();
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks'));
+        $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
+
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget'));
     }
 
 
@@ -119,7 +121,7 @@ class ManajemenLctController extends Controller
                 'budget' => $request->budget_amount,
                 'deskripsi' => $request->budget_description,
                 'lampiran' => $filePath, // Bisa null
-                'status' => 'pending',
+                'status_budget' => 'pending',
             ]);
 
             DB::commit(); // Jika semua berhasil, commit transaksi

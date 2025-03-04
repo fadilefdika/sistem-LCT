@@ -12,7 +12,7 @@ class BudgetApproval extends Model
         'pic_id',
         'budget',
         'deskripsi',
-        'status',
+        'status_budget',
         'lampiran',
         'created_at',
         'updated_at',
