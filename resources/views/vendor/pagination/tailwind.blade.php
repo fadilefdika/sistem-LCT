@@ -1,5 +1,5 @@
 @if ($paginator->hasPages())
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-row items-center justify-between">
         <nav class="flex justify-center mb-4 sm:mb-0 sm:order-1" role="navigation" aria-label="{!! __('Pagination Navigation') !!}">
             {{-- Previous Page Link --}}
             <div class="mr-2">
@@ -67,7 +67,7 @@
             </div>        
         </nav>
         
-        <div class="text-sm text-gray-500 text-center sm:text-left">
+        {{-- <div class="text-sm text-gray-500 text-center sm:text-left border-2 border-blue-500">
             {!! __('Showing') !!}
             @if ($paginator->firstItem())
                 <span class="font-medium text-gray-600 dark:text-gray-300">{{ $paginator->firstItem() }}</span>
@@ -79,6 +79,6 @@
             {!! __('of') !!}
             <span class="font-medium text-gray-600 dark:text-gray-300">{{ $paginator->total() }}</span>
             {!! __('results') !!}            
-        </div>    
+        </div>     --}}
     </div>
 @endif
