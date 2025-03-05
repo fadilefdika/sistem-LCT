@@ -45,33 +45,35 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="min-w-full table-auto mt-10 border-collapse">
-            <thead>
-                <tr class="bg-gray-200 text-gray-700 text-left">
-                    <th class="px-4 py-2 border text-center">No</th>
-                    <th class="px-4 py-2 border">Task Name</th>
-                    <th class="px-4 py-2 border">Status Task</th>
-                    <th class="px-4 py-2 border">Due Date</th>
-                    <th class="px-4 py-2 border text-center">Validasi EHS</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($tasks as $index => $task)
-                    <tr class="border-b hover:bg-gray-100 transition">
-                        <td class="px-4 py-2 border text-center">{{ $loop->iteration }}</td>
-                        <td class="px-4 py-2 border">{{ $task->task_name }}</td>
-                        <td class="px-4 py-2 border">{{ ucfirst($task->status_task) }}</td>
-                        <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($task->due_date)->format('d M Y') }}</td>
-                        <td class="px-4 py-2 border text-center">
-                            <input type="checkbox" class="cursor-pointer" {{ $task->validate_by_ehs ? 'checked' : '' }} disabled>
-                        </td>
+        <div class="overflow-x-auto mt-10">
+            <table class="min-w-full bg-white shadow-lg rounded-lg">
+                <thead>
+                    <tr class="text-gray-700 text-left border-b">
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600">No</th>
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600 w-1/3">Task Name</th>
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Status Task</th>
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Due Date</th>
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Validasi EHS</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-2 border text-center text-gray-500">Tidak ada task tersedia</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($tasks as $index => $task)
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 text-sm text-center">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 text-sm w-1/2">{{ $task->task_name }}</td>
+                            <td class="px-6 py-4 text-sm">{{ ucfirst($task->status_task) }}</td>
+                            <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($task->due_date)->format('d M Y') }}</td>
+                            <td class="px-6 py-4 text-center">
+                                <input type="checkbox" class="cursor-pointer" {{ $task->validate_by_ehs ? 'checked' : '' }} disabled>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada task tersedia</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>            
+        </div>        
     </div>    
 </div>

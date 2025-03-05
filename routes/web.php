@@ -73,6 +73,7 @@ Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
     
     Route::post('/manajemen-lct/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('admin.manajemen-lct.storeTask');
     Route::post('/manajemen-lct/{id_laporan_lct}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('admin.manajemen-lct.updateStatus');
+
 });
 
 // Middleware untuk User

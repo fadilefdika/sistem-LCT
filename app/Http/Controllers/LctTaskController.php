@@ -60,24 +60,15 @@ class LctTaskController extends Controller
 
     public function updateStatus(Request $request, $id_laporan_lct)
     {
-        // Cari task berdasarkan ID
-        $task = LctTask::findOrFail($id_laporan_lct);
+        dd($id_laporan_lct);
+        // Tangkap task dan status_task untuk update
+        $task = Task::findOrFail($id_laporan_lct);
+        $task->status_task = $request->input('status_task');
+        $task->save();
 
-        // Cek apakah user adalah PIC dari task ini
-        if ($task->pic_id !== auth()->id()) {
-            return response()->json(['error' => 'Anda tidak memiliki akses untuk mengubah status task ini'], 403);
-        }
-
-        // Validasi status
-        $validatedData = $request->validate([
-            'status_task' => 'required|string|in:pending,in_progress,completed',
-        ]);
-
-        // Update status task
-        $task->update(['status_task' => $validatedData['status_task']]);
-
-        return response()->json(['message' => 'Status berhasil diperbarui']);
+        return response()->json(['message' => 'Status task updated successfully']);
     }
+
 
 
 
