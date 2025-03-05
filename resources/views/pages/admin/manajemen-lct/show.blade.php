@@ -1,6 +1,7 @@
 <x-app-layout>
 
-    <div x-data="{ activeTab: '{{ $budget->status_budget === 'pending' ? 'task-and-timeline' : 'laporan' }}' }" class="px-5 pt-2 pb-8">
+    <div x-data="{ activeTab: ['approved', 'rejected', 'pending'].includes('{{ $budget->status_budget }}') ? 'task-and-timeline' : 'laporan' }"
+        class="px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'laporan'" :class="activeTab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"

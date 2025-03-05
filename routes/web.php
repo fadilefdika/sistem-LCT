@@ -10,6 +10,7 @@ use App\Http\Controllers\RiwayatLctController;
 use App\Http\Controllers\ManajemenLctController;
 use App\Http\Controllers\ManajemenPicController;
 use App\Http\Controllers\BudgetApprovalController;
+use App\Http\Controllers\LctTaskController;
 use App\Http\Controllers\ProgressPerbaikanController;
 
 /*
@@ -69,6 +70,9 @@ Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
     Route::get('/manajemen-lct/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('admin.manajemen-lct.show');
     Route::post('/manajemen-lct/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('admin.manajemen-lct.store');
     Route::post('/manajemen-lct/{id_laporan_lct}/submitBudget', [ManajemenLctController::class, 'submitBudget'])->name('admin.manajemen-lct.submitBudget');
+    
+    Route::post('/manajemen-lct/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('admin.manajemen-lct.storeTask');
+    Route::post('/manajemen-lct/{id_laporan_lct}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('admin.manajemen-lct.updateStatus');
 });
 
 // Middleware untuk User

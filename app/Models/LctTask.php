@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class LctTask extends Model
 {
     protected $table = 'lct_task';
-    protected $fillable = ['id_laporan_lct', 'pic_id', 'deskripsi', 'status_task', 'due_date'];
+    protected $fillable = ['id_laporan_lct', 'pic_id', 'task_name', 'status_task', 'due_date', 'validate_by_ehs'];
+
+    protected $attributes = [
+        'status_task' => 'pending',
+        'validate_by_ehs'=> false
+    ];
 
     // Relasi ke Laporan LCT
     public function laporanLct()

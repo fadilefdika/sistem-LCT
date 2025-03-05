@@ -96,21 +96,24 @@
                 </div>
             </div>
         
-            <!-- Action Form -->
-            <form method="POST" class="flex justify-end space-x-4">
-                @csrf
-                <!-- Approve Button -->
-                <button type="submit" formaction="{{ route('admin.budget-approval.approve', $budget->id) }}" 
-                    class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition">
-                    Approve
-                </button>
-
-                 <!-- Reject Button -->
-                <button type="button" id="rejectBtn" 
-                    class="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition">
-                    Reject
-                </button>
-            </form>
+            @if($budget->status_budget !== 'approved')
+                <!-- Action Form -->
+                <form method="POST" class="flex justify-end space-x-4">
+                    @csrf
+                    <!-- Approve Button -->
+                    <button type="submit" formaction="{{ route('admin.budget-approval.approve', $budget->id) }}" 
+                        class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition">
+                        Approve
+                    </button>
+            
+                    <!-- Reject Button -->
+                    <button type="button" id="rejectBtn" 
+                        class="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition">
+                        Reject
+                    </button>
+                </form>
+            @endif
+        
 
             <!-- Reject Reason Form (Hidden by Default) -->
             <form method="POST" id="rejectForm" class="hidden mt-4 space-y-2">
