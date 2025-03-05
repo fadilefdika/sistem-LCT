@@ -98,44 +98,53 @@ class ManajemenLctController extends Controller
         $request->merge([
             'budget_amount' => str_replace('.', '', $request->budget_amount),
         ]);
+        
         $request->validate([
             'budget_amount' => 'required|numeric',
             'budget_description' => 'required|string',
             'payment_proof' => 'sometimes|nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
-        
 
         try {
             DB::beginTransaction(); // Mulai transaksi
 
-            // Cek apakah ada file yang diunggah
-            $filePath = null;
-            if ($request->hasFile('payment_proof')) {
-                $filePath = $request->file('payment_proof')->store('budget_proofs', 'public');
-            }
-
             $user = auth()->user()->id;
             $pic = Pic::where('user_id', $user)->first()->id;
 
-            // Simpan ke database
-            $budget = BudgetApproval::create([
-                'id_laporan_lct' => $id_laporan_lct,
-                'pic_id' => $pic,
-                'budget' => $request->budget_amount,
-                'deskripsi' => $request->budget_description,
-                'lampiran' => $filePath, // Bisa null
-                'status_budget' => 'pending',
-            ]);
+            // Cek apakah budget sudah ada sebelumnya
+            $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
+
+            // Cek apakah ada file yang diunggah
+            $filePath = $budget->lampiran ?? null;
+            if ($request->hasFile('payment_proof')) {
+                // Hapus file lama jika ada
+                if ($filePath) {
+                    Storage::disk('public')->delete($filePath);
+                }
+                $filePath = $request->file('payment_proof')->store('budget_proofs', 'public');
+            }
+
+            // Jika budget sudah ada, perbarui, jika belum, buat baru
+            BudgetApproval::updateOrCreate(
+                ['id_laporan_lct' => $id_laporan_lct], // Kondisi pencarian
+                [
+                    'pic_id' => $pic,
+                    'budget' => $request->budget_amount,
+                    'deskripsi' => $request->budget_description,
+                    'lampiran' => $filePath,
+                    'status_budget' => 'pending', // Reset status setelah perbaikan
+                ]
+            );
 
             DB::commit(); // Jika semua berhasil, commit transaksi
 
             return redirect()->back()->with('success', 'Budget request submitted successfully');
         } catch (\Exception $e) {
             DB::rollBack(); // Jika ada error, rollback transaksi
-
-            return redirect()->back()->with('error', 'Failed to submit budget request');
+            return redirect()->back()->with('error', 'Failed to submit budget request: ' . $e->getMessage());
         }
-    }   
+    }
+
 
 
 
