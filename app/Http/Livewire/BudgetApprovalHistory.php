@@ -15,7 +15,7 @@ class BudgetApprovalHistory extends Component
 
     public function render()
     {
-        $budgets = BudgetApproval::with(['laporanLct', 'pic.user'])
+        $budgets = BudgetApproval::with(['laporanLct', 'pic.user'])->where('status_budget', 'approved')
             ->orderBy('updated_at', 'desc') // Urutkan berdasarkan tanggal terbaru
             ->paginate(10); // Sesuaikan dengan jumlah data per halaman
 

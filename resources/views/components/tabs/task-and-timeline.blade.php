@@ -1,4 +1,19 @@
 <div class="w-full mx-auto bg-[#F3F4F6] overflow-hidden max-h-[calc(100vh)] pb-36 pt-3">
+    @if($budget->status_budget === 'rejected')
+        @foreach($budget->rejects as $reject)
+        <!-- Reject Reason Card -->
+        <div class="bg-red-50 p-6 rounded-lg shadow-md border-l-4 border-red-600 mb-6">
+            <p class="text-sm text-gray-700">
+                <strong class="text-gray-800 font-semibold">Rejected on:</strong> 
+                <span class="font-medium text-red-600">{{ $reject->created_at->format('F j, Y') }} at {{ $reject->created_at->format('h:i A') }}</span>
+            </p>
+            <p class="text-sm text-gray-700 mt-2">
+                <strong class="text-gray-800 font-semibold">Reason:</strong> 
+                <span class="font-medium text-gray-800">{{ $reject->alasan_reject }}</span>
+            </p>
+        </div>  
+        @endforeach                
+    @endif
     @if($budget->status_budget === 'pending')
     <div class="bg-white p-6 rounded-lg shadow-lg text-center">
         <h2 class="text-xl font-semibold text-gray-800 mb-2">Awaiting Approval</h2>

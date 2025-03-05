@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Pic;
 use App\Models\LctTask;
 use App\Models\LaporanLct;
@@ -43,7 +42,11 @@ class ManajemenLctController extends Controller
             ->orderBy('due_date', 'asc')
             ->get();
 
-        $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
+        $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)
+            ->with(['rejects' => function ($query) {
+                $query->where('tipe_reject', 'budget_approval'); // Filter hanya "budget_approval"
+            }])
+            ->first();
 
         return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget'));
     }

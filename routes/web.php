@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified', 'role:manajer'])->group(function () {
     Route::post('/budget-approval/{id_laporan_lct}/approve',[BudgetApprovalController::class, 'approve'])->name('admin.budget-approval.approve');
     Route::post('/budget-approval/{id_laporan_lct}/reject',[BudgetApprovalController::class, 'reject'])->name('admin.budget-approval.reject'); 
 
-    Route::get('/budget-approval-history',[BudgetApprovalController::class, 'history'])->name('admin.budget-approval-history.history');
+    Route::get('/budget-approval-history',[BudgetApprovalController::class, 'history'])->name('admin.budget-approval-history');
 });
 
 // Middleware khusus EHS

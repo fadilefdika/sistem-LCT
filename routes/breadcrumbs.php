@@ -38,6 +38,18 @@ Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $lapo
     $trail->push("Detail Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
+// budget approval history
+Breadcrumbs::for('budget-approval-history', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Budget Approval History', route('admin.budget-approval-history'));
+});
+
+// budget approval history detail
+Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('budget-approval-history');
+    $trail->push("Detail History Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
+});
+
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

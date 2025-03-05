@@ -103,7 +103,7 @@
                     <!-- RIwayat Anggaran -->
                     @role('manajer')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
-                        <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.budget-approval-history.history') }}">
+                        <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.budget-approval-history') }}">
                             <div class="flex items-center">
                                 <svg class="shrink-0 fill-current @if(Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'text-violet-500' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>

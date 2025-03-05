@@ -136,7 +136,7 @@
                         <div class="bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-red-500">
                             <p class="text-sm text-gray-600">
                                 <strong class="text-gray-800">Rejected on:</strong> 
-                                <span class="font-medium">{{ $reject->created_at->format('F j, Y') }}</span>
+                                <span class="font-medium">{{ $reject->created_at->format('F j, Y') }} at {{ $budget->rejects->first()->created_at->format('h:i A') }}</span>
                             </p>
                             <p class="text-sm text-gray-600">
                                 <strong class="text-gray-800">Reason:</strong> 
