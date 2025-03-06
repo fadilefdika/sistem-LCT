@@ -58,11 +58,24 @@ class LctTaskController extends Controller
     }
 
     
+    public function updateTask(Request $request, $id) {
+        $task = Task::findOrFail($id);
+        $task->update([
+            'task_name' => $request->task_name,
+            'due_date' => $request->due_date,
+        ]);
+    
+        return redirect()->route('admin.manajemen-lct.index')->with('success', 'Task updated successfully.');
+    }
+    
+    
 
     public function updateStatus(Request $request, $id_task)
     {
     
         $task = LctTask::findOrFail($id_task);
+
+    
 
         if (!$task) {
             return response()->json(['success' => false, 'message' => 'Task tidak ditemukan'], 404);
@@ -71,7 +84,7 @@ class LctTaskController extends Controller
         $task->status_task = $request->status;
         $task->save();
     
-        return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui']);
+        return view('admin.manajemen-lct.edit-task', compact('task')); 
     }
     
 

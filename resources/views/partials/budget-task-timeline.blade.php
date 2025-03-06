@@ -1,4 +1,4 @@
-<div class="bg-white px-6 pt-6 pb-16 rounded-lg shadow-lg relative" x-data="{ showForm: false }">
+<div class="bg-white px-6 pt-6 pb-16 rounded-lg shadow-lg relative h-full" x-data="{ showForm: false }">
     <h3 class="text-lg font-semibold mb-4">Tasks and Timeline</h3>
 
     <!-- Button Tambah Task -->
@@ -44,13 +44,14 @@
         </form>
     </div>
 
-            <table class="min-w-full bg-white rounded-lg">
+            <table class="min-w-full bg-white rounded-lg mt-5">
                 <thead>
                     <tr class="text-gray-700 text-left border-b">
                         <th class="px-6 py-3 text-sm font-semibold text-gray-600">No</th>
                         <th class="px-6 py-3 text-sm font-semibold text-gray-600 w-1/3">Task Name</th>
                         <th class="px-6 py-3 text-sm font-semibold text-gray-600">Status Task</th>
                         <th class="px-6 py-3 text-sm font-semibold text-gray-600">Due Date</th>
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600">Action</th>
                         <th class="px-6 py-3 text-sm font-semibold text-gray-600">Validasi EHS</th>
                     </tr>
                 </thead>
@@ -90,6 +91,13 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($task->due_date)->format('d M Y') }}</td>
+                            <td class="px-6 py-4 text-sm text-center">
+                                <!-- Button Update -->
+                                <a href="#{{-- route('admin.manajemen-lct.editTask', ['task' => $task->id]) --}}" 
+                                    class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition">
+                                    Update
+                                </a>
+                            </td>                            
                             <td class="px-6 py-4 text-center">
                                 <input type="checkbox" class="cursor-pointer" {{ $task->validate_by_ehs ? 'checked' : '' }} disabled>
                             </td>
