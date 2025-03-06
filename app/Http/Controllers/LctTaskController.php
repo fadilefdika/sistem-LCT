@@ -5,6 +5,7 @@ use App\Models\LctTask;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Console\View\Components\Task;
 
@@ -60,13 +61,23 @@ class LctTaskController extends Controller
 
     public function updateStatus(Request $request, $id_laporan_lct)
     {
-        dd($id_laporan_lct);
-        // Tangkap task dan status_task untuk update
-        $task = Task::findOrFail($id_laporan_lct);
-        $task->status_task = $request->input('status_task');
-        $task->save();
+    
+        $task = LctTask::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
-        return response()->json(['message' => 'Status task updated successfully']);
+        if (!$task) {
+            return response()->json(['success' => false, 'message' => 'Task tidak ditemukan'], 404);
+        }
+    
+        $task->status_task = $request->status;
+        $task->save();
+    
+        return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui']);
+    }
+    
+
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['updateStatus']);
     }
 
 

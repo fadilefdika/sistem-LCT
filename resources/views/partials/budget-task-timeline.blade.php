@@ -61,7 +61,14 @@
                         <tr class="border-b hover:bg-gray-50 transition">
                             <td class="px-6 py-4 text-sm text-center">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 text-sm w-1/2">{{ $task->task_name }}</td>
-                            <td class="px-6 py-4 text-sm">{{ ucfirst($task->status_task) }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                <select class="status-dropdown border rounded px-2 py-1" data-task-id="{{ $task->id_laporan_lct }}">
+                                    <option value="pending" {{ $task->status_task == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="in_progress" {{ $task->status_task == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                    <option value="completed" {{ $task->status_task == 'completed' ? 'selected' : '' }}>Completed</option>
+                                </select>
+                            </td>
+                            
                             <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($task->due_date)->format('d M Y') }}</td>
                             <td class="px-6 py-4 text-center">
                                 <input type="checkbox" class="cursor-pointer" {{ $task->validate_by_ehs ? 'checked' : '' }} disabled>
@@ -77,3 +84,40 @@
         </div>        
     </div>    
 </div>
+
+<script>
+    document.querySelectorAll('.status-dropdown').forEach((dropdown) => {
+        dropdown.addEventListener('change', async function () {
+            const taskId = dropdown.getAttribute('data-task-id');
+            const newStatus = dropdown.value; // Ambil nilai status dari dropdown
+
+            const updateUrl = `http://127.0.0.1:8000/manajemen-lct/${taskId}/updateStatus`;
+
+            try {
+                const response = await fetch(updateUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                });
+
+                console.log("Response Status:", response.status);
+
+                // Cek apakah responsenya berhasil (status 200 atau 201)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Response Data:", data);
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+            }
+        });
+    });
+</script>

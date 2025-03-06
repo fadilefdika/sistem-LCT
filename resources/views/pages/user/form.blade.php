@@ -5,7 +5,7 @@
 @endphp
 
 @section('content')
-<div class="w-full pt-5 pb-4 sm:pb-6 md:pb-2 px-4 sm:px-0 md:px-8 mb-6">
+<div class="max-w-6xl mx-auto pt-5 pb-4 sm:pb-6 px-4 sm:px-0 mb-6">
     <div class="flex justify-center">
         <div class="w-full">
 
@@ -30,7 +30,7 @@
                 <form action="{{ route('laporan-lct.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6">
                         <!-- NPK -->
                         <div>
                             <label for="no_npk" class="block text-sm font-medium text-gray-700">
@@ -65,7 +65,7 @@
                     </div>
                     
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="grid grid-cols-1 gap-6 mt-4">
                         <!-- Tanggal Temuan -->
                         <div>
                             <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">Tanggal Temuan <span class="text-red-500">*</span></label>
@@ -121,9 +121,9 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="grid grid-cols-1 gap-6 mt-4">
                         <!-- Detail Area -->
-                        <div class="order-1 md:order-2 flex flex-col relative" x-data="{ open: false }">
+                        <div class="order-1 flex flex-col relative" x-data="{ open: false }">
                             <label for="detail_area" class="block text-sm font-medium text-gray-700">
                                 Detail Area <span class="text-red-500">*</span>
                                 <button type="button" @click.prevent="open = !open" class="text-gray-500 hover:text-gray-700 focus:outline-none">
@@ -161,11 +161,12 @@
 
 
                         <!-- Unggah Foto -->
-                        <div class="order-2 md:order-1">
+                        <div class="order-2 ">
                             <label for="foto_temuan" class="block text-sm font-medium text-gray-700">
                                 Unggah Foto <span class="text-red-500">*</span>
                             </label>
                             <div class="flex items-center justify-center w-full mt-2">
+                                <!-- Opsi memilih gambar dari galeri -->
                                 <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
                                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                         <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
@@ -176,8 +177,16 @@
                                     </div>
                                     <input id="dropzone-file" type="file" class="hidden" accept="image/*"/>
                                 </label>
-                            </div> 
-                    
+
+                                <!-- Opsi akses kamera -->
+                                <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Ambil Foto</button>
+                            </div>
+
+                            <!-- Menampilkan foto yang diambil atau dipilih -->
+                            <div class="mt-4">
+                                <img id="preview" src="" alt="Preview Foto" class="h-auto w-36" style="display: none;" />
+                            </div>
+
                             <!-- Deskripsi kecil -->
                             <p class="text-xs text-gray-500 mt-1">Unggah foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                         </div>
@@ -186,9 +195,9 @@
                     </div>
                     
                     
-                    <div class="flex flex-col md:flex-row gap-6 mt-4">
+                    <div class="flex flex-col gap-6 mt-4">
                        <!-- Kategori Temuan -->
-                        <div class="w-full md:w-1/2 flex flex-col">
+                        <div class="w-full flex flex-col">
                             <label for="kategori" class="block text-sm font-medium text-gray-700">
                                 Kategori Temuan <span class="text-red-500">*</span>
                             </label>
@@ -268,7 +277,7 @@
 
                     
                         <!-- Temuan Ketidaksesuaian -->
-                        <div class="w-full md:w-1/2">
+                        <div class="w-full">
                             <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700">
                                 Temuan Ketidaksesuaian <span class="text-red-500">*</span>
                             </label>
@@ -313,6 +322,78 @@
         });
     </script>
 @endif
+
+<script>
+    // Menangani input file (galeri)
+    document.getElementById('dropzone-file').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview');
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block'; // Menampilkan gambar yang diupload
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Menangani tombol "Ambil Foto" menggunakan getUserMedia()
+    document.getElementById('open-camera').addEventListener('click', function() {
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(stream) {
+                    // Menyiapkan video untuk streaming
+                    const videoElement = document.createElement('video');
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                    
+                    // Menampilkan video
+                    const videoPreview = document.createElement('div');
+                    videoPreview.appendChild(videoElement);
+                    document.body.appendChild(videoPreview);
+                    
+                    // Menambahkan tombol untuk mengambil foto
+                    const captureButton = document.createElement('button');
+                    captureButton.innerText = 'Ambil Foto';
+                    captureButton.classList.add('mt-4', 'w-full', 'h-12', 'bg-green-500', 'text-white', 'rounded-lg');
+                    document.body.appendChild(captureButton);
+
+                    captureButton.addEventListener('click', function() {
+                        // Menangkap gambar dari video
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 320; // Lebar maksimal gambar
+                        const maxHeight = 240; // Tinggi maksimal gambar
+                        
+                        // Mengatur ukuran canvas berdasarkan ukuran video (pastikan tetap sesuai rasio)
+                        const scale = Math.min(maxWidth / videoElement.videoWidth, maxHeight / videoElement.videoHeight);
+                        canvas.width = videoElement.videoWidth * scale;
+                        canvas.height = videoElement.videoHeight * scale;
+
+                        const context = canvas.getContext('2d');
+                        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                        // Menampilkan gambar yang diambil di halaman
+                        const imageData = canvas.toDataURL('image/png');
+                        const preview = document.getElementById('preview');
+                        preview.src = imageData;
+                        preview.style.display = 'block';
+
+                        // Menghentikan streaming kamera
+                        stream.getTracks().forEach(track => track.stop());
+                        videoPreview.remove(); // Menghapus video preview
+                        captureButton.remove(); // Menghapus tombol ambil foto
+                    });
+
+                })
+                .catch(function(error) {
+                    console.error('Gagal mengakses kamera: ', error);
+                });
+        }
+    });
+</script>
 
 
 @endsection
