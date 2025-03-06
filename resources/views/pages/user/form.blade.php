@@ -41,7 +41,7 @@
                                 id="no_npk" 
                                 name="no_npk"
                                 value="{{ $user->npk }}"
-                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-500 cursor-not-allowed"
                                 required 
                                 readonly
                             >
@@ -57,7 +57,7 @@
                                 id="nama" 
                                 name="nama" 
                                 value="{{ $user->fullname }}" 
-                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm bg-white text-gray-500 cursor-not-allowed"
                                 required 
                                 readonly
                             >
@@ -68,57 +68,75 @@
                     <div class="grid grid-cols-1 gap-6 mt-4">
                         <!-- Tanggal Temuan -->
                         <div>
-                            <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">Tanggal Temuan <span class="text-red-500">*</span></label>
-                            <input type="date" id="tanggal_temuan" name="tanggal_temuan" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required>
-                            <p class="text-xs text-gray-500 mt-1">Masukkan tanggal LCT ditemukan</p> <!-- Deskripsi kecil -->
+                            <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">
+                                Tanggal Temuan <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="tanggal_temuan" 
+                                name="tanggal_temuan" 
+                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                                required
+                            >
+                            <p class="text-xs text-gray-500 mt-1">Masukkan tanggal LCT ditemukan. Input maksimal 3 hari setelah temuan</p> <!-- Deskripsi kecil -->
                         </div>
 
-
                         <!-- Area -->
-                        <div x-data="{ open: false, selected: '' }">
-                            <label for="area" class="block text-sm font-medium text-gray-700">Area <span class="text-red-500">*</span></label>
-                            
+                        <div x-data="{ open: false, selected: '', error: false }">
+                            <label for="area" class="block text-sm font-medium text-gray-700">
+                                Area <span class="text-red-500">*</span>
+                            </label>
+
                             <!-- Dropdown Input with Icon and Text -->
                             <div class="relative mt-2">
-                                <div class="flex justify-between items-center px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer" @click="open = !open">
-                                    <span x-text="selected || 'Pilih Area'"></span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <div class="flex justify-between items-center px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                    @click="open = !open" :class="{ 'border-red-500': error }">
+                                    <span x-text="selected || 'Pilih Area'" class="text-gray-700"></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M6 9l6 6 6-6"></path>
                                     </svg>
                                 </div>
-                                
+
                                 <!-- Dropdown list -->
-                                <ul 
-                                    x-show="open" 
-                                    x-transition:enter="transition ease-out duration-200 transform"
+                                <ul x-show="open" x-transition:enter="transition ease-out duration-200 transform"
                                     x-transition:enter-start="opacity-0 -translate-y-2"
                                     x-transition:enter-end="opacity-100 translate-y-0"
                                     x-transition:leave="transition ease-out duration-200"
                                     x-transition:leave-start="opacity-100"
                                     x-transition:leave-end="opacity-0"
                                     class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
-                                    x-cloak
-                                >
-                                    <li @click="selected = 'Office Lantai 1'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Office Lantai 1</li>
-                                    <li @click="selected = 'Office Lantai 2'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Office Lantai 2</li>
-                                    <li @click="selected = 'FA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">FA</li>
-                                    <li @click="selected = 'SMT'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">SMT</li>
-                                    <li @click="selected = 'Changing Room'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Changing Room</li>
-                                    <li @click="selected = 'Gudang B3'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Gudang B3</li>
-                                    <li @click="selected = 'Gudang GA'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Gudang GA</li>
-                                    <li @click="selected = 'Lab AVI'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Lab AVI</li>
-                                    <li @click="selected = 'Ruang E-Comp'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang E-Comp</li>
-                                    <li @click="selected = 'Ruang Panel'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Panel</li>
-                                    <li @click="selected = 'Ruang Server'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Server</li>
-                                    <li @click="selected = 'Ruang Sparepart'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Sparepart</li>
-                                    <li @click="selected = 'Ruang Kompressor'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Ruang Kompressor</li>
+                                    x-cloak>
+                                    <template x-for="area in ['Office Lantai 1', 'Office Lantai 2', 'FA', 'SMT', 'Changing Room', 'Gudang B3', 'Gudang GA', 'Lab AVI', 'Ruang E-Comp', 'Ruang Panel', 'Ruang Server', 'Ruang Sparepart', 'Ruang Kompressor']">
+                                        <li @click="selected = area; open = false; error = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">
+                                            <span x-text="area"></span>
+                                        </li>
+                                    </template>
                                 </ul>
                             </div>
-                            <!-- Hidden Input untuk menyimpan nilai -->
-                            <input type="hidden" name="area" x-ref="area" x-model="selected">
-                            
+
+                            <!-- Input Tersembunyi untuk Validasi -->
+                            <input type="text" name="area" x-model="selected" required class="absolute opacity-0 w-0 h-0">
+
                             <p class="text-xs text-gray-500 mt-1">Pilih area tempat temuan LCT ditemukan.</p> <!-- Deskripsi -->
+
+                            <!-- Pesan error manual -->
+                            <p x-show="error" class="text-red-500 text-xs mt-1">Silakan pilih area.</p>
+
+                            <!-- Validasi saat submit -->
+                            <script>
+                                document.querySelector("form").addEventListener("submit", function (e) {
+                                    let areaDropdown = document.querySelector("[x-data]");
+                                    let selectedValue = areaDropdown.__x.$data.selected;
+
+                                    if (!selectedValue) {
+                                        e.preventDefault();
+                                        areaDropdown.__x.$data.error = true;
+                                    }
+                                });
+                            </script>
                         </div>
+
                     </div>
 
                     <div class="grid grid-cols-1 gap-6 mt-4">
@@ -196,83 +214,60 @@
                     
                     
                     <div class="flex flex-col gap-6 mt-4">
-                       <!-- Kategori Temuan -->
-                        <div class="w-full flex flex-col">
-                            <label for="kategori" class="block text-sm font-medium text-gray-700">
+                        <!-- Kategori Temuan -->
+                        <div x-data="{ open: false, selected: '', error: false }">
+                            <label for="area" class="block text-sm font-medium text-gray-700">
                                 Kategori Temuan <span class="text-red-500">*</span>
                             </label>
-                            <div class="relative inline-flex" x-data="{ open: false, selected: '' }">
-                                <!-- Input Hidden untuk mengirimkan kategori ke backend -->
-                                <input type="hidden" name="kategori_temuan" x-model="selected">
 
-                                <button 
-                                    type="button" 
-                                    class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white"
-                                    @click.prevent="open = !open" 
-                                    :aria-expanded="open" 
-                                    aria-haspopup="true"
-                                >
-                                    <div class="flex justify-between items-center">
-                                        <span x-text="selected || 'Pilih Kategori'"></span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M6 9l6 6 6-6"></path>
-                                        </svg>
-                                    </div>
-                                </button>
+                            <!-- Dropdown Input with Icon and Text -->
+                            <div class="relative mt-2">
+                                <div class="flex justify-between items-center px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                    @click="open = !open" :class="{ 'border-red-500': error }">
+                                    <span x-text="selected || 'Pilih Kategori'" class="text-gray-700"></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 9l6 6 6-6"></path>
+                                    </svg>
+                                </div>
 
-                                <!-- Dropdown Menu -->
-                                <div 
-                                    class="origin-top-right z-10 absolute top-full left-0 min-w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-2 overflow-hidden"
-                                    x-show="open"
-                                    x-transition:enter="transition ease-out duration-200 transform"
+                                <!-- Dropdown list -->
+                                <ul x-show="open" x-transition:enter="transition ease-out duration-200 transform"
                                     x-transition:enter-start="opacity-0 -translate-y-2"
                                     x-transition:enter-end="opacity-100 translate-y-0"
                                     x-transition:leave="transition ease-out duration-200"
                                     x-transition:leave-start="opacity-100"
                                     x-transition:leave-end="opacity-0"
-                                    x-cloak
-                                >
-                                    <ul class="text-sm">
-                                        <li>
-                                            <button 
-                                                type="button" 
-                                                class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
-                                                @click="selected = 'Kondisi Tidak Aman (Unsafe Condition)'; open = false"
-                                            >
-                                                Kondisi Tidak Aman (Unsafe Condition)
-                                            </button>
+                                    class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
+                                    x-cloak>
+                                    <template x-for="kategori in ['Kondisi Tidak Aman (Unsafe Condition)', 'Tindakan Tidak Aman (Unsafe Act)', '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)', 'Near miss']">
+                                        <li @click="selected = kategori; open = false; error = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">
+                                            <span x-text="kategori"></span>
                                         </li>
-                                        <li>
-                                            <button 
-                                                type="button" 
-                                                class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
-                                                @click="selected = 'Tindakan Tidak Aman (Unsafe Act)'; open = false"
-                                            >
-                                                Tindakan Tidak Aman (Unsafe Act)
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button 
-                                                type="button" 
-                                                class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
-                                                @click="selected = '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)'; open = false"
-                                            >
-                                                5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button 
-                                                type="button" 
-                                                class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
-                                                @click="selected = 'Near miss'; open = false"
-                                            >
-                                                Near miss
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
+                                    </template>
+                                </ul>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1">Pilih kategori yang sesuai dengan temuan LCT Anda. Misalnya, apakah ini berkaitan dengan kondisi atau tindakan yang tidak aman, atau masalah lainnya.</p>
+
+                            <!-- Input Tersembunyi untuk Validasi -->
+                            <input type="text" name="kategori_temuan" x-model="selected" required class="absolute opacity-0 w-0 h-0">
+
+                            <p class="text-xs text-gray-500 mt-1">Pilih kategori yang sesuai dengan temuan LCT Anda. Misalnya, apakah ini berkaitan dengan kondisi atau tindakan yang tidak aman, atau masalah lainnya.</p> <!-- Deskripsi -->
+
+                            <!-- Pesan error manual -->
+                            <p x-show="error" class="text-red-500 text-xs mt-1">Silakan pilih kategori.</p>
+
+                            <!-- Validasi saat submit -->
+                            <script>
+                                document.querySelector("form").addEventListener("submit", function (e) {
+                                    let kategoriDropdown = document.querySelector("[x-data]");
+                                    let selectedValue = kategoriDropdown.__x.$data.selected;
+
+                                    if (!selectedValue) {
+                                        e.preventDefault();
+                                        kategoriDropdown.__x.$data.error = true;
+                                    }
+                                });
+                            </script>
                         </div>
 
                     
@@ -303,7 +298,7 @@
                     </div>
 
                     <!-- Tombol Kirim -->
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md focus:ring-2 focus:ring-blue-500 mt-2">Kirim Laporan</button>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md focus:ring-2 focus:ring-blue-500 mt-2 cursor-pointer">Kirim Laporan</button>
                 </form>
             </div>
 
@@ -393,9 +388,14 @@
                 });
         }
     });
+
+    document.getElementById('tanggal_temuan').addEventListener('click', function() {
+        this.showPicker();
+    });
 </script>
 
 
 @endsection
+
 
 
