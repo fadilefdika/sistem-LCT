@@ -59,10 +59,10 @@ class LctTaskController extends Controller
 
     
 
-    public function updateStatus(Request $request, $id_laporan_lct)
+    public function updateStatus(Request $request, $id_task)
     {
     
-        $task = LctTask::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+        $task = LctTask::findOrFail($id_task);
 
         if (!$task) {
             return response()->json(['success' => false, 'message' => 'Task tidak ditemukan'], 404);

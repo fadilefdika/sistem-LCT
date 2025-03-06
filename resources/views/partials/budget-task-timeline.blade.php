@@ -62,7 +62,7 @@
                             <td class="px-6 py-4 text-sm text-center">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 text-sm w-1/2">{{ $task->task_name }}</td>
                             <td class="px-6 py-4 text-sm">
-                                <select class="status-dropdown border rounded px-2 py-1" data-task-id="{{ $task->id_laporan_lct }}">
+                                <select class="status-dropdown border rounded px-2 py-1" data-task-id="{{ $task->id }}" data-laporan-id="{{ $task->id_laporan_lct }}">
                                     <option value="pending" {{ $task->status_task == 'pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="in_progress" {{ $task->status_task == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                     <option value="completed" {{ $task->status_task == 'completed' ? 'selected' : '' }}>Completed</option>
@@ -88,9 +88,10 @@
 <script>
     document.querySelectorAll('.status-dropdown').forEach((dropdown) => {
         dropdown.addEventListener('change', async function () {
-            const taskId = dropdown.getAttribute('data-task-id');
+            const taskId = dropdown.getAttribute('data-task-id'); // Gunakan task ID yang unik
             const newStatus = dropdown.value; // Ambil nilai status dari dropdown
 
+            // Gunakan taskId dalam URL agar update status dilakukan pada task yang benar
             const updateUrl = `http://127.0.0.1:8000/manajemen-lct/${taskId}/updateStatus`;
 
             try {
@@ -107,7 +108,6 @@
 
                 console.log("Response Status:", response.status);
 
-                // Cek apakah responsenya berhasil (status 200 atau 201)
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
