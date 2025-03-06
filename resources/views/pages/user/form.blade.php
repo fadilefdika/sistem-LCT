@@ -152,7 +152,7 @@
                             <!-- Input utama -->
                             <input type="text" id="detail_area" name="detail_area" 
                                 class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
-                                required x-model="detailArea">
+                                required>
 
                             <p class="text-xs text-gray-500 mt-1">Masukkan detail lokasi atau area tempat temuan LCT. Untuk contoh: klik ikon tanda tanya.</p>    
 
@@ -180,7 +180,7 @@
 
                         <!-- Unggah Foto -->
                         <div class="order-2">
-                            <label for="foto_temuan" class="block text-sm font-medium text-gray-700">
+                            <label for="gambar_temuan" class="block text-sm font-medium text-gray-700">
                                 Unggah Foto <span class="text-red-500">*</span>
                             </label>
                             <div class="flex flex-col items-center justify-center w-full mt-2">
@@ -193,7 +193,7 @@
                                         <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 1MB)</p>
                                     </div>
-                                    <input id="dropzone-file" type="file" class="hidden" accept="image/*" multiple />
+                                    <input id="dropzone-file" name="gambar_temuan[]" type="file" class="hidden" accept="image/*" multiple />
                                 </label>
 
                                 <!-- Opsi akses kamera -->
@@ -212,6 +212,7 @@
                             <!-- Deskripsi kecil -->
                             <p class="text-xs text-gray-500 mt-1">Unggah hingga 5 foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                         </div>
+
 
                     
                         
@@ -325,111 +326,113 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-    const fileInput = document.getElementById("dropzone-file");
-    const openCameraBtn = document.getElementById("open-camera");
-    const video = document.getElementById("video");
-    const captureBtn = document.getElementById("capture-photo");
-    const previewContainer = document.getElementById("preview-container");
-
-    let stream = null;
-    let images = []; // Array untuk menyimpan foto (maks 5)
-
-    // Fungsi untuk menampilkan preview gambar
-    function updatePreview() {
-        previewContainer.innerHTML = ""; // Kosongkan preview sebelumnya
-
-        images.forEach((imgSrc, index) => {
-            const imgWrapper = document.createElement("div");
-            imgWrapper.className = "relative";
-
-            const img = document.createElement("img");
-            img.src = imgSrc;
-            img.className = "w-24 h-24 object-cover border rounded-lg";
-
-            // Tombol hapus
-            const deleteBtn = document.createElement("button");
-            deleteBtn.innerText = "×";
-            deleteBtn.className = "absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full";
-            deleteBtn.onclick = () => {
-                images.splice(index, 1);
-                updatePreview();
-            };
-
-            imgWrapper.appendChild(img);
-            imgWrapper.appendChild(deleteBtn);
-            previewContainer.appendChild(imgWrapper);
-        });
-    }
-
-    // Fungsi menangani file input (galeri)
-    fileInput.addEventListener("change", (event) => {
-        if (images.length >= 5) {
-            alert("Maksimal 5 foto!");
-            fileInput.value = ""; // Reset input
-            return;
-        }
-
-        const files = Array.from(event.target.files);
-        files.forEach((file) => {
-            if (images.length < 5) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    images.push(e.target.result);
+        const fileInput = document.getElementById("dropzone-file");
+        const openCameraBtn = document.getElementById("open-camera");
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("capture-photo");
+        const previewContainer = document.getElementById("preview-container");
+    
+        let stream = null;
+        let images = []; // Array untuk menyimpan foto (maks 5)
+    
+        // Fungsi untuk menampilkan preview gambar
+        function updatePreview() {
+            previewContainer.innerHTML = ""; // Kosongkan preview sebelumnya
+    
+            images.forEach((imgSrc, index) => {
+                const imgWrapper = document.createElement("div");
+                imgWrapper.className = "relative";
+    
+                const img = document.createElement("img");
+                img.src = imgSrc;
+                img.className = "w-24 h-24 object-cover border rounded-lg";
+    
+                // Tombol hapus
+                const deleteBtn = document.createElement("button");
+                deleteBtn.innerText = "×";
+                deleteBtn.className = "absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full";
+                deleteBtn.onclick = () => {
+                    images.splice(index, 1);
                     updatePreview();
                 };
-                reader.readAsDataURL(file);
+    
+                imgWrapper.appendChild(img);
+                imgWrapper.appendChild(deleteBtn);
+                previewContainer.appendChild(imgWrapper);
+            });
+        }
+    
+        // Fungsi menangani file input (galeri)
+        fileInput.addEventListener("change", (event) => {
+            if (images.length >= 5) {
+                alert("Maksimal 5 foto!");
+                fileInput.value = ""; // Reset input
+                return;
+            }
+    
+            const files = Array.from(event.target.files);
+            files.forEach((file) => {
+                if (images.length < 5) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        images.push(e.target.result);
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    
+        // Fungsi mengakses kamera
+        openCameraBtn.addEventListener("click", async () => {
+            if (images.length >= 5) {
+                alert("Maksimal 5 foto!");
+                return;
+            }
+    
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = "block";
+                captureBtn.style.display = "block";
+            } catch (error) {
+                console.error("Gagal mengakses kamera: ", error);
+                alert("Tidak dapat mengakses kamera!");
             }
         });
+    
+        // Fungsi menangkap gambar dari kamera
+        captureBtn.addEventListener("click", () => {
+            if (images.length >= 5) {
+                alert("Maksimal 5 foto!");
+                return;
+            }
+    
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext("2d");
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+            const imageDataURL = canvas.toDataURL("image/png");
+            images.push(imageDataURL);
+            updatePreview();
+    
+            // Matikan kamera setelah ambil gambar
+            stream.getTracks().forEach(track => track.stop());
+            video.style.display = "none";
+            captureBtn.style.display = "none";
+        });
     });
-
-    // Fungsi mengakses kamera
-    openCameraBtn.addEventListener("click", async () => {
-        if (images.length >= 5) {
-            alert("Maksimal 5 foto!");
-            return;
-        }
-
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            video.style.display = "block";
-            captureBtn.style.display = "block";
-        } catch (error) {
-            console.error("Gagal mengakses kamera: ", error);
-            alert("Tidak dapat mengakses kamera!");
-        }
-    });
-
-    // Fungsi menangkap gambar dari kamera
-    captureBtn.addEventListener("click", () => {
-        if (images.length >= 5) {
-            alert("Maksimal 5 foto!");
-            return;
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imageDataURL = canvas.toDataURL("image/png");
-        images.push(imageDataURL);
-        updatePreview();
-
-        // Matikan kamera setelah ambil gambar
-        stream.getTracks().forEach(track => track.stop());
-        video.style.display = "none";
-        captureBtn.style.display = "none";
-    });
-});
+    </script>
+    
 
 
-    document.getElementById('tanggal_temuan').addEventListener('click', function() {
+<script>
+     document.getElementById('tanggal_temuan').addEventListener('click', function() {
         this.showPicker();
     });
 </script>
-
 
 @endsection
 

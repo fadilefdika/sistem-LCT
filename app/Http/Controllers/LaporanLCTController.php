@@ -37,8 +37,10 @@ class LaporanLctController extends Controller
 
 
     //laporan dari user ke ehs 
-    public function store(StoreLaporanRequest $request) 
+    public function store(Request $request) 
     { 
+        dd($request->all(), $request->file());
+        
         try {
             DB::beginTransaction(); // Mulai transaksi
 
@@ -75,7 +77,8 @@ class LaporanLctController extends Controller
             ]);
 
             DB::commit(); // Simpan perubahan
-            return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
+            return response()->json(['success' => true, 'message' => 'Laporan berhasil disimpan!'], 200);
+            // return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
 
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan jika ada error
