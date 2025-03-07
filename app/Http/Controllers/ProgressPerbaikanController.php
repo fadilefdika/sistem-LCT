@@ -26,12 +26,16 @@ class ProgressPerbaikanController extends Controller
             return asset('storage/' . $path);
         });    
 
+        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(function ($path) {
+            return asset('storage/' . $path);
+        });   
+
         if (!$laporan) {
             return abort(404, 'Laporan tidak ditemukan');
         }
         
 
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan'));
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan'));
     }
 
 

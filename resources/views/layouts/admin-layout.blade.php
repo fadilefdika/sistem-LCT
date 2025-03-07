@@ -57,8 +57,8 @@
                 x-init="page = '{{ Route::currentRouteName() }}'"
                 x-ref="contentarea"
                 :class="{ 
-                    'overflow-hidden': page === 'admin.laporan-lct.show', 
-                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.show','admin.budget-approval','admin.budget-approval.show','admin.manajemen-lct.show','admin.manajemen-pic'].includes(page) 
+                    'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show'].includes(page), 
+                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.show','admin.budget-approval','admin.budget-approval.show','admin.manajemen-pic'].includes(page) 
                 }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />

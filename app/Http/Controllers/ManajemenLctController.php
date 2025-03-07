@@ -35,7 +35,7 @@ class ManajemenLctController extends Controller
         if ($laporan->status_lct === 'in_progress') {
             $laporan->update(['status_lct' => 'progress_work']);
         }
-
+ 
         // Ambil semua task terkait laporan ini
         $tasks = LctTask::with('pic')
             ->where('id_laporan_lct', $id_laporan_lct)
@@ -47,51 +47,63 @@ class ManajemenLctController extends Controller
                 $query->where('tipe_reject', 'budget_approval'); // Filter hanya "budget_approval"
             }])
             ->first();
+        
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
+            return asset('storage/' . $path);
+        });
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget'));
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget', 'bukti_temuan'));
     }
 
 
-    public function store(AssignToEhsRequest $request, $id_laporan_lct)
+    public function store(Request $request, $id_laporan_lct)
     {
-        // dd("masuk");
+        $request->validate([
+            'date_completion' => ['required', 'date'],
+            'bukti_perbaikan' => ['required', 'array', 'max:5'], // Maksimal 5 file
+            'bukti_perbaikan.*' => ['file', 'mimes:png,jpg,jpeg,gif', 'max:1024'], // Setiap file harus gambar dan max 1MB
+        ]);
+
         try {
-            DB::beginTransaction(); 
-            // Cari laporan berdasarkan ID
-            $laporan = LaporanLct::where('id_laporan_lct',$id_laporan_lct)->first();
+            DB::beginTransaction();
 
-            // dd($laporan);
-            // Simpan gambar hanya jika diunggah
-            $buktiPerbaikan = $laporan->bukti_perbaikan; // Simpan nilai lama jika tidak ada file baru
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+
+            $buktiPerbaikan = [];
+
+            // Loop untuk menyimpan semua gambar
             if ($request->hasFile('bukti_perbaikan')) {
-                $file = $request->file('bukti_perbaikan');
+                foreach ($request->file('bukti_perbaikan') as $file) {
+                    // Buat nama file unik
+                    $filename = 'bukti_' . $id_laporan_lct . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                // Buat nama file unik
-                $filename = 'bukti_' . $id_laporan_lct . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    // Simpan file ke storage/public/bukti_perbaikan
+                    $path = $file->storeAs('public/bukti_perbaikan', $filename);
 
-                // Simpan file di storage
-                $buktiPerbaikan = Storage::putFileAs('bukti_perbaikan', $file, $filename);
+                    // Simpan hanya nama file atau path relatif
+                    $buktiPerbaikan[] = 'bukti_perbaikan/' . $filename;
+                }
             }
 
             // Update laporan dengan data terbaru
             $laporan->update([
                 'date_completion' => $request->date_completion,
                 'status_lct' => 'waiting_approval',
-                'bukti_perbaikan' => $buktiPerbaikan,
+                'bukti_perbaikan' => json_encode($buktiPerbaikan), // Simpan dalam format JSON
             ]);
 
-            DB::commit(); 
+            DB::commit();
 
             return redirect()->route('admin.manajemen-lct')->with('success', 'Hasil perbaikan telah dikirim ke EHS.');
         } catch (\Exception $e) {
-            // dd("gagal");
-            DB::rollBack(); // Batalkan transaksi jika ada error
+            DB::rollBack();
 
             Log::error('Gagal mengirim hasil perbaikan ke EHS: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
     }
+
 
     public function submitBudget(Request $request, $id_laporan_lct)
     {

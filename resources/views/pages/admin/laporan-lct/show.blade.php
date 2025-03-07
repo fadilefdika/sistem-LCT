@@ -11,7 +11,7 @@
                 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
 
                 
-                @include('partials.laporan-lct-card', [
+                @include('partials.laporan-lct-report', [
                     'laporan' => $laporan,
                     'bukti_temuan' => $bukti_temuan,
                 ])

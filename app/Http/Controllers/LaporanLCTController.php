@@ -50,7 +50,6 @@ class LaporanLctController extends Controller
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 
     { 
-        // dd($request->all(), $request->file());
         
         try {
             DB::beginTransaction(); // Mulai transaksi

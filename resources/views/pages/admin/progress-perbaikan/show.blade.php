@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'rejected']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'waiting_approval', 'rejected']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" 
@@ -260,18 +260,19 @@
                                 <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
                             </div>
 
-                            <!-- Card Gambar Temuan -->
-                            <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
+                            <!-- Card Gambar Perbaikan -->
+                            <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                                 <p class="text-gray-700 text-lg font-semibold">Gambar Hasil Perbaikan</p>
-                                <div class="relative mt-2">
-                                    <img src="{{ asset('images/user-36-05.jpg') }}" 
-                                        class="w-full aspect-[4/3] rounded-md shadow-md object-cover" 
-                                        alt="Gambar Temuan">
+                                <div class="grid grid-cols-5 gap-2 mt-2">
+                                    @foreach ($bukti_perbaikan->take(5) as $gambar)
+                                        <img src="{{ $gambar }}" 
+                                            class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                            alt="Gambar Hasil Perbaikan"
+                                            onclick="openModal('{{ $gambar }}')">
+                                    @endforeach
                                 </div>
                             </div>
-                        
                         </div>
-                        
                     </div>
                     
                 
@@ -423,3 +424,4 @@
         });
     </script>
 </x-app-layout>
+

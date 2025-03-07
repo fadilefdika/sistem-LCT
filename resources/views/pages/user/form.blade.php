@@ -177,7 +177,6 @@
                             </div>
                         </div>
 
-
                         <!-- Unggah Foto -->
                         <div class="order-2">
                             <label for="bukti_temuan" class="block text-sm font-medium text-gray-700">
@@ -213,9 +212,6 @@
                             <p class="text-xs text-gray-500 mt-1">Unggah hingga 5 foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                         </div>
 
-
-                    
-                        
                     </div>
                     
                     
@@ -324,6 +320,7 @@
     </script>
 @endif
 
+{{-- Gambar Temuan --}}
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const fileInput = document.getElementById("dropzone-file");
@@ -424,7 +421,7 @@
             captureBtn.style.display = "none";
         });
     });
-    </script>
+</script>
     
 
 

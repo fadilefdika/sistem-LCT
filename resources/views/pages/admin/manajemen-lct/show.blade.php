@@ -21,7 +21,7 @@
         <!-- Tab Content -->
         <div class="mt-1">
             <!-- Laporan -->
-            <div x-show="activeTab === 'laporan'" >
+            <div x-show="activeTab === 'laporan'">
                 @include('components.tabs.pic-report-detail')
             </div>
 
