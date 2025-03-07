@@ -98,6 +98,7 @@ class LaporanLctController extends Controller
     // dari ehs ke pic
     public function assignToPic(AssignToPicRequest $request, $id_laporan_lct)
     {
+        dd("masuk sini");
         try {
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();

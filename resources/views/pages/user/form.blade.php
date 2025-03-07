@@ -435,6 +435,3 @@
 </script>
 
 @endsection
-
-
-
