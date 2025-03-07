@@ -27,6 +27,17 @@ class BudgetApprovalController extends Controller
         return view('pages.admin.budget-approval.show', compact('budget'));
     }
 
+    public function showHistory($id_laporan_lct)
+    {
+        $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
+            $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
+        }])
+        ->where('id_laporan_lct', $id_laporan_lct)
+        ->firstOrFail();  
+
+        return view('pages.admin.budget-approval-history.show', compact('budget'));
+    }
+
     public function approve($id)
     {
         try {

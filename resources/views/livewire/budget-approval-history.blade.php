@@ -4,13 +4,7 @@
         <input type="text" wire:model="search" placeholder="Cari budget request..."
             class="w-1/3 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-gray-200 outline-none"
         >
-        <select wire:model="perPage"
-            class="p-2 border border-gray-300 rounded-lg focus:ring focus:ring-gray-200 outline-none"
-        >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-        </select>
+        
     </div>
 
     <!-- Tabel (Notion-style) -->
@@ -43,7 +37,7 @@
                             </p>
                         </td>
                         <td class="px-4 py-4 text-center">
-                            <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}" 
+                            <a href="{{ route('admin.budget-approval-history.show', $budget->id_laporan_lct) }}" 
                                 class="text-blue-500 hover:text-blue-700 font-medium hover:underline ">
                                 Detail
                             </a>
@@ -65,10 +59,12 @@
         </table>
     </div>
 
-    <!-- Pagination -->
-    @if($budgets->count() > 0)
-        <div class="mt-4 flex justify-end">
-            {{ $budgets->links() }}
+    <div class="mt-6 flex justify-between items-center border-t px-5 py-3">
+        <span class="text-sm text-gray-600">
+            Showing {{ $budgets->firstItem() }} to {{ $budgets->lastItem() }} of {{ $budgets->total() }} entries
+        </span>
+        <div>
+            {{ $budgets->links('pagination::tailwind') }}
         </div>
-    @endif
+    </div>
 </div>

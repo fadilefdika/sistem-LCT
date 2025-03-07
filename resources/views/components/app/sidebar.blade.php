@@ -100,7 +100,7 @@
                     </li>
                     @endrole
 
-                    <!-- RIwayat Anggaran -->
+                    <!-- Riwayat Anggaran -->
                     @role('manajer')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('budget-approval-history') || Request::is('budget-approval-history/*')){{ 'hover:text-gray-900 dark:hover:text-white' }}@endif" href="{{ route('admin.budget-approval-history') }}">

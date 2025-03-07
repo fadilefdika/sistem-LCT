@@ -10,8 +10,6 @@ class BudgetApprovalHistory extends Component
 {
     use WithPagination;
 
-    // Set jumlah data per halaman
-    protected $paginationTheme = 'bootstrap'; // Atur tema pagination sesuai dengan kebutuhan
 
     public function render()
     {
