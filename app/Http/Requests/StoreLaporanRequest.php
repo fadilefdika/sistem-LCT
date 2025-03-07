@@ -20,15 +20,18 @@ class StoreLaporanRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'no_npk' => 'required|string|max:20', // Pastikan tidak kosong dan batas panjang sesuai
+            'nama' => 'required|string|max:255', // Pastikan tidak kosong
             'tanggal_temuan' => 'required|date',
             'area' => 'required|string|max:255',
-            'detail_area' => 'required|string|max:255',
-            'kategori_temuan' => 'required|string|max:255',
-            'temuan_ketidaksesuaian' => 'required|string',
-            'rekomendasi_safety' => 'required|string',
-            'bukti_temuan' => 'required|array|max:5', // Bisa mengunggah lebih dari satu gambar
-            'bukti_temuan.*' => 'image|mimes:webp,jpeg,png,jpg|max:2048', // Menerima WebP
+            'detail_area' => 'required|string|max:255', // Menggunakan email karena formatnya seperti email
+            'kategori_temuan' => 'required|string|max:500', // Bisa diperbesar jika butuh lebih panjang
+            'temuan_ketidaksesuaian' => 'required|string|max:1000', // Bisa disesuaikan dengan kebutuhan
+            'rekomendasi_safety' => 'required|string|max:255',
+            'bukti_temuan' => 'required|array|max:5', // Maksimal 5 file
+            'bukti_temuan.*' => 'required|file|image|mimes:webp,jpeg,png,jpg|max:2048', // Setiap file harus berupa gambar dengan ukuran maksimal 2MB
         ];
+        
     }
 
     /**

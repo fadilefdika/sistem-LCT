@@ -6,16 +6,15 @@
     $user = auth()->user();    
 @endphp
 
-<div class="relative inline-flex" x-data="{ open: false }">
+<div class="relative inline-flex cursor-pointer" x-data="{ open: false }">
     <button
         class="inline-flex justify-center items-center group"
         aria-haspopup="true"
         @click.prevent="open = !open"
         :aria-expanded="open"                        
     >
-        <img class="w-8 h-8 rounded-full" src="{{ asset('images/user-36-05.jpg') }}" width="32" height="32" alt="{{ $user->fullname }}" />
         <div class="flex items-center truncate">
-            <span class="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white">{{ $user->fullname }}</span>
+            <span class="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 cursor-pointer dark:group-hover:text-white">{{ $user->fullname }}</span>
             <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 12 12">
                 <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
             </svg>

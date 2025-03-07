@@ -31,6 +31,9 @@ class LaporanLct extends Model
         'bukti_perbaikan',
     ];
     
+    protected $casts = [
+        'bukti_temuan' => 'array',
+    ];    
   
 
     public $timestamps = true;

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\AssignToPicRequest;
 use App\Http\Requests\StoreLaporanRequest;
+use Illuminate\Contracts\Cache\Store;
 
 class LaporanLctController extends Controller
 {
@@ -31,39 +32,45 @@ class LaporanLctController extends Controller
         $laporan = LaporanLct::with('user')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
         $departemen = LctDepartement::all();
         $picDepartemen=LctDepartemenPic::with(['departemen','pic.user'])->get();
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
+            return asset('storage/' . $path);
+        });
 
-        return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen'));
+        return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan'));
     }
 
 
     //laporan dari user ke ehs 
-    public function store(Request $request) 
+    public function store(StoreLaporanRequest $request) 
     { 
-        dd($request->all(), $request->file());
+        // dd($request->all(), $request->file());
         
         try {
             DB::beginTransaction(); // Mulai transaksi
-
+            
             // Ambil user yang sedang login
             $user = Auth::user();
 
             // Buat ID unik untuk laporan
             $idLCT = LaporanLct::generateLCTId();
-
-            // Simpan gambar hanya jika diunggah
-            $buktiFotoPath = null;
+            
+            // Simpan gambar ke storage public
+            $buktiFotoPaths = [];
             if ($request->hasFile('bukti_temuan')) {
-                $file = $request->file('bukti_temuan');
+                foreach ($request->file('bukti_temuan') as $file) {
+                    // Nama file unik
+                    $filename = 'bukti_' . $idLCT . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-                // Nama file unik (pakai timestamp agar tidak menimpa file lain)
-                $filename = 'bukti_' . $idLCT . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    // Simpan file ke storage/public/bukti_temuan/
+                    $path = $file->storeAs('public/bukti_temuan', $filename);
 
-                // Simpan file di storage
-                $buktiFotoPath = Storage::putFileAs('bukti_temuan', $file, $filename);
+                    // Simpan path gambar ke array
+                    $buktiFotoPaths[] = str_replace('public/', '', $path); // Simpan tanpa 'public/'
+                }
             }
 
             // Simpan data ke database
-            LaporanLct::create([
+            $laporan = LaporanLct::create([
                 'id_laporan_lct' => $idLCT,
                 'user_id' => $user->id,
                 'tanggal_temuan' => $request->tanggal_temuan,
@@ -72,17 +79,16 @@ class LaporanLctController extends Controller
                 'kategori_temuan' => $request->kategori_temuan,
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'rekomendasi_safety' => $request->rekomendasi_safety,
-                'bukti_temuan' => $buktiFotoPath, 
-                'status_lct' => 'open', 
+                'bukti_temuan' => json_encode($buktiFotoPaths), // Simpan sebagai JSON
+                'status_lct' => 'open',
             ]);
 
             DB::commit(); // Simpan perubahan
-            return response()->json(['success' => true, 'message' => 'Laporan berhasil disimpan!'], 200);
-            // return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
+            return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
 
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan jika ada error
-
+            dd($e->getMessage());
             Log::error('Gagal menyimpan laporan LCT: ' . $e->getMessage()); // Logging error
             
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');

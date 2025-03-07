@@ -36,7 +36,7 @@
             </div>
         @else
             <table class="w-full text-sm text-left text-gray-700 border-collapse">
-                <thead class="text-xs text-black uppercase">
+                <thead class="text-xs text-black uppercase border-b">
                     <tr>
                         <th scope="col" class="px-4 py-3">No</th>
                         <th scope="col" class="px-4 py-3">Nama Pelapor</th>
@@ -61,8 +61,19 @@
                         <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('id')->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">{{ $laporan->area }}</td>
                         <td class="px-4 py-3">
-                            <img src="{{ asset('storage/' . $laporan->foto_temuan) }}" class="w-20 h-20 object-cover rounded-lg shadow">
-                        </td>
+                            @if (!empty($laporan->bukti_temuan))
+                                @php
+                                    $gambar = json_decode($laporan->bukti_temuan, true)[0] ?? null;
+                                @endphp
+                                @if ($gambar)
+                                    <img src="{{ asset('storage/' . $gambar) }}" class="w-20 h-20 object-cover rounded-lg shadow">
+                                @else
+                                    <span class="text-gray-500 italic">Tidak ada gambar</span>
+                                @endif
+                            @else
+                                <span class="text-gray-500 italic">Tidak ada gambar</span>
+                            @endif
+                        </td>                        
                         <td class="px-4 py-3">{{ $laporan->kategori_temuan }}</td>
                         <td class="px-4 py-3 flex items-center gap-2">
                             <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>

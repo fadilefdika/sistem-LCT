@@ -180,7 +180,7 @@
 
                         <!-- Unggah Foto -->
                         <div class="order-2">
-                            <label for="gambar_temuan" class="block text-sm font-medium text-gray-700">
+                            <label for="bukti_temuan" class="block text-sm font-medium text-gray-700">
                                 Unggah Foto <span class="text-red-500">*</span>
                             </label>
                             <div class="flex flex-col items-center justify-center w-full mt-2">
@@ -193,7 +193,7 @@
                                         <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                                         <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 1MB)</p>
                                     </div>
-                                    <input id="dropzone-file" name="gambar_temuan[]" type="file" class="hidden" accept="image/*" multiple />
+                                    <input id="dropzone-file" name="bukti_temuan[]" type="file" class="hidden" accept="image/*" multiple />
                                 </label>
 
                                 <!-- Opsi akses kamera -->

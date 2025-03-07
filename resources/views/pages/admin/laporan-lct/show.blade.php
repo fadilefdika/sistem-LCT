@@ -88,18 +88,35 @@
                         <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
                             {{$laporan->rekomendasi_safety}}
                         </p>
-                    </div>
+                    </div> 
 
                     <!-- Card Gambar Temuan -->
                     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                         <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
-                        <div class="relative mt-2">
-                            <img src="{{ asset('images/user-36-05.jpg') }}" 
-                                class="w-full h-auto rounded-md shadow-md object-cover" 
-                                alt="Gambar Temuan">
+                        <div class="grid grid-cols-5 gap-2 mt-2">
+                            @foreach ($bukti_temuan->take(5) as $gambar)
+                                <img src="{{ $gambar }}" 
+                                    class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                    alt="Bukti Temuan"
+                                    onclick="openModal('{{ $gambar }}')">
+                            @endforeach
                         </div>
                     </div>
 
+                    <!-- Modal Preview -->
+                    <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+                        <div class="relative bg-white p-1 rounded-lg shadow-lg">
+                            <!-- Tombol Close -->
+                            <button id="closeModalBtn"
+                                class="absolute -top-4 -right-4 bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition cursor-pointer"
+                                onclick="closeModal()">
+                                &times;
+                            </button>
+                            
+                            <!-- Gambar di Modal -->
+                            <img id="modalImage" class="w-[600px] h-[500px] object-cover rounded-lg">
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -199,36 +216,36 @@
                                 
                                         <!-- Dropdown Departemen -->
                                         <div x-data="departemenPic" x-init='initData(@json($departemen), @json($picDepartemen))'>
-                                            <!-- Dropdown Departemen -->
-                                        <div class="relative mb-4">
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
-                                            <button 
-                                                type="button"
-                                                @click="open = !open" 
-                                                class="flex justify-between items-center w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left"
-                                            >
-                                                <span x-text="selectedDept ? departemen.find(d => d.id == selectedDept).nama_departemen : 'Pilih Departemen'"></span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    :class="{'rotate-180': open}">
-                                                    <path d="M6 9l6 6 6-6"></path>
-                                                </svg>
-                                            </button>
                                             
-                                            <ul 
-                                                x-show="open" 
-                                                @click.away="open = false"
-                                                class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
-                                            >
-                                                <template x-for="dept in departemen" :key="dept.id">
-                                                    <li @click="selectedDept = dept.id; open = false; updatePIC();" 
-                                                        class="px-4 py-2 cursor-pointer hover:bg-blue-100">
-                                                        <span x-text="dept.nama_departemen"></span>
-                                                    </li>
-                                                </template>
-                                            </ul>
-                                            
-                                            <input type="hidden" name="departemen_id" x-model="selectedDept" required>
-                                        </div>
+                                            <div class="relative mb-4">
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
+                                                <button 
+                                                    type="button"
+                                                    @click="open = !open" 
+                                                    class="flex justify-between items-center w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left"
+                                                >
+                                                    <span x-text="selectedDept ? departemen.find(d => d.id == selectedDept).nama_departemen : 'Pilih Departemen'"></span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                        :class="{'rotate-180': open}">
+                                                        <path d="M6 9l6 6 6-6"></path>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <ul 
+                                                    x-show="open" 
+                                                    @click.away="open = false"
+                                                    class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
+                                                >
+                                                    <template x-for="dept in departemen" :key="dept.id">
+                                                        <li @click="selectedDept = dept.id; open = false; updatePIC();" 
+                                                            class="px-4 py-2 cursor-pointer hover:bg-blue-100">
+                                                            <span x-text="dept.nama_departemen"></span>
+                                                        </li>
+                                                    </template>
+                                                </ul>
+                                                
+                                                <input type="hidden" name="departemen_id" x-model="selectedDept" required>
+                                            </div>
                                         
                                         <!-- Dropdown PIC -->
                                         <div class="relative mb-4">
@@ -364,15 +381,28 @@
         });
         </script>
         
-        {{-- @if (session('success'))
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            </script>
-        @endif --}}
+        {{-- script untuk modal gambar --}}
+        <script>
+            function openModal(imageSrc) {
+                const modal = document.getElementById("imageModal");
+                const modalImage = document.getElementById("modalImage");
+
+                modal.classList.remove("hidden");
+                modal.classList.add("flex"); // Agar modal muncul
+                modalImage.src = imageSrc;
+            }
+
+            function closeModal() {
+                const modal = document.getElementById("imageModal");
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+
+            // Tutup modal jika klik di luar gambar
+            document.getElementById("imageModal").addEventListener("click", function(event) {
+                if (event.target === this) {
+                    closeModal();
+                }
+            });
+        </script>
 </x-app-layout>
