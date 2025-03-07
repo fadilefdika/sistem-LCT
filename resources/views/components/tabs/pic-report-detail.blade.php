@@ -27,17 +27,21 @@
                             @elseif($laporan->status_lct === 'rejected') bg-red-100 text-red-700 border border-red-400 
                             @else bg-yellow-100 text-yellow-700 border border-yellow-400 @endif">
                             
-                            <!-- Ikon Status -->
-                            @if($laporan->status_lct === 'approved')
-                                <i class="fas fa-check-circle text-green-500"></i>
-                                <span>Disetujui</span>
-                            @elseif($laporan->status_lct === 'rejected')
-                                <i class="fas fa-times-circle text-red-500"></i>
-                                <span>Ditolak</span>
-                            @else
-                                <i class="fas fa-hourglass-half text-yellow-500"></i>
-                                <span>Menunggu Persetujuan</span>
-                            @endif
+                            <div class="flex items-center space-x-2 text-sm font-medium">
+                                @if($laporan->status_lct === 'approved')
+                                    <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                                    <span class="text-green-600">Disetujui</span>
+                                @elseif($laporan->status_lct === 'rejected')
+                                    <i class="fas fa-times-circle text-red-500 text-lg"></i>
+                                    <span class="text-red-600">Ditolak</span>
+                                @elseif($laporan->status_lct === 'progress_work')
+                                    <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
+                                    <span class="text-yellow-600">Dalam Proses</span>
+                                @else
+                                    <i class="fas fa-hourglass-half text-gray-500 text-lg"></i>
+                                    <span class="text-gray-600">Menunggu Persetujuan</span>
+                                @endif
+                            </div>                            
                         </div>
                     </div>                                    
                     
@@ -238,7 +242,6 @@
 
             </div>
         </div>
-
         
     
         <!-- Form Laporan Temuan -->

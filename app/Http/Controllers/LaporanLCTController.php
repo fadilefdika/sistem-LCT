@@ -122,7 +122,7 @@ class LaporanLctController extends Controller
                 abort(404, 'Data laporan tidak ditemukan');
             }
 
-            dd($request->all());
+            // dd($request->all());
             // dd($laporan);
             $laporan->update([
                 'pic_id' => $request->pic_id,
@@ -132,7 +132,7 @@ class LaporanLctController extends Controller
                 'due_date' => $request->due_date,
                 'status_lct' => 'in_progress',
             ]);
-            dd("masuk sini");
+            // dd("masuk sini");
             
             DB::commit();
             

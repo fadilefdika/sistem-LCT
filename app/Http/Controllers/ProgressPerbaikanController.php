@@ -22,13 +22,16 @@ class ProgressPerbaikanController extends Controller
         $laporan = LaporanLct::with(['user', 'picUser', 'rejectLaporan'])
             ->where('id_laporan_lct', $id_laporan_lct)
             ->first();
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
+            return asset('storage/' . $path);
+        });    
 
         if (!$laporan) {
             return abort(404, 'Laporan tidak ditemukan');
         }
         
 
-        return view('pages.admin.progress-perbaikan.show', compact('laporan'));
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan'));
     }
 
 

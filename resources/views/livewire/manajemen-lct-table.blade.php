@@ -23,7 +23,7 @@
                         <td class="px-4 py-3"> {{$laporan->area}} - {{ $laporan->detail_area }}</td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 rounded-full text-white text-xs font-semibold
-                                {{ $laporan->tingkat_bahaya === 'Tinggi' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Sedang' ? 'bg-yellow-500' : 'bg-green-500') }}">
+                                {{ $laporan->tingkat_bahaya === 'High' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Medium' ? 'bg-yellow-500' : 'bg-green-500') }}">
                                 {{ $laporan->tingkat_bahaya }}
                             </span>
                         </td>

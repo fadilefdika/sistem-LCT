@@ -88,17 +88,19 @@
                         </p>
                     </div>
                 
-                    <!-- Gambar Temuan -->
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
-                        <div class="relative mt-2">
-                            <img src="{{ asset('images/user-36-05.jpg') }}" 
-                                class="w-40 h-40 rounded-md shadow-md object-cover cursor-pointer hover:opacity-80 transition duration-300 ease-in-out" 
-                                alt="Gambar Temuan" 
-                                onclick="openImageModal('{{ asset('images/user-36-05.jpg') }}')">
+                    <!-- Card Gambar Temuan -->
+                            <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+                                <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
+                                <div class="grid grid-cols-5 gap-2 mt-2">
+                                    @foreach ($bukti_temuan->take(5) as $gambar)
+                                        <img src="{{ $gambar }}" 
+                                            class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                            alt="Bukti Temuan"
+                                            onclick="openModal('{{ $gambar }}')">
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                
                 </div>
             </div>
 
@@ -298,15 +300,16 @@
                                     <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <button type="submit" 
-                                            class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer"
-                                            @if($laporan->status_lct === 'approved') disabled @endif>
+                                            class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                            @if(in_array($laporan->status_lct, ['approved', 'progress_work'])) disabled @endif>
                                             Approve
                                         </button>
+                                    
                                     </form>
                                 
                                     <button type="button" @click="rejected = true"
                                         class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
-                                        @if($laporan->status_lct === 'approved') disabled @endif>
+                                        @if(in_array($laporan->status_lct, ['approved', 'progress_work'])) disabled @endif>
                                         Reject
                                     </button>
                                 </div>
@@ -394,4 +397,29 @@
         </div>
     </div>
 
+
+    {{-- script untuk modal gambar --}}
+    <script>
+        function openModal(imageSrc) {
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+
+            modal.classList.remove("hidden");
+            modal.classList.add("flex"); // Agar modal muncul
+            modalImage.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        // Tutup modal jika klik di luar gambar
+        document.getElementById("imageModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </x-app-layout>

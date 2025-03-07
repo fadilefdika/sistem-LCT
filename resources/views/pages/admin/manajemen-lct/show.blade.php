@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div x-data="{ activeTab: ['approved', 'rejected', 'pending'].includes('{{ $budget->status_budget }}') ? 'task-and-timeline' : 'laporan' }"
+    <div x-data="{ activeTab: ['approved', 'rejected', 'pending'].includes('{{ $budget->status_budget ?? '' }}') ? 'task-and-timeline' : 'laporan' }"
         class="px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
