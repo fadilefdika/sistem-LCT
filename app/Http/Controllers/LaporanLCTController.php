@@ -8,16 +8,18 @@ use App\Models\User;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\LctDepartement;
+use PhpParser\Node\Expr\Assign;
 use App\Models\LctDepartemenPic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\AssignToPicRequest;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreLaporanRequest;
-use Illuminate\Contracts\Cache\Store;
 
 class LaporanLctController extends Controller
 {
@@ -30,11 +32,16 @@ class LaporanLctController extends Controller
     public function show($id_laporan_lct)
     {
         $laporan = LaporanLct::with('user')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
-        $departemen = LctDepartement::all();
+        $departemen = LctDepartement::all()->map(fn($d) => [
+            'id' => $d->id,
+            'nama' => $d->nama_departemen,
+        ])->toArray();
         $picDepartemen=LctDepartemenPic::with(['departemen','pic.user'])->get();
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
             return asset('storage/' . $path);
         });
+
+        // dd($departemen);
 
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan'));
     }
@@ -96,18 +103,27 @@ class LaporanLctController extends Controller
     }
 
     // dari ehs ke pic
-    public function assignToPic(AssignToPicRequest $request, $id_laporan_lct)
+    public function assignToPic(Request $request, $id_laporan_lct)
     {
-        dd("masuk sini");
+        // Validasi request
+        $validator = Validator::make($request->all(), [
+            'departemen_id' => 'required|integer|exists:lct_departemen,id',
+            'pic_id' => 'required|integer|exists:lct_pic,id',
+            'tingkat_bahaya' => 'required|in:Low,Medium,High',
+            'rekomendasi' => 'required|string|max:255',
+            'due_date' => 'required|date|after_or_equal:today',
+        ]);
+        
         try {
+            DB::beginTransaction();
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
-
             if (!$laporan) {
                 abort(404, 'Data laporan tidak ditemukan');
             }
 
-
+            dd($request->all());
+            // dd($laporan);
             $laporan->update([
                 'pic_id' => $request->pic_id,
                 'departemen_id' => $request->departemen_id,
@@ -116,14 +132,19 @@ class LaporanLctController extends Controller
                 'due_date' => $request->due_date,
                 'status_lct' => 'in_progress',
             ]);
+            dd("masuk sini");
+            
+            DB::commit();
             
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // dd($e);
+            DB::rollBack();
+            dd($e);
             return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
         } catch (\Exception $e) {
-            // dd($e);
+            DB::rollBack();
+            dd($e);
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim laporan.');
         }
     }

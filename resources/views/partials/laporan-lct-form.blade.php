@@ -20,7 +20,7 @@
                                     <!-- Kategori Temuan -->
                                     <div class="mb-4 flex flex-col">
                                         <label for="kategori" class="block text-sm font-medium text-gray-700">
-                                            Kategori Temuan
+                                            Kategori Temuan <span class="text-red-500">*</span>
                                         </label>
                                         <div class="relative inline-flex" x-data="{ open: false, selected: @js($laporan->kategori_temuan ?? '') }">
                                             <button 
@@ -83,71 +83,43 @@
                                             readonly>
                                     </div>     
                                 
+                                    <div x-data="dropdownData()">
                                         <!-- Dropdown Departemen -->
-                                        <div x-data="departemenPic" x-init='initData(@json($departemen), @json($picDepartemen))'>
-                                            
-                                            <div class="relative mb-4">
-                                                <label class="block text-sm font-medium text-gray-700 mb-1">Departemen</label>
-                                                <button 
-                                                    type="button"
-                                                    @click="open = !open" 
-                                                    class="flex justify-between items-center w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left cursor-pointer"
-                                                >
-                                                    <span x-text="selectedDept ? departemen.find(d => d.id == selectedDept).nama_departemen : 'Pilih Departemen'"></span>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        :class="{'rotate-180': open}">
-                                                        <path d="M6 9l6 6 6-6"></path>
-                                                    </svg>
-                                                </button>
-                                                
-                                                <ul 
-                                                    x-show="open" 
-                                                    @click.away="open = false"
-                                                    class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
-                                                >
-                                                    <template x-for="dept in departemen" :key="dept.id">
-                                                        <li @click="selectedDept = dept.id; open = false; updatePIC();" 
-                                                            class="px-4 py-2 cursor-pointer hover:bg-blue-100">
-                                                            <span x-text="dept.nama_departemen"></span>
-                                                        </li>
-                                                    </template>
-                                                </ul>
-                                                
-                                            <input type="hidden" name="departemen_id" x-model="selectedDept" required>
-                                        </div>
-                                        
-                                        
-                                        <!-- Dropdown PIC -->
-                                        <div class="relative mb-4">
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
-                                            <button 
-                                                type="button"
-                                                @click="openPic = !openPic" 
-                                                class="flex justify-between items-center w-full px-4 py-2 border border-gray-800 rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 text-left cursor-pointer"
-                                                :disabled="filteredPics.length === 0"
-                                            >
-                                                <span x-text="selectedPic ? filteredPics.find(pic => pic.id == selectedPic).user.fullname : 'Pilih PIC'"></span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    :class="{'rotate-180': openPic}">
-                                                    <path d="M6 9l6 6 6-6"></path>
-                                                </svg>
-                                            </button>
-                                            
-                                            <ul 
-                                                x-show="openPic" 
-                                                @click.away="openPic = false"
-                                                class="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
-                                            >
-                                                <template x-for="pic in filteredPics" :key="pic.id">
-                                                    <li @click="selectedPic = pic.id; openPic = false" 
-                                                        class="px-4 py-2 cursor-pointer hover:bg-blue-100">
-                                                        <span x-text="pic.user.fullname"></span>
-                                                    </li>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Departemen <span class="text-red-500">*</span></label>
+                                        <div class="relative">
+                                            <select 
+                                                x-model="selectedDepartemen" 
+                                                name="departemen_id"
+                                                @change="updateFilteredPics()" 
+                                                class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                                :class="{ 'border-red-500': errorDepartemen }"
+                                                required>
+                                                <option value="">Pilih Departemen</option>
+                                                <template x-for="dept in departemen" :key="dept.id">
+                                                    <option :value="dept.id" x-text="dept.nama"></option>
                                                 </template>
-                                            </ul>
-                                            
-                                            <input type="hidden" name="pic_id" x-model="selectedPic" required>
+                                            </select>
                                         </div>
+                                        <p x-show="errorDepartemen" class="text-red-500 text-xs mt-1">Silakan pilih departemen.</p>
+                                    
+                                        <!-- Dropdown PIC -->
+                                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">Nama PIC <span class="text-red-500">*</span></label>
+                                        <div class="relative">
+                                            <select 
+                                                x-model="selectedPic"
+                                                name="pic_id"
+                                                class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                                :class="{ 'border-red-500': errorPic }"
+                                                required>
+                                                <option value="">Pilih PIC</option>
+                                                <template x-for="pic in filteredPics" :key="pic.pic.id">
+                                                    <option :value="pic.pic.id" x-text="pic.pic.user.fullname"></option>
+                                                </template>
+                                                
+                                            </select>
+                                        </div>
+                                        <p x-show="errorPic" class="text-red-500 text-xs mt-1">Silakan pilih PIC.</p>
+                                    </div>
                                         
                                     
                                     {{-- Temuan Ketidaksesuaian --}}
@@ -156,49 +128,25 @@
                                         <input type="text" value="{{$laporan->temuan_ketidaksesuaian}}" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" readonly>
                                     </div>
 
+                                <div x-data="dropdownData()">
                                     {{-- Tingkat Bahaya --}}
-                                    <div x-data="{ open: false, selected: '' }" class="relative mb-4">
-                                        <label for="tingkat_bahaya" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Tingkat Bahaya
-                                        </label>
-                                        
-                                        <!-- Tombol Dropdown -->
-                                        <button 
-                                            type="button" 
-                                            class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white cursor-pointer"
-                                            @click.prevent="open = !open" 
-                                            :aria-expanded="open" 
-                                            aria-haspopup="true"
-                                        >
-                                        <div class="flex justify-between items-center">
-
-                                            <span x-text="selected || 'Pilih Tingkat Bahaya'"></span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M6 9l6 6 6-6"></path>
-                                            </svg>
-                                        </div>
-                                        </button>
-                                    
-                                        <!-- Dropdown List -->
-                                        <ul 
-                                            x-show="open" 
-                                            x-transition:enter="transition ease-out duration-200 transform"
-                                            x-transition:enter-start="opacity-0 -translate-y-2"
-                                            x-transition:enter-end="opacity-100 translate-y-0"
-                                            x-transition:leave="transition ease-out duration-200"
-                                            x-transition:leave-start="opacity-100"
-                                            x-transition:leave-end="opacity-0"
-                                            class="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-auto"
-                                            x-cloak
-                                        >
-                                            <li @click="selected = 'Low'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Low</li>
-                                            <li @click="selected = 'Medium'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">Medium</li>
-                                            <li @click="selected = 'High'; open = false" class="px-4 py-2 cursor-pointer hover:bg-blue-100">High</li>
-                                        </ul>
-                                    
-                                        <!-- Input Hidden untuk Submit Form -->
-                                        <input type="hidden" name="tingkat_bahaya" x-model="selected" required>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tingkat Bahaya <span class="text-red-500">*</span></label>
+                                    <div class="relative">
+                                        <select 
+                                            name="tingkat_bahaya"
+                                            x-model="tingkat_bahaya" 
+                                            class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                            :class="{ 'border-red-500': errorTingkatBahaya }"
+                                            required>
+                                            <option value="">Pilih Tingkat Bahaya</option>
+                                            <template x-for="tingkat in ['Low', 'Medium', 'High']" :key="tingkat">
+                                                <option :value="tingkat" x-text="tingkat"></option>
+                                            </template>
+                                        </select>
                                     </div>
+                                    <p x-show="errorTingkatBahaya" class="text-red-500 text-xs mt-1">Silakan pilih tingkat bahaya.</p>
+                                </div>
+
                                     
                                      <!-- Rekomendasi -->
                                      <div class="mb-4">
@@ -229,8 +177,55 @@
                         </div>
                     </div>
 
-                    <script>
-                        document.getElementById('due_date').addEventListener('click', function() {
-                           this.showPicker();
-                       });
-                   </script>
+                    {{-- untuk due date --}}
+                <script>
+                    document.getElementById('due_date').addEventListener('click', function() {
+                    this.showPicker();
+                });
+                </script>
+
+                <!-- Skrip untuk Dropdown -->
+                <script>
+                    function dropdownData() {
+                        return {
+                            departemen: {{ Js::from($departemen) }},
+                            allPics: {{ Js::from($picDepartemen) }},
+                            selectedDepartemen: '',
+                            selectedPic: '',
+                            filteredPics: [],
+                            errorDepartemen: false,
+                            errorPic: false,
+                            tingkat_bahaya: '',
+                            errorTingkatBahaya: false,
+
+                            updateFilteredPics() {
+                                if (this.selectedDepartemen) {
+                                    this.filteredPics = this.allPics.filter(pic => pic.departemen.id == this.selectedDepartemen);
+                                    this.selectedPic = '';
+                                    this.errorDepartemen = false;
+                                    console.log("Departemen terpilih ID:", this.selectedDepartemen); // Debug
+                                } else {
+                                    this.filteredPics = [];
+                                }
+                            },
+
+                            validateForm(event) {
+                                this.errorDepartemen = !this.selectedDepartemen;
+                                this.errorPic = !this.selectedPic;
+                                this.errorTingkatBahaya = !this.tingkat_bahaya;
+                                console.log("Departemen ID:", this.selectedDepartemen); // Debug
+                                console.log("PIC ID:", this.selectedPic); // Debug
+                                if (this.errorDepartemen || this.errorPic || this.errorTingkatBahaya) {
+                                    event.preventDefault(); // Mencegah form dikirim jika ada error
+                                }
+                            }
+                        };
+                    }
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        document.querySelector("form").addEventListener("submit", function (e) {
+                            let dropdownComponent = document.querySelector("[x-data]");
+                            dropdownComponent.__x.$data.validateForm(e);
+                        });
+                    });
+                </script>
