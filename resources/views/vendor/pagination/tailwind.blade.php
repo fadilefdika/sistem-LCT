@@ -66,19 +66,5 @@
                 @endif
             </div>        
         </nav>
-        
-        {{-- <div class="text-sm text-gray-500 text-center sm:text-left border-2 border-blue-500">
-            {!! __('Showing') !!}
-            @if ($paginator->firstItem())
-                <span class="font-medium text-gray-600 dark:text-gray-300">{{ $paginator->firstItem() }}</span>
-                {!! __('to') !!}
-                <span class="font-medium text-gray-600 dark:text-gray-300">{{ $paginator->lastItem() }}</span>
-            @else
-                {{ $paginator->count() }}
-            @endif
-            {!! __('of') !!}
-            <span class="font-medium text-gray-600 dark:text-gray-300">{{ $paginator->total() }}</span>
-            {!! __('results') !!}            
-        </div>     --}}
     </div>
 @endif

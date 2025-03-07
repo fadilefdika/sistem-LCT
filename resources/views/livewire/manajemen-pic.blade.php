@@ -1,17 +1,18 @@
-<div class="py-3 bg-white rounded-lg">
-    <table class="w-full text-sm text-left text-gray-700 border-collapse rounded-lg overflow-hidden border-b">
-        <thead class="text-xs text-gray-700 uppercase bg-white border-b">
-            <tr>
-                <th class="py-4 px-6 text-sm tracking-wider">No</th>
-                <th class="py-4 px-6 text-sm tracking-wider">Name</th>
-                <th class="py-4 px-6 text-sm tracking-wider">Email</th>
-                <th class="py-4 px-6 text-sm tracking-wider">Department</th>
-                <th class="py-4 px-6 text-sm tracking-wider">Actions</th>
+<div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl">
+<div class="overflow-hidden rounded-lg border border-gray-200">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr class="text-left text-sm font-semibold text-gray-600">
+                <th class="py-3 px-4">No</th>
+                <th class="py-3 px-4">Name</th>
+                <th class="py-3 px-4">Email</th>
+                <th class="py-3 px-4">Department</th>
+                <th class="py-3 px-4">Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-100 bg-white">
             @foreach ($pics as $index => $pic)
-                <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
+                <tr class="hover:bg-gray-100 text-sm transition duration-200 ease-in-out border-b bg-white">
                     <td class="py-4 px-6 border-b text-sm text-gray-800">{{ $pics->firstItem() + $index }}</td>
                     <td class="py-4 px-6 border-b text-sm text-gray-800">{{ $pic->user->fullname }}</td>
                     <td class="py-4 px-6 border-b text-sm text-gray-800">{{ $pic->user->email }}</td>
@@ -39,4 +40,5 @@
             {{ $pics->links('pagination::tailwind') }}
         </div>
     </div>
+</div>
 </div>

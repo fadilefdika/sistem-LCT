@@ -19,9 +19,7 @@ class ProgressPerbaikanTable extends Component
             ->paginate(10);
 
         // dd($laporans);
-        return view('livewire.progress-perbaikan-table', [
-            'laporans' => $laporans
-        ]);
+        return view('livewire.progress-perbaikan-table', compact('laporans'));
     }
 
 }

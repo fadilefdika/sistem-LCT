@@ -1,10 +1,10 @@
-<div class="bg-white shadow-md rounded-lg p-4">
+<div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl">
     <input type="text" wire:model="search" placeholder="Cari laporan..." class="border p-2 mb-3 w-full rounded-md focus:ring focus:ring-blue-200">
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-700 border-collapse">
-            <thead class="text-xs text-black uppercase bg-gray-50">
-                <tr>
+    <div class="overflow-hidden rounded-lg border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr class="text-left text-sm font-semibold text-gray-600">
                     <th scope="col" class="px-4 py-3 ">No</th>
                     <th scope="col" class="px-4 py-3 ">Temuan Ketidaksesuaian</th>
                     <th scope="col" class="px-4 py-3 ">Detail Area</th>
@@ -15,20 +15,20 @@
                     <th scope="col" class="px-4 py-3 ">Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-100 bg-white">
                 @foreach($laporans as $index => $laporan)
-                    <tr class="border-b hover:bg-gray-100">
-                        <td class="px-4 py-3">{{ $index + 1 }}</td>
-                        <td class="px-4 py-3">{{ $laporan->temuan_ketidaksesuaian }}</td>
-                        <td class="px-4 py-3"> {{$laporan->area}} - {{ $laporan->detail_area }}</td>
-                        <td class="px-4 py-3">
+                    <tr class="hover:bg-gray-100 text-sm transition duration-200 ease-in-out border-b bg-white">
+                        <td class="px-6 py-4 border-b text-gray-800">{{ $index + 1 }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800">{{ $laporan->temuan_ketidaksesuaian }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800"> {{$laporan->area}} - {{ $laporan->detail_area }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800">
                             <span class="px-2 py-1 rounded-full text-white text-xs font-semibold
                                 {{ $laporan->tingkat_bahaya === 'High' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Medium' ? 'bg-yellow-500' : 'bg-green-500') }}">
                                 {{ $laporan->tingkat_bahaya }}
                             </span>
                         </td>
-                        <td class="px-4 py-3">{{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('d M Y') }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-6 py-4 border-b text-gray-800">{{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('d M Y') }}</td>
+                        <td class="px-6 py-4 border-b text-gray-800">
                             @php
                                 $statusColors = [
                                     'in_progress' => 'bg-gray-500', // Abu-abu untuk belum dibuka
@@ -54,10 +54,10 @@
                             </span>
                         </td>
                         
-                        <td class="px-4 py-3">
+                        <td class="px-6 py-4 border-b text-gray-800">
                             {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('d M Y') : '-' }}
                         </td>
-                        <td class="px-4 py-3">
+                        <td class="px-6 py-4 border-b">
                             
                             <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
                         </td>
@@ -67,7 +67,12 @@
         </table>
     </div>
 
-    <div class="mt-4">
-        {{ $laporans->links() }}
+    <div class="mt-6 flex justify-between items-center border-t px-5 py-3">
+        <span class="text-sm text-gray-600">
+            Showing {{ $laporans->firstItem() }} to {{ $laporans->lastItem() }} of {{ $laporans->total() }} entries
+        </span>
+        <div>
+            {{ $laporans->links('pagination::tailwind') }}
+        </div>
     </div>
 </div>

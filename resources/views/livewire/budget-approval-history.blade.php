@@ -7,7 +7,6 @@
         
     </div>
 
-    <!-- Tabel (Notion-style) -->
     <div class="overflow-hidden rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -22,16 +21,16 @@
             </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
                 @forelse($budgets as $budget)
-                    <tr class="hover:bg-gray-100 transition">
-                        <td class="px-4 py-4 text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
-                        <td class="px-4 py-4 text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
+                    <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
                             Rp {{ number_format($budget->budget, 0, ',', '.') }}
                         </td>
-                        <td class="px-4 py-4 text-gray-600">
+                        <td class="px-4 py-4 text-sm text-gray-800">
                             {{ $budget->created_at->translatedFormat('d F Y') }}
                         </td>                        
-                        <td class="px-4 py-4">
+                        <td class="px-4 py-4 text-sm text-gray-800">
                             <p class="truncate block max-w-xs">
                                 {{$budget->status_budget}}
                             </p>
