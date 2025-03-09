@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\LctDepartement;
 use PhpParser\Node\Expr\Assign;
 use App\Models\LctDepartemenPic;
+use App\Mail\LaporanDikirimKePic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -142,7 +143,7 @@ class LaporanLctController extends Controller
             //     Mail::to($pic->email)->send(new LaporanDikirimKePic($laporan));
             // }
             
-            Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+            Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
 
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
@@ -158,17 +159,17 @@ class LaporanLctController extends Controller
     }
 
 
-    public function kirimEmail()
-    {
-        $laporan = [
-            'judul' => 'Ketidaksesuaian Mesin Produksi',
-            'deskripsi' => 'Ada masalah pada mesin produksi yang perlu segera diperbaiki.',
-            'tanggal' => now()->format('d-m-Y'),
-            'url' => url('/laporan/123'), // Ganti dengan link laporan yang benar
-        ];
+    // public function kirimEmail()
+    // {
+    //     $laporan = [
+    //         'judul' => 'Ketidaksesuaian Mesin Produksi',
+    //         'deskripsi' => 'Ada masalah pada mesin produksi yang perlu segera diperbaiki.',
+    //         'tanggal' => now()->format('d-m-Y'),
+    //         'url' => url('/laporan/123'), // Ganti dengan link laporan yang benar
+    //     ];
 
-        Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+    //     Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
 
-        return "Email laporan ketidaksesuaian berhasil dikirim!";
-    }
+    //     return "Email laporan ketidaksesuaian berhasil dikirim!";
+    // }
 }

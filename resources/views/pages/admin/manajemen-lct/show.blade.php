@@ -33,6 +33,31 @@
         </div>
     </div>
 
+    {{-- script untuk modal gambar --}}
+    <script>
+        function openModal(imageSrc) {
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+
+            modal.classList.remove("hidden");
+            modal.classList.add("flex"); // Agar modal muncul
+            modalImage.src = imageSrc;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        // Tutup modal jika klik di luar gambar
+        document.getElementById("imageModal").addEventListener("click", function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+
 </x-app-layout>
 
 

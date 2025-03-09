@@ -22,7 +22,7 @@
     <div class="p-6">
         <form action="{{ route('admin.manajemen-lct.store', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
             @csrf
-        
+         
             <div class="space-y-6">
                 <div class="mb-4">
                     <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>

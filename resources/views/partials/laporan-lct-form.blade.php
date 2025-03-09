@@ -166,6 +166,8 @@
                                             class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
                                             required
                                         >
+                                        <!-- Tempat untuk menampilkan tanggal dalam format yang lebih mudah dibaca -->
+                                        <p id="formatted_date" class="mt-2 text-gray-600"></p>
                                     </div>
 
                                     <!-- Submit button -->
@@ -177,11 +179,22 @@
                         </div>
                     </div>
 
-                    {{-- untuk due date --}}
+
+                {{-- Due Date --}}
                 <script>
                     document.getElementById('due_date').addEventListener('click', function() {
                     this.showPicker();
                 });
+                    document.getElementById('due_date').addEventListener('change', function() {
+                        let dateValue = this.value;
+                        if (dateValue) {
+                            let options = { year: 'numeric', month: 'long', day: 'numeric' };
+                            let formattedDate = new Date(dateValue).toLocaleDateString('en-US', options);
+                            document.getElementById('formatted_date').textContent = `Selected Date: ${formattedDate}`;
+                        } else {
+                            document.getElementById('formatted_date').textContent = "";
+                        }
+                    });
                 </script>
 
                 <!-- Skrip untuk Dropdown -->

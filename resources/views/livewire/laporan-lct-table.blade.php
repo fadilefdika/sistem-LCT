@@ -72,7 +72,6 @@
                     <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori_temuan }}</td>
                     <td class="px-4 py-3 flex items-center justify-center gap-2">
                         <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
-                        <button wire:click="delete({{ $laporan->id }})" class="text-red-600 hover:underline">Hapus</button>
                     </td>
                 </tr>
                 @empty
