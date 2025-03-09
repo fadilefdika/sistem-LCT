@@ -1,7 +1,7 @@
 <x-app-layout class="overflow-y-auto">
-    <section class="p-5">
-        <div class="max-w-screen-xl mx-auto overflow-y-auto">
-            <livewire:laporan-table />
+    <section class="p-3 sm:p-5">
+        <div class="max-w-screen-2xl mx-auto overflow-y-auto">
+            <livewire:laporan-lct-table />
         </div>
     </section>
 </x-app-layout>

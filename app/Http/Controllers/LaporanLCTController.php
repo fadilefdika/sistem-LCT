@@ -13,7 +13,9 @@ use App\Models\LctDepartemenPic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Mail\LaporanKetidaksesuaian;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
@@ -134,7 +136,14 @@ class LaporanLctController extends Controller
             // dd("masuk sini");
             
             DB::commit();
+
+            // $pic = Pic::find($request->pic_id); // Ambil data PIC berdasarkan ID
+            // if ($pic && $pic->email) {
+            //     Mail::to($pic->email)->send(new LaporanDikirimKePic($laporan));
+            // }
             
+            Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -149,4 +158,17 @@ class LaporanLctController extends Controller
     }
 
 
+    public function kirimEmail()
+    {
+        $laporan = [
+            'judul' => 'Ketidaksesuaian Mesin Produksi',
+            'deskripsi' => 'Ada masalah pada mesin produksi yang perlu segera diperbaiki.',
+            'tanggal' => now()->format('d-m-Y'),
+            'url' => url('/laporan/123'), // Ganti dengan link laporan yang benar
+        ];
+
+        Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+
+        return "Email laporan ketidaksesuaian berhasil dikirim!";
+    }
 }

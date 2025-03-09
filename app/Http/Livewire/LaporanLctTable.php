@@ -7,7 +7,7 @@ use Livewire\WithPagination;
 use App\Models\LaporanLCT;
 use Illuminate\Support\Facades\Auth;
 
-class LaporanTable extends Component
+class LaporanLctTable extends Component
 {
     use WithPagination;
 
@@ -51,7 +51,7 @@ class LaporanTable extends Component
         // Pastikan kita pakai paginate sebelum return
         $laporans = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
-        return view('livewire.laporan-table', [
+        return view('livewire.laporan-lct-table', [
             'laporans' => $laporans,
             'kategoriOptions' => LaporanLct::select('kategori_temuan')->distinct()->pluck('kategori_temuan'),
         ]);

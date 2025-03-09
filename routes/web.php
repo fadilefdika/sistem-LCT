@@ -23,6 +23,7 @@ use App\Http\Controllers\ProgressPerbaikanController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/kirim-email', [LaporanLctController::class, 'kirimEmail']);
 
 Route::redirect('/', 'login');
 Route::middleware(['auth','verified', 'role:ehs,pic,manajer'])->group(function () {
