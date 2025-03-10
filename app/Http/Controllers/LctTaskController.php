@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Console\View\Components\Task;
 
 class LctTaskController extends Controller
@@ -14,6 +15,8 @@ class LctTaskController extends Controller
 
     public function store(Request $request, $id_laporan_lct)
     {
+        // dd($request->all()); // Debugging, pastikan request sesuai
+        
         try {
             DB::beginTransaction(); // Mulai transaksi
 
@@ -27,35 +30,45 @@ class LctTaskController extends Controller
                 return back()->with('error', 'Anda tidak memiliki akses sebagai PIC.');
             }
 
-            // Validasi data request
-            $validatedData = $request->validate([
-                'task_name' => 'required|string|max:255',
-                'due_date' => 'required|date|after_or_equal:today', // Bisa pilih hari ini
-                'status_task' => 'nullable|string|in:pending,in_progress,completed', // Tidak wajib
-            ]);
+            // Decode tasks dari JSON ke array
+            $tasks = json_decode($request->tasks, true);
 
-            // Set default status jika tidak ada dalam request
-            $statusTask = $validatedData['status_task'] ?? 'pending';
-            
-            // Buat task baru dengan `pic_id`
-            LctTask::create([
-                'id_laporan_lct' => $id_laporan_lct,
-                'task_name' => $validatedData['task_name'],
-                'due_date' => $validatedData['due_date'],
-                'status_task' => $statusTask,
-                'pic_id' => $pic_id, // Pakai `pic_id` langsung
-                'validate_by_ehs' => 0, // Default belum divalidasi oleh EHS
-            ]);
-            
+            if (!is_array($tasks)) {
+                return back()->with('error', 'Format tasks tidak valid.');
+            }
+
+            // dd($tasks);
+            // Validasi setiap task dalam array
+            foreach ($tasks as $task) {
+                $validatedData = Validator::make($task, [
+                    'taskName' => 'required|string|max:255',
+                    'dueDate' => 'required|date|after_or_equal:today',
+                    'status' => 'nullable|string|in:pending,in_progress,completed',
+                ])->validate();
+
+                // Set default status jika tidak ada dalam request
+                $statusTask = $validatedData['status'] ?? 'pending';
+
+                // Buat task baru dengan `pic_id`
+                LctTask::create([
+                    'id_laporan_lct' => $id_laporan_lct,
+                    'task_name' => $validatedData['taskName'],
+                    'due_date' => $validatedData['dueDate'],
+                    'status_task' => $statusTask,
+                    'pic_id' => $pic_id, // Pakai `pic_id` langsung
+                    'validate_by_ehs' => 0, // Default belum divalidasi oleh EHS
+                ]);
+            }
+
             DB::commit(); // Simpan transaksi jika tidak ada error
 
-            return back()->with('success', 'Task berhasil ditambahkan');
+            return back()->with('success', 'Semua task berhasil ditambahkan');
         } catch (\Exception $e) {
-            dd("Error: " . $e->getMessage()); // Tampilkan pesan error
             DB::rollBack(); // Batalkan transaksi jika ada error
             return back()->with('error', 'Gagal menambahkan task: ' . $e->getMessage());
         }
     }
+
 
     
     public function updateTask(Request $request, $id) {

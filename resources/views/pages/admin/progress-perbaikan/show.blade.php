@@ -100,6 +100,21 @@
                                     @endforeach
                                 </div>
                             </div>
+
+                             <!-- Modal Preview -->
+                            <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+                                <div class="relative bg-white p-1 rounded-lg shadow-lg">
+                                    <!-- Tombol Close -->
+                                    <button id="closeModalBtn"
+                                        class="absolute -top-4 -right-4 bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition cursor-pointer"
+                                        onclick="closeModal()">
+                                        &times;
+                                    </button>
+                                    
+                                    <!-- Gambar di Modal -->
+                                    <img id="modalImage" class="w-[600px] h-[500px] object-cover rounded-lg">
+                                </div>
+                            </div>
                         </div>
                 </div>
             </div>
