@@ -110,6 +110,7 @@ class LaporanLctController extends Controller
     {
         // Validasi request
         $validator = Validator::make($request->all(), [
+            'temuan_ketidaksesuaian' => 'required|string|max:255',
             'departemen_id' => 'required|integer|exists:lct_departemen,id',
             'pic_id' => 'required|integer|exists:lct_pic,id',
             'tingkat_bahaya' => 'required|in:Low,Medium,High',
@@ -128,6 +129,7 @@ class LaporanLctController extends Controller
             // dd($request->all());
             // dd($laporan);
             $laporan->update([
+                'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'pic_id' => $request->pic_id,
                 'departemen_id' => $request->departemen_id,
                 'tingkat_bahaya' => $request->tingkat_bahaya,
