@@ -53,10 +53,11 @@ class LaporanLctController extends Controller
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 
     { 
+        // dd($request->all(), $request->files->all());
         
         try {
             DB::beginTransaction(); // Mulai transaksi
-            
+            // dd("masuk sini");
             // Ambil user yang sedang login
             $user = Auth::user();
 
@@ -143,7 +144,7 @@ class LaporanLctController extends Controller
             //     Mail::to($pic->email)->send(new LaporanDikirimKePic($laporan));
             // }
             
-            Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
+            Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
 
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 

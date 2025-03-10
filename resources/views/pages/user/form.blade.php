@@ -179,7 +179,7 @@
 
                         <!-- Unggah Foto -->
                         <div class="order-2">
-                            <label for="bukti_temuan" class="block text-sm font-medium text-gray-700">
+                            <label for="dropzone-file" class="block text-sm font-medium text-gray-700">
                                 Unggah Foto <span class="text-red-500">*</span>
                             </label>
                             <div class="flex flex-col items-center justify-center w-full mt-2">
@@ -190,25 +190,24 @@
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                                         </svg>
                                         <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 1MB)</p>
+                                        <p class="text-xs text-gray-500">SVG, PNG, JPG, atau GIF (MAX. 1MB)</p>
                                     </div>
                                     <input id="dropzone-file" name="bukti_temuan[]" type="file" class="hidden" accept="image/*" multiple />
                                 </label>
 
-                                <!-- Opsi akses kamera -->
+                                <!-- Opsi akses kamera dengan Webcam.js -->
                                 <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Ambil Foto</button>
+
+                                <!-- Area kamera -->
+                                <div id="my_camera" class="mt-2 w-64 h-48 border" style="display: none;"></div>
+
+                                <!-- Tombol ambil foto -->
+                                <button type="button" id="capture-photo" class="mt-2 w-full h-12 bg-green-500 text-white rounded-lg" style="display: none;">Capture</button>
+
+                                <!-- Menampilkan foto yang diambil atau dipilih -->
+                                <div id="preview-container" class="mt-4 flex flex-wrap gap-2"></div>
                             </div>
 
-                            <!-- Video untuk menampilkan kamera -->
-                            <video id="video" autoplay playsinline class="mt-2 w-48 h-36 border" style="display: none;"></video>
-
-                            <!-- Tombol ambil foto -->
-                            <button type="button" id="capture-photo" class="mt-2 w-full h-12 bg-green-500 text-white rounded-lg" style="display: none;">Capture</button>
-
-                            <!-- Menampilkan foto yang diambil atau dipilih -->
-                            <div id="preview-container" class="mt-4 flex flex-wrap gap-2"></div>
-
-                            <!-- Deskripsi kecil -->
                             <p class="text-xs text-gray-500 mt-1">Unggah hingga 5 foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                         </div>
 
@@ -321,109 +320,121 @@
 @endif
 
 {{-- Gambar Temuan --}}
+<!-- Script untuk menangani Kamera -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const fileInput = document.getElementById("dropzone-file");
+    document.addEventListener("DOMContentLoaded", function () {
+        let maxFiles = 5;
+        let uploadedFiles = [];
+
+        const dropzone = document.getElementById("dropzone-file");
         const openCameraBtn = document.getElementById("open-camera");
-        const video = document.getElementById("video");
         const captureBtn = document.getElementById("capture-photo");
+        const myCamera = document.getElementById("my_camera");
         const previewContainer = document.getElementById("preview-container");
-    
-        let stream = null;
-        let images = []; // Array untuk menyimpan foto (maks 5)
-    
-        // Fungsi untuk menampilkan preview gambar
-        function updatePreview() {
-            previewContainer.innerHTML = ""; // Kosongkan preview sebelumnya
-    
-            images.forEach((imgSrc, index) => {
-                const imgWrapper = document.createElement("div");
-                imgWrapper.className = "relative";
-    
-                const img = document.createElement("img");
-                img.src = imgSrc;
-                img.className = "w-24 h-24 object-cover border rounded-lg";
-    
-                // Tombol hapus
-                const deleteBtn = document.createElement("button");
-                deleteBtn.innerText = "×";
-                deleteBtn.className = "absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full";
-                deleteBtn.onclick = () => {
-                    images.splice(index, 1);
-                    updatePreview();
-                };
-    
-                imgWrapper.appendChild(img);
-                imgWrapper.appendChild(deleteBtn);
-                previewContainer.appendChild(imgWrapper);
+
+        // Pastikan dropzone tidak null sebelum digunakan
+        if (!dropzone) {
+            console.error("Elemen dropzone-file tidak ditemukan.");
+            return;
+        }
+
+        // Inisialisasi Webcam.js
+        Webcam.set({
+            width: 200,
+            height: 150,
+            image_format: 'jpeg',
+            jpeg_quality: 90
+        });
+
+        openCameraBtn.addEventListener("click", function () {
+            if (uploadedFiles.length >= maxFiles) {
+                alert("Maksimal 5 foto yang bisa diunggah.");
+                return;
+            }
+
+            myCamera.style.display = "block";
+            captureBtn.style.display = "block";
+            Webcam.attach(myCamera);
+        });
+
+        captureBtn.addEventListener("click", function () {
+            Webcam.snap(function (data_uri) {
+                // Konversi base64 menjadi file
+                fetch(data_uri)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        let file = new File([blob], `kamera-${Date.now()}.jpg`, { type: "image/jpeg" });
+
+                        // Tambahkan file ke daftar
+                        uploadedFiles.push(file);
+                        updateInputFiles();
+                        renderPreview();
+                    });
+
+                // Sembunyikan kamera
+                Webcam.reset();
+                myCamera.style.display = "none";
+                captureBtn.style.display = "none";
+            });
+        });
+
+        // Saat memilih file dari galeri
+        dropzone.addEventListener("change", function (event) {
+            let files = Array.from(event.target.files);
+            if (uploadedFiles.length + files.length > maxFiles) {
+                alert("Maksimal 5 foto yang bisa diunggah.");
+                return;
+            }
+
+            uploadedFiles = uploadedFiles.concat(files);
+            updateInputFiles();
+            renderPreview();
+        });
+
+        // Fungsi memperbarui input file agar dikirim ke backend
+        function updateInputFiles() {
+            let dataTransfer = new DataTransfer();
+            uploadedFiles.forEach(file => dataTransfer.items.add(file));
+
+            // Pastikan input file diperbarui
+            dropzone.files = dataTransfer.files;
+        }
+
+        // Render pratinjau gambar
+        function renderPreview() {
+            previewContainer.innerHTML = "";
+            uploadedFiles.forEach((file, index) => {
+                let wrapper = document.createElement("div");
+                wrapper.classList.add("relative", "w-24", "h-24", "rounded-lg", "overflow-hidden", "group");
+
+                let img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.classList.add("w-full", "h-full", "object-cover", "rounded-lg");
+
+                let removeBtn = document.createElement("button");
+                removeBtn.innerHTML = "&times;";
+                removeBtn.classList.add(
+                    "absolute", "top-0", "right-0", "bg-red-600", "text-white",
+                    "rounded-full", "w-5", "h-5", "flex", "items-center", "justify-center",
+                    "text-xs", "opacity-75", "hover:opacity-100", "transition-opacity",
+                    "transform", "translate-x-1", "-translate-y-1", "hover:scale-110"
+                );
+                removeBtn.addEventListener("click", function () {
+                    uploadedFiles.splice(index, 1);
+                    updateInputFiles();
+                    renderPreview();
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewContainer.appendChild(wrapper);
             });
         }
-    
-        // Fungsi menangani file input (galeri)
-        fileInput.addEventListener("change", (event) => {
-            if (images.length >= 5) {
-                alert("Maksimal 5 foto!");
-                fileInput.value = ""; // Reset input
-                return;
-            }
-    
-            const files = Array.from(event.target.files);
-            files.forEach((file) => {
-                if (images.length < 5) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        images.push(e.target.result);
-                        updatePreview();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
-    
-        // Fungsi mengakses kamera
-        openCameraBtn.addEventListener("click", async () => {
-            if (images.length >= 5) {
-                alert("Maksimal 5 foto!");
-                return;
-            }
-    
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                video.style.display = "block";
-                captureBtn.style.display = "block";
-            } catch (error) {
-                console.error("Gagal mengakses kamera: ", error);
-                alert("Tidak dapat mengakses kamera!");
-            }
-        });
-    
-        // Fungsi menangkap gambar dari kamera
-        captureBtn.addEventListener("click", () => {
-            if (images.length >= 5) {
-                alert("Maksimal 5 foto!");
-                return;
-            }
-    
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext("2d");
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-            const imageDataURL = canvas.toDataURL("image/png");
-            images.push(imageDataURL);
-            updatePreview();
-    
-            // Matikan kamera setelah ambil gambar
-            stream.getTracks().forEach(track => track.stop());
-            video.style.display = "none";
-            captureBtn.style.display = "none";
-        });
+
+
     });
 </script>
-    
-
 
 <script>
      document.getElementById('tanggal_temuan').addEventListener('click', function() {
