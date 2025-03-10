@@ -140,13 +140,8 @@ class LaporanLctController extends Controller
             // dd("masuk sini");
             
             DB::commit();
-
-            // $pic = Pic::find($request->pic_id); // Ambil data PIC berdasarkan ID
-            // if ($pic && $pic->email) {
-            //     Mail::to($pic->email)->send(new LaporanDikirimKePic($laporan));
-            // }
             
-            Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
+            Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
 
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 
