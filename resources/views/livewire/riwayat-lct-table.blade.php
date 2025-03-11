@@ -31,7 +31,7 @@
                         @php
                             $statusColors = [
                                 'closed' => 'bg-green-700', 
-                                'rejected' => 'bg-red-500', 
+                                'revision' => 'bg-red-500', 
                                 'progress_work' => 'bg-yellow-500', 
                                 'waiting_approval' => 'bg-blue-500', 
                                 'approved' => 'bg-green-500', 
@@ -50,7 +50,7 @@
 
                     <!-- Tombol Aksi -->
                     <td class="py-4 px-6 border-b">
-                        <a href="{{ route('riwayat.lct.detail', $laporan->id_laporan_lct) }}" 
+                        <a href="{{-- route('riwayat.lct.detail', $laporan->id_laporan_lct) --}}" 
                             class="text-blue-600 hover:underline font-semibold">
                             Detail
                         </a>

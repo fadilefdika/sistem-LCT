@@ -1,5 +1,5 @@
 <div class="bg-red-50 p-6 rounded-lg shadow-md border-l-4 border-red-600 mb-6">
-    <p class="text-sm text-gray-700 font-semibold">Budget Rejected</p>
+    <p class="text-sm text-gray-700 font-semibold">Budget Revision</p>
 
     @php
         $rejects = $rejects->sortByDesc('created_at')->values(); // Urutkan & reset indeks
@@ -11,7 +11,7 @@
              @click="expanded = !expanded">
             <div>
                 <p class="text-sm text-gray-700">
-                    <strong class="text-gray-800">Rejected on:</strong>
+                    <strong class="text-gray-800">Revision on:</strong>
                     <span class="text-red-600">{{ $rejects[0]->created_at->format('F j, Y h:i A') }}</span>
                 </p>
                 <p class="text-sm text-gray-700 mt-2">
@@ -40,7 +40,7 @@
             <div class="p-4 transition duration-200 hover:bg-gray-100 
                         {{ $index !== 0 ? 'border-t border-gray-300' : '' }}">
                 <p class="text-sm text-gray-700">
-                    <strong class="text-gray-800">Rejected on:</strong>
+                    <strong class="text-gray-800">Revision on:</strong>
                     <span class="text-red-600">{{ $reject->created_at->format('F j, Y h:i A') }}</span>
                 </p>
                 <p class="text-sm text-gray-700 mt-2">

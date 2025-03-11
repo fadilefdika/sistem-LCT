@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800">Budget Approval Detail</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">Budget Approval Detail History</h2>
                     <p class="text-sm text-gray-600 flex items-center">
                         Submitted on {{ $budget->created_at->format('F j, Y') }}
                     </p>
@@ -59,22 +59,25 @@
                 </div>
         
                 <!-- Attachments -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Attachments</h3>
-                    <div class="flex space-x-2 mt-2">
-                        @if (!empty($budget->attachments) && count($budget->attachments) > 0)
-                            @foreach ($budget->attachments as $attachment)
-                                @if (Str::endsWith($attachment->file_path, ['.pdf']))
-                                    <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank" 
-                                        class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition">
-                                        View PDF
-                                    </a>
-                                @endif
-                            @endforeach
-                        @else
-                            <p class="text-gray-500 italic">No PDF attachments available.</p>
-                        @endif
-                    </div>
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Attachments</h3>
+
+                    @if (!empty($budget->lampiran) && Str::endsWith($budget->lampiran, '.pdf'))
+                        <div class="flex flex-col space-y-3">
+                            <!-- Tombol untuk melihat PDF -->
+                            <a href="{{ asset('storage/' . $budget->lampiran) }}" target="_blank"
+                                class="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition">
+                                View PDF
+                            </a>
+
+                            <!-- Preview PDF -->
+                            <div class="border rounded-lg overflow-hidden">
+                                <iframe src="{{ asset('storage/' . $budget->lampiran) }}" class="w-full h-96 border-none"></iframe>
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-gray-500 italic">No PDF attachments available.</p>
+                    @endif
                 </div>
 
 
@@ -83,7 +86,7 @@
                 <div class="border-t pt-4">
                     <h3 class="text-lg font-semibold text-gray-800">Approval Status</h3>
                     <span class="inline-block px-4 py-2 text-sm font-medium text-white rounded-lg
-                        {{ $budget->status_budget == 'Approved' ? 'bg-green-500' : ($budget->status_budget == 'Rejected' ? 'bg-red-500' : 'bg-gray-500') }}">
+                        {{ $budget->status_budget == 'Approved' ? 'bg-green-500' : ($budget->status_budget == 'Revision' ? 'bg-red-500' : 'bg-gray-500') }}">
                         {{ ucfirst($budget->status_budget) }}
                     </span>
         
@@ -138,7 +141,7 @@
                     @foreach ($budget->rejects as $reject)
                         <div class="bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-red-500">
                             <p class="text-sm text-gray-600">
-                                <strong class="text-gray-800">Rejected on:</strong> 
+                                <strong class="text-gray-800">Revision on:</strong> 
                                 <span class="font-medium">{{ $reject->created_at->format('F j, Y') }} at {{ $budget->rejects->first()->created_at->format('h:i A') }}</span>
                             </p>
                             <p class="text-sm text-gray-600">

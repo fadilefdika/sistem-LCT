@@ -14,7 +14,7 @@ class ProgressPerbaikanTable extends Component
     public function render()
     {
         // Query laporan yang sedang dalam perbaikan
-        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval', 'approved', 'need_revision','rejected'])
+        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval', 'approved', 'revision'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

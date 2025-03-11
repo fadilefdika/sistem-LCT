@@ -49,7 +49,7 @@ class BudgetApprovalController extends Controller
     
             DB::commit(); 
             
-            return redirect()->route('admin.budget-approval')->with('success', 'Budget request telah disetujui.');
+            return redirect()->route('admin.budget-approval-history')->with('success', 'Budget request telah disetujui.');
         } catch (\Exception $e) {
             DB::rollBack(); // Kembalikan perubahan jika ada error
     
@@ -70,7 +70,7 @@ class BudgetApprovalController extends Controller
 
             // 2. Update status_budget di tabel lct_budget_approval
             $budget->update([
-                'status_budget' => 'rejected',
+                'status_budget' => 'revision',
             ]);
 
             // 3. Simpan alasan reject di tabel lct_laporan_reject

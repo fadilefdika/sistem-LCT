@@ -141,7 +141,7 @@ class LaporanLctController extends Controller
             
             DB::commit();
             
-            Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
+            Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
 
             return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
 

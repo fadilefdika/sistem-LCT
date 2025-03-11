@@ -12,14 +12,14 @@
             <!-- Status Laporan -->
             <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
                 @if($laporan->status_lct === 'approved') bg-green-100 text-green-700 border border-green-400 
-                @elseif($laporan->status_lct === 'rejected') bg-red-100 text-red-700 border border-red-400 
+                @elseif($laporan->status_lct === 'revision') bg-red-100 text-red-700 border border-red-400 
                 @else bg-yellow-100 text-yellow-700 border border-yellow-400 @endif">
                 
                 <div class="flex items-center space-x-2 text-sm font-medium">
                     @if($laporan->status_lct === 'approved')
                         <i class="fas fa-check-circle text-green-500 text-lg"></i>
                         <span class="text-green-600">Disetujui</span>
-                    @elseif($laporan->status_lct === 'rejected')
+                    @elseif($laporan->status_lct === 'revision')
                         <i class="fas fa-times-circle text-red-500 text-lg"></i>
                         <span class="text-red-600">Ditolak</span>
                     @elseif($laporan->status_lct === 'progress_work')
@@ -173,7 +173,7 @@
         </p>
     </div>
 
-    @if($laporan->status_lct === 'rejected') 
+    @if($laporan->status_lct === 'revision') 
     <!-- Card Laporan Ditolak -->
     <div class="bg-white p-4 rounded-lg border border-red-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
         <div class="flex items-center space-x-2 mb-2">
@@ -206,7 +206,7 @@
         </div>
     @endif
     @else
-        <!-- Card Rekomendasi Safety (Jika status_lct bukan rejected) -->
+        <!-- Card Rekomendasi Safety (Jika status_lct bukan revision) -->
         <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
             <div class="flex items-center space-x-2 mb-2">
                 <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>

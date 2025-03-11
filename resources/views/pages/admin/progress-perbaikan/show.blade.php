@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'waiting_approval', 'rejected']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'waiting_approval', 'revision']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" 
@@ -310,7 +310,7 @@
 
                             <p class="text-gray-700 font-semibold mb-2">Setujui laporan ini?</p>
 
-                            <div x-data="{ rejected: false, reason: '', closed: false }">
+                            <div x-data="{ revision: false, reason: '', closed: false }">
                                 <div class="flex space-x-4">
                                     <!-- Approve Button -->
                                     <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
@@ -323,7 +323,7 @@
                                     
                                     </form>
                                 
-                                    <button type="button" @click="rejected = true"
+                                    <button type="button" @click="revision = true"
                                         class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
                                         @if(in_array($laporan->status_lct, ['approved', 'progress_work'])) disabled @endif>
                                         Reject
@@ -331,8 +331,8 @@
                                 </div>
                                 
                                 <!-- Alasan Penolakan -->
-                                <div x-show="rejected" class="mt-4">
-                                    <form @submit="rejected = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                <div x-show="revision" class="mt-4">
+                                    <form @submit="revision = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <label class="block text-gray-700 font-semibold">Alasan Penolakan:</label>
                                         <textarea x-model="reason" name="alasan_reject" rows="3"
@@ -343,7 +343,7 @@
                                                 class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
                                                 Kirim Revisi
                                             </button>
-                                            <button type="button" @click="rejected = false"
+                                            <button type="button" @click="revision = false"
                                                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer">
                                                 Batal
                                             </button>

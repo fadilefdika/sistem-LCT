@@ -11,6 +11,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
+                    <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">PIC Name</th> 
                     <th class="px-4 py-3">Risk Level</th> 
                     <th class="px-4 py-3">Total Amount</th> 
@@ -20,8 +21,9 @@
                 </tr>                
             </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
-                @forelse($budgets as $budget)
+                @forelse($budgets as $index => $budget)
                     <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
                         <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
                         <td class="px-4 py-4 text-sm text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">

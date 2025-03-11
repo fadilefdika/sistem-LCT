@@ -44,7 +44,7 @@
                                 'waiting_approval' => 'bg-blue-500',
                                 'approved' => 'bg-green-500',
                                 'closed' => 'bg-green-700',
-                                'rejected' => 'bg-red-500'
+                                'revision' => 'bg-red-500'
                             ];
                         @endphp
                         <span class="inline-flex items-center justify-center px-3 py-1 text-[10px] font-semibold text-white rounded-full

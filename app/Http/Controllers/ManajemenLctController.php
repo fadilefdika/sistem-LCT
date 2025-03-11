@@ -108,13 +108,13 @@ class ManajemenLctController extends Controller
     public function submitBudget(Request $request, $id_laporan_lct)
     {
         $request->merge([
-            'budget_amount' => str_replace('.', '', $request->budget_amount),
+            'budget_amount' => str_replace('.', '', $request->budget_amount), // Hapus titik sebagai pemisah ribuan
         ]);
-        
+
         $request->validate([
             'budget_amount' => 'required|numeric',
             'budget_description' => 'required|string',
-            'payment_proof' => 'sometimes|nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'attachment' => 'required|file|mimes:pdf,doc,docx|max:2048', // Sesuai dengan form
         ]);
 
         try {
@@ -128,12 +128,12 @@ class ManajemenLctController extends Controller
 
             // Cek apakah ada file yang diunggah
             $filePath = $budget->lampiran ?? null;
-            if ($request->hasFile('payment_proof')) {
+            if ($request->hasFile('attachment')) {
                 // Hapus file lama jika ada
                 if ($filePath) {
                     Storage::disk('public')->delete($filePath);
                 }
-                $filePath = $request->file('payment_proof')->store('budget_proofs', 'public');
+                $filePath = $request->file('attachment')->store('budget_proofs', 'public');
             }
 
             // Jika budget sudah ada, perbarui, jika belum, buat baru
@@ -156,8 +156,4 @@ class ManajemenLctController extends Controller
             return redirect()->back()->with('error', 'Failed to submit budget request: ' . $e->getMessage());
         }
     }
-
-
-
-
 }

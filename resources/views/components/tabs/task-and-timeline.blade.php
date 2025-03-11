@@ -6,8 +6,10 @@
             dark:[&::-webkit-scrollbar-track]:bg-neutral-700
             dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
     @switch($budget->status_budget ?? null)
-        @case('rejected')
+        @case('revision')
                 @include('partials.budget-reject', ['rejects' => $budget->rejects ?? []])
+                @include('partials.budget-task-timeline', ['tasks' => $tasks ?? []])
+                @include('partials.budget-form', ['budget' => $budget ?? null])
             @break
 
         @case('pending')

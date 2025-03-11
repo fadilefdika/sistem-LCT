@@ -10,13 +10,16 @@
             <input type="text" 
                    name="budget_amount" 
                    id="budget_amount" 
-                   value="{{ old('budget_amount', $budget->budget ?? '') }}" 
+                   value="{{ old('budget_amount', number_format($budget->budget ?? 0, 0, ',', '.')) }}" 
                    required 
                    placeholder="Masukkan jumlah budget (contoh: 1.000.000)"
                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
-                   aria-describedby="budget_help">
-            <p id="budget_help" class="text-sm text-gray-500 mt-1">Masukkan jumlah dalam format angka tanpa simbol mata uang.</p>
-        </div>        
+                   aria-describedby="budget_help"
+                   oninput="formatNumberInput(this)">
+            <p id="budget_help" class="text-sm text-gray-500 mt-1">
+                Masukkan jumlah dalam format angka tanpa simbol mata uang.
+            </p>
+        </div>     
 
         <div class="mb-6">
             <label for="budget_description" class="block text-sm font-medium text-gray-700">Budget Description <span class="text-red-500">*</span></label>
@@ -34,3 +37,16 @@
         </button>
     </form>
 </div>
+
+<script>
+    function formatNumberInput(input) {
+        // Ambil nilai tanpa karakter non-digit
+        let value = input.value.replace(/\D/g, '');
+        
+        // Format angka dengan titik setiap 3 digit
+        let formattedValue = new Intl.NumberFormat('id-ID').format(value);
+
+        // Update nilai input
+        input.value = formattedValue;
+    }
+</script>

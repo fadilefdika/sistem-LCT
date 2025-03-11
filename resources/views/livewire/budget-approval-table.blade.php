@@ -18,6 +18,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
+                    <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">PIC Name</th> 
                     <th class="px-4 py-3">Risk Level</th> 
                     <th class="px-4 py-3">Total Amount</th> 
@@ -27,17 +28,18 @@
                 </tr>                
             </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
-                @forelse($budgets as $budget)
-                    <tr class="hover:bg-gray-100 transition">
-                        <td class="px-4 py-4 text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
-                        <td class="px-4 py-4 text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
+                @forelse($budgets as $index => $budget)
+                    <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
                             Rp {{ number_format($budget->budget, 0, ',', '.') }}
                         </td>
-                        <td class="px-4 py-4 text-gray-600">
+                        <td class="px-4 py-4 text-sm text-gray-800">
                             {{ $budget->created_at->translatedFormat('d F Y') }}
                         </td>                        
-                        <td class="px-4 py-4">
+                        <td class="px-4 py-4 text-sm text-gray-800">
                             <p class="truncate block max-w-xs">
                                 {{$budget->status_budget}}
                             </p>
@@ -51,7 +53,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center py-6 text-gray-500">
+                        <td colspan="7" class="text-center py-6 text-gray-500">
                             <div class="flex flex-col items-center">
                                 <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
@@ -63,6 +65,7 @@
                 @endforelse
             </tbody>
         </table>
+        
     </div>
 
     <!-- Pagination -->

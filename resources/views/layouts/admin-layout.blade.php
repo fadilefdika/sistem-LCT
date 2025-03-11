@@ -58,7 +58,7 @@
                 x-ref="contentarea"
                 :class="{ 
                     'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show'].includes(page), 
-                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.show','admin.budget-approval','admin.budget-approval.show','admin.manajemen-pic'].includes(page) 
+                    'overflow-y-auto': ['admin.laporan-lct', 'admin.progress-perbaikan.show','admin.budget-approval','admin.budget-approval.show','admin.budget-approval-history.show','admin.manajemen-pic'].includes(page) 
                 }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />

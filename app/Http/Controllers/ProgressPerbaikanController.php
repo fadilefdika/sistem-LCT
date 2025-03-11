@@ -69,7 +69,7 @@ class ProgressPerbaikanController extends Controller
                 return response()->json(['error' => 'Laporan tidak ditemukan'], 404);
             }
     
-            $laporan->status_lct = 'rejected';
+            $laporan->status_lct = 'revision';
             $laporan->save();
     
             // Simpan alasan ke tabel lct_laporan_reject
