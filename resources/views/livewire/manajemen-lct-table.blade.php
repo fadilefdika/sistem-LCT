@@ -29,7 +29,7 @@
                         </td>
                         <!-- Tenggat Waktu -->
                         <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
-                            {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') : '-' }}
+                            {{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') }}
                         </td>
                         <td class="px-6 py-4 border-b text-gray-800">
                             @php

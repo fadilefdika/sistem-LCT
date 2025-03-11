@@ -219,17 +219,31 @@
     @endif
 
         <!-- Card Gambar Temuan -->
-    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-        <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
-        <div class="grid grid-cols-5 gap-2 mt-2">
-            @foreach ($bukti_temuan->take(5) as $gambar)
-                <img src="{{ $gambar }}" 
-                    class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                    alt="Bukti Temuan"
-                    onclick="openModal('{{ $gambar }}')">
-            @endforeach
+        @if($laporan->status_lct === 'revision')
+        <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+            <p class="text-gray-700 text-lg font-semibold">Gambar Hasil Perbaikan</p>
+            <div class="grid grid-cols-5 gap-2 mt-2">
+                @foreach ($bukti_perbaikan->take(5) as $gambar)
+                    <img src="{{ $gambar }}" 
+                        class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                        alt="Bukti Perbaikan"
+                        onclick="openModal('{{ $gambar }}')">
+                @endforeach
+            </div>
         </div>
-    </div>
+        @else
+        <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+            <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
+            <div class="grid grid-cols-5 gap-2 mt-2">
+                @foreach ($bukti_temuan->take(5) as $gambar)
+                    <img src="{{ $gambar }}" 
+                        class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                        alt="Bukti Temuan"
+                        onclick="openModal('{{ $gambar }}')">
+                @endforeach
+            </div>
+        </div>
+        @endif
 
     <!-- Modal Preview -->
     <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">

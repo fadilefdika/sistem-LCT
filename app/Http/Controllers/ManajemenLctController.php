@@ -51,8 +51,11 @@ class ManajemenLctController extends Controller
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
             return asset('storage/' . $path);
         });
+        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(function ($path) {
+            return asset('storage/' . $path);
+        });
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget', 'bukti_temuan'));
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget', 'bukti_temuan', 'bukti_perbaikan'));
     }
 
 

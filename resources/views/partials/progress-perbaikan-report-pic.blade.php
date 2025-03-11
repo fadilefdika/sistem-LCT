@@ -93,13 +93,16 @@
                         
                         <!-- Status -->
                         <p class="text-xs mt-1 font-semibold 
-                            {{ $diffInDays < 0 ? 'text-red-500' : ($diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500') }}">
-                            @if($diffInDays < 0)
-                                ⚠️ Melewati batas waktu
-                            @elseif($diffInDays === 0 && $remainingHours < 24)
-                                ⏳ Batas waktu hampir habis
-                            @elseif($laporan->status_lct === 'closed')
+                            {{ in_array($laporan->status_lct, ['approved', 'closed']) ? 'text-green-500' : 
+                            ($diffInDays < 0 ? 'text-red-500' : 
+                            ($diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
+
+                            @if (in_array($laporan->status_lct, ['approved', 'closed']))
                                 ✅ Selesai
+                            @elseif ($diffInDays < 0)
+                                ⚠️ Melewati batas waktu
+                            @elseif ($diffInDays === 0 && $remainingHours < 24)
+                                ⏳ Batas waktu hampir habis
                             @else
                                 ✅ Masih dalam batas waktu
                             @endif
@@ -107,7 +110,6 @@
                     </div>
                 </div>
             </div>
-
         
             <!-- Card Tanggal Selesai -->
             <div class="bg-white p-4 rounded-lg shadow-md border-l-4 
