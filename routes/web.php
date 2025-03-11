@@ -30,6 +30,7 @@ Route::middleware(['auth','verified', 'role:ehs,pic,manajer'])->group(function (
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/riwayat-lct', [RiwayatLctController::class, 'index'])->name('admin.riwayat-lct');
+    Route::get('/riwayat-lct/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('admin.riwayat-lct.show');
 });
 
 // Middleware untuk Manajer & EHS 

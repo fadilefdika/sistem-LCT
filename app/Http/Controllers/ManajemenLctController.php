@@ -85,10 +85,15 @@ class ManajemenLctController extends Controller
                 }
             }
 
+            // Tentukan status berdasarkan tingkat bahaya
+            $statusLct = ($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') 
+                ? 'waiting_approval_temporary' 
+                : 'waiting_approval';
+
             // Update laporan dengan data terbaru
             $laporan->update([
                 'date_completion' => $request->date_completion,
-                'status_lct' => 'waiting_approval',
+                'status_lct' => $statusLct,
                 'bukti_perbaikan' => json_encode($buktiPerbaikan), // Simpan dalam format JSON
             ]);
 
@@ -103,6 +108,7 @@ class ManajemenLctController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
     }
+
 
 
     public function submitBudget(Request $request, $id_laporan_lct)

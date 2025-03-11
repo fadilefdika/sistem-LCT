@@ -82,7 +82,7 @@ class BudgetApprovalController extends Controller
 
             DB::commit(); // Simpan perubahan
 
-            return redirect()->back()->with('success', 'Budget request telah ditolak.');
+            return redirect()->back()->with('success', 'Budget request perlu revisi.');
         } catch (\Exception $e) {
             dd("masuk catch", $e->getMessage());
             DB::rollBack(); // Kembalikan perubahan jika ada error

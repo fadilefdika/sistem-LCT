@@ -43,6 +43,8 @@
                         {{ Breadcrumbs::render('budget-approval-history.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.riwayat-lct')
                         {{ Breadcrumbs::render('riwayat-lct') }}
+                    @elseif(Route::currentRouteName() === 'admin.riwayat-lct.show')
+                        {{ Breadcrumbs::render('riwayat-lct.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.manajemen-pic')
                         {{ Breadcrumbs::render('manajemen-pic') }}
                     @endif

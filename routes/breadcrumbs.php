@@ -81,6 +81,11 @@ Breadcrumbs::for('riwayat-lct', function (BreadcrumbTrail $trail) {
     $trail->push('Riwayat LCT', route('admin.riwayat-lct'));
 });
 
+Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('riwayat-lct');
+    $trail->push("Detail Riwayat Laporan LCT #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
+});
+
 // laporan manajemen pic
 Breadcrumbs::for('manajemen-pic', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

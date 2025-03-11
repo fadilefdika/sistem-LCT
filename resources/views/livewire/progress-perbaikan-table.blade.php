@@ -1,8 +1,8 @@
-<div class="bg-white dark:bg-gray-800 p-6 relative shadow-md sm:rounded-lg overflow-hidden">
+<div class="bg-white p-6 relative shadow-md rounded-xl overflow-x-auto">
     
     <div class="overflow-x-auto rounded-lg border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+            <thead class="bg-gray-100">
                 <tr class="text-left text-sm font-semibold text-gray-600">
                     <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">Temuan Ketidaksesuaian</th>
@@ -29,16 +29,25 @@
     
                     <!-- Tingkat Bahaya -->
                     <td class="px-4 py-3 text-gray-800 w-28">
-                        <span class="px-3 py-1 text-xs font-semibold text-white rounded-full
-                            {{ $laporan->tingkat_bahaya === 'High' ? 'bg-red-500' : ($laporan->tingkat_bahaya === 'Medium' ? 'bg-yellow-500' : 'bg-green-500') }}">
+                        @php
+                            $bahayaColors = [
+                                'High' => 'bg-red-500',
+                                'Medium' => 'bg-yellow-500',
+                                'Low' => 'bg-green-500'
+                            ];
+                        @endphp
+                        <span class="px-3 py-1 text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
                             {{ $laporan->tingkat_bahaya }}
                         </span>
                     </td>
-    
+
                     <!-- Status Progress -->
                     <td class="px-4 py-3 text-gray-800 w-36">
                         @php
+                            // Default status color
                             $statusColors = [
+                                'open' => 'bg-gray-500',
+                                'review' => 'bg-purple-500',
                                 'in_progress' => 'bg-gray-500',
                                 'progress_work' => 'bg-yellow-500',
                                 'waiting_approval' => 'bg-blue-500',
@@ -46,27 +55,52 @@
                                 'closed' => 'bg-green-700',
                                 'revision' => 'bg-red-500'
                             ];
+
+                            // Tambahan status untuk Medium & High
+                            if ($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') {
+                                $statusColors = array_merge($statusColors, [
+                                    'waiting_approval_temporary' => 'bg-blue-500',
+                                    'approved_temporary' => 'bg-green-500',
+                                    'temporary_revision' => 'bg-red-500',
+                                    'work_permanent' => 'bg-yellow-500',
+                                    'waiting_approval_permanent' => 'bg-blue-500',
+                                    'approved_permanent' => 'bg-green-500',
+                                    'permanent_revision' => 'bg-red-500'
+                                ]);
+                            }
                         @endphp
+
                         <span class="inline-flex items-center justify-center px-3 py-1 text-[10px] font-semibold text-white rounded-full
                             {{ $statusColors[$laporan->status_lct] ?? 'bg-gray-400' }} whitespace-nowrap">
                             {{ ucwords(str_replace('_', ' ', $laporan->status_lct)) }}
                         </span>
                     </td>
-    
+
                     <!-- Tenggat Waktu -->
-                    <td class="px-4 py-3 text-gray-800 w-32">
-                        {{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->translatedFormat('d F Y') }}
+                    <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                        {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') : '-' }}
                     </td>
     
                     <!-- Tanggal Selesai -->
-                    <td class="px-4 py-3 text-gray-800 w-32">
-                        @if($laporan->tanggal_selesai)
-                            {{ \Carbon\Carbon::parse($laporan->tanggal_selesai)->translatedFormat('d F Y') }}
+                    <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                        @if ($laporan->date_completion)
+                            {{ \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') }}
                         @else
-                            <span class="text-red-500 font-semibold">Belum Selesai</span>
+                            @php
+                                $dueDate = \Carbon\Carbon::parse($laporan->tenggat_waktu);
+                                $today = \Carbon\Carbon::now();
+                                $overdueDays = $dueDate->diffInDays($today, false); // Hitung selisih hari
+                            @endphp
+                    
+                            @if ($overdueDays > 0)
+                                <span class="text-red-600 font-semibold">Overdue {{ $overdueDays }} days</span>
+                            @else
+                                -
+                            @endif
                         @endif
                     </td>
-    
+                    
+
                     <!-- Tombol Aksi -->
                     <td class="px-4 py-3 flex items-center gap-2 w-28">
                         <a href="{{ route('admin.progress-perbaikan.show', $laporan->id_laporan_lct) }}"

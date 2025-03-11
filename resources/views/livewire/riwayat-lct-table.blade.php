@@ -8,7 +8,7 @@
                     <th class="py-3 px-4">Tanggal Temuan</th>
                     <th class="py-3 px-4">Nama PIC</th>
                     <th class="py-3 px-4">Status Akhir</th>
-                    <th class="py-3 px-4">Feedback</th>
+                    <th class="px-4 py-3">Tanggal Selesai</th>
                     <th class="py-3 px-4">Aksi</th>
                 </tr>
             </thead>
@@ -23,7 +23,7 @@
                         {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->translatedFormat('d F Y') }}
                     </td>
                     <td class="py-4 px-6 border-b text-gray-800">
-                        {{ $laporan->pic->nama ?? '-' }}
+                        {{ $laporan->picUser->fullname ?? '-' }}
                     </td>
 
                     <!-- Status Akhir dengan Badge Warna -->
@@ -44,13 +44,14 @@
                         </span>
                     </td>
 
-                    <td class="py-4 px-6 border-b text-gray-800">
-                        {{ $laporan->feedback_reject ?? '-' }}
+                    <!-- Tenggat Waktu -->
+                    <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                        {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') : '-' }}
                     </td>
 
                     <!-- Tombol Aksi -->
                     <td class="py-4 px-6 border-b">
-                        <a href="{{-- route('riwayat.lct.detail', $laporan->id_laporan_lct) --}}" 
+                        <a href="{{ route('admin.riwayat-lct.show', $laporan->id_laporan_lct) }}" 
                             class="text-blue-600 hover:underline font-semibold">
                             Detail
                         </a>

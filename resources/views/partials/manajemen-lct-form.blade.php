@@ -78,7 +78,7 @@
                                 <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
                                 <p class="text-xs text-gray-500">SVG, PNG, JPG, atau GIF (MAX. 1MB)</p>
                             </div>
-                            <input id="dropzone-file" name="bukti_temuan[]" type="file" class="hidden" accept="image/*" multiple />
+                            <input id="dropzone-file" name="bukti_perbaikan[]" type="file" class="hidden" accept="image/*" multiple />
                         </label>
 
                         <!-- Opsi akses kamera dengan Webcam.js -->
@@ -97,10 +97,18 @@
                     <p class="text-xs text-gray-500 mt-1">Unggah hingga 5 foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
                 </div>
                 
-                <!-- Submit button -->
-                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 cursor-pointer">
+                 <!-- Submit button -->
+                <button 
+                    type="submit" 
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
+                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
+                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) disabled @endif
+                    >
                     Kirim Laporan
                 </button>
+
+           
+
             </div>
         </form>
     </div>

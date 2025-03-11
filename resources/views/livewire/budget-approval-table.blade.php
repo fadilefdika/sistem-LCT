@@ -68,10 +68,12 @@
         
     </div>
 
-    <!-- Pagination -->
-    @if($budgets->count() > 0)
-        <div class="mt-4 flex justify-end">
-            {{ $budgets->links() }}
+    <div class="mt-6 flex justify-between items-center border-t px-5 py-3">
+        <span class="text-sm text-gray-600">
+            Showing {{ $budgets->firstItem() }} to {{ $budgets->lastItem() }} of {{ $budgets->total() }} entries
+        </span>
+        <div>
+            {{ $budgets->links('pagination::tailwind') }}
         </div>
-    @endif
+    </div>
 </div>

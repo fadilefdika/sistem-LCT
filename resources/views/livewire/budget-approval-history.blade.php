@@ -45,16 +45,16 @@
                         </td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="5" class="text-center py-6 text-gray-500">
-                            <div class="flex flex-col items-center">
-                                <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
-                                </svg>
-                                <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
-                            </div>
-                        </td>
-                    </tr>
+                <tr>
+                    <td colspan="7" class="text-center py-6 text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
+                            </svg>
+                            <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
+                        </div>
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>

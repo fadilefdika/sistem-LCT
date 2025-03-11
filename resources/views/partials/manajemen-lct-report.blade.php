@@ -21,7 +21,7 @@
                         <span class="text-green-600">Disetujui</span>
                     @elseif($laporan->status_lct === 'revision')
                         <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-600">Ditolak</span>
+                        <span class="text-red-600">Revisi</span>
                     @elseif($laporan->status_lct === 'progress_work')
                         <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
                         <span class="text-yellow-600">Dalam Proses</span>
@@ -174,11 +174,11 @@
     </div>
 
     @if($laporan->status_lct === 'revision') 
-    <!-- Card Laporan Ditolak -->
+    <!-- Card Laporan Revisi -->
     <div class="bg-white p-4 rounded-lg border border-red-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
         <div class="flex items-center space-x-2 mb-2">
             <i class="fa-solid fa-exclamation-circle text-red-500 text-lg"></i>
-            <p class="text-gray-500 text-xs font-semibold">Laporan Ditolak</p>
+            <p class="text-gray-500 text-xs font-semibold">Laporan Perlu Revisi</p>
         </div>
 
         @if ($laporan->rejectLaporan->isNotEmpty())

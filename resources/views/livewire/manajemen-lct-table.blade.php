@@ -1,7 +1,7 @@
 <div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl">
     <input type="text" wire:model="search" placeholder="Cari laporan..." class="border p-2 mb-3 w-full rounded-md focus:ring focus:ring-blue-200">
 
-    <div class="overflow-hidden rounded-lg border border-gray-200">
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg overflow-hidden">
             <thead class="bg-gray-100">
                 <tr class="text-left text-sm font-semibold text-gray-700">
@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
-                @foreach($laporans as $index => $laporan)
+                @forelse($laporans as $index => $laporan)
                     <tr class="hover:bg-gray-100 text-sm transition duration-200 ease-in-out">
                         <td class="px-6 py-4 text-gray-800">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 text-gray-800">{{ $laporan->temuan_ketidaksesuaian }}</td>
@@ -27,7 +27,10 @@
                                 {{ $laporan->tingkat_bahaya }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-gray-800">{{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('d M Y') }}</td>
+                        <!-- Tenggat Waktu -->
+                        <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                            {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') : '-' }}
+                        </td>
                         <td class="px-6 py-4 border-b text-gray-800">
                             @php
                                 $statusColors = [
@@ -42,7 +45,7 @@
                                 $statusLabels = [
                                     'in_progress' => 'Not Started',
                                     'progress_work' => 'In Progress',
-                                    'waiting_approval' => 'Pending Approval',
+                                    'waiting_approval' => 'Waiting Approval',
                                     'approved' => 'Approved',
                                     'closed' => 'Closed',
                                     'revision' => 'Revision',
@@ -53,8 +56,9 @@
                                 {{ $statusLabels[$laporan->status_lct] ?? 'Unknown' }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-gray-800">
-                            {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('d M Y') : '-' }}
+                        <!-- Completion Date -->
+                        <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                            {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') : '-' }}
                         </td>
                         <td class="px-6 py-4">
                             <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline font-medium">
@@ -62,7 +66,21 @@
                             </a>
                         </td>
                     </tr>
-                @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="8" class="text-center py-6 text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6">
+                                    </path>
+                                </svg>
+                                <p class="text-sm">Tidak ada laporan yang tersedia.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
             </tbody>
         </table>
         

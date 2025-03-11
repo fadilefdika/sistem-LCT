@@ -126,8 +126,7 @@ class LaporanLctController extends Controller
                 abort(404, 'Data laporan tidak ditemukan');
             }
 
-            // dd($request->all());
-            // dd($laporan);
+            
             $laporan->update([
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'pic_id' => $request->pic_id,
