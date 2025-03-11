@@ -25,7 +25,7 @@
                 <div class="flex items-center justify-between">
                     <!-- Header -->
                     <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                        📝 Laporan dari PIC
+                        📝 Report from the PIC
                     </h5>
 
                     <!-- Badge Tingkat Bahaya -->
@@ -39,7 +39,7 @@
 
                 <!-- Isi Laporan -->
                 <div class="space-y-1">
-                    <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
+                    <p class="text-gray-500 text-xs">Non-Conformity Finding</p>
                     <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
                 </div>
             </div>
@@ -65,11 +65,11 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-2 items-center">
                     
-                    <!-- Nama Pelapor -->
+                    <!-- PIC Name -->
                     <div class="flex flex-col">
                         <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                             <i class="fas fa-user text-blue-500"></i>
-                            <p>Nama PIC</p>
+                            <p>PIC Name</p>
                         </div>
                         <p class="text-gray-900 font-semibold text-sm mt-1">
                             {{ $laporan->picUser->fullname }}
@@ -98,13 +98,13 @@
                             ($diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
 
                             @if (in_array($laporan->status_lct, ['approved', 'closed']))
-                                ✅ Selesai
+                                ✅ Completed
                             @elseif ($diffInDays < 0)
-                                ⚠️ Melewati batas waktu
+                                ⚠️ Overdue
                             @elseif ($diffInDays === 0 && $remainingHours < 24)
-                                ⏳ Batas waktu hampir habis
+                                ⏳ Deadline Approaching
                             @else
-                                ✅ Masih dalam batas waktu
+                                ✅ Within Deadline
                             @endif
                         </p>
                     </div>
@@ -118,12 +118,12 @@
                     <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
                         <i class="fas fa-calendar-alt 
                             {{ $laporan->date_completion == null ? 'text-red-500' : 'text-green-500' }}"></i>
-                        <p>Tanggal Selesai</p>
+                        <p>Completion Date</p>
                     </div>
 
                     @if($laporan->date_completion == null)
                         <!-- Jika belum selesai -->
-                        <p class="text-red-500 font-semibold text-sm mt-1">Belum selesai</p>
+                        <p class="text-red-500 font-semibold text-sm mt-1">Not Completed Yet</p>
                     @else
                         @php
                             $dueDate = \Carbon\Carbon::parse($laporan->due_date); // Ambil due date
@@ -138,7 +138,7 @@
 
                         @if($isLate)
                             <!-- Jika terlambat -->
-                            <p class="text-xs text-red-500 font-medium mt-1">⚠️ Terlambat {{ $completionDate->diffInDays($dueDate) }} hari</p>
+                            <p class="text-xs text-red-500 font-medium mt-1">⚠️ Overdue {{ $completionDate->diffInDays($dueDate) }} hari</p>
                         @endif
                     @endif
                 </div>
@@ -149,7 +149,7 @@
             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
                 <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                     <i class="fas fa-map-marker-alt text-red-500"></i>
-                    <p>Area Temuan</p>
+                    <p>Finding Area</p>
                 </div>
                 <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
             </div>
@@ -180,13 +180,18 @@
             
             <!-- Header -->
             <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                Approval Laporan Perbaikan LCT 
+                @if($laporan->status_lct === 'waiting_approval_temporary' || $laporan->status_lct === 'temporary_revision')
+                    LCT Corrective Report Approval (Temporary)
+                @else
+                    LCT Corrective Report Approval
+                @endif
             </h5>
+            
 
             <!-- Garis Pemisah -->
             <div class="w-full h-[2px] bg-gray-200 my-3"></div>
 
-            <p class="text-gray-700 font-semibold mb-2">Setujui laporan ini?</p>
+            <p class="text-gray-700 font-semibold mb-2">Approve this report?</p>
 
             <div x-data="{ revision: false, reason: '', closed: false }">
 
@@ -214,18 +219,18 @@
                     <div x-show="revision" class="mt-4">
                         <form @submit="revision = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
                             @csrf
-                            <label class="block text-gray-700 font-semibold">Alasan Penolakan:</label>
+                            <label class="block text-gray-700 font-semibold">Revision Reason:</label>
                             <textarea x-model="reason" name="alasan_reject" rows="3"
                                 class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
 
                             <div class="flex mt-3 space-x-2">
                                 <button type="submit"
                                     class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
-                                    Kirim Revisi
+                                    Send Revision
                                 </button>
                                 <button type="button" @click="revision = false"
                                     class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer">
-                                    Batal
+                                    Cancel
                                 </button>
                             </div>
                         </form>
@@ -234,7 +239,7 @@
                     <!-- Status Laporan -->
                     @if($laporan->status_lct === "approved" && $laporan->tingkat_bahaya === 'Low')
                         <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
-                            <p class="text-green-800 font-semibold">✅ Laporan telah disetujui.</p>
+                            <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
                             <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf
                                 <button type="submit" @click="closed = true"
@@ -246,7 +251,7 @@
                     @endif
                 @else
                     <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                        <p class="text-gray-700 font-semibold">🔒 Laporan telah ditutup.</p>
+                        <p class="text-gray-700 font-semibold">🔒 The report has been closed.</p>
                     </div>
                 @endif
 
@@ -255,13 +260,13 @@
                 <div class="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="text-red-500 text-xl">❌</span>
-                        <p class="text-red-800 font-semibold text-lg">Laporan Perlu Revisi</p>
+                        <p class="text-red-800 font-semibold text-lg">The report needs revision.</p>
                     </div>
                     <table class="w-full border-collapse">
                         <thead>
                             <tr class="bg-red-200 text-red-800 text-sm font-semibold">
-                                <th class="p-2 text-left">Alasan</th>
-                                <th class="p-2 text-left">Tanggal</th>
+                                <th class="p-2 text-left">Reason</th>
+                                <th class="p-2 text-left">Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -281,7 +286,7 @@
 
                 <!-- Notifikasi Laporan Ditutup -->
                 <div x-show="closed" class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                    <p class="text-gray-700 font-semibold">🔒 Laporan telah ditutup.</p>
+                    <p class="text-gray-700 font-semibold">🔒 The report has been closed.</p>
                 </div>
             </div>
         </div>

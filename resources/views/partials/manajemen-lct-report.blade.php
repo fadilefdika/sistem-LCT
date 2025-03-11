@@ -13,21 +13,46 @@
             <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
                 @if($laporan->status_lct === 'approved') bg-green-100 text-green-700 border border-green-400 
                 @elseif($laporan->status_lct === 'revision') bg-red-100 text-red-700 border border-red-400 
-                @else bg-yellow-100 text-yellow-700 border border-yellow-400 @endif">
-                
+                @elseif($laporan->status_lct === 'waiting_approval_temporary') bg-yellow-100 text-yellow-700 border border-yellow-400
+                @elseif($laporan->status_lct === 'approved_temporary') bg-green-100 text-green-700 border border-green-400
+                @elseif($laporan->status_lct === 'temporary_revision') bg-red-100 text-red-700 border border-red-400
+                @elseif($laporan->status_lct === 'work_permanent') bg-blue-100 text-blue-700 border border-blue-400
+                @elseif($laporan->status_lct === 'waiting_approval_permanent') bg-yellow-100 text-yellow-700 border border-yellow-400
+                @elseif($laporan->status_lct === 'approved_permanent') bg-green-100 text-green-700 border border-green-400
+                @elseif($laporan->status_lct === 'permanent_revision') bg-red-100 text-red-700 border border-red-400
+                @else bg-gray-100 text-gray-700 border border-gray-400 @endif">
+
                 <div class="flex items-center space-x-2 text-sm font-medium">
                     @if($laporan->status_lct === 'approved')
                         <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                        <span class="text-green-600">Approved</span>
+                        <span class="text-green-800">Approved</span>
                     @elseif($laporan->status_lct === 'revision')
                         <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-600">Revision Required</span>
-                    @elseif($laporan->status_lct === 'progress_work')
+                        <span class="text-red-800">Revision Required</span>
+                    @elseif($laporan->status_lct === 'waiting_approval_temporary')
                         <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
-                        <span class="text-yellow-600">In Progress</span>
+                        <span class="text-yellow-800">Waiting Approval (Temporary)</span>
+                    @elseif($laporan->status_lct === 'approved_temporary')
+                        <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                        <span class="text-green-800">Approved (Temporary)</span>
+                    @elseif($laporan->status_lct === 'temporary_revision')
+                        <i class="fas fa-times-circle text-red-500 text-lg"></i>
+                        <span class="text-red-800">Revision (Temporary)</span>
+                    @elseif($laporan->status_lct === 'work_permanent')
+                        <i class="fas fa-hourglass-half text-blue-500 text-lg"></i>
+                        <span class="text-blue-800">Work (Permanent)</span>
+                    @elseif($laporan->status_lct === 'waiting_approval_permanent')
+                        <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
+                        <span class="text-yellow-800">Waiting Approval (Permanent)</span>
+                    @elseif($laporan->status_lct === 'approved_permanent')
+                        <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                        <span class="text-green-800">Approved (Permanent)</span>
+                    @elseif($laporan->status_lct === 'permanent_revision')
+                        <i class="fas fa-times-circle text-red-500 text-lg"></i>
+                        <span class="text-red-800">Revision (Permanent)</span>
                     @else
                         <i class="fas fa-hourglass-half text-gray-500 text-lg"></i>
-                        <span class="text-gray-600">Pending Approval</span>
+                        <span class="text-gray-800">Pending Approval</span>
                     @endif
                 </div>                                         
             </div>

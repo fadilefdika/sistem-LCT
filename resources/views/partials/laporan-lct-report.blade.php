@@ -12,7 +12,7 @@
 
         <!-- Isi Laporan -->
         <div class="flex flex-col space-y-1 mt-4">
-            <p class="text-gray-500 text-xs">Non-Conformity Finding</p>
+            <p class="text-gray-500 text-xs">Non-Conformity Findings</p>
             <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
         </div>
     </div>

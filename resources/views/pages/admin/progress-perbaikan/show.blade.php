@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'waiting_approval', 'revision']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved', 'waiting_approval', 'revision', 'waiting_approval_temporary', 'temporary_revision']) ? 'pic' : 'user' }}' }" class="px-5 pt-2">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" 
@@ -14,7 +14,7 @@
                 PIC
             </button>
         
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && $laporan->status_lct === 'approved')
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && $laporan->status_lct === 'approved_temporary')
                 <button @click="activeTab = 'task-pic'" 
                         :class="activeTab === 'task-pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                         class="px-4 py-2 focus:outline-none cursor-pointer">

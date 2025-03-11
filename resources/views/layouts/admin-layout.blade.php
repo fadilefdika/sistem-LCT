@@ -83,7 +83,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Berhasil!',
+                        title: 'Success!',
                         text: '{{ session('success') }}',
                         showConfirmButton: false,
                         timer: 2000
@@ -96,7 +96,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Berhasil!',
+                        title: 'Success!',
                         text: '{{ session('approve') }}',
                         showConfirmButton: false,
                         timer: 2000
@@ -109,7 +109,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'info', // Bisa diganti ke 'success' jika ingin warna hijau
-                        title: 'Laporan Closed!',
+                        title: 'Report Closed!',
                         text: '{{ session('closed') }}',
                         showConfirmButton: false,
                         timer: 2000
@@ -122,7 +122,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Revisi!',
+                        title: 'Revision!',
                         text: '{{ session('reject') }}',
                         showConfirmButton: false,
                         timer: 2500

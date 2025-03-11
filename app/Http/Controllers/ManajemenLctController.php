@@ -66,14 +66,14 @@ class ManajemenLctController extends Controller
             'bukti_perbaikan' => ['required', 'array', 'max:5'], // Maksimal 5 file
             'bukti_perbaikan.*' => ['file', 'mimes:png,jpg,jpeg,gif', 'max:1024'], // Setiap file harus gambar dan max 1MB
         ]);
-
+        
         try {
             DB::beginTransaction();
-
+            
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
             $buktiPerbaikan = [];
-
+            
             // Loop untuk menyimpan semua gambar
             if ($request->hasFile('bukti_perbaikan')) {
                 foreach ($request->file('bukti_perbaikan') as $file) {
@@ -82,7 +82,7 @@ class ManajemenLctController extends Controller
 
                     // Simpan file ke storage/public/bukti_perbaikan
                     $path = $file->storeAs('public/bukti_perbaikan', $filename);
-
+                    
                     // Simpan hanya nama file atau path relatif
                     $buktiPerbaikan[] = 'bukti_perbaikan/' . $filename;
                 }
@@ -90,9 +90,10 @@ class ManajemenLctController extends Controller
 
             // Tentukan status berdasarkan tingkat bahaya
             $statusLct = ($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') 
-                ? 'waiting_approval_temporary' 
-                : 'waiting_approval';
-
+            ? 'waiting_approval_temporary' 
+            : 'waiting_approval';
+            
+            // dd("masuk sin");
             // Update laporan dengan data terbaru
             $laporan->update([
                 'date_completion' => $request->date_completion,
@@ -102,13 +103,13 @@ class ManajemenLctController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.manajemen-lct')->with('success', 'Hasil perbaikan telah dikirim ke EHS.');
+            return redirect()->route('admin.manajemen-lct')->with('success', 'The repair results have been sent to EHS.');
         } catch (\Exception $e) {
             DB::rollBack();
-
+            dd($e);
             Log::error('Gagal mengirim hasil perbaikan ke EHS: ' . $e->getMessage());
 
-            return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
+            return redirect()->back()->with('error', 'An error occurred, please try again.');
         }
     }
 

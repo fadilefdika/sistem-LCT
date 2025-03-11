@@ -94,14 +94,14 @@ class LctReportController extends Controller
             ]);
 
             DB::commit(); // Simpan perubahan
-            return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
+            return redirect()->back()->with('success', 'The report has been successfully saved!');
 
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan jika ada error
             dd($e->getMessage());
             Log::error('Gagal menyimpan laporan LCT: ' . $e->getMessage()); // Logging error
             
-            return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
+            return redirect()->back()->with('error', 'An error occurred, please try again.');
         }
     }
 
@@ -124,7 +124,7 @@ class LctReportController extends Controller
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
             if (!$laporan) {
-                abort(404, 'Data laporan tidak ditemukan');
+                abort(404, 'Report data not found');
             }
 
             
@@ -144,16 +144,16 @@ class LctReportController extends Controller
             
             Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
 
-            return redirect()->route('admin.progress-perbaikan')->with('success', 'Laporan berhasil dikirim ke PIC.');
+            return redirect()->route('admin.progress-perbaikan')->with('success', 'The report has been successfully submitted to the PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
             dd($e);
-            return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
+            return redirect()->back()->with('error', 'Report not found.');
         } catch (\Exception $e) {
             DB::rollBack();
             dd($e);
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim laporan.');
+            return redirect()->back()->with('error', 'An error occurred while submitting the report.');
         }
     }
 

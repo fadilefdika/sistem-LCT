@@ -10,10 +10,10 @@
     <!-- Laporan dari Pelapor (Full Width) -->
     <div class="col-span-2 bg-white p-6 rounded-xl shadow-md">
         <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            📝 Laporan dari Pelapor
+            📝 Report from the Reporter
         </h5>
         <div class="w-full h-[2px] bg-gray-200 my-3"></div>
-        <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
+        <p class="text-gray-500 text-xs">Non-Conformity Finding</p>
         <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
     </div>
 
@@ -22,33 +22,34 @@
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <p class="text-gray-500 text-xs flex items-center gap-1">
-                    <i class="fas fa-user text-blue-500"></i> Nama Pelapor
+                    <i class="fas fa-user text-blue-500"></i> Reporter Name
                 </p>
                 <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->user->fullname}}</p>
             </div>
             <div>
                 <p class="text-gray-500 text-xs flex items-center gap-1">
-                    <i class="fas fa-calendar-alt text-green-500"></i> Tanggal Temuan
+                    <i class="fas fa-calendar-alt text-green-500"></i> Finding Date
                 </p>
                 <p class="text-gray-900 font-semibold text-sm mt-1">
-                    {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->translatedFormat('l, d F Y') }}
-                </p>
+                    {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('en')->translatedFormat('l, d F Y') }}
+                </p>                
             </div>
+            
         </div>
     </div>
 
     <!-- Area Temuan -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         <p class="text-gray-500 text-xs flex items-center gap-1">
-            <i class="fas fa-map-marker-alt text-red-500"></i> Area Temuan
+            <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
         </p>
         <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
     </div>
 
-    <!-- Kategori Temuan -->
+    <!-- Finding Category -->
     <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2">
         <p class="text-gray-500 text-xs flex items-center gap-2">
-            <i class="fa-solid fa-flag text-yellow-500"></i> Kategori Temuan
+            <i class="fa-solid fa-flag text-yellow-500"></i> Finding Category
         </p>
         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">
             {{$laporan->kategori_temuan}}
@@ -58,7 +59,7 @@
     <!-- Rekomendasi Safety -->
     <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2">
         <p class="text-gray-500 text-xs flex items-center gap-2">
-            <i class="fa-solid fa-shield-alt text-green-500"></i> Rekomendasi Safety
+            <i class="fa-solid fa-shield-alt text-green-500"></i> Safety Recommendation
         </p>
         <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
             {{$laporan->rekomendasi_safety}}

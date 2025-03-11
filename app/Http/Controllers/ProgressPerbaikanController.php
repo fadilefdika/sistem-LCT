@@ -71,7 +71,7 @@ class ProgressPerbaikanController extends Controller
 
         $laporan->save();
 
-        return redirect()->back()->with('approve', 'Laporan perbaikan berhasil diapprove.');
+        return redirect()->back()->with('approve', 'The repair report has been successfully approved.');
     }
 
 
@@ -123,7 +123,7 @@ class ProgressPerbaikanController extends Controller
 
             DB::commit(); // ✅ Simpan perubahan ke database sebelum redirect
 
-            return redirect()->back()->with('reject', 'Laporan revisi berhasil dikirim ke PIC.');
+            return redirect()->back()->with('reject', 'The revision report has been successfully sent to the PIC.');
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan semua perubahan jika ada error
             return response()->json(['error' => 'Terjadi kesalahan saat menolak laporan.', 'message' => $e->getMessage()], 500);
@@ -143,7 +143,7 @@ class ProgressPerbaikanController extends Controller
         $laporan->status_lct = 'closed';
         $laporan->save();
 
-        return redirect()->route('admin.riwayat-lct')->with('closed', 'Laporan perbaikan berhasil diapprove.');
+        return redirect()->route('admin.riwayat-lct')->with('closed', 'The repair report has been successfully approved.');
     }
 
 

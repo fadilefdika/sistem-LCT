@@ -49,11 +49,11 @@ class BudgetApprovalController extends Controller
     
             DB::commit(); 
             
-            return redirect()->route('admin.budget-approval-history')->with('success', 'Budget request telah disetujui.');
+            return redirect()->route('admin.budget-approval-history')->with('success', 'Budget request has been approved.');
         } catch (\Exception $e) {
             DB::rollBack(); // Kembalikan perubahan jika ada error
     
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyetujui budget request.');
+            return redirect()->back()->with('error', 'An error occurred while approving the budget request.');
         }
     }
 
@@ -65,7 +65,7 @@ class BudgetApprovalController extends Controller
             $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
             
             if (!$budget) {
-                return redirect()->back()->with('error', 'Budget tidak ditemukan.');
+                return redirect()->back()->with('error', 'Budget not found.');
             }
 
             // 2. Update status_budget di tabel lct_budget_approval
@@ -82,12 +82,12 @@ class BudgetApprovalController extends Controller
 
             DB::commit(); // Simpan perubahan
 
-            return redirect()->back()->with('success', 'Budget request perlu revisi.');
+            return redirect()->back()->with('success', 'Budget request needs revision.');
         } catch (\Exception $e) {
             dd("masuk catch", $e->getMessage());
             DB::rollBack(); // Kembalikan perubahan jika ada error
 
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menolak budget request: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while rejecting the budget request: ' . $e->getMessage());
         }
     }
 

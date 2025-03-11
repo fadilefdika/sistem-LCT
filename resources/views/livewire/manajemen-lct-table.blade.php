@@ -40,8 +40,15 @@
                                     'approved' => 'bg-green-500', // Green for Approved
                                     'closed' => 'bg-purple-500', // Purple for Closed
                                     'revision' => 'bg-red-500', // Red for revision
+                                    'waiting_approval_temporary' => 'bg-yellow-600', // Yellow for Temporary Waiting Approval
+                                    'approved_temporary' => 'bg-green-600', // Green for Temporary Approved
+                                    'temporary_revision' => 'bg-red-600', // Red for Temporary Revision
+                                    'work_permanent' => 'bg-blue-600', // Blue for Permanent Work
+                                    'waiting_approval_permanent' => 'bg-yellow-700', // Yellow for Permanent Waiting Approval
+                                    'approved_permanent' => 'bg-green-700', // Green for Permanent Approved
+                                    'permanent_revision' => 'bg-red-700', // Red for Permanent Revision
                                 ];
-        
+                        
                                 $statusLabels = [
                                     'in_progress' => 'Not Started',
                                     'progress_work' => 'In Progress',
@@ -49,13 +56,21 @@
                                     'approved' => 'Approved',
                                     'closed' => 'Closed',
                                     'revision' => 'Revision',
+                                    'waiting_approval_temporary' => 'Waiting Approval (Temporary)',
+                                    'approved_temporary' => 'Approved (Temporary)',
+                                    'temporary_revision' => 'Revision (Temporary)',
+                                    'work_permanent' => 'Work (Permanent)',
+                                    'waiting_approval_permanent' => 'Waiting Approval (Permanent)',
+                                    'approved_permanent' => 'Approved (Permanent)',
+                                    'permanent_revision' => 'Revision (Permanent)',
                                 ];
                             @endphp
-        
+                        
                             <span class="inline-block px-2 py-1 rounded-full text-white text-xs font-semibold {{ $statusColors[$laporan->status_lct] ?? 'bg-gray-300' }} whitespace-nowrap">
                                 {{ $statusLabels[$laporan->status_lct] ?? 'Unknown' }}
                             </span>
                         </td>
+                        
                         <!-- Completion Date -->
                         <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
                             {{ $laporan->date_completion ? \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') : '-' }}

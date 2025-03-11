@@ -34,7 +34,7 @@ class ManajemenLCTTable extends Component
         $picId = Pic::where('user_id', $user->id)->value('id');
 
         // Query untuk mengambil laporan yang hanya sesuai dengan PIC dan Departemennya
-        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval', 'revision', 'approved']) // Hanya yang dikirim EHS
+        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval', 'rejected', 'approved','waiting_approval_temporary', 'approved_temporary', 'temporary_revision', 'work_permanent', 'waiting_approval_permanent', 'approved_permanent', 'permanent_revision']) // Hanya yang dikirim EHS
             ->where('pic_id', $picId) // Hanya laporan yang ditugaskan ke PIC ini
             ->orderBy('created_at', 'desc')
             ->paginate(10);

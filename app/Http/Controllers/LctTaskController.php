@@ -27,14 +27,14 @@ class LctTaskController extends Controller
 
             // Periksa apakah laporan memiliki PIC
             if (!$pic_id) {
-                return back()->with('error', 'Anda tidak memiliki akses sebagai PIC.');
+                return back()->with('error', 'You do not have access as a PIC.');
             }
 
             // Decode tasks dari JSON ke array
             $tasks = json_decode($request->tasks, true);
 
             if (!is_array($tasks)) {
-                return back()->with('error', 'Format tasks tidak valid.');
+                return back()->with('error', 'The task format is invalid.');
             }
 
             // dd($tasks);
@@ -62,7 +62,7 @@ class LctTaskController extends Controller
 
             DB::commit(); // Simpan transaksi jika tidak ada error
 
-            return back()->with('success', 'Semua task berhasil ditambahkan');
+            return back()->with('success', 'All tasks have been successfully added.');
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan transaksi jika ada error
             return back()->with('error', 'Gagal menambahkan task: ' . $e->getMessage());
