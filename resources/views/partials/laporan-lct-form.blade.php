@@ -1,6 +1,6 @@
                 <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
                         <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
-                            <h5 class="text-xl font-bold">Formulir Pengajuan Laporan Ketidaksesuaian ke PIC</h5>
+                            <h5 class="text-xl font-bold">Non-Conformity Report Submission Form to PIC</h5>
                         </div>
 
                         <div class="w-full h-[2px] bg-gray-200 px-3"></div>
@@ -13,14 +13,14 @@
 
                                     {{-- Area Temuan --}}
                                     <div class="mb-4">
-                                        <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Area Temuan</label>
+                                        <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Finding Area</label>
                                         <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" readonly required>
                                     </div>
 
                                     <!-- Kategori Temuan -->
                                     <div class="mb-4 flex flex-col">
                                         <label for="kategori" class="block text-sm font-medium text-gray-700">
-                                            Kategori Temuan <span class="text-red-500">*</span>
+                                            Finding Category <span class="text-red-500">*</span>
                                         </label>
                                         <div class="relative inline-flex" x-data="{ open: false, selected: @js($laporan->kategori_temuan ?? '') }">
                                             <button 
@@ -31,7 +31,7 @@
                                                 aria-haspopup="true"
                                             >
                                                 <div class="flex justify-between items-center">
-                                                    <span x-text="selected || 'Pilih Kategori'"></span>
+                                                    <span x-text="selected || 'Select a Category'"></span>
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                         <path d="M6 9l6 6 6-6"></path>
                                                     </svg>
@@ -74,7 +74,7 @@
 
                                     {{-- Tanggal Temuan --}}
                                     <div class="mb-4">
-                                        <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Temuan</label>
+                                        <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Date of Finding</label>
                                         <input type="text" 
                                             value="{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->translatedFormat('d F Y') }}" 
                                             id="tanggal_temuan" 
@@ -84,8 +84,8 @@
                                     </div>     
                                 
                                     <div x-data="dropdownData()">
-                                        <!-- Dropdown Departemen -->
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Departemen <span class="text-red-500">*</span></label>
+                                        <!-- Dropdown Department -->
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Department <span class="text-red-500">*</span></label>
                                         <div class="relative">
                                             <select 
                                                 x-model="selectedDepartemen" 
@@ -94,16 +94,16 @@
                                                 class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
                                                 :class="{ 'border-red-500': errorDepartemen }"
                                                 required>
-                                                <option value="">Pilih Departemen</option>
+                                                <option value="">Select a Department</option>
                                                 <template x-for="dept in departemen" :key="dept.id">
                                                     <option :value="dept.id" x-text="dept.nama"></option>
                                                 </template>
                                             </select>
                                         </div>
-                                        <p x-show="errorDepartemen" class="text-red-500 text-xs mt-1">Silakan pilih departemen.</p>
+                                        <p x-show="errorDepartemen" class="text-red-500 text-xs mt-1">Please Select a Department.</p>
                                     
                                         <!-- Dropdown PIC -->
-                                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">Nama PIC <span class="text-red-500">*</span></label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">PIC Name <span class="text-red-500">*</span></label>
                                         <div class="relative">
                                             <select 
                                                 x-model="selectedPic"
@@ -111,26 +111,26 @@
                                                 class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
                                                 :class="{ 'border-red-500': errorPic }"
                                                 required>
-                                                <option value="">Pilih PIC</option>
+                                                <option value="">Select a PIC</option>
                                                 <template x-for="pic in filteredPics" :key="pic.pic.id">
                                                     <option :value="pic.pic.id" x-text="pic.pic.user.fullname"></option>
                                                 </template>
                                                 
                                             </select>
                                         </div>
-                                        <p x-show="errorPic" class="text-red-500 text-xs mt-1">Silakan pilih PIC.</p>
+                                        <p x-show="errorPic" class="text-red-500 text-xs mt-1">Please Select a PIC.</p>
                                     </div>
                                         
                                     
-                                    {{-- Temuan Ketidaksesuaian --}}
+                                    {{-- Non-Conformity Finding --}}
                                     <div class="mb-4">
-                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian <span class="text-red-500">*</span></label>
+                                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Non-Conformity Finding <span class="text-red-500">*</span></label>
                                         <input type="text" value="{{$laporan->temuan_ketidaksesuaian}}" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" required>
                                     </div>
 
                                 <div x-data="dropdownData()">
-                                    {{-- Tingkat Bahaya --}}
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tingkat Bahaya <span class="text-red-500">*</span></label>
+                                    {{-- Risk Level --}}
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Risk Level <span class="text-red-500">*</span></label>
                                     <div class="relative">
                                         <select 
                                             name="tingkat_bahaya"
@@ -138,19 +138,19 @@
                                             class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
                                             :class="{ 'border-red-500': errorTingkatBahaya }"
                                             required>
-                                            <option value="">Pilih Tingkat Bahaya</option>
+                                            <option value="">Please Select a Risk Level</option>
                                             <template x-for="tingkat in ['Low', 'Medium', 'High']" :key="tingkat">
                                                 <option :value="tingkat" x-text="tingkat"></option>
                                             </template>
                                         </select>
                                     </div>
-                                    <p x-show="errorTingkatBahaya" class="text-red-500 text-xs mt-1">Silakan pilih tingkat bahaya.</p>
+                                    <p x-show="errorTingkatBahaya" class="text-red-500 text-xs mt-1">Please Select a Risk Level.</p>
                                 </div>
 
                                     
-                                     <!-- Rekomendasi -->
+                                     <!-- Recommendation -->
                                      <div class="mb-4">
-                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Rekomendasi</label>
+                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Recommendation</label>
                                         <textarea class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
                                     </div>
 
@@ -172,7 +172,7 @@
 
                                     <!-- Submit button -->
                                     <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 cursor-pointer">
-                                        Kirim Laporan
+                                        Submit Report
                                     </button>
                                 </div>
                             </form>
@@ -216,7 +216,6 @@
                                     this.filteredPics = this.allPics.filter(pic => pic.departemen.id == this.selectedDepartemen);
                                     this.selectedPic = '';
                                     this.errorDepartemen = false;
-                                    console.log("Departemen terpilih ID:", this.selectedDepartemen); // Debug
                                 } else {
                                     this.filteredPics = [];
                                 }
@@ -226,8 +225,6 @@
                                 this.errorDepartemen = !this.selectedDepartemen;
                                 this.errorPic = !this.selectedPic;
                                 this.errorTingkatBahaya = !this.tingkat_bahaya;
-                                console.log("Departemen ID:", this.selectedDepartemen); // Debug
-                                console.log("PIC ID:", this.selectedPic); // Debug
                                 if (this.errorDepartemen || this.errorPic || this.errorTingkatBahaya) {
                                     event.preventDefault(); // Mencegah form dikirim jika ada error
                                 }

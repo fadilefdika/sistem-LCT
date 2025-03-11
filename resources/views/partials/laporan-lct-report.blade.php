@@ -4,7 +4,7 @@
     <div class="bg-white p-5 rounded-xl shadow-md border ">
         <!-- Header -->
         <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            📝 Laporan dari Pelapor
+            📝 Report from Reporter
         </h5>
         
         <!-- Garis Pemisah -->
@@ -12,7 +12,7 @@
 
         <!-- Isi Laporan -->
         <div class="flex flex-col space-y-1 mt-4">
-            <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
+            <p class="text-gray-500 text-xs">Non-Conformity Finding</p>
             <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
         </div>
     </div>
@@ -25,7 +25,7 @@
         <div class="flex flex-col items-start">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
-                <p>Nama Pelapor</p>
+                <p>Reporter Name</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->user->fullname}}</p>
         </div>
@@ -37,7 +37,7 @@
         <div class="flex flex-col items-start">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-calendar-alt text-green-500"></i> <!-- Ikon Kalender -->
-                <p>Tanggal Temuan</p>
+                <p>Date of Finding</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->tanggal_temuan}}</p>
         </div>
@@ -49,7 +49,7 @@
         <div class="flex flex-col items-start">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                <p>Area Temuan</p>
+                <p>Finding Area</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
         </div>
@@ -60,7 +60,7 @@
     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
-            <p class="text-gray-500 text-xs">Kategori Temuan</p>
+            <p class="text-gray-500 text-xs">Finding Category</p>
         </div>
         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">{{$laporan->kategori_temuan}}</p>
     </div>
@@ -70,16 +70,16 @@
     <div class="bg-white p-4 rounded-lg border-gray-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
         <div class="flex items-center space-x-2 mb-2">
             <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
-            <p class="text-gray-500 text-xs">Rekomendasi Safety</p>
+            <p class="text-gray-500 text-xs">Safety Recommendation</p>
         </div>
         <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
             {{$laporan->rekomendasi_safety}}
         </p>
     </div> 
 
-    <!-- Card Gambar Temuan -->
+    <!-- Card Non-Conformity Image -->
     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-        <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
+        <p class="text-gray-700 text-lg font-semibold">Non-Conformity Image</p>
         <div class="grid grid-cols-5 gap-2 mt-2">
             @foreach ($bukti_temuan->take(5) as $gambar)
                 <img src="{{ $gambar }}" 

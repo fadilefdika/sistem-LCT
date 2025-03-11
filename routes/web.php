@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DataFeedController;
-use App\Http\Controllers\LaporanLctController;
+use App\Http\Controllers\LctReportController;
 use App\Http\Controllers\RiwayatLctController;
 use App\Http\Controllers\ManajemenLctController;
 use App\Http\Controllers\ManajemenPicController;
@@ -23,7 +23,7 @@ use App\Http\Controllers\ProgressPerbaikanController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// Route::get('/kirim-email', [LaporanLctController::class, 'kirimEmail']);
+// Route::get('/kirim-email', [LctReportController::class, 'kirimEmail']);
 
 Route::redirect('/', 'login');
 Route::middleware(['auth','verified', 'role:ehs,pic,manajer'])->group(function () {
@@ -55,9 +55,9 @@ Route::middleware(['auth', 'verified', 'role:manajer'])->group(function () {
 
 // Middleware khusus EHS
 Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
-    Route::get('/laporan-lct', [LaporanLctController::class, 'index'])->name('admin.laporan-lct');
-    Route::get('/laporan-lct/{id_laporan_lct}', [LaporanLctController::class, 'show'])->name('admin.laporan-lct.show');
-    Route::post('/laporan-lct/{id_laporan_lct}/assign', [LaporanLctController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
+    Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct');
+    Route::get('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('admin.laporan-lct.show');
+    Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
 
     Route::post('/progress-perbaikan/{id_laporan_lct}/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('admin.progress-perbaikan.approve');
     Route::post('/progress-perbaikan/{id_laporan_lct}/reject', [ProgressPerbaikanController::class, 'rejectLaporan'])->name('admin.progress-perbaikan.reject');
@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
 // Middleware untuk User
 Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
-    Route::post('/laporan-lct/store', [LaporanLctController::class, 'store'])->name('laporan-lct.store');
+    Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('laporan-lct.store');
 });  
 
 // Cek Koneksi Database

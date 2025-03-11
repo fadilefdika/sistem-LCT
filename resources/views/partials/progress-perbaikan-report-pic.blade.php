@@ -156,12 +156,12 @@
 
             <!-- Card Gambar Perbaikan -->
             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-                <p class="text-gray-700 text-lg font-semibold">Gambar Hasil Perbaikan</p>
+                <p class="text-gray-700 text-lg font-semibold">Corrective Action Image</p>
                 <div class="grid grid-cols-5 gap-2 mt-2">
                     @foreach ($bukti_perbaikan->take(5) as $gambar)
                         <img src="{{ $gambar }}" 
                             class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                            alt="Gambar Hasil Perbaikan"
+                            alt="Corrective Action Image"
                             onclick="openModal('{{ $gambar }}')">
                     @endforeach
                 </div>

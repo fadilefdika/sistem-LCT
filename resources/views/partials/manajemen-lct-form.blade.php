@@ -1,16 +1,14 @@
 <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
     <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
         @php
-            $formTitle = 'cek';
-
             if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
-                if ($laporan->status_lct === 'revision') {
-                    $formTitle = 'Formulir Revisi Perbaikan Sementara ke EHS';
-                } else {
-                    $formTitle = 'Formulir Laporan Perbaikan Sementara ke EHS';
-                }
-            } elseif ($laporan->status_lct === 'revision' || $laporan->tingkat_bahaya === 'Low') {
-                $formTitle = 'Formulir Revisi Perbaikan ke EHS';
+                $formTitle = ($laporan->status_lct === 'revision') 
+                    ? 'Temporary Corrective Action Revision Form to EHS' 
+                    : 'Temporary Corrective Action Report Form to EHS';
+            } elseif ($laporan->tingkat_bahaya === 'Low') {
+                $formTitle = 'Corrective Action Revision Form to EHS';
+            } elseif ($laporan->status_lct === 'revision') {
+                $formTitle = 'Corrective Action Revision Form to EHS';
             }
         @endphp
 
@@ -25,12 +23,12 @@
          
             <div class="space-y-6">
                 <div class="mb-4">
-                    <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Temuan Ketidaksesuaian</label>
+                    <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Non-Conformity Finding</label>
                     <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" value="{{ $laporan->temuan_ketidaksesuaian }}" required readonly>
                 </div>
         
                 <div class="mb-4">
-                    <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Nama PIC</label>
+                    <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">PIC Name</label>
                     <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" value="{{ $laporan->picUser->fullname ?? '' }}" required readonly>
                 </div>
         
@@ -66,7 +64,7 @@
                 <!-- Bukti Perbaikan Foto -->
                 <div class="order-2">
                     <label for="dropzone-file" class="block text-sm font-medium text-gray-700">
-                        Unggah Foto <span class="text-red-500">*</span>
+                        Upload Photo <span class="text-red-500">*</span>
                     </label>
                     <div class="flex flex-col items-center justify-center w-full mt-2">
                         <!-- Opsi memilih gambar dari galeri -->
@@ -82,7 +80,7 @@
                         </label>
 
                         <!-- Opsi akses kamera dengan Webcam.js -->
-                        <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Ambil Foto</button>
+                        <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Capture Photo</button>
 
                         <!-- Area kamera -->
                         <div id="my_camera" class="mt-2 w-64 h-48 border" style="display: none;"></div>
@@ -94,17 +92,19 @@
                         <div id="preview-container" class="mt-4 flex flex-wrap gap-2"></div>
                     </div>
 
-                    <p class="text-xs text-gray-500 mt-1">Unggah hingga 5 foto yang berkaitan dengan temuan LCT. Pastikan file gambar tidak lebih dari 1MB dan dalam format PNG, JPG, atau GIF.</p>
-                </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Upload up to 5 photos related to the LCT finding. Ensure that the image file size does not exceed 1MB and is in PNG, JPG, or GIF format.
+                    </p>
+                    </div>
                 
-                 <!-- Submit button -->
+            <!-- Submit button -->
                 <button 
                     type="submit" 
                     class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
                     @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
                     @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) disabled @endif
                     >
-                    Kirim Laporan
+                    Submit Report
                 </button>
 
            

@@ -24,7 +24,7 @@ use App\Http\Requests\AssignToPicRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreLaporanRequest;
 
-class LaporanLctController extends Controller
+class LctReportController extends Controller
 {
     public function index()
     {

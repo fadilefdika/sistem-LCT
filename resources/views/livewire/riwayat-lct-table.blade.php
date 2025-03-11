@@ -4,13 +4,13 @@
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
                     <th class="py-3 px-4">No</th>
-                    <th class="py-3 px-4">Temuan Ketidaksesuaian</th>
-                    <th class="py-3 px-4">Tanggal Temuan</th>
-                    <th class="py-3 px-4">Nama PIC</th>
-                    <th class="py-3 px-4">Status Akhir</th>
-                    <th class="px-4 py-3">Tanggal Selesai</th>
-                    <th class="py-3 px-4">Aksi</th>
-                </tr>
+                    <th class="py-3 px-4">Non-Conformity Findings</th>
+                    <th class="py-3 px-4">Date of Finding</th>
+                    <th class="py-3 px-4">PIC Name</th>
+                    <th class="py-3 px-4">Final Status</th>
+                    <th class="px-4 py-3">Completion Date</th>
+                    <th class="py-3 px-4">Action</th>
+                </tr>                
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white">
                 @forelse($laporans as $index => $laporan)
@@ -64,7 +64,7 @@
                             <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
                             </svg>
-                            <p class="text-sm font-medium">Tidak ada laporan yang tersedia.</p>
+                            <p class="text-sm font-medium">No reports are available.</p>
                         </div>
                     </td>
                 </tr>

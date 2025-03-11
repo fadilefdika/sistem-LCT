@@ -76,7 +76,7 @@
                                         d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6">
                                     </path>
                                 </svg>
-                                <p class="text-sm">Tidak ada laporan yang tersedia.</p>
+                                <p class="text-sm">No reports are available.</p>
                             </div>
                         </td>
                     </tr>

@@ -6,7 +6,7 @@
         <div class="flex justify-between items-center bg-white rounded-lg">
             <!-- Judul -->
             <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                📝 Laporan dari EHS
+                📝 Report from EHS
             </h5>
         
             <!-- Status Laporan -->
@@ -18,18 +18,18 @@
                 <div class="flex items-center space-x-2 text-sm font-medium">
                     @if($laporan->status_lct === 'approved')
                         <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                        <span class="text-green-600">Disetujui</span>
+                        <span class="text-green-600">Approved</span>
                     @elseif($laporan->status_lct === 'revision')
                         <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-600">Revisi</span>
+                        <span class="text-red-600">Revision Required</span>
                     @elseif($laporan->status_lct === 'progress_work')
                         <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
-                        <span class="text-yellow-600">Dalam Proses</span>
+                        <span class="text-yellow-600">In Progress</span>
                     @else
                         <i class="fas fa-hourglass-half text-gray-500 text-lg"></i>
-                        <span class="text-gray-600">Menunggu Persetujuan</span>
+                        <span class="text-gray-600">Pending Approval</span>
                     @endif
-                </div>                            
+                </div>                                         
             </div>
         </div>                                    
         
@@ -38,7 +38,7 @@
 
         <!-- Isi Laporan -->
         <div class="flex flex-col space-y-1 mt-4">
-            <p class="text-gray-500 text-xs">Temuan Ketidaksesuaian</p>
+            <p class="text-gray-500 text-xs">Non-Conformity Finding</p>
             <p class="text-gray-900 font-semibold text-lg">{{$laporan->temuan_ketidaksesuaian}}</p>
         </div>
     </div>
@@ -47,11 +47,11 @@
     <!-- Card Informasi dari EHS -->
     <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-row justify-around items-center">
         
-        <!-- Nama PIC -->
+        <!-- PIC Name -->
         <div class="flex flex-col items-start">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
-                <p>Nama PIC</p>
+                <p>PIC Name</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{ $laporan->picUser->fullname ?? 'Tidak ada PIC' }}</p>
         </div>
@@ -76,7 +76,7 @@
 
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-calendar-alt text-green-500"></i> <!-- Ikon Kalender -->
-                <p>Tanggal Temuan</p>
+                <p>Date of Finding</p>
             </div>
 
             <p class="text-gray-900 font-semibold text-sm mt-1" x-text="formattedTanggalTemuan"></p>
@@ -90,7 +90,7 @@
         <div class="flex flex-col items-start">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                <p>Detail Area Temuan</p>
+                <p>Finding Area Details</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{ $laporan->area}} - {{ $laporan->detail_area }}</p>
         </div>
@@ -130,18 +130,18 @@
             <span x-text="formattedDueDate"></span>
         </p>
     
-        <!-- Bagian Hitungan Mundur -->
+       <!-- Countdown Section -->
         <p x-show="!isApproved" class="text-xs font-medium mt-2"
-            :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'">
-            <template x-if="daysLeft !== null && daysLeft < 0">
-                <span>Overdue sejak <span x-text="Math.abs(daysLeft)"></span> hari yang lalu</span>
-            </template>
-            <template x-if="daysLeft !== null && daysLeft >= 0">
-                <span><span x-text="daysLeft"></span> hari lagi sebelum overdue</span>
-            </template>
-            <template x-if="daysLeft === null">
-                <span class="text-gray-500">Tanggal tidak valid</span>
-            </template>
+        :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'">
+        <template x-if="daysLeft !== null && daysLeft < 0">
+            <span>Overdue by <span x-text="Math.abs(daysLeft)"></span> days</span>
+        </template>
+        <template x-if="daysLeft !== null && daysLeft >= 0">
+            <span><span x-text="daysLeft"></span> days left before overdue</span>
+        </template>
+        <template x-if="daysLeft === null">
+            <span class="text-gray-500">Invalid date</span>
+        </template>
         </p>
     </div>
                                 
@@ -149,7 +149,7 @@
     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
-            <p class="text-gray-500 text-xs">Kategori Temuan</p>
+            <p class="text-gray-500 text-xs">Finding Category</p>
         </div>
         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">{{$laporan->kategori_temuan}}</p>
     </div>
@@ -162,7 +162,7 @@
                 'text-yellow-500 fa-exclamation-triangle': level === 'Medium',
                 'text-red-500 fa-skull-crossbones': level === 'High'
             }" class="fa-solid text-lg"></i>
-            <p class="text-gray-500 text-xs">Tingkat Bahaya</p>
+            <p class="text-gray-500 text-xs">Risk Level</p>
         </div>
         <p :class="{
             'bg-green-100 text-green-900 hover:bg-green-200': level === 'Low',
@@ -178,7 +178,7 @@
     <div class="bg-white p-4 rounded-lg border border-red-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
         <div class="flex items-center space-x-2 mb-2">
             <i class="fa-solid fa-exclamation-circle text-red-500 text-lg"></i>
-            <p class="text-gray-500 text-xs font-semibold">Laporan Perlu Revisi</p>
+            <p class="text-gray-500 text-xs font-semibold">Report needs revision</p>
         </div>
 
         @if ($laporan->rejectLaporan->isNotEmpty())
@@ -189,7 +189,7 @@
                 </div>
             @endforeach
         @else
-            <p class="text-gray-500 text-sm">Belum ada alasan penolakan yang dicatat.</p>
+            <p class="text-gray-500 text-sm">No rejection reason has been recorded yet</p>
         @endif
     </div>
 
@@ -198,7 +198,7 @@
         <div class="bg-white p-4 rounded-lg border border-blue-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
             <div class="flex items-center space-x-2 mb-2">
                 <i class="fa-solid fa-edit text-blue-500 text-lg"></i>
-                <p class="text-gray-500 text-xs font-semibold">Revisi Diterima oleh PIC</p>
+                <p class="text-gray-500 text-xs font-semibold">Revision Accepted by PIC</p>
             </div>
             <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
                 {{ $laporan->revisi_pic }}
@@ -210,7 +210,7 @@
         <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
             <div class="flex items-center space-x-2 mb-2">
                 <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
-                <p class="text-gray-500 text-xs font-semibold">Rekomendasi Safety</p>
+                <p class="text-gray-500 text-xs font-semibold">Safety Recommendation</p>
             </div>
             <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
                 {{ $laporan->rekomendasi_safety ?? 'Tidak ada rekomendasi safety' }}
@@ -218,10 +218,10 @@
         </div>
     @endif
 
-        <!-- Card Gambar Temuan -->
+        <!-- Card Non-Conformity Image -->
         @if($laporan->status_lct === 'revision')
         <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-            <p class="text-gray-700 text-lg font-semibold">Gambar Hasil Perbaikan</p>
+            <p class="text-gray-700 text-lg font-semibold">Corrective Action Image</p>
             <div class="grid grid-cols-5 gap-2 mt-2">
                 @foreach ($bukti_perbaikan->take(5) as $gambar)
                     <img src="{{ $gambar }}" 
@@ -233,7 +233,7 @@
         </div>
         @else
         <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-            <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
+            <p class="text-gray-700 text-lg font-semibold">Non-Conformity Image</p>
             <div class="grid grid-cols-5 gap-2 mt-2">
                 @foreach ($bukti_temuan->take(5) as $gambar)
                     <img src="{{ $gambar }}" 

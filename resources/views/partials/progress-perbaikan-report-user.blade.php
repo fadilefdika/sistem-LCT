@@ -65,9 +65,9 @@
         </p>
     </div>
 
-    <!-- Card Gambar Temuan -->
+    <!-- Card Non-Conformity Image -->
             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-                <p class="text-gray-700 text-lg font-semibold">Gambar Temuan</p>
+                <p class="text-gray-700 text-lg font-semibold">Non-Conformity Image</p>
                 <div class="grid grid-cols-5 gap-2 mt-2">
                     @foreach ($bukti_temuan->take(5) as $gambar)
                         <img src="{{ $gambar }}" 

@@ -17,12 +17,12 @@ Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
 // laporan lct
 Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Laporan LCT', route('admin.laporan-lct'));
+    $trail->push('LCT Reports', route('admin.laporan-lct'));
 });
 
 Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('laporan-lct');
-    $trail->push("Detail Laporan LCT #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
+    $trail->push("Detail LCT Report #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
 });
 
 
@@ -53,41 +53,41 @@ Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trai
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Progress Perbaikan', route('admin.progress-perbaikan'));
+    $trail->push('Repair Progress', route('admin.progress-perbaikan'));
 });
 
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Detail Progress Perbaikan LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Detail Repair Progress LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
 
 
 // laporan perbaikan lct
 Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Manajemen LCT', route('admin.manajemen-lct'));
+    $trail->push('LCT Management', route('admin.manajemen-lct'));
 });
 
 // laporan perbaikan lct detail
 Breadcrumbs::for('manajemen-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('manajemen-lct');
-    $trail->push("Detail Laporan LCT #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
+    $trail->push("Detail LCT Report #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
 });
 
 // laporan riwayat lct
 Breadcrumbs::for('riwayat-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Riwayat LCT', route('admin.riwayat-lct'));
+    $trail->push('LCT History', route('admin.riwayat-lct'));
 });
 
 Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('riwayat-lct');
-    $trail->push("Detail Riwayat Laporan LCT #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
+    $trail->push("Detail LCT History #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
 });
 
 // laporan manajemen pic
 Breadcrumbs::for('manajemen-pic', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Manajemen PIC', route('admin.manajemen-pic'));
+    $trail->push('PIC Management', route('admin.manajemen-pic'));
 });

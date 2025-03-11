@@ -5,14 +5,14 @@
             <thead class="bg-gray-100">
                 <tr class="text-left text-sm font-semibold text-gray-600">
                     <th class="px-4 py-3">No</th>
-                    <th class="px-4 py-3">Temuan Ketidaksesuaian</th>
-                    <th class="px-4 py-3">Nama PIC</th>
-                    <th class="px-4 py-3">Tingkat Bahaya</th>
-                    <th class="px-4 py-3">Status Progress</th>
-                    <th class="px-4 py-3">Tenggat Waktu</th>
-                    <th class="px-4 py-3">Tanggal Selesai</th>
+                    <th class="px-4 py-3">Non-Conformity Findings</th>
+                    <th class="px-4 py-3">PIC Name</th>
+                    <th class="px-4 py-3">Risk Level</th>
+                    <th class="px-4 py-3">Progress Status</th>
+                    <th class="px-4 py-3">Due Date</th>
+                    <th class="px-4 py-3">Completion Date</th>
                     <th class="px-4 py-3">Action</th>
-                </tr>
+                </tr>                
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($laporans as $index => $laporan)
@@ -120,7 +120,7 @@
                                     d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6">
                                 </path>
                             </svg>
-                            <p class="text-sm">Tidak ada laporan yang tersedia.</p>
+                            <p class="text-sm">No reports are available.</p>
                         </div>
                     </td>
                 </tr>

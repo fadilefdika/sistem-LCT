@@ -34,14 +34,14 @@
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
                     <th scope="col" class="px-4 py-3 w-12 text-center">No</th>
-                    <th scope="col" class="px-4 py-3 w-40">Nama Pelapor</th>
-                    <th scope="col" class="px-4 py-3 w-60">Temuan Ketidaksesuaian</th>
-                    <th scope="col" class="px-4 py-3 w-32">Tanggal</th>
+                    <th scope="col" class="px-4 py-3 w-40">Reporter Name</th>
+                    <th scope="col" class="px-4 py-3 w-60">Non-Conformity Findings</th>
+                    <th scope="col" class="px-4 py-3 w-32">Date</th>
                     <th scope="col" class="px-4 py-3 w-36">Area</th>
-                    <th scope="col" class="px-4 py-3 w-24 text-center">Foto</th>
-                    <th scope="col" class="px-4 py-3 w-36">Kategori</th>
+                    <th scope="col" class="px-4 py-3 w-24 text-center">Photo</th>
+                    <th scope="col" class="px-4 py-3 w-36">Category</th>
                     <th scope="col" class="px-4 py-3 w-28 text-center">Actions</th>
-                </tr>
+                </tr>                
             </thead>                
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($laporans as $index => $laporan)
@@ -63,10 +63,10 @@
                             @if ($gambar)
                                 <img src="{{ asset('storage/' . $gambar) }}" class="w-16 h-16 object-cover rounded-lg shadow">
                             @else
-                                <span class="text-gray-500 italic">Tidak ada gambar</span>
+                                <span class="text-gray-500 italic">Image not found</span>
                             @endif
                         @else
-                            <span class="text-gray-500 italic">Tidak ada gambar</span>
+                            <span class="text-gray-500 italic">Image not found</span>
                         @endif
                     </td>                        
                     <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori_temuan }}</td>
@@ -81,7 +81,7 @@
                             <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
                             </svg>
-                            <p class="text-sm">Tidak ada laporan yang tersedia.</p>
+                            <p class="text-sm">No reports are available.</p>
                         </div>
                     </td>
                 </tr>

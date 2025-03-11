@@ -319,7 +319,7 @@
     </script>
 @endif
 
-{{-- Gambar Temuan --}}
+{{-- Non-Conformity Image --}}
 <!-- Script untuk menangani Kamera -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
 <script>
