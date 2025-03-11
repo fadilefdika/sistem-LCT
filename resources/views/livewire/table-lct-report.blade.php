@@ -6,7 +6,7 @@
                 placeholder="Cari laporan..." />
         </div>
 
-        <!-- Dropdown untuk memilih kategori -->
+        {{-- <!-- Dropdown untuk memilih kategori -->
         <div>
             <select wire:model="filterKategori"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:border-blue-500 focus:ring focus:ring-blue-300">
@@ -15,7 +15,7 @@
                     <option value="{{ $kategori }}">{{ $kategori }}</option>
                 @endforeach
             </select>
-        </div>
+        </div> --}}
 
         <!-- Dropdown untuk memilih jumlah baris per halaman -->
         <div>
@@ -69,7 +69,7 @@
                             <span class="text-gray-500 italic">Image not found</span>
                         @endif
                     </td>                        
-                    <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori_temuan }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori ? $laporan->kategori->nama_kategori : 'Tidak ada kategori' }}</td>
                     <td class="px-4 py-3 flex items-center justify-center gap-2">
                         <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
                     </td>

@@ -16,7 +16,7 @@ class LaporanLct extends Model
         'tanggal_temuan', 
         'area', 
         'detail_area', 
-        'kategori_temuan', 
+        'kategori_id', 
         'temuan_ketidaksesuaian', 
         'rekomendasi_safety', 
         'bukti_temuan',
@@ -89,5 +89,9 @@ class LaporanLct extends Model
         return $this->hasOne(BudgetApproval::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
 
 }

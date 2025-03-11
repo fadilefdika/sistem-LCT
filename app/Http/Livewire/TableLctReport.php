@@ -34,27 +34,15 @@ class TableLctReport extends Component
 
     public function render()
     {
-        $query = LaporanLct::where('status_lct', 'open');
+        // Ambil laporan LCT dengan kategori yang statusnya 'open'
+        $query = LaporanLct::with('kategori')->where('status_lct', 'open');
 
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('nama_pelapor', 'like', '%' . $this->search . '%')
-                ->orWhere('kategori_temuan', 'like', '%' . $this->search . '%')
-                ->orWhere('area', 'like', '%' . $this->search . '%');
-            });
-        }
-
-        if ($this->filterKategori) {
-            $query->where('kategori_temuan', $this->filterKategori);
-        }
-
-        // Pastikan kita pakai paginate sebelum return
+        // Pastikan menggunakan paginate sebelum return
         $laporans = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.table-lct-report', [
-            'laporans' => $laporans,
-            'kategoriOptions' => LaporanLct::select('kategori_temuan')->distinct()->pluck('kategori_temuan'),
+            'laporans' => $laporans, // Perbaiki koma berlebih
         ]);
-
     }
+
 }

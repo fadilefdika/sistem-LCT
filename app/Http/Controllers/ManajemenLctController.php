@@ -22,7 +22,7 @@ class ManajemenLctController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with(['picUser', 'rejectLaporan'])
+        $laporan = LaporanLct::with(['picUser', 'rejectLaporan', 'kategori'])
             ->where('id_laporan_lct', $id_laporan_lct)
             ->first();
 

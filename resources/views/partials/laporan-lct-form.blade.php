@@ -22,12 +22,18 @@
                                         <label for="kategori" class="block text-sm font-medium text-gray-700">
                                             Finding Category <span class="text-red-500">*</span>
                                         </label>
-                                        <div class="relative inline-flex" x-data="{ open: false, selected: @js($laporan->kategori_temuan ?? '') }">
+                                    
+                                        <div class="relative inline-flex" x-data="{ 
+                                            open: false, 
+                                            selected: @js($laporan->kategori->nama_kategori ?? ''), 
+                                            kategori: @js($kategori) 
+                                        }">
+                                            <!-- Tombol Dropdown -->
                                             <button 
                                                 type="button" 
                                                 class="mt-2 w-full px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 text-left bg-white cursor-pointer"
-                                                @click.prevent="open = !open" 
-                                                :aria-expanded="open" 
+                                                @click.prevent="open = !open"
+                                                :aria-expanded="open"
                                                 aria-haspopup="true"
                                             >
                                                 <div class="flex justify-between items-center">
@@ -38,7 +44,7 @@
                                                 </div>
                                             </button>
                                     
-                                            <!-- Hidden Input -->
+                                            <!-- Hidden Input untuk Menyimpan Nilai Terpilih -->
                                             <input type="hidden" name="kategori_temuan" x-model="selected" required>
                                     
                                             <!-- Dropdown Menu -->
@@ -51,26 +57,24 @@
                                                 x-transition:leave="transition ease-out duration-200"
                                                 x-transition:leave-start="opacity-100"
                                                 x-transition:leave-end="opacity-0"
+                                                @click.away="open = false"
                                                 x-cloak
                                             >
                                                 <ul class="text-sm">
-                                                    @foreach(['Kondisi Tidak Aman (Unsafe Condition)', 'Tindakan Tidak Aman (Unsafe Act)', '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)', 'Near miss'] as $kategori)
-                                                    <li>
-                                                        <button 
-                                                            type="button" 
-                                                            class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
-                                                            @click="selected = '{{ $kategori }}'; open = false"
-                                                        >
-                                                            {{ $kategori }}
-                                                        </button>
-                                                    </li>
-                                                    @endforeach
+                                                    <template x-for="category in kategori" :key="category.id">
+                                                        <li>
+                                                            <button 
+                                                                type="button" 
+                                                                class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 focus:outline-none"
+                                                                @click="selected = category.nama_kategori; open = false"
+                                                                x-text="category.nama_kategori"
+                                                            ></button>
+                                                        </li>
+                                                    </template>
                                                 </ul>
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    
+                                    </div>    
 
                                     {{-- Tanggal Temuan --}}
                                     <div class="mb-4">

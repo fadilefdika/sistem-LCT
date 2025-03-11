@@ -52,7 +52,7 @@
             <i class="fa-solid fa-flag text-yellow-500"></i> Finding Category
         </p>
         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">
-            {{$laporan->kategori_temuan}}
+            {{$laporan->kategori->nama_kategori}}
         </p>
     </div>
 

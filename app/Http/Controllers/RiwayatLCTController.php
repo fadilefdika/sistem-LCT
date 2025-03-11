@@ -13,7 +13,7 @@ class RiwayatLctController extends Controller
     }
 
     public function show($id_laporan_lct){
-        $laporan = LaporanLct::with(['user', 'picUser', 'rejectLaporan'])
+        $laporan = LaporanLct::with(['user', 'picUser', 'rejectLaporan', 'kategori'])
             ->where('id_laporan_lct', $id_laporan_lct)
             ->first();
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {

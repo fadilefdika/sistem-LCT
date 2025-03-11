@@ -18,6 +18,6 @@
 
         @default
                 @include('partials.budget-task-timeline', ['tasks' => $tasks ?? []])
-                @include('partials.budget-form', ['budget' => $budget ?? null])
+                {{-- @include('partials.budget-form', ['budget' => $budget ?? null]) --}}
     @endswitch
 </div>
