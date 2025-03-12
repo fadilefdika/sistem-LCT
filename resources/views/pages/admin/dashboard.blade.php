@@ -53,7 +53,7 @@
             data: {
                 labels: monthlyLabels,
                 datasets: [{
-                    label: 'Jumlah Temuan',
+                    label: 'Number of findings',
                     data: monthlyData,
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
@@ -84,7 +84,7 @@
             data: {
                 labels: @json(array_keys($areaCounts->toArray())),
                 datasets: [{
-                    label: 'Jumlah Temuan',
+                    label: 'Number of findings',
                     data: @json(array_values($areaCounts->toArray())),
                     backgroundColor: @json(array_values($areaCounts->toArray())).map((_, i) => {
                         const colors = [
@@ -136,7 +136,7 @@
             data: {
                 labels: @json($categoryCounts->keys()->toArray()), // Pakai alias
                 datasets: [{
-                    label: 'Jumlah Temuan',
+                    label: 'Number of findings',
                     data: @json($categoryCounts->values()->toArray()),
                     backgroundColor: @json($categoryCounts->values()->toArray()).map((_, i) => {
                         const colors = [

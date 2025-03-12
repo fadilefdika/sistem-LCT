@@ -3,45 +3,47 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use App\Models\Kategori;
+use App\Models\LaporanLct;
 use Livewire\WithPagination;
-use App\Models\LaporanLCT;
 use Illuminate\Support\Facades\Auth;
 
 class TableLctReport extends Component
 {
     use WithPagination;
 
-    public $search = '';
     public $filterKategori = '';
-    public $perPage = 10;
 
-    protected $paginationTheme = 'tailwind';
 
-    public function updatingSearch()
+    public function filterKategori()
     {
         $this->resetPage();
     }
 
-    public function updatingFilterKategori()
+    public function applyFilter()
     {
-        $this->resetPage();
+        
     }
 
-    public function updatingPerPage()
-    {
-        $this->resetPage();
-    }
-
-    public function render()
+    public function filterData()
     {
         // Ambil laporan LCT dengan kategori yang statusnya 'open'
         $query = LaporanLct::with('kategori')->where('status_lct', 'open');
 
         // Pastikan menggunakan paginate sebelum return
-        $laporans = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        return $query->orderBy('created_at', 'desc')
+        ->when($this->filterKategori, fn($query)=>$query->where('kategori_id',$this->filterKategori))
+        ->paginate(10);
+    }
+
+
+    public function render()
+    {
+        $categories = Kategori::all();  
 
         return view('livewire.table-lct-report', [
-            'laporans' => $laporans, // Perbaiki koma berlebih
+            'laporans' => $this->filterData(), // Perbaiki koma berlebih
+            'categories' => $categories,
         ]);
     }
 

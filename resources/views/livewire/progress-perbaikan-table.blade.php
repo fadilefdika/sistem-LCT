@@ -1,9 +1,10 @@
 <div class="bg-white p-6 relative shadow-md rounded-xl overflow-x-auto">
     
     <div class="flex flex-row flex-wrap align-items-center gap-3 p-3 border rounded shadow-sm bg-white mb-4">
+        
         <!-- Filter Tingkat Bahaya -->
         <div class="flex flex-col" style="min-width: 180px;">
-            <label class="form-label fw-bold text-muted">Tingkat Bahaya</label>
+            <label class="form-label fw-bold text-muted mb-1">Tingkat Bahaya</label>
             <select wire:model="riskLevel" wire:change="applyFilter" class="form-select">
                 @foreach (['' => 'Semua Tingkat Bahaya', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
@@ -13,7 +14,7 @@
     
         <!-- Filter Status LCT -->
         <div class="flex flex-col" style="min-width: 220px;">
-            <label class="form-label fw-bold text-muted">Status LCT</label>
+            <label class="form-label fw-bold text-muted mb-1">Status LCT</label>
             <select wire:model="statusLct" wire:change="applyFilter" class="form-select">
                 <option value="">Semua Status</option>
                 <option value="in_progress">In Progress</option>
@@ -40,7 +41,7 @@
             
             <!-- Loading Indicator -->
             <div wire:loading wire:target="riskLevel, statusLct, resetFilters" class="text-sm text-muted mt-8">
-                <i class="spinner-border spinner-border-sm"></i> Memuat...
+                <i class="spinner-border spinner-border-sm"></i> Loading...
             </div>
     </div>
 

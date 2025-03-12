@@ -1,31 +1,18 @@
 <div class="bg-white dark:bg-gray-800 p-6 relative shadow-md sm:rounded-lg overflow-y-auto">
-    <div class="flex flex-wrap md:flex-nowrap items-center justify-between p-4 gap-2">
-        <div class="w-full md:w-1/2">
-            <input type="text" wire:model.debounce.300ms="search"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-3 p-2.5 focus:border-blue-500 focus:ring focus:ring-blue-300"
-                placeholder="Cari laporan..." />
-        </div>
-
-        {{-- <!-- Dropdown untuk memilih kategori -->
-        <div>
-            <select wire:model="filterKategori"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:border-blue-500 focus:ring focus:ring-blue-300">
-                <option value="">Semua Kategori</option>
-                @foreach($kategoriOptions as $kategori)
-                    <option value="{{ $kategori }}">{{ $kategori }}</option>
+    <div class="flex flex-row flex-wrap align-items-center gap-3 p-3 border rounded shadow-sm bg-white mb-4">   
+        <!-- Filter Tingkat Bahaya -->
+        <div class="flex flex-col" style="min-width: 180px;">
+            <label for="filterKategori" class="form-label fw-bold text-muted mb-1">Filter Kategori</label>
+            <select wire:model="filterKategori" wire:change="applyFilter" id="filterKategori" class="form-select">
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->nama_kategori }}</option>
                 @endforeach
-            </select>
-        </div> --}}
 
-        <!-- Dropdown untuk memilih jumlah baris per halaman -->
-        <div>
-            <select wire:model="perPage"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-1 pr-6">
-                <option value="5">5 Baris</option>
-                <option value="10">10 Baris</option>
-                <option value="25">25 Baris</option>
-                <option value="50">50 Baris</option>
             </select>
+        </div>
+        <!-- Loading Indicator -->
+        <div wire:loading wire:target="filterKategori" class="text-sm text-muted mt-8">
+            <i class="spinner-border spinner-border-sm"></i> Loading...
         </div>
     </div>
 
