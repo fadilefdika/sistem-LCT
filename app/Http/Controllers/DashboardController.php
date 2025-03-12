@@ -80,7 +80,102 @@ class DashboardController extends Controller
 
 
     
-        // dd($laporanOverdue);
+            // $laporanMediumHighh = collect([
+            //     (object)[
+            //         'id_laporan_lct' => 1,
+            //         'temuan_ketidaksesuaian' => 'Machine malfunction due to overheating.',
+            //         'picUser' => (object)['fullname' => 'John Doe'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'open',
+            //         'tenggat_waktu' => '2025-03-20',
+            //         'date_completion' => null
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 2,
+            //         'temuan_ketidaksesuaian' => 'Chemical spill in the factory.',
+            //         'picUser' => (object)['fullname' => 'Jane Smith'],
+            //         'tingkat_bahaya' => 'Medium',
+            //         'status_lct' => 'in_progress',
+            //         'tenggat_waktu' => '2025-02-15',
+            //         'date_completion' => '2025-02-12'
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 3,
+            //         'temuan_ketidaksesuaian' => 'Electrical short circuit in the warehouse.',
+            //         'picUser' => (object)['fullname' => 'Alice Johnson'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'waiting_approval',
+            //         'tenggat_waktu' => '2025-03-10',
+            //         'date_completion' => null
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 4,
+            //         'temuan_ketidaksesuaian' => 'Lack of safety equipment in storage.',
+            //         'picUser' => (object)['fullname' => 'Tom White'],
+            //         'tingkat_bahaya' => 'Medium',
+            //         'status_lct' => 'approved',
+            //         'tenggat_waktu' => '2025-03-15',
+            //         'date_completion' => '2025-03-14'
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 5,
+            //         'temuan_ketidaksesuaian' => 'Hazardous materials improperly stored.',
+            //         'picUser' => (object)['fullname' => 'Emily Brown'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'closed',
+            //         'tenggat_waktu' => '2025-03-01',
+            //         'date_completion' => '2025-02-28'
+            //     ]
+            // ]);
+        
+            // // Dummy data for Overdue Reports
+            // $laporanOverduee = collect([
+            //     (object)[
+            //         'id_laporan_lct' => 6,
+            //         'temuan_ketidaksesuaian' => 'Broken emergency exit sign.',
+            //         'picUser' => (object)['fullname' => 'Charlie Davis'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'in_progress',
+            //         'tenggat_waktu' => '2025-02-10',
+            //         'date_completion' => null
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 7,
+            //         'temuan_ketidaksesuaian' => 'Uncalibrated equipment in the lab.',
+            //         'picUser' => (object)['fullname' => 'Linda Williams'],
+            //         'tingkat_bahaya' => 'Medium',
+            //         'status_lct' => 'review',
+            //         'tenggat_waktu' => '2025-01-25',
+            //         'date_completion' => '2025-02-01'
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 8,
+            //         'temuan_ketidaksesuaian' => 'Expired safety equipment.',
+            //         'picUser' => (object)['fullname' => 'Greg Harris'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'waiting_approval',
+            //         'tenggat_waktu' => '2025-02-05',
+            //         'date_completion' => null
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 9,
+            //         'temuan_ketidaksesuaian' => 'Improper chemical storage.',
+            //         'picUser' => (object)['fullname' => 'Sophia Clark'],
+            //         'tingkat_bahaya' => 'Medium',
+            //         'status_lct' => 'approved',
+            //         'tenggat_waktu' => '2025-01-30',
+            //         'date_completion' => '2025-02-10'
+            //     ],
+            //     (object)[
+            //         'id_laporan_lct' => 10,
+            //         'temuan_ketidaksesuaian' => 'Non-compliance with safety protocols.',
+            //         'picUser' => (object)['fullname' => 'James Lee'],
+            //         'tingkat_bahaya' => 'High',
+            //         'status_lct' => 'closed',
+            //         'tenggat_waktu' => '2025-02-01',
+            //         'date_completion' => '2025-02-02'
+            //     ]
+            // ]);
 
         return view('pages.admin.dashboard', [
             'layout' => 'layouts.admin',
