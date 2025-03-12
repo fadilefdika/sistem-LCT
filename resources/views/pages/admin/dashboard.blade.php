@@ -5,7 +5,7 @@
             <div class="container mx-auto px-4">
     
                 <!-- Grafik dalam 2 kolom -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Grafik Garis: LCT Per Bulan -->
                     <div class="p-4 bg-white rounded-lg shadow">
                         <h2 class="text-xl font-bold mb-4">Incident By Month</h2>
@@ -17,6 +17,28 @@
                         <h2 class="text-xl font-bold mb-4">Most Findings Areas</h2>
                         <canvas id="areaChart"></canvas>
                     </div>
+                    
+                    <div class="p-4 bg-white rounded-lg shadow">
+                        @include('partials.dashboard-tabel', [
+                            'title' => 'Medium & High Risk Reports',
+                            'laporans' => $laporanMediumHigh
+                        ])
+                    </div>
+
+                    <div class="p-4 bg-white rounded-lg shadow">
+                        @include('partials.dashboard-tabel', [
+                            'title' => 'Overdue Reports',
+                            'laporans' => $laporanOverdue
+                        ])
+                    </div>
+
+                    
+
+                    <!-- Grafik Pie: Open vs Closed -->
+                    <div class="p-4 bg-white rounded-lg shadow flex flex-col">
+                        <h2 class="text-xl font-bold mb-4">Status of Finding</h2>
+                        <canvas id="statusChart" class="self-center" style="max-width: 300px; max-height: 300px;"></canvas>
+                    </div>                                     
     
                     <!-- Grafik Batang Vertikal: Berdasarkan Kategori -->
                     <div class="p-4 bg-white rounded-lg shadow">
@@ -24,11 +46,6 @@
                         <canvas id="categoryChart"></canvas>
                     </div>
     
-                    <!-- Grafik Pie: Open vs Closed -->
-                    <div class="p-4 bg-white rounded-lg shadow flex flex-col">
-                        <h2 class="text-xl font-bold mb-4">Status of Finding</h2>
-                        <canvas id="statusChart" class="self-center" style="max-width: 300px; max-height: 300px;"></canvas>
-                    </div>                                     
                 </div>
             </div>
         </div>
