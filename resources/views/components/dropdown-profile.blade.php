@@ -42,7 +42,7 @@
                 <form method="POST" action="{{ route('logout') }}" x-data>
                     @csrf
 
-                    <a class="font-medium text-sm text-violet-500 hover:text-violet-600 dark:hover:text-violet-400 flex items-center py-1 px-3"
+                    <a class="font-medium text-sm text-[#048cfb] flex items-center py-1 px-3"
                         href="{{ route('logout') }}"
                         @click.prevent="$root.submit();"
                         @focus="open = true"
