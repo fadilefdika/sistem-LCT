@@ -12,6 +12,7 @@ class ProgressPerbaikanTable extends Component
     use WithPagination;
 
     public $riskLevel = '';
+    public $statusLct = '';
 
     private function filterData()
     {
@@ -22,7 +23,8 @@ class ProgressPerbaikanTable extends Component
             'permanent_revision'
         ])
         ->when($this->riskLevel, fn($query) => $query->where('tingkat_bahaya', $this->riskLevel))
-        ->latest() // Lebih singkat dari orderBy('created_at', 'desc')
+        ->when($this->statusLct, fn($query) => $query->where('status_lct', $this->statusLct))
+        ->latest() 
         ->paginate(10);
     }
 
@@ -34,6 +36,13 @@ class ProgressPerbaikanTable extends Component
     public function applyFilter()
     {
 
+    }
+
+    public function resetFilters()
+    {
+        $this->riskLevel = '';
+        $this->statusLct = '';
+        $this->resetPage();
     }
 
 
