@@ -1,4 +1,18 @@
 <div class="bg-white p-6 relative shadow-md rounded-xl overflow-x-auto">
+    <!-- Filter Risk Level -->
+    <div>
+        <select wire:model="riskLevel" wire:change="applyFilter" class="form-control">
+            @foreach (['' => 'Semua Tingkat Bahaya', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
+                <option value="{{ $value }}">{{ $label }}</option>
+            @endforeach
+        </select>
+    
+        <div wire:loading wire:target="riskLevel" class="text-sm text-gray-500 mt-1">
+            Memuat data...
+        </div>
+    </div>
+    
+    
     
     <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg overflow-hidden">
