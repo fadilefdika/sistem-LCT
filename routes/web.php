@@ -10,6 +10,7 @@ use App\Http\Controllers\RiwayatLctController;
 use App\Http\Controllers\ManajemenLctController;
 use App\Http\Controllers\ManajemenPicController;
 use App\Http\Controllers\BudgetApprovalController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LctTaskController;
 use App\Http\Controllers\ProgressPerbaikanController;
 
@@ -27,7 +28,7 @@ use App\Http\Controllers\ProgressPerbaikanController;
 
 Route::redirect('/', 'login');
 Route::middleware(['auth','verified', 'role:ehs,pic,manajer'])->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     Route::get('/riwayat-lct', [RiwayatLctController::class, 'index'])->name('admin.riwayat-lct');
     Route::get('/riwayat-lct/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('admin.riwayat-lct.show');
