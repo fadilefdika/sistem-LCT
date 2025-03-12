@@ -129,8 +129,8 @@
                     <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
                         {{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') }}
                     </td>
-    
-                    <!-- Tanggal Selesai -->
+
+                    <!-- Tanggal Selesai / Overdue -->
                     <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
                         @if ($laporan->date_completion)
                             {{ \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') }}
@@ -142,12 +142,20 @@
                             @endphp
 
                             @if ($overdueDays > 0)
-                                <span class="text-red-600 font-semibold">Overdue {{ abs($overdueDays) }} days</span>
+                                <span class="bg-red-100 text-red-600 text-sm font-semibold px-2 py-1 rounded">
+                                    Overdue {{ $overdueDays }} days
+                                </span>
+                            @elseif ($overdueDays === 0)
+                                <span class="bg-yellow-100 text-yellow-600 text-sm font-semibold px-2 py-1 rounded">
+                                    Due Today
+                                </span>
                             @else
-                                -
+                                <span class="text-gray-500">-</span>
                             @endif
                         @endif
                     </td>
+
+
 
                     
 

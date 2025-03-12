@@ -89,5 +89,5 @@ Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan)
 // laporan manajemen pic
 Breadcrumbs::for('manajemen-pic', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('PIC Management', route('admin.manajemen-pic'));
+    $trail->push('Master Data', route('admin.manajemen-pic'));
 });

@@ -1,7 +1,7 @@
 <x-app-layout>
-    <section class="p-3 sm:p-5">
+    <section class="px-3 sm:px-5">
         <div class="mx-auto max-w-screen-2xl">
-            <livewire:manajemen-pic />
+            <livewire:master-data />
         </div>
       </section>
 </x-app-layout>
