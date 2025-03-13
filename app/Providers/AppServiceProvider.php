@@ -41,10 +41,10 @@ class AppServiceProvider extends ServiceProvider
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
         }else if ($route && $route->getName() === 'admin.budget-approval.show') {
             $id_laporan_lct = $route->parameter('id_laporan_lct');
-            $laporan = LaporanLct::with('budget')->where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+            $laporan = LaporanLct::with('tasks')->where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
         }else if ($route && $route->getName() === 'admin.budget-approval-history.show') {
             $id_laporan_lct = $route->parameter('id_laporan_lct');
-            $laporan = LaporanLct::with('budget')->where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+            $laporan = LaporanLct::with('tasks')->where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
         }
 
         $view->with('laporan', $laporan);

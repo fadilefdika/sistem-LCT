@@ -40,6 +40,7 @@
                                     'closed' => 'bg-purple-500', // Purple for Closed
                                     'revision' => 'bg-red-500', // Red for revision
                                     'waiting_approval_temporary' => 'bg-yellow-600', // Yellow for Temporary Waiting Approval
+                                    'waiting_approval_taskbudget' => 'bg-yellow-600', // Yellow for Temporary Waiting Approval
                                     'approved_temporary' => 'bg-green-600', // Green for Temporary Approved
                                     'temporary_revision' => 'bg-red-600', // Red for Temporary Revision
                                     'work_permanent' => 'bg-blue-600', // Blue for Permanent Work
@@ -56,6 +57,7 @@
                                     'closed' => 'Closed',
                                     'revision' => 'Revision',
                                     'waiting_approval_temporary' => 'Waiting Approval (Temporary)',
+                                    'waiting_approval_taskbudget' => 'Waiting Approval (Temporary)',
                                     'approved_temporary' => 'Approved (Temporary)',
                                     'temporary_revision' => 'Revision (Temporary)',
                                     'work_permanent' => 'Work (Permanent)',

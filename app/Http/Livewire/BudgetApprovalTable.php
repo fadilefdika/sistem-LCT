@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\BudgetApproval; // Sesuaikan dengan model yang digunakan
+use App\Models\LaporanLct;
 
 class BudgetApprovalTable extends Component
 {
@@ -32,18 +33,19 @@ class BudgetApprovalTable extends Component
 
     public function render()
     {
-        $budgets = BudgetApproval::with('laporanLct')
-        ->whereIn('status_budget', ['pending', 'revision'])
-        ->where(function ($query) {
-            $query->whereHas('pic.user', function ($subQuery) {
-                $subQuery->where('fullname', 'like', '%' . $this->search . '%');
-            })
-            ->orWhere('deskripsi', 'like', '%' . $this->search . '%');
-        })
+        $taskBudget = LaporanLct::with([
+            'picUser',
+            'tasks' => function ($query) {
+                $query->select('id', 'id_laporan_lct', 'created_at');
+            }
+        ])
+        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision'])
         ->orderBy($this->sortField, $this->sortDirection)
         ->paginate($this->perPage);
+    
+    
 
-        return view('livewire.budget-approval-table', compact('budgets'));
+        return view('livewire.budget-approval-table', compact('taskBudget'));
     }
 
 }

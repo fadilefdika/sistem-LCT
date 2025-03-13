@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LaporanLct;
 use Illuminate\Http\Request;
+use App\Models\RejectLaporan;
 use App\Models\BudgetApproval;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\RejectLaporan;
 
 class BudgetApprovalController extends Controller
 {
@@ -18,14 +19,24 @@ class BudgetApprovalController extends Controller
 
     public function show($id_laporan_lct)
     {
-        // $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
-        //     $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
-        // }])
-        // ->where('id_laporan_lct', $id_laporan_lct)
-        // ->firstOrFail();  
+        $taskBudget = LaporanLct::with([
+            'picUser',
+            'tasks' => function ($query) {
+                $query->select('id', 'id_laporan_lct', 'created_at');
+            },
+            'rejects' => function ($query) {
+                $query->where('tipe_reject', 'budget_approval')
+                    ->orderBy('created_at', 'desc');
+            }
+        ])
+        ->where('id_laporan_lct', $id_laporan_lct) // Filter berdasarkan ID laporan
+        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision'])
+        ->first();
 
-        return view('pages.admin.budget-approval.show', compact('budget'));
+        // dd($taskBudget);
+        return view('pages.admin.budget-approval.show', compact('taskBudget'));
     }
+
 
     public function showHistory($id_laporan_lct)
     {

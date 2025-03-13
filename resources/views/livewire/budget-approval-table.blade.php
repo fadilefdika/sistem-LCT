@@ -1,17 +1,5 @@
 <div class="bg-white p-6 shadow-sm rounded-xl">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-        <input type="text" wire:model="search" placeholder="Cari budget request..."
-            class="w-1/3 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-gray-200 outline-none"
-        >
-        <select wire:model="perPage"
-            class="p-2 border border-gray-300 rounded-lg focus:ring focus:ring-gray-200 outline-none"
-        >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-        </select>
-    </div>
+
 
     <!-- Tabel (Notion-style) -->
     <div class="overflow-hidden rounded-lg border border-gray-200">
@@ -28,22 +16,38 @@
                 </tr>                
             </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
-                @forelse($budgets as $index => $budget)
+                @forelse($taskBudget as $index => $budget)
                     <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
                         <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
-                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
-                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->picUser->fullname ?? '-' }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
-                            Rp {{ number_format($budget->budget, 0, ',', '.') }}
+                            Rp {{ number_format($budget->estimated_budget, 0, ',', '.') }}
                         </td>
+                        <td>
+                            @if($budget->tasks->isNotEmpty())
+                                {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('F j, Y') }}
+
+                            @else
+                                -
+                            @endif
+                        </td>                      
+                        @php
+                            $statusMapping = [
+                                'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
+                                'taskbudget_revision' => 'Budget Needs Revision',
+                                'approved_taskbudget' => 'Budget Approved',
+                            ];
+
+                            $statusLabel = $statusMapping[$budget->status_lct] ?? ucfirst(str_replace('_', ' ', $budget->status_lct));
+                        @endphp
+
                         <td class="px-4 py-4 text-sm text-gray-800">
-                            {{ $budget->created_at->translatedFormat('d F Y') }}
-                        </td>                        
-                        <td class="px-4 py-4 text-sm text-gray-800">
-                            <p class="truncate block max-w-xs">
-                                {{$budget->status_budget}}
+                            <p class="truncate block max-w-xs font-medium">
+                                {{ $statusLabel }}
                             </p>
                         </td>
+
                         <td class="px-4 py-4 text-center">
                             <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}" 
                                 class="text-blue-500 hover:text-blue-700 font-medium hover:underline ">
@@ -70,10 +74,10 @@
 
     <div class="mt-6 flex justify-between items-center border-t px-5 py-3">
         <span class="text-sm text-gray-600">
-            Showing {{ $budgets->firstItem() }} to {{ $budgets->lastItem() }} of {{ $budgets->total() }} entries
+            Showing {{ $taskBudget->firstItem() }} to {{ $taskBudget->lastItem() }} of {{ $taskBudget->total() }} entries
         </span>
         <div>
-            {{ $budgets->links('pagination::tailwind') }}
+            {{ $taskBudget->links('pagination::tailwind') }}
         </div>
     </div>
 </div>

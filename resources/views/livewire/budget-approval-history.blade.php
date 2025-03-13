@@ -21,11 +21,11 @@
                 </tr>                
             </thead>            
             <tbody class="divide-y divide-gray-100 bg-white">
-                @forelse($budgets as $index => $budget)
+                @forelse($taskBudget as $index => $budget)
                     <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
                         <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
                         <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
-                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->laporanLct->tingkat_bahaya}}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{$budget->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
                             Rp {{ number_format($budget->budget, 0, ',', '.') }}
                         </td>
@@ -62,10 +62,10 @@
 
     <div class="mt-6 flex justify-between items-center border-t px-5 py-3">
         <span class="text-sm text-gray-600">
-            Showing {{ $budgets->firstItem() }} to {{ $budgets->lastItem() }} of {{ $budgets->total() }} entries
+            Showing {{ $taskBudget->firstItem() }} to {{ $taskBudget->lastItem() }} of {{ $taskBudget->total() }} entries
         </span>
         <div>
-            {{ $budgets->links('pagination::tailwind') }}
+            {{ $taskBudget->links('pagination::tailwind') }}
         </div>
     </div>
 </div>

@@ -26,40 +26,40 @@ Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan)
 });
 
 
-// budget approval
+// activity approval
 Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Budget Approval', route('admin.budget-approval'));
+    $trail->push('Activity Approval', route('admin.budget-approval'));
 });
 
-// budget approval detail
+// activity approval detail
 Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval');
-    $trail->push("Detail Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
+    $trail->push("Detail Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
-// budget approval history
+// activity approval history
 Breadcrumbs::for('budget-approval-history', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Budget Approval History', route('admin.budget-approval-history'));
+    $trail->push('Activity Approval History', route('admin.budget-approval-history'));
 });
 
-// budget approval history detail
+// activity approval history detail
 Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval-history');
-    $trail->push("Detail History Budget Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
+    $trail->push("Detail History Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
 });
 
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Repair Progress', route('admin.progress-perbaikan'));
+    $trail->push('Activity Approval', route('admin.progress-perbaikan'));
 });
 
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Detail Repair Progress LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Detail Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
 
 

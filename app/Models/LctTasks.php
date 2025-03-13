@@ -25,10 +25,11 @@ class LctTasks extends Model
     ];
 
     // Relasi ke Laporan LCT
-    public function laporanLct()
+    public function laporan()
     {
-        return $this->belongsTo(LaporanLct::class, 'id_laporan_lct', 'id');
+        return $this->belongsTo(LaporanLct::class, 'id_laporan_lct', 'id_laporan_lct');
     }
+
 
     // Relasi ke PIC
     public function pic()
