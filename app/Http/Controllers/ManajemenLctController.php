@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pic;
-use App\Models\LctTask;
+use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\BudgetApproval;
@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AssignToEhsRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ManajemenLctController extends Controller
 {
@@ -37,16 +38,16 @@ class ManajemenLctController extends Controller
         }
  
         // Ambil semua task terkait laporan ini
-        $tasks = LctTask::with('pic')
+        $tasks = LctTasks::with('pic')
             ->where('id_laporan_lct', $id_laporan_lct)
             ->orderBy('due_date', 'asc')
             ->get();
 
-        $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)
-            ->with(['rejects' => function ($query) {
-                $query->where('tipe_reject', 'budget_approval'); // Filter hanya "budget_approval"
-            }])
-            ->first();
+        // $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)
+        //     ->with(['rejects' => function ($query) {
+        //         $query->where('tipe_reject', 'budget_approval'); // Filter hanya "budget_approval"
+        //     }])
+        //     ->first();
         
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
             return asset('storage/' . $path);
@@ -55,7 +56,7 @@ class ManajemenLctController extends Controller
             return asset('storage/' . $path);
         });
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'budget', 'bukti_temuan', 'bukti_perbaikan'));
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan'));
     }
 
 
@@ -115,55 +116,65 @@ class ManajemenLctController extends Controller
 
 
 
-    public function submitBudget(Request $request, $id_laporan_lct)
+    public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
-        $request->merge([
-            'budget_amount' => str_replace('.', '', $request->budget_amount), // Hapus titik sebagai pemisah ribuan
-        ]);
+        // Ambil semua data
+        $data = $request->all();
 
-        $request->validate([
-            'budget_amount' => 'required|numeric',
-            'budget_description' => 'required|string',
-            'attachment' => 'required|file|mimes:pdf,doc,docx|max:2048', // Sesuai dengan form
-        ]);
+        // Filter hanya task yang memiliki nilai
+        $filteredTasks = array_filter($data['tasks'], function ($task) {
+            return !empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']);
+        });
+
+        // Gantilah 'tasks' dengan data yang sudah difilter
+        $data['tasks'] = array_values($filteredTasks);
+
+        // Jika setelah filtering tidak ada task yang valid, hentikan proses
+        if (empty($data['tasks'])) {
+            return redirect()->back()->with('error', 'Tidak ada task yang valid untuk disimpan.');
+        }
+
+        // Validasi setelah filtering
+        $validatedData = Validator::make($data, [
+            'tasks' => 'array|required',
+            'tasks.*.taskName' => 'required|string',
+            'tasks.*.namePic' => 'required|string',
+            'tasks.*.dueDate' => 'required|date',
+            'tasks.*.notes' => 'nullable|string',
+            'estimatedBudget' => 'required|numeric',
+        ])->validate();
+        
+        $pic = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->value('pic_id');
+
 
         try {
-            DB::beginTransaction(); // Mulai transaksi
-
-            $user = auth()->user()->id;
-            $pic = Pic::where('user_id', $user)->first()->id;
-
-            // Cek apakah budget sudah ada sebelumnya
-            $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
-
-            // Cek apakah ada file yang diunggah
-            $filePath = $budget->lampiran ?? null;
-            if ($request->hasFile('attachment')) {
-                // Hapus file lama jika ada
-                if ($filePath) {
-                    Storage::disk('public')->delete($filePath);
-                }
-                $filePath = $request->file('attachment')->store('budget_proofs', 'public');
-            }
-
-            // Jika budget sudah ada, perbarui, jika belum, buat baru
-            BudgetApproval::updateOrCreate(
-                ['id_laporan_lct' => $id_laporan_lct], // Kondisi pencarian
-                [
+            DB::beginTransaction(); 
+            foreach ($filteredTasks as $task) {
+                LctTasks::create([
+                    'id_laporan_lct' => $id_laporan_lct,
+                    'task_name' => $task['taskName'],
+                    'name_pic' => $task['namePic'],
+                    'due_date' => $task['dueDate'],
+                    'notes' => $task['notes'] ?? null,
                     'pic_id' => $pic,
-                    'budget' => $request->budget_amount,
-                    'deskripsi' => $request->budget_description,
-                    'lampiran' => $filePath,
-                    'status_budget' => 'pending', // Reset status setelah perbaikan
-                ]
-            );
+                    'status' => 'pending',
+                ]);
+            }
+            // dd("masuk ini euy");
+            // Simpan atau update estimasi budget di Laporan LCT
+            LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
+                'estimated_budget' => $validatedData['estimatedBudget'],
+                'status_lct' => 'waiting_approval_taskbudget',
+            ]);
 
-            DB::commit(); // Jika semua berhasil, commit transaksi
+            DB::commit(); // Simpan perubahan jika semua berhasil
 
-            return redirect()->back()->with('success', 'Budget request submitted successfully');
+            return redirect()->back()->with('success', 'Tasks successfully submitted!');
         } catch (\Exception $e) {
-            DB::rollBack(); // Jika ada error, rollback transaksi
-            return redirect()->back()->with('error', 'Failed to submit budget request: ' . $e->getMessage());
+            DB::rollBack(); 
+            dd($e);
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 }

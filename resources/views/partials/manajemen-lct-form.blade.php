@@ -101,13 +101,11 @@
                 <button 
                     type="submit" 
                     class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
-                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
-                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved'])) disabled @endif
+                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
+                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) disabled @endif
                     >
                     Submit Report
                 </button>
-
-           
 
             </div>
         </form>

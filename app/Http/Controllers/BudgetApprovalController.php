@@ -18,22 +18,22 @@ class BudgetApprovalController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
-            $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
-        }])
-        ->where('id_laporan_lct', $id_laporan_lct)
-        ->firstOrFail();  
+        // $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
+        //     $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
+        // }])
+        // ->where('id_laporan_lct', $id_laporan_lct)
+        // ->firstOrFail();  
 
         return view('pages.admin.budget-approval.show', compact('budget'));
     }
 
     public function showHistory($id_laporan_lct)
     {
-        $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
-            $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
-        }])
-        ->where('id_laporan_lct', $id_laporan_lct)
-        ->firstOrFail();  
+        // $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
+        //     $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
+        // }])
+        // ->where('id_laporan_lct', $id_laporan_lct)
+        // ->firstOrFail();  
 
         return view('pages.admin.budget-approval-history.show', compact('budget'));
     }
@@ -43,9 +43,9 @@ class BudgetApprovalController extends Controller
         try {
             DB::beginTransaction(); // Mulai transaksi
             
-            $budget = BudgetApproval::findOrFail($id);
-            $budget->status_budget = 'approved';
-            $budget->save();
+            // $budget = BudgetApproval::findOrFail($id);
+            // $budget->status_budget = 'approved';
+            // $budget->save();
     
             DB::commit(); 
             
@@ -60,18 +60,7 @@ class BudgetApprovalController extends Controller
     public function reject(Request $request, $id_laporan_lct)
     {
         try {
-
             DB::beginTransaction(); // Mulai transaksi
-            $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)->first();
-            
-            if (!$budget) {
-                return redirect()->back()->with('error', 'Budget not found.');
-            }
-
-            // 2. Update status_budget di tabel lct_budget_approval
-            $budget->update([
-                'status_budget' => 'revision',
-            ]);
 
             // 3. Simpan alasan reject di tabel lct_laporan_reject
             RejectLaporan::create([

@@ -57,7 +57,7 @@
     </div>
 
     <!-- Rekomendasi Safety -->
-    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2">
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all border-green-300 duration-300 ease-in-out col-span-2">
         <p class="text-gray-500 text-xs flex items-center gap-2">
             <i class="fa-solid fa-shield-alt text-green-500"></i> Safety Recommendation
         </p>

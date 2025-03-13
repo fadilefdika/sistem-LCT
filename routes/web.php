@@ -73,7 +73,7 @@ Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
     Route::get('/manajemen-lct', [ManajemenLctController::class, 'index'])->name('admin.manajemen-lct');
     Route::get('/manajemen-lct/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('admin.manajemen-lct.show');
     Route::post('/manajemen-lct/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('admin.manajemen-lct.store');
-    Route::post('/manajemen-lct/{id_laporan_lct}/submitBudget', [ManajemenLctController::class, 'submitBudget'])->name('admin.manajemen-lct.submitBudget');
+    Route::post('/manajemen-lct/{id_laporan_lct}/submitTaskBudget', [ManajemenLctController::class, 'submitTaskBudget'])->name('admin.manajemen-lct.submitTaskBudget');
     
     Route::post('/manajemen-lct/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('admin.manajemen-lct.storeTask');
     Route::post('/manajemen-lct/{id_task}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('admin.manajemen-lct.updateStatus');

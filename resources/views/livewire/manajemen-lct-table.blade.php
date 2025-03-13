@@ -1,6 +1,5 @@
 <div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl">
-    <input type="text" wire:model="search" placeholder="Cari laporan..." class="border p-2 mb-3 w-full rounded-md focus:ring focus:ring-blue-200">
-
+    
     <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg overflow-hidden">
             <thead class="bg-gray-100">

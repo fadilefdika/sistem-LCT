@@ -1,4 +1,10 @@
-<div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl">
+<div class="overflow-x-auto bg-white p-6 shadow-sm rounded-xl flex flex-col gap-6">
+    <!-- Add PIC Button -->
+    <div class="flex justify-end">
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 cursor-pointer">
+          + Add PIC
+        </button>
+    </div>
     <div class="rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -21,14 +27,14 @@
                             <div class="flex justify-center space-x-2">
                                 <!-- Edit Button -->
                                 <button wire:click="edit({{ $pic->id }})"
-                                    class="flex items-center bg-yellow-500 text-white py-2 px-3 rounded-md hover:bg-yellow-400 transition duration-200"
+                                    class="cursor-pointer flex items-center bg-yellow-500 text-white py-2 px-3 rounded-md hover:bg-yellow-400 transition duration-200"
                                     aria-label="Edit">
                                     ✏️ Edit
                                 </button>
                                 
                                 <!-- Delete Button -->
                                 <button wire:click="delete({{ $pic->id }})"
-                                    class="flex items-center bg-red-500 text-white py-2 px-3 rounded-md hover:bg-red-400 transition duration-200"
+                                    class="cursor-pointer flex items-center bg-red-500 text-white py-2 px-3 rounded-md hover:bg-red-400 transition duration-200"
                                     aria-label="Delete">
                                     🗑️ Delete
                                 </button>

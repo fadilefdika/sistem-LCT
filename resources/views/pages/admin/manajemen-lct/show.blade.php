@@ -9,7 +9,7 @@
                 Laporan LCT
             </button>
             <!-- Menampilkan tombol Task & Timeline hanya jika status LCT adalah 'approved' dan tingkat bahaya Medium atau High -->
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && $laporan->status_lct === 'approved_temporary')
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent']))
             <button @click="activeTab = 'task-and-timeline'" 
                     :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                     class="px-4 py-2 focus:outline-none cursor-pointer">

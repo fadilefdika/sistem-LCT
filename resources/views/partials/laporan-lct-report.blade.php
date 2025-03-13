@@ -57,7 +57,7 @@
     </div>
 
     <!-- Card Kategori Temuan -->
-    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-500 mt-3">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
             <p class="text-gray-500 text-xs">Finding Category</p>
@@ -67,7 +67,7 @@
 
 
     <!-- Card Rekomendasi Safety -->
-    <div class="bg-white p-4 rounded-lg border-gray-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+    <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
         <div class="flex items-center space-x-2 mb-2">
             <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
             <p class="text-gray-500 text-xs">Safety Recommendation</p>

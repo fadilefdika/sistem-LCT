@@ -52,7 +52,7 @@
                         <span class="text-red-800">Revision (Permanent)</span>
                     @else
                         <i class="fas fa-hourglass-half text-gray-500 text-lg"></i>
-                        <span class="text-gray-800">Pending Approval</span>
+                        <span class="text-gray-800">{{$laporan->status_lct}}</span>
                     @endif
                 </div>                                         
             </div>
@@ -70,21 +70,23 @@
 
 
     <!-- Card Informasi dari EHS -->
-    <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-row justify-around items-center">
-        
+    <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-wrap justify-evenly items-start w-full gap-4">
+
         <!-- PIC Name -->
-        <div class="flex flex-col items-start">
+        <div class="flex flex-col items-start min-w-[120px] max-w-[200px]">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
                 <p>PIC Name</p>
             </div>
-            <p class="text-gray-900 font-semibold text-sm mt-1">{{ $laporan->picUser->fullname ?? 'Tidak ada PIC' }}</p>
+            <p class="text-gray-900 font-semibold text-sm mt-1 truncate w-full">
+                {{ $laporan->picUser->fullname ?? 'Tidak ada PIC' }}
+            </p>
         </div>
-
+    
         <!-- Garis Pemisah -->
-        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-
-       <!-- Tanggal Temuan -->
+        <div class="w-[2px] bg-gray-300 h-10 rounded-full hidden md:block"></div>
+    
+        <!-- Tanggal Temuan -->
         <div x-data="{ 
                 rawTanggalTemuan: '{{ $laporan->tanggal_temuan }}',
                 formattedTanggalTemuan: ''
@@ -97,81 +99,113 @@
                     formattedTanggalTemuan = 'Tanggal tidak valid';
                 }
             "
-            class="flex flex-col items-start">
-
+            class="flex flex-col items-start min-w-[120px] max-w-[200px]">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-calendar-alt text-green-500"></i> <!-- Ikon Kalender -->
                 <p>Date of Finding</p>
             </div>
-
-            <p class="text-gray-900 font-semibold text-sm mt-1" x-text="formattedTanggalTemuan"></p>
+            <p class="text-gray-900 font-semibold text-sm mt-1 truncate w-full" x-text="formattedTanggalTemuan"></p>
         </div>
-
-
-        <!-- Garis Pemisah -->
-        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-
-        <!-- Area Temuan -->
-        <div class="flex flex-col items-start">
-            <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                <p>Finding Area Details</p>
-            </div>
-            <p class="text-gray-900 font-semibold text-sm mt-1">{{ $laporan->area}} - {{ $laporan->detail_area }}</p>
+        
+    </div>
+    
+    <!-- Area Temuan -->
+    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col items-start border-l-4 border-gray-700">
+        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
+            <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
+            <p>Finding Area Details</p>
         </div>
-
+        <p class="text-gray-900 font-semibold text-sm mt-1 whitespace-normal break-words overflow-hidden text-ellipsis max-h-[3rem]">
+            {{ $laporan->area }} - {{ $laporan->detail_area }} asdwfegrthgrf wadefwgrerfe wdefredw dwefsrfeds wdefe wdef wdefdwa dwefdqwddad
+        </p>
     </div>
 
-    <!-- Card Due Date -->
+
+    <!-- Card  Date -->
     <div x-data="{ 
         rawDueDate: '{{$laporan->due_date}}', 
+        rawCompletionDate: '{{$laporan->date_completion}}',
         today: new Date(), 
         formattedDueDate: '', 
+        formattedCompletionDate: '',
         daysLeft: 0, 
+        overdueDays: 0,
         isApproved: ['approved', 'closed'].includes('{{ $laporan->status_lct }}')
-    }"
-    x-init="
-        let due = new Date(rawDueDate);
-        if (!isNaN(due)) {
-            formattedDueDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(due);
-            let diffTime = due - today;
-            daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        } else {
-            formattedDueDate = 'Tanggal tidak valid';
-            daysLeft = null;
-        }
-    "
-    :class="daysLeft !== null && daysLeft < 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
-    class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col items-start">
-    
-        <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
-            <i class="fas fa-calendar-alt text-lg"
-                :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'"></i>
-            <p class="font-medium">Due Date</p>
+        }"
+        x-init="
+            let due = new Date(rawDueDate);
+            let completion = new Date(rawCompletionDate);
+            let now = today;
+
+            if (!isNaN(due)) {
+                formattedDueDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(due);
+            } else {
+                formattedDueDate = 'Tanggal tidak valid';
+            }
+
+            if (!isNaN(completion)) {
+                formattedCompletionDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(completion);
+                now = completion; // Jika sudah selesai, gunakan date_completion sebagai batas overdue
+            } else {
+                formattedCompletionDate = '-';
+            }
+
+            if (!isNaN(due)) {
+                let diffTime = due - now;
+                daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (daysLeft < 0) {
+                    overdueDays = Math.abs(daysLeft);
+                } else {
+                    overdueDays = 0;
+                }
+            }
+        "
+        :class="overdueDays > 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
+        class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-row items-start justify-evenly flex-wrap gap-4">
+        
+        <!-- Due Date -->
+        <div class="flex flex-col items-start w-1/3 min-w-[120px] max-w-[200px]">
+            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
+                <i class="fas fa-calendar-alt"
+                    :class="overdueDays > 0 ? 'text-red-500' : 'text-green-500'"></i>
+                <p class="font-medium">Due Date</p>
+            </div>
+            <p class="text-sm font-semibold mt-1"
+                :class="overdueDays > 0 ? 'text-red-600' : 'text-gray-900'">
+                <span x-text="formattedDueDate"></span>
+            </p>
+            <!-- Countdown Section -->
+            <p x-show="!isApproved" class="text-xs font-medium mt-2"
+                :class="overdueDays > 0 ? 'text-red-500' : 'text-green-500'">
+                <template x-if="overdueDays > 0">
+                    <span>Overdue by <span x-text="overdueDays"></span> days</span>
+                </template>
+                <template x-if="overdueDays === 0 && daysLeft >= 0">
+                    <span><span x-text="daysLeft"></span> days left before overdue</span>
+                </template>
+                <template x-if="formattedDueDate === 'Tanggal tidak valid'">
+                    <span class="text-gray-500">Invalid date</span>
+                </template>
+            </p>
         </div>
-    
-        <p class="text-sm font-semibold mt-1"
-            :class="daysLeft !== null && daysLeft < 0 ? 'text-red-600' : 'text-gray-900'">
-            <span x-text="formattedDueDate"></span>
-        </p>
-    
-       <!-- Countdown Section -->
-        <p x-show="!isApproved" class="text-xs font-medium mt-2"
-        :class="daysLeft !== null && daysLeft < 0 ? 'text-red-500' : 'text-green-500'">
-        <template x-if="daysLeft !== null && daysLeft < 0">
-            <span>Overdue by <span x-text="Math.abs(daysLeft)"></span> days</span>
-        </template>
-        <template x-if="daysLeft !== null && daysLeft >= 0">
-            <span><span x-text="daysLeft"></span> days left before overdue</span>
-        </template>
-        <template x-if="daysLeft === null">
-            <span class="text-gray-500">Invalid date</span>
-        </template>
-        </p>
+
+        <!-- Separator -->
+        <div class="w-[2px] bg-gray-300 h-12 rounded-full flex-shrink-0"></div>
+
+        <!-- Date of Completion -->
+        <div class="flex flex-col items-start w-1/3 min-w-[120px] max-w-[200px]">
+            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
+                <i class="fas fa-calendar-check text-blue-500"></i>
+                <p class="font-medium">Date of Completion</p>
+            </div>
+            <p class="text-sm font-semibold mt-1 text-gray-900" x-text="formattedCompletionDate"></p>
+        </div>
     </div>
+
                                 
     <!-- Card Kategori Temuan -->
-    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-500 mt-3">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-flag text-yellow-500 text-lg"></i>
             <p class="text-gray-500 text-xs">Finding Category</p>
@@ -180,7 +214,7 @@
     </div>
 
    <!-- Card Tingkat Bahaya -->
-    <div x-data="{ level: '{{ $laporan->tingkat_bahaya }}' }" class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
+    <div x-data="{ level: '{{ $laporan->tingkat_bahaya }}' }" class="bg-white p-4 rounded-lg shadow-md mt-3 border-l-4" :class="level === 'Low' ? 'border-green-500' : level === 'Medium' ? 'border-yellow-500' : 'border-red-500'">
         <div class="flex items-center space-x-2">
             <i :class="{
                 'text-green-500 fa-check-circle': level === 'Low',

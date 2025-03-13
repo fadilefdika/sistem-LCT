@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\LctTask;
+use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,15 +22,12 @@ class LctTaskController extends Controller
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
-            // Ambil pic_id langsung dari laporan
             $pic_id = $laporan->pic_id;
 
-            // Periksa apakah laporan memiliki PIC
             if (!$pic_id) {
                 return back()->with('error', 'You do not have access as a PIC.');
             }
 
-            // Decode tasks dari JSON ke array
             $tasks = json_decode($request->tasks, true);
 
             if (!is_array($tasks)) {
@@ -50,7 +47,7 @@ class LctTaskController extends Controller
                 $statusTask = $validatedData['status'] ?? 'pending';
 
                 // Buat task baru dengan `pic_id`
-                LctTask::create([
+                LctTasks::create([
                     'id_laporan_lct' => $id_laporan_lct,
                     'task_name' => $validatedData['taskName'],
                     'due_date' => $validatedData['dueDate'],
@@ -72,7 +69,7 @@ class LctTaskController extends Controller
 
     
     public function updateTask(Request $request, $id) {
-        $task = Task::findOrFail($id);
+        $task = LctTasks::findOrFail($id);
         $task->update([
             'task_name' => $request->task_name,
             'due_date' => $request->due_date,
@@ -86,7 +83,7 @@ class LctTaskController extends Controller
     public function updateStatus(Request $request, $id_task)
     {
     
-        $task = LctTask::findOrFail($id_task);
+        $task = LctTasks::findOrFail($id_task);
 
     
 
@@ -104,20 +101,6 @@ class LctTaskController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->except(['updateStatus']);
-    }
-
-
-
-
-    public function validateTask(Task $task)
-    {
-        if (auth()->user()->role !== 'ehs') {
-            return abort(403, 'Unauthorized');
-        }
-
-        $task->update(['validated_by_ehs' => true]);
-
-        return redirect()->back()->with('success', 'Task berhasil divalidasi!');
     }
 
 }

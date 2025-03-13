@@ -2,14 +2,14 @@
     <div class="flex flex-row flex-wrap align-items-center gap-3 p-3 border rounded shadow-sm bg-white mb-4">   
         <!-- Filter Tingkat Bahaya -->
         <div class="flex flex-col" style="min-width: 180px;">
-            <label for="filterKategori" class="form-label fw-bold text-muted mb-1">Filter Kategori</label>
+            <label for="filterKategori" class="form-label fw-bold text-muted mb-1">Category</label>
             <select wire:model="filterKategori" wire:change="applyFilter" id="filterKategori" class="form-select">
+                <option value="">All Category</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->nama_kategori }}</option>
                 @endforeach
-
             </select>
-        </div>
+        </div>        
         <!-- Loading Indicator -->
         <div wire:loading wire:target="filterKategori" class="text-sm text-muted mt-8">
             <i class="spinner-border spinner-border-sm"></i> Loading...
@@ -40,7 +40,7 @@
                             {{ $laporan->temuan_ketidaksesuaian }}
                         </span>
                     </td>
-                    <td class="px-4 py-3 text-gray-800">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('id')->translatedFormat('d F Y') }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('d F Y') }}</td>
                     <td class="px-4 py-3 text-gray-800">{{ $laporan->area }}</td>
                     <td class="px-4 py-3 text-center">
                         @if (!empty($laporan->bukti_temuan))
@@ -56,7 +56,7 @@
                             <span class="text-gray-500 italic">Image not found</span>
                         @endif
                     </td>                        
-                    <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori ? $laporan->kategori->nama_kategori : 'Tidak ada kategori' }}</td>
+                    <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori ? $laporan->kategori->nama_kategori : 'No categories' }}</td>
                     <td class="px-4 py-3 flex items-center justify-center gap-2">
                         <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
                     </td>

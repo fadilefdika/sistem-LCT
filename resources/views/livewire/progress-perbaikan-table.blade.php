@@ -4,9 +4,9 @@
         
         <!-- Filter Tingkat Bahaya -->
         <div class="flex flex-col" style="min-width: 180px;">
-            <label class="form-label fw-bold text-muted mb-1">Tingkat Bahaya</label>
+            <label class="form-label fw-bold text-muted mb-1">Risk Level</label>
             <select wire:model="riskLevel" wire:change="applyFilter" class="form-select">
-                @foreach (['' => 'Semua Tingkat Bahaya', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
+                @foreach (['' => 'All Risk Level', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
             </select>
@@ -14,9 +14,9 @@
     
         <!-- Filter Status LCT -->
         <div class="flex flex-col" style="min-width: 220px;">
-            <label class="form-label fw-bold text-muted mb-1">Status LCT</label>
+            <label class="form-label fw-bold text-muted mb-1">LCT Status</label>
             <select wire:model="statusLct" wire:change="applyFilter" class="form-select">
-                <option value="">Semua Status</option>
+                <option value="">All statuses</option>
                 <option value="in_progress">In Progress</option>
                 <option value="progress_work">Progress Work</option>
                 <option value="waiting_approval">Waiting Approval</option>
