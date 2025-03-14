@@ -1,9 +1,20 @@
 <form action="{{ route('admin.manajemen-lct.submitTaskBudget',['id_laporan_lct' => $laporan->id_laporan_lct] )}}" method="POST">
     @csrf
-    <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg relative h-full mb-4 overflow-x-auto" x-data="{ 
-        tasks: [{ taskName: '', dueDate: '', namePic: '', notes: '' }],
-        estimatedBudget: '' 
-    }">
+    <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg relative h-full mb-4 overflow-x-auto"
+        x-data="{ 
+            tasks: JSON.parse(JSON.stringify({{ Illuminate\Support\Js::from($tasks) }})),
+            estimatedBudget: '{{ number_format($laporan->estimated_budget, 0, ',', '.') }}',
+            formatCurrency(value) {
+                let cleaned = value.replace(/\D/g, '');
+                return new Intl.NumberFormat('id-ID').format(cleaned);
+            },
+            canSubmit() {
+                return this.tasks.some(task => task.taskName.trim() !== '');
+            }
+        }"
+        x-init="console.log('Loaded tasks:', tasks)"
+    >
+
         <h3 class="text-lg font-semibold mb-4">Task Management and Timeline</h3>
 
         <div class="mt-4 overflow-x-auto">
@@ -59,16 +70,14 @@
                 <input type="hidden" name="estimatedBudget" :value="estimatedBudget.replace(/\./g, '')">
             </div>
         </div>
-
         <!-- Submit button -->
         <div class="flex justify-end">
             <button type="submit"
                 class="text-white w-32 bg-blue-700 cursor-pointer hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4"
-                x-bind:disabled="tasks.some(task => (task.taskName.trim() === '' && (task.namePic.trim() !== '' || task.dueDate.trim() !== '')))">
+                :disabled="!canSubmit()">
                 Submit Report
             </button>
         </div>
-        
     </div>
 </form>
 
@@ -84,7 +93,13 @@
     });
 
     function formatCurrency(value) {
-        value = value.replace(/\D/g, ""); // Hanya angka
+        value = value.replace(/\D/g, ""); // Hapus semua karakter non-digit
         return new Intl.NumberFormat("id-ID").format(value);
     }
+
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("taskManager", () => ({
+            estimatedBudget: '{{ number_format($laporan->estimatedBudget, 0, ',', '.') }}',
+        }));
+    });
 </script>

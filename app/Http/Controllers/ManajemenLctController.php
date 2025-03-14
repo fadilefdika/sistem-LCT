@@ -23,11 +23,13 @@ class ManajemenLctController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with(['picUser', 'rejectLaporan', 'kategori'])
-            ->where('id_laporan_lct', $id_laporan_lct)
-            ->first();
+        $laporan = LaporanLct::with([
+            'picUser', 
+            'rejectLaporan', 
+            'kategori',
+            'tasks.pic' // Langsung ambil tasks dan relasinya
+        ])->where('id_laporan_lct', $id_laporan_lct)->first();
 
-            // dd($laporan);
         if (!$laporan) {
             abort(404, 'Laporan tidak ditemukan');
         }
@@ -36,23 +38,24 @@ class ManajemenLctController extends Controller
         if ($laporan->status_lct === 'in_progress') {
             $laporan->update(['status_lct' => 'progress_work']);
         }
- 
-        // Ambil semua task terkait laporan ini
-        $tasks = LctTasks::with('pic')
-            ->where('id_laporan_lct', $id_laporan_lct)
-            ->orderBy('due_date', 'asc')
-            ->get();
-        
-        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
-            return asset('storage/' . $path);
-        });
-        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(function ($path) {
-            return asset('storage/' . $path);
-        });
+
+        // Ambil tasks langsung dari relasi tanpa query tambahan
+        $tasks = LctTasks::where('id_laporan_lct', $laporan->id_laporan_lct)
+            ->get()
+            ->map(function ($task) {
+                return [
+                    'taskName' => $task->task_name,
+                    'namePic' => $task->name_pic,
+                    'dueDate' => $task->due_date,
+                    'notes' => $task->notes,
+                ];
+            });
+        // Konversi bukti_temuan dan bukti_perbaikan
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
+        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
 
         return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan'));
     }
-
 
     public function store(Request $request, $id_laporan_lct)
     {
