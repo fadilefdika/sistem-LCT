@@ -19,21 +19,11 @@ class BudgetApprovalController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $taskBudget = LaporanLct::with([
-            'picUser',
-            'tasks' => function ($query) {
-                $query->select('id', 'id_laporan_lct', 'created_at');
-            },
-            'rejects' => function ($query) {
-                $query->where('tipe_reject', 'budget_approval')
-                    ->orderBy('created_at', 'desc');
-            }
-        ])
+        $taskBudget = LaporanLct::with('picUser','tasks','rejects')
         ->where('id_laporan_lct', $id_laporan_lct) // Filter berdasarkan ID laporan
         ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision'])
         ->first();
 
-        // dd($taskBudget);
         return view('pages.admin.budget-approval.show', compact('taskBudget'));
     }
 

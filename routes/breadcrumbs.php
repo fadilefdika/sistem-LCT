@@ -53,13 +53,13 @@ Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trai
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Approval', route('admin.progress-perbaikan'));
+    $trail->push('Activity Progress', route('admin.progress-perbaikan'));
 });
 
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Detail Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Detail Activity Progress LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
 
 

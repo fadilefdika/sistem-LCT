@@ -31,7 +31,7 @@ class BudgetApprovalTable extends Component
         $this->resetPage();
     }
 
-    public function render()
+    public function render() 
     {
         $taskBudget = LaporanLct::with([
             'picUser',
