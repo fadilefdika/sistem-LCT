@@ -87,7 +87,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'John Doe'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'open',
-            //         'tenggat_waktu' => '2025-03-20',
+            //         'due_date' => '2025-03-20',
             //         'date_completion' => null
             //     ],
             //     (object)[
@@ -96,7 +96,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Jane Smith'],
             //         'tingkat_bahaya' => 'Medium',
             //         'status_lct' => 'in_progress',
-            //         'tenggat_waktu' => '2025-02-15',
+            //         'due_date' => '2025-02-15',
             //         'date_completion' => '2025-02-12'
             //     ],
             //     (object)[
@@ -105,7 +105,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Alice Johnson'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'waiting_approval',
-            //         'tenggat_waktu' => '2025-03-10',
+            //         'due_date' => '2025-03-10',
             //         'date_completion' => null
             //     ],
             //     (object)[
@@ -114,7 +114,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Tom White'],
             //         'tingkat_bahaya' => 'Medium',
             //         'status_lct' => 'approved',
-            //         'tenggat_waktu' => '2025-03-15',
+            //         'due_date' => '2025-03-15',
             //         'date_completion' => '2025-03-14'
             //     ],
             //     (object)[
@@ -123,7 +123,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Emily Brown'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'closed',
-            //         'tenggat_waktu' => '2025-03-01',
+            //         'due_date' => '2025-03-01',
             //         'date_completion' => '2025-02-28'
             //     ]
             // ]);
@@ -136,7 +136,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Charlie Davis'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'in_progress',
-            //         'tenggat_waktu' => '2025-02-10',
+            //         'due_date' => '2025-02-10',
             //         'date_completion' => null
             //     ],
             //     (object)[
@@ -145,7 +145,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Linda Williams'],
             //         'tingkat_bahaya' => 'Medium',
             //         'status_lct' => 'review',
-            //         'tenggat_waktu' => '2025-01-25',
+            //         'due_date' => '2025-01-25',
             //         'date_completion' => '2025-02-01'
             //     ],
             //     (object)[
@@ -154,7 +154,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Greg Harris'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'waiting_approval',
-            //         'tenggat_waktu' => '2025-02-05',
+            //         'due_date' => '2025-02-05',
             //         'date_completion' => null
             //     ],
             //     (object)[
@@ -163,7 +163,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'Sophia Clark'],
             //         'tingkat_bahaya' => 'Medium',
             //         'status_lct' => 'approved',
-            //         'tenggat_waktu' => '2025-01-30',
+            //         'due_date' => '2025-01-30',
             //         'date_completion' => '2025-02-10'
             //     ],
             //     (object)[
@@ -172,7 +172,7 @@ class DashboardController extends Controller
             //         'picUser' => (object)['fullname' => 'James Lee'],
             //         'tingkat_bahaya' => 'High',
             //         'status_lct' => 'closed',
-            //         'tenggat_waktu' => '2025-02-01',
+            //         'due_date' => '2025-02-01',
             //         'date_completion' => '2025-02-02'
             //     ]
             // ]);

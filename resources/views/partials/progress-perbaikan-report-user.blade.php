@@ -18,7 +18,7 @@
     </div>
 
     <!-- Informasi Pelapor -->
-    <div class="bg-white p-6 rounded-xl shadow-md">
+    <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <p class="text-gray-500 text-xs flex items-center gap-1">
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Area Temuan -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
         <p class="text-gray-500 text-xs flex items-center gap-1">
             <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
         </p>
@@ -47,8 +47,8 @@
     </div>
 
     <!-- Finding Category -->
-    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2">
-        <p class="text-gray-500 text-xs flex items-center gap-2">
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ease-in-out col-span-2 border-l-4 border-yellow-500">
+        <p class="text-gray-500 text-base flex items-center gap-2">
             <i class="fa-solid fa-flag text-yellow-500"></i> Finding Category
         </p>
         <p class="text-gray-900 font-semibold mt-2 bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition-all duration-200 ease-in-out">
@@ -57,8 +57,8 @@
     </div>
 
     <!-- Rekomendasi Safety -->
-    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all border-green-300 duration-300 ease-in-out col-span-2">
-        <p class="text-gray-500 text-xs flex items-center gap-2">
+    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-all border-l-4 border-green-300 duration-300 ease-in-out col-span-2">
+        <p class="text-gray-500 text-base flex items-center gap-2">
             <i class="fa-solid fa-shield-alt text-green-500"></i> Safety Recommendation
         </p>
         <p class="text-gray-900 mt-2 text-justify leading-relaxed text-sm">
@@ -68,12 +68,12 @@
 
     <!-- Card Non-Conformity Image -->
             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-                <p class="text-gray-700 text-lg font-semibold">Non-Conformity Image</p>
-                <div class="grid grid-cols-5 gap-2 mt-2">
+                <p class="text-gray-700 text-lg font-semibold text-center">Non-Conformity Image</p>
+                <div class="flex justify-center gap-1.5 mt-2">
                     @foreach ($bukti_temuan->take(5) as $gambar)
                         <img src="{{ $gambar }}" 
                             class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                            alt="Bukti Temuan"
+                            alt="Finding Image"
                             onclick="openModal('{{ $gambar }}')">
                     @endforeach
                 </div>

@@ -10,53 +10,53 @@
             </h5>
         
             <!-- Status Laporan -->
-            <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
-                @if($laporan->status_lct === 'approved') bg-green-100 text-green-700 border border-green-400 
-                @elseif($laporan->status_lct === 'revision') bg-red-100 text-red-700 border border-red-400 
-                @elseif($laporan->status_lct === 'waiting_approval_temporary') bg-yellow-100 text-yellow-700 border border-yellow-400
-                @elseif($laporan->status_lct === 'approved_temporary') bg-green-100 text-green-700 border border-green-400
-                @elseif($laporan->status_lct === 'temporary_revision') bg-red-100 text-red-700 border border-red-400
-                @elseif($laporan->status_lct === 'work_permanent') bg-blue-100 text-blue-700 border border-blue-400
-                @elseif($laporan->status_lct === 'waiting_approval_permanent') bg-yellow-100 text-yellow-700 border border-yellow-400
-                @elseif($laporan->status_lct === 'approved_permanent') bg-green-100 text-green-700 border border-green-400
-                @elseif($laporan->status_lct === 'permanent_revision') bg-red-100 text-red-700 border border-red-400
-                @else bg-gray-100 text-gray-700 border border-gray-400 @endif">
+            @php
+            $statusMapping = [
+                'In Progress' => ['in_progress', 'progress_work', 'work_permanent'],
+                'Waiting Approval' => ['waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent', 'waiting_approval_taskbudget'],
+                'Approved' => ['approved', 'approved_temporary', 'approved_permanent', 'approved_taskbudget'],
+                'Revision' => ['revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision']
+            ];
 
-                <div class="flex items-center space-x-2 text-sm font-medium">
-                    @if($laporan->status_lct === 'approved')
-                        <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                        <span class="text-green-800">Approved</span>
-                    @elseif($laporan->status_lct === 'revision')
-                        <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-800">Revision Required</span>
-                    @elseif($laporan->status_lct === 'waiting_approval_temporary')
-                        <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
-                        <span class="text-yellow-800">Waiting Approval (Temporary)</span>
-                    @elseif($laporan->status_lct === 'approved_temporary')
-                        <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                        <span class="text-green-800">Approved (Temporary)</span>
-                    @elseif($laporan->status_lct === 'temporary_revision')
-                        <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-800">Revision (Temporary)</span>
-                    @elseif($laporan->status_lct === 'work_permanent')
-                        <i class="fas fa-hourglass-half text-blue-500 text-lg"></i>
-                        <span class="text-blue-800">Work (Permanent)</span>
-                    @elseif($laporan->status_lct === 'waiting_approval_permanent')
-                        <i class="fas fa-hourglass-start text-yellow-500 text-lg"></i>
-                        <span class="text-yellow-800">Waiting Approval (Permanent)</span>
-                    @elseif($laporan->status_lct === 'approved_permanent')
-                        <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                        <span class="text-green-800">Approved (Permanent)</span>
-                    @elseif($laporan->status_lct === 'permanent_revision')
-                        <i class="fas fa-times-circle text-red-500 text-lg"></i>
-                        <span class="text-red-800">Revision (Permanent)</span>
-                    @else
-                        <i class="fas fa-hourglass-half text-gray-500 text-lg"></i>
-                        <span class="text-gray-800">{{$laporan->status_lct}}</span>
-                    @endif
-                </div>                                         
+            $statusText = 'Unknown';
+            $statusColor = 'gray';
+            $statusIcon = 'fas fa-hourglass-half text-gray-500';
+
+            foreach ($statusMapping as $label => $statuses) {
+                if (in_array($laporan->status_lct, $statuses)) {
+                    $statusText = $label;
+                    switch ($label) {
+                        case 'In Progress':
+                            $statusColor = 'blue';
+                            $statusIcon = 'fas fa-hourglass-half text-blue-500';
+                            break;
+                        case 'Waiting Approval':
+                            $statusColor = 'yellow';
+                            $statusIcon = 'fas fa-hourglass-start text-yellow-500';
+                            break;
+                        case 'Approved':
+                            $statusColor = 'green';
+                            $statusIcon = 'fas fa-check-circle text-green-500';
+                            break;
+                        case 'Revision':
+                            $statusColor = 'red';
+                            $statusIcon = 'fas fa-times-circle text-red-500';
+                            break;
+                    }
+                    break;
+                }
+            }
+            @endphp
+
+            <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
+            bg-{{ $statusColor }}-100 text-{{ $statusColor }}-700 border border-{{ $statusColor }}-400">
+
+            <div class="flex items-center space-x-2 text-sm font-medium">
+                <i class="{{ $statusIcon }} text-lg"></i>
+                <span class="text-{{ $statusColor }}-800">{{ $statusText }}</span>
+            </div>                                         
             </div>
-        </div>                                    
+        </div>                                   
         
         <!-- Garis Pemisah -->
         <div class="w-full h-[2px] bg-gray-200 my-3"></div>
@@ -70,7 +70,7 @@
 
 
     <!-- Card Informasi dari EHS -->
-    <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-wrap justify-evenly items-start w-full gap-4">
+    <div class="bg-white py-5 px-3 rounded-xl shadow-md mt-3 flex flex-wrap justify-evenly items-start w-full gap-4 border-l-4 border-blue-500">
 
         <!-- PIC Name -->
         <div class="flex flex-col items-start min-w-[120px] max-w-[200px]">
@@ -116,7 +116,7 @@
             <p>Finding Area Details</p>
         </div>
         <p class="text-gray-900 font-semibold text-sm mt-1 whitespace-normal break-words overflow-hidden text-ellipsis max-h-[3rem]">
-            {{ $laporan->area }} - {{ $laporan->detail_area }} asdwfegrthgrf wadefwgrerfe wdefredw dwefsrfeds wdefe wdef wdefdwa dwefdqwddad
+            {{ $laporan->area }} - {{ $laporan->detail_area }}
         </p>
     </div>
 
@@ -195,9 +195,9 @@
 
         <!-- Date of Completion -->
         <div class="flex flex-col items-start w-1/3 min-w-[120px] max-w-[200px]">
-            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
+            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide whitespace-nowrap">
                 <i class="fas fa-calendar-check text-blue-500"></i>
-                <p class="font-medium">Date of Completion</p>
+                <p class="font-medium">{{$laporan->tingkat_bahaya == 'Low'?'Completion Date':'Completion Date (termporary)'}}</p>
             </div>
             <p class="text-sm font-semibold mt-1 text-gray-900" x-text="formattedCompletionDate"></p>
         </div>
@@ -244,7 +244,7 @@
             @foreach ($laporan->rejectLaporan as $reject)
                 <div class="bg-red-50 p-3 rounded-lg mb-2">
                     <p class="text-red-700 text-sm"><strong>Alasan:</strong> {{ $reject->alasan_reject }}</p>
-                    <p class="text-gray-500 text-xs">{{ $reject->created_at->format('d M Y H:i') }}</p>
+                    <p class="text-gray-500 text-xs">{{ $reject->created_at->format('d M Y') }}</p>
                 </div>
             @endforeach
         @else
@@ -266,7 +266,7 @@
     @endif
     @else
         <!-- Card Rekomendasi Safety (Jika status_lct bukan revision) -->
-        <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
+        <div class="bg-white p-4 rounded-lg border-l-4 border-green-300 mt-3 shadow-md hover:shadow-xl transition-all duration-300 ease-in-out">
             <div class="flex items-center space-x-2 mb-2">
                 <i class="fa-solid fa-shield-alt text-green-500 text-lg"></i>
                 <p class="text-gray-500 text-xs font-semibold">Safety Recommendation</p>

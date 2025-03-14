@@ -23,7 +23,10 @@ class ProgressPerbaikanTable extends Component
             'permanent_revision'
         ])
         ->when($this->riskLevel, fn($query) => $query->where('tingkat_bahaya', $this->riskLevel))
-        ->when($this->statusLct, fn($query) => $query->where('status_lct', $this->statusLct))
+        ->when($this->statusLct, function ($query) {
+            $statuses = explode(',', $this->statusLct); 
+            return $query->whereIn('status_lct', $statuses);
+        })
         ->latest() 
         ->paginate(10);
     }

@@ -48,7 +48,7 @@
                 
                 <div>
                     <label for="date_completion" class="block text-sm font-medium text-gray-700">
-                        Date of Completion <span class="text-red-500">*</span>
+                        Completion Date <span class="text-red-500">*</span>
                     </label>
                     <input 
                         type="date" 

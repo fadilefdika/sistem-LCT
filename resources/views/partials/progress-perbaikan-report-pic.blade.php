@@ -60,8 +60,7 @@
                     $borderClass = 'border-yellow-500';
                 }
             @endphp
-            <div class="bg-white p-5 rounded-xl shadow-md border-l-4 
-                {{ $diffInDays < 0 ? 'border-red-500' : ($diffInDays === 0 && $remainingHours < 24 ? 'border-yellow-500' : 'border-green-500') }}">
+            <div class="bg-white p-5 rounded-xl shadow-md border-l-4 border-blue-500">
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-2 items-center">
                     
@@ -146,7 +145,7 @@
 
         
             <!-- Card Area Temuan -->
-            <div class="bg-white p-4 rounded-lg shadow-md border-gray-300">
+            <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
                 <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                     <i class="fas fa-map-marker-alt text-red-500"></i>
                     <p>Finding Area</p>
@@ -154,16 +153,22 @@
                 <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
             </div>
 
-            <!-- Card Gambar Perbaikan -->
+            <!-- Corrective Action Image Card -->
             <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-                <p class="text-gray-700 text-lg font-semibold">Corrective Action Image</p>
-                <div class="grid grid-cols-5 gap-2 mt-2">
-                    @foreach ($bukti_perbaikan->take(5) as $gambar)
-                        <img src="{{ $gambar }}" 
-                            class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                            alt="Corrective Action Image"
-                            onclick="openModal('{{ $gambar }}')">
-                    @endforeach
+                <p class="text-gray-700 text-lg font-semibold text-center">Corrective Action Image</p>
+                <div class="flex justify-center gap-1.5 mt-2">
+                    @if ($bukti_perbaikan->isNotEmpty())
+                        <div class="grid grid-cols-{{ min(5, $bukti_perbaikan->count()) }} gap-2">
+                            @foreach ($bukti_perbaikan->take(5) as $gambar)
+                                <img src="{{ $gambar }}" 
+                                    class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                    alt="Corrective Action Image"
+                                    onclick="openModal('{{ $gambar }}')">
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-gray-600 text-sm font-semibold text-center">No image available. PIC has not submitted a report.</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -171,7 +176,7 @@
     
 
     <!-- Form Laporan Temuan -->
-    <div class="relative max-w-full bg-gray-100 overflow-hidden shadow-md p-1 pb-32 px-2 max-h-[calc(100vh)] overflow-y-auto 
+    <div class="relative max-w-full bg-gray-100 overflow-hidden p-1 pb-32 px-2 max-h-[calc(100vh)] overflow-y-auto 
         [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100
         [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300
         dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
@@ -273,7 +278,7 @@
                             @foreach ($laporan->rejectLaporan as $reject)
                                 <tr class="border-t border-red-300 text-gray-700">
                                     <td class="p-2 text-sm">{{ $reject->alasan_reject }}</td>
-                                    <td class="p-2 text-sm">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y H:i') }}</td>
+                                    <td class="p-2 text-sm">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

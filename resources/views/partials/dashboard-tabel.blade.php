@@ -82,7 +82,7 @@
                         
                                             <!-- Tenggat Waktu -->
                                             <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
-                                                {{ \Carbon\Carbon::parse($laporan->tenggat_waktu)->format('F d, Y') }}
+                                                {{ \Carbon\Carbon::parse($laporan->due_date)->format('F d, Y') }}
                                             </td>
                         
                                             <!-- Tanggal Selesai / Overdue -->
@@ -91,7 +91,7 @@
                                                     {{ \Carbon\Carbon::parse($laporan->date_completion)->format('F d, Y') }}
                                                 @else
                                                     @php
-                                                        $dueDate = \Carbon\Carbon::parse($laporan->tenggat_waktu)->startOfDay();
+                                                        $dueDate = \Carbon\Carbon::parse($laporan->due_date)->startOfDay();
                                                         $today = \Carbon\Carbon::now()->startOfDay();
                                                         $overdueDays = $dueDate->diffInDays($today, false);
                                                     @endphp
