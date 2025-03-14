@@ -79,7 +79,6 @@
                         <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-sm">
                             <thead class="bg-gray-200 text-gray-700">
                                 <tr>
-                                    {{-- <th class="px-4 py-3 text-left">#</th> --}}
                                     <th class="px-4 py-3 text-left">Task Name</th>
                                     <th class="px-4 py-3 text-left">PIC Name</th>
                                     <th class="px-4 py-3 text-left">Due Date</th>

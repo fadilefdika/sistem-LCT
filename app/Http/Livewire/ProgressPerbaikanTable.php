@@ -17,11 +17,30 @@ class ProgressPerbaikanTable extends Component
     private function filterData()
     {
         return LaporanLct::whereIn('status_lct', [
-            'in_progress', 'progress_work', 'waiting_approval', 'approved', 'revision', 
-            'waiting_approval_temporary', 'approved_temporary', 'temporary_revision', 
-            'work_permanent', 'waiting_approval_permanent', 'approved_permanent', 
+            // Status dalam tahap pengerjaan
+            'in_progress', 
+            'progress_work', 
+        
+            // Status terkait approval/revisi
+            'waiting_approval', 
+            'approved', 
+            'revision',
+        
+            // Status terkait persetujuan sementara (temporary)
+            'waiting_approval_temporary', 
+            'approved_temporary', 
+            'temporary_revision',
+        
+            // Status terkait task budget
+            'waiting_approval_taskbudget', 
+            'taskbudget_revision',
+        
+            // Status terkait pengerjaan permanen
+            'work_permanent', 
+            'waiting_approval_permanent', 
+            'approved_permanent', 
             'permanent_revision'
-        ])
+        ])        
         ->when($this->riskLevel, fn($query) => $query->where('tingkat_bahaya', $this->riskLevel))
         ->when($this->statusLct, function ($query) {
             $statuses = explode(',', $this->statusLct); 

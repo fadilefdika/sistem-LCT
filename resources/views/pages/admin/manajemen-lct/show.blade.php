@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div x-data="{ activeTab: ['approved', 'revision', 'pending'].includes('{{ $budget->status_budget ?? '' }}') ? 'task-and-timeline' : 'laporan' }"
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent']) ? 'task-and-timeline' : 'laporan'}}' }"
         class="px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">

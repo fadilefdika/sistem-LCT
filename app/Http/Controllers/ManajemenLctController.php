@@ -42,12 +42,6 @@ class ManajemenLctController extends Controller
             ->where('id_laporan_lct', $id_laporan_lct)
             ->orderBy('due_date', 'asc')
             ->get();
-
-        // $budget = BudgetApproval::where('id_laporan_lct', $id_laporan_lct)
-        //     ->with(['rejects' => function ($query) {
-        //         $query->where('tipe_reject', 'budget_approval'); // Filter hanya "budget_approval"
-        //     }])
-        //     ->first();
         
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
             return asset('storage/' . $path);

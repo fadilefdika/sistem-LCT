@@ -207,7 +207,7 @@
                             @csrf
                             <button type="submit" 
                                 class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                @disabled(in_array($laporan->status_lct, ['approved', 'progress_work']))>
+                                @disabled(auth()->user()->role !== 'pic' || in_array($laporan->status_lct, ['approved', 'progress_work', 'revision', 'revision_temporary']))>
                                 Approve
                             </button>
                         </form>
@@ -215,11 +215,11 @@
                         <!-- Reject Button -->
                         <button type="button" @click="revision = true"
                             class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
-                            @disabled(in_array($laporan->status_lct, ['approved', 'progress_work']))>
-                            Reject
+                            @disabled(auth()->user()->role !== 'pic' || in_array($laporan->status_lct, ['approved', 'progress_work']))>
+                            Revision
                         </button>
                     </div>
-
+                
                     <!-- Alasan Penolakan -->
                     <div x-show="revision" class="mt-4">
                         <form @submit="revision = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
@@ -246,7 +246,7 @@
                         <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
                             <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
                             <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
-                                @csrf
+                                @csrf 
                                 <button type="submit" @click="closed = true"
                                         class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
                                     Close
