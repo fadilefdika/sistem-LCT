@@ -44,18 +44,22 @@ class ManajemenLctController extends Controller
             ->get()
             ->map(function ($task) {
                 return [
+                    'id' => $task->id,
                     'taskName' => $task->task_name,
                     'namePic' => $task->name_pic,
                     'dueDate' => $task->due_date,
                     'notes' => $task->notes,
                 ];
             });
+
+        // dd($tasks);
         // Konversi bukti_temuan dan bukti_perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
 
         return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan'));
     }
+
 
     public function store(Request $request, $id_laporan_lct)
     {
@@ -115,9 +119,9 @@ class ManajemenLctController extends Controller
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
-        // Ambil semua data
+        
+        // dd($request->all());
         $data = $request->all();
-
         // Filter hanya task yang memiliki nilai
         $filteredTasks = array_filter($data['tasks'], function ($task) {
             return !empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']);
@@ -145,31 +149,36 @@ class ManajemenLctController extends Controller
 
 
         try {
-            DB::beginTransaction(); 
+            DB::beginTransaction();
+    
             foreach ($filteredTasks as $task) {
-                LctTasks::create([
-                    'id_laporan_lct' => $id_laporan_lct,
-                    'task_name' => $task['taskName'],
-                    'name_pic' => $task['namePic'],
-                    'due_date' => $task['dueDate'],
-                    'notes' => $task['notes'] ?? null,
-                    'pic_id' => $pic,
-                    'status' => 'pending',
-                ]);
+                LctTasks::updateOrCreate(
+                    [
+                        'id' => $task['id'] ?? null, // Gunakan ID jika ada
+                    ],
+                    [
+                        'id_laporan_lct' => $id_laporan_lct,
+                        'task_name' => $task['taskName'],
+                        'name_pic' => $task['namePic'],
+                        'due_date' => $task['dueDate'],
+                        'notes' => $task['notes'] ?? null,
+                        'pic_id' => $pic,
+                        'status' => 'pending',
+                    ]
+                );
             }
-            // dd("masuk ini euy");
-            // Simpan atau update estimasi budget di Laporan LCT
+    
+            // Update estimated budget
             LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
                 'estimated_budget' => $validatedData['estimatedBudget'],
                 'status_lct' => 'waiting_approval_taskbudget',
             ]);
-
-            DB::commit(); // Simpan perubahan jika semua berhasil
-
+    
+            DB::commit();
+    
             return redirect()->back()->with('success', 'Tasks successfully submitted!');
         } catch (\Exception $e) {
-            DB::rollBack(); 
-            dd($e);
+            DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

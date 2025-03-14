@@ -2,7 +2,7 @@
     @csrf
     <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg relative h-full mb-4 overflow-x-auto"
         x-data="{ 
-            tasks: JSON.parse(JSON.stringify({{ Illuminate\Support\Js::from($tasks) }})),
+            tasks: ({{ Illuminate\Support\Js::from($tasks) }}.length > 0) ? {{ Illuminate\Support\Js::from($tasks) }} : [{ taskName: '', namePic: '', dueDate: '', notes: '' }],
             estimatedBudget: '{{ number_format($laporan->estimated_budget, 0, ',', '.') }}',
             formatCurrency(value) {
                 let cleaned = value.replace(/\D/g, '');
@@ -32,9 +32,11 @@
                     <template x-for="(task, index) in tasks" :key="index">
                         <tr>
                             <td class="border border-gray-300 px-3 py-2 text-center w-12" x-text="index + 1"></td>
+                            <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
                             <td class="border border-gray-300 w-3/6">
                                 <input type="text" x-model="task.taskName" :name="'tasks['+index+'][taskName]'"
-                                    @input="if(index === tasks.length - 1 && task.taskName.trim() !== '') tasks.push({ taskName: '', dueDate: '', namePic: '', notes: '' })"
+                                @input="if(index === tasks.length - 1 && task.taskName.trim() !== '') tasks.push({ taskName: '', dueDate: '', namePic: '', notes: '' })"
+
                                     class="w-full p-2 focus:ring-0 outline-none bg-transparent border border-gray-50" 
                                     placeholder="Enter task name">
                             </td>
