@@ -69,8 +69,7 @@
                     </td>
                     <td class="px-4 py-3 text-gray-800 max-w-xs truncate cursor-pointer relative group">
                         <span class="temuan-clamp" title="{{ $laporan->temuan_ketidaksesuaian }}">
-                            {{ $laporan->temuan_ketidaksesuaian }} Lorem, ipsum dolor sit amet consectetur adipisicing elit. Tenetur provident eaque in doloribus praesentium accusamus?
-                        </span>
+                            {{ $laporan->temuan_ketidaksesuaian }} </span>
                     </td>
                     <td class="px-4 py-3 text-gray-800 w-40 whitespace-nowrap">{{ $laporan->picUser->fullname ?? '-' }}</td>
     

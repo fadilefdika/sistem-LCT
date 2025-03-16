@@ -33,33 +33,63 @@
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($laporans as $index => $laporan)
                 <tr class="hover:bg-gray-100 text-sm transition duration-200 ease-in-out">
-                    <td class="px-4 py-3 text-center font-semibold text-gray-800">{{ $laporans->firstItem() + $index }}</td>
-                    <td class="px-4 py-3 text-gray-800">{{ $laporan->user->fullname }}</td>
+                    <!-- Nomor Urut -->
+                    <td class="px-4 py-3 text-center font-semibold text-gray-800 w-12">
+                        {{ $laporans->firstItem() + $index }}
+                    </td>
+            
+                    <!-- Nama User -->
+                    <td class="px-4 py-3 text-gray-800 whitespace-nowrap">
+                        {{ $laporan->user->fullname }}
+                    </td>
+            
+                    <!-- Temuan Ketidaksesuaian -->
                     <td class="px-4 py-3 text-gray-800 max-w-xs break-words truncate cursor-pointer relative group">
                         <span class="temuan-clamp" title="{{ $laporan->temuan_ketidaksesuaian }}">
                             {{ $laporan->temuan_ketidaksesuaian }}
                         </span>
                     </td>
-                    <td class="px-4 py-3 text-gray-800">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('d F Y') }}</td>
-                    <td class="px-4 py-3 text-gray-800">{{ $laporan->area }}</td>
-                    <td class="px-4 py-3 text-center">
+            
+                    <!-- Tanggal Temuan -->
+                    <td class="px-4 py-3 text-gray-800 text-center w-32">
+                        {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('d F Y') }}
+                    </td>
+            
+                    <!-- Area -->
+                    <td class="px-4 py-3 text-gray-800 whitespace-nowrap">
+                        {{ $laporan->area }}
+                    </td>
+            
+                    <!-- Bukti Temuan -->
+                    <td class="px-4 py-3 text-center w-24">
                         @if (!empty($laporan->bukti_temuan))
                             @php
                                 $gambar = json_decode($laporan->bukti_temuan, true)[0] ?? null;
                             @endphp
                             @if ($gambar)
-                                <img src="{{ asset('storage/' . $gambar) }}" class="w-16 h-16 object-cover rounded-lg shadow">
+                                <img src="{{ asset('storage/' . $gambar) }}" class="w-20 h-20 object-cover rounded-lg shadow">
                             @else
-                                <span class="text-gray-500 italic">Image not found</span>
+                                <span class="text-gray-500 italic">No Image</span>
                             @endif
                         @else
-                            <span class="text-gray-500 italic">Image not found</span>
+                            <span class="text-gray-500 italic">No Image</span>
                         @endif
-                    </td>                        
-                    <td class="px-4 py-3 text-gray-800">{{ $laporan->kategori ? $laporan->kategori->nama_kategori : 'No categories' }}</td>
-                    <td class="px-4 py-3 flex items-center justify-center gap-2">
-                        <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">Detail</a>
                     </td>
+            
+                    <!-- Kategori -->
+                    <td class="px-4 py-3 text-gray-800 text-center">
+                        {{ $laporan->kategori ? $laporan->kategori->nama_kategori : 'No categories' }}
+                    </td>
+            
+                    <!-- Aksi -->
+                    <td class="px-4 py-3 text-center w-24">
+                        <div class="flex items-center justify-center">
+                            <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">
+                                Detail
+                            </a>
+                        </div>
+                    </td>
+                    
                 </tr>
                 @empty
                 <tr>
@@ -74,6 +104,7 @@
                 </tr>
                 @endforelse
             </tbody>
+            
         </table>
     </div>
     

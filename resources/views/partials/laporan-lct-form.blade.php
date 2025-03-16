@@ -80,7 +80,7 @@
                                     <div class="mb-4">
                                         <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700 mb-1">Date of Finding</label>
                                         <input type="text" 
-                                            value="{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->translatedFormat('d F Y') }}" 
+                                            value="{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('en')->translatedFormat('d F Y') }}" 
                                             id="tanggal_temuan" 
                                             name="tanggal_temuan" 
                                             class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 

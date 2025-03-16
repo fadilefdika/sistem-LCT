@@ -207,7 +207,7 @@
                             @csrf
                             <button type="submit" 
                                 class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                @disabled(auth()->user()->role !== 'pic' || in_array($laporan->status_lct, ['approved', 'progress_work', 'revision', 'revision_temporary']))>
+                                @disabled(in_array($laporan->status_lct, ['approved', 'progress_work', 'revision', 'revision_temporary']))>
                                 Approve
                             </button>
                         </form>
@@ -215,7 +215,7 @@
                         <!-- Reject Button -->
                         <button type="button" @click="revision = true"
                             class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
-                            @disabled(auth()->user()->role !== 'pic' || in_array($laporan->status_lct, ['approved', 'progress_work']))>
+                            @disabled(in_array($laporan->status_lct, ['approved', 'progress_work']))>
                             Revision
                         </button>
                     </div>

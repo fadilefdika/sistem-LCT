@@ -50,11 +50,13 @@ class ProgressPerbaikanController extends Controller
         // Tentukan status berdasarkan tingkat bahaya
         switch ($laporan->tingkat_bahaya) {
             case 'Low':
+                // dd("masuk low");
                 $laporan->status_lct = 'approved';
                 break;
 
             case 'Medium':
             case 'High':
+                // dd("masuk medium");
                 // Jika masih dalam tahap perbaikan sementara, set ke approved_temporary
                 if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
                     $laporan->status_lct = 'approved_temporary';
