@@ -47,7 +47,7 @@
 
             {{-- Task dari PIC --}}
             <div x-show="activeTab === 'task-pic'">
-                <p>ini buat mantau</p>
+                @include('partials.progress-perbaikan-task')
             </div>
         </div>
     </div>

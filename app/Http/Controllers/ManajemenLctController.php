@@ -50,10 +50,11 @@ class ManajemenLctController extends Controller
                     'namePic' => $task->name_pic,
                     'dueDate' => $task->due_date,
                     'notes' => $task->notes,
+                    'status' => $task->status ?? 'pending',
                 ];
             });
 
-        $tasks[] = ['taskName' => '', 'namePic' => '', 'dueDate' => '', 'notes' => '']; // Tambah 1 baris kosong
+        $tasks[] = ['id'=> '','taskName' => '', 'namePic' => '', 'dueDate' => '', 'notes' => '', 'status' => '']; // Tambah 1 baris kosong
 
             
         // dd($tasks);

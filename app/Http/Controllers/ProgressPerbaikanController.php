@@ -19,24 +19,31 @@ class ProgressPerbaikanController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with(['user', 'picUser', 'rejectLaporan','kategori'])
+        $laporan = LaporanLct::with([
+                'user', 'picUser', 'rejectLaporan', 'kategori',
+                'tasks' => function ($query) {
+                    $query->orderBy('due_date', 'asc'); // Urutkan dari due date terdekat
+                }
+            ])
             ->where('id_laporan_lct', $id_laporan_lct)
             ->first();
-        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(function ($path) {
-            return asset('storage/' . $path);
-        });    
-
-        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(function ($path) {
-            return asset('storage/' . $path);
-        });   
 
         if (!$laporan) {
             return abort(404, 'Laporan tidak ditemukan');
         }
-        
 
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan'));
+        // Ambil bukti temuan & perbaikan
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
+        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn($path) => asset('storage/' . $path));
+
+        // Cek apakah semua task sudah selesai
+        $allTasksCompleted = $laporan->tasks->every(fn($task) => $task->status === 'completed');
+
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan', 'allTasksCompleted'));
     }
+
+    
+
 
 
     public function approveLaporan($id_laporan_lct)

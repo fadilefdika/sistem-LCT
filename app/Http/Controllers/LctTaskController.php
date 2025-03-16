@@ -82,20 +82,33 @@ class LctTaskController extends Controller
 
     public function updateStatus(Request $request, $id_task)
     {
-    
-        $task = LctTasks::findOrFail($id_task);
+        Log::info('Request data:', $request->all());
+        // Validasi input
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,completed'
+        ]);
 
-    
+        try {
+            $task = LctTasks::findOrFail($id_task);
 
-        if (!$task) {
-            return response()->json(['success' => false, 'message' => 'Task tidak ditemukan'], 404);
+            // Update status
+            $task->status = $request->status;
+            $task->save();
+
+            // Return response JSON
+            return response()->json([
+                'success' => true,
+                'message' => 'Status berhasil diperbarui',
+                'data' => $task
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-    
-        $task->status_task = $request->status;
-        $task->save();
-    
-        return view('admin.manajemen-lct.edit-task', compact('task')); 
     }
+
     
 
     public function __construct()
