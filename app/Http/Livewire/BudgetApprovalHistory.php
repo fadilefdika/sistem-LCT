@@ -35,7 +35,7 @@ class BudgetApprovalHistory extends Component
                 $query->select('id', 'id_laporan_lct', 'created_at');
             }
         ])
-        ->where('status_lct', 'approved')
+        ->where('status_lct', 'approved_taskbudget')
         ->orderBy($this->sortField, $this->sortDirection)
         ->paginate($this->perPage);
 

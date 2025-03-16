@@ -41,6 +41,7 @@ class ManajemenLctController extends Controller
 
         // Ambil tasks langsung dari relasi tanpa query tambahan
         $tasks = LctTasks::where('id_laporan_lct', $laporan->id_laporan_lct)
+            ->orderBy('due_date', 'asc') // Urutkan berdasarkan due_date terdekat
             ->get()
             ->map(function ($task) {
                 return [
@@ -52,6 +53,9 @@ class ManajemenLctController extends Controller
                 ];
             });
 
+        $tasks[] = ['taskName' => '', 'namePic' => '', 'dueDate' => '', 'notes' => '']; // Tambah 1 baris kosong
+
+            
         // dd($tasks);
         // Konversi bukti_temuan dan bukti_perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
@@ -119,9 +123,9 @@ class ManajemenLctController extends Controller
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
-        
         // dd($request->all());
         $data = $request->all();
+
         // Filter hanya task yang memiliki nilai
         $filteredTasks = array_filter($data['tasks'], function ($task) {
             return !empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']);
@@ -147,10 +151,26 @@ class ManajemenLctController extends Controller
         
         $pic = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->value('pic_id');
 
-
         try {
             DB::beginTransaction();
-    
+
+            // Ambil semua ID task yang ada di database untuk laporan ini
+            $existingTaskIds = LctTasks::where('id_laporan_lct', $id_laporan_lct)
+                ->pluck('id')
+                ->toArray();
+
+            // Ambil ID task yang dikirim dalam request (jika ada)
+            $submittedTaskIds = array_filter(array_column($filteredTasks, 'id'));
+
+            // Cari task yang ada di database tetapi tidak ada di request → ini yang harus dihapus
+            $tasksToDelete = array_diff($existingTaskIds, $submittedTaskIds);
+
+            // Hapus task yang tidak lagi ada di request
+            if (!empty($tasksToDelete)) {
+                LctTasks::whereIn('id', $tasksToDelete)->delete();
+            }
+
+            // Simpan atau update task yang dikirim
             foreach ($filteredTasks as $task) {
                 LctTasks::updateOrCreate(
                     [
@@ -167,20 +187,22 @@ class ManajemenLctController extends Controller
                     ]
                 );
             }
-    
+
             // Update estimated budget
             LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
                 'estimated_budget' => $validatedData['estimatedBudget'],
                 'status_lct' => 'waiting_approval_taskbudget',
             ]);
-    
+
             DB::commit();
-    
+
             return redirect()->back()->with('success', 'Tasks successfully submitted!');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    
 
 }

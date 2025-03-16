@@ -32,6 +32,7 @@ class ProgressPerbaikanTable extends Component
             'temporary_revision',
         
             // Status terkait task budget
+            'approved_taskbudget',
             'waiting_approval_taskbudget', 
             'taskbudget_revision',
         

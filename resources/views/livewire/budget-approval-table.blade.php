@@ -1,6 +1,7 @@
 <div class="bg-white p-6 shadow-sm rounded-xl">
 
-
+    
+    
     <!-- Tabel (Notion-style) -->
     <div class="overflow-hidden rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
@@ -27,7 +28,6 @@
                         <td>
                             @if($budget->tasks->isNotEmpty())
                                 {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('F j, Y') }}
-
                             @else
                                 -
                             @endif
@@ -35,7 +35,7 @@
                         @php
                             $statusMapping = [
                                 'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
-                                'taskbudget_revision' => 'Budget Needs Revision',
+                                'taskbudget_revision' => 'The Task and Budget Require Revision by PIC.',
                                 'approved_taskbudget' => 'Budget Approved',
                             ];
 

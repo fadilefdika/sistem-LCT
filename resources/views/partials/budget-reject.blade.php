@@ -2,7 +2,7 @@
     <p class="text-sm text-gray-700 font-semibold">Budget Revision</p>
 
     @php
-        $rejects = $rejects->sortByDesc('created_at')->values(); // Urutkan & reset indeks
+        $rejectLaporan = $rejectLaporan->sortByDesc('created_at')->values(); // Urutkan & reset indeks
     @endphp
 
     <div x-data="{ expanded: false }" class="relative">
@@ -12,11 +12,11 @@
             <div>
                 <p class="text-sm text-gray-700">
                     <strong class="text-gray-800">Revision on:</strong>
-                    <span class="text-red-600">{{ $rejects[0]->created_at->format('F j, Y h:i A') }}</span>
+                    <span class="text-red-600">{{ $rejectLaporan[0]->created_at->format('F j, Y h:i A') }}</span>
                 </p>
                 <p class="text-sm text-gray-700 mt-2">
                     <strong class="text-gray-800">Reason:</strong>
-                    <span>{{ Str::limit($rejects[0]->alasan_reject, 50) }}</span>
+                    <span>{{ Str::limit($rejectLaporan[0]->alasan_reject, 50) }}</span>
                 </p>
             </div>
             <svg :class="expanded ? 'rotate-180' : 'rotate-0'" class="w-5 h-5 text-gray-500 transition-transform duration-300"
@@ -36,7 +36,7 @@
             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
             x-transition:leave-end="opacity-0 scale-95 translate-y-2">
 
-            @foreach($rejects as $index => $reject)
+            @foreach($rejectLaporan as $index => $reject)
             <div class="p-4 transition duration-200 hover:bg-gray-100 
                         {{ $index !== 0 ? 'border-t border-gray-300' : '' }}">
                 <p class="text-sm text-gray-700">

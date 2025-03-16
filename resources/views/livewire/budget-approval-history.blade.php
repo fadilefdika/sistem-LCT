@@ -24,19 +24,34 @@
                 @forelse($taskBudget as $index => $budget)
                     <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
                         <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
-                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->pic->user->fullname ?? '-' }}</td>
+                        <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->picUser->fullname ?? '-' }}</td>
                         <td class="px-4 py-4 text-sm text-gray-800">{{$budget->tingkat_bahaya}}</td>
                         <td class="px-4 py-4 text-gray-900 font-medium">
-                            Rp {{ number_format($budget->budget, 0, ',', '.') }}
+                            Rp {{ number_format($budget->estimated_budget, 0, ',', '.') }}
                         </td>
+                        <td>
+                            @if($budget->tasks->isNotEmpty())
+                                {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('F j, Y') }}
+                            @else
+                                -
+                            @endif
+                        </td>                      
+                        @php
+                            $statusMapping = [
+                                'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
+                                'taskbudget_revision' => 'The Task and Budget Require Revision by PIC.',
+                                'approved_taskbudget' => 'Budget Approved',
+                            ];
+
+                            $statusLabel = $statusMapping[$budget->status_lct] ?? ucfirst(str_replace('_', ' ', $budget->status_lct));
+                        @endphp
+
                         <td class="px-4 py-4 text-sm text-gray-800">
-                            {{ $budget->created_at->translatedFormat('d F Y') }}
-                        </td>                        
-                        <td class="px-4 py-4 text-sm text-gray-800">
-                            <p class="truncate block max-w-xs">
-                                {{$budget->status_budget}}
+                            <p class="truncate block max-w-xs font-medium">
+                                {{ $statusLabel }}
                             </p>
                         </td>
+
                         <td class="px-4 py-4 text-center">
                             <a href="{{ route('admin.budget-approval-history.show', $budget->id_laporan_lct) }}" 
                                 class="text-blue-500 hover:text-blue-700 font-medium hover:underline ">
@@ -45,16 +60,16 @@
                         </td>
                     </tr>
                 @empty
-                <tr>
-                    <td colspan="7" class="text-center py-6 text-gray-500">
-                        <div class="flex flex-col items-center">
-                            <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
-                            </svg>
-                            <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
-                        </div>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="7" class="text-center py-6 text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
+                                </svg>
+                                <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
+                            </div>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

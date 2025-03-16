@@ -79,11 +79,6 @@ class LaporanLct extends Model
         return self::where('id_laporan_lct', $idLCT)->first();
     }
 
-    public function rejectLaporan()
-    {
-        return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
-    }
-
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
@@ -94,9 +89,9 @@ class LaporanLct extends Model
         return $this->hasMany(LctTasks::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
-    public function rejects()
+    public function rejectLaporan()
     {
-        return $this->hasMany(RejectLaporan::class, 'id_laporan_lct');
+        return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
 }

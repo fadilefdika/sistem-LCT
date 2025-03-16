@@ -19,34 +19,46 @@ class BudgetApprovalController extends Controller
 
     public function show($id_laporan_lct)
     {
-        $taskBudget = LaporanLct::with('picUser','tasks','rejects')
-        ->where('id_laporan_lct', $id_laporan_lct) // Filter berdasarkan ID laporan
-        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision'])
-        ->first();
+        // dd(LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first());
 
+        $taskBudget = LaporanLct::with([
+                'picUser',
+                'tasks' => function ($query) {
+                    $query->orderBy('due_date', 'asc'); // Urutkan dari due_date terdekat
+                },
+                'rejectLaporan'
+            ])
+            ->where('id_laporan_lct', $id_laporan_lct)
+            ->whereIn('status_lct', ['waiting_approval_taskbudget','approved_taskbudget', 'taskbudget_revision'])
+            ->first();
         return view('pages.admin.budget-approval.show', compact('taskBudget'));
     }
 
 
+
     public function showHistory($id_laporan_lct)
     {
-        // $budget = BudgetApproval::with(['laporanLct', 'pic.user', 'rejects' => function ($query) {
-        //     $query->where('tipe_reject', 'budget_approval')->orderBy('created_at', 'desc');;
-        // }])
-        // ->where('id_laporan_lct', $id_laporan_lct)
-        // ->firstOrFail();  
+        $taskBudget = LaporanLct::with([
+            'picUser',
+            'tasks' => function ($query) {
+                $query->orderBy('due_date', 'asc'); 
+            },
+            'rejectLaporan'
+        ])
+        ->where('id_laporan_lct', $id_laporan_lct)
+        ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
+        ->first();
 
-        return view('pages.admin.budget-approval-history.show', compact('budget'));
+        return view('pages.admin.budget-approval-history.show', compact('taskBudget'));
     }
 
-    public function approve($id)
+    public function approve($id_laporan_lct)
     {
         try {
             DB::beginTransaction(); // Mulai transaksi
-            
-            // $budget = BudgetApproval::findOrFail($id);
-            // $budget->status_budget = 'approved';
-            // $budget->save();
+
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
+            $laporan = $laporan->update(['status_lct' => 'approved_taskbudget']);
     
             DB::commit(); 
             
@@ -60,26 +72,42 @@ class BudgetApprovalController extends Controller
 
     public function reject(Request $request, $id_laporan_lct)
     {
+        // Validasi input untuk memastikan alasan reject tidak kosong
+        $request->validate([
+            'alasan_reject' => 'required|string|max:255',
+        ]);
+
         try {
             DB::beginTransaction(); // Mulai transaksi
 
-            // 3. Simpan alasan reject di tabel lct_laporan_reject
+            // Cari laporan berdasarkan ID
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+
+            // Simpan alasan reject di tabel lct_laporan_reject
             RejectLaporan::create([
                 'id_laporan_lct' => $id_laporan_lct,
                 'alasan_reject' => $request->alasan_reject,
-                'tipe_reject' => 'budget_approval',
+                'tipe_reject' => $request->tipe_reject ?? 'budget_approval',
+            ]);
+
+            // Update status laporan
+            $laporan->update([
+                'status_lct' => 'taskbudget_revision',
             ]);
 
             DB::commit(); // Simpan perubahan
 
             return redirect()->back()->with('success', 'Budget request needs revision.');
         } catch (\Exception $e) {
-            dd("masuk catch", $e->getMessage());
             DB::rollBack(); // Kembalikan perubahan jika ada error
+
+            // Log error untuk debugging (gantilah `Log` dengan use `Illuminate\Support\Facades\Log;`)
+            Log::error('Error rejecting budget request: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'An error occurred while rejecting the budget request: ' . $e->getMessage());
         }
     }
+
 
     public function history(){
         return view('pages.admin.budget-approval-history.index');

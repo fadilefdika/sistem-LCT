@@ -16,9 +16,5 @@ class RejectLaporan extends Model
         return $this->belongsTo(LaporanLct::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
-    public function budgetApproval()
-    {
-        return $this->belongsTo(BudgetApproval::class, 'id_laporan_lct', 'id_laporan_lct');
-    }
 
 }

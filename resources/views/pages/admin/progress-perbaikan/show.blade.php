@@ -23,7 +23,7 @@
                 PIC
             </button>
         
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','taskbudget_revision','waiting_approval_taskbudget']))
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','approved_taskbudget','taskbudget_revision','waiting_approval_taskbudget']))
                 <button @click="activeTab = 'task-pic'" 
                         :class="activeTab === 'task-pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                         class="px-4 py-2 focus:outline-none cursor-pointer">
