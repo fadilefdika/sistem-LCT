@@ -72,7 +72,7 @@
                                 <tr>
                                     <th class="px-4 py-3 text-left">No</th>
                                     <th class="px-4 py-3 text-left">Task Name</th>
-                                    <th class="px-4 py-3 text-left">PIC Name</th>
+                                    <th class="px-4 py-3 text-left">SVP Name</th>
                                     <th class="px-4 py-3 text-left">Due Date</th>
                                     <th class="px-4 py-3 text-left">Notes</th>
                                 </tr>

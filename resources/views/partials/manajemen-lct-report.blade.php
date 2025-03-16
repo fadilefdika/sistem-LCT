@@ -76,7 +76,7 @@
         <div class="flex flex-col items-start min-w-[120px] max-w-[200px]">
             <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-user text-blue-500"></i> <!-- Ikon User -->
-                <p>PIC Name</p>
+                <p>Team Department</p>
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1 truncate w-full">
                 {{ $laporan->picUser->fullname ?? 'Tidak ada PIC' }}

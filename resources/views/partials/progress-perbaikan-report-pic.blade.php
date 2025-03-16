@@ -68,7 +68,7 @@
                     <div class="flex flex-col">
                         <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
                             <i class="fas fa-user text-blue-500"></i>
-                            <p>PIC Name</p>
+                            <p>SVP Name</p>
                         </div>
                         <p class="text-gray-900 font-semibold text-sm mt-1">
                             {{ $laporan->picUser->fullname }}

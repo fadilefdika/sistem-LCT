@@ -5,7 +5,7 @@
                                     <tr class="text-left text-sm font-semibold text-gray-600">
                                         <th class="px-4 py-3">No</th>
                                         <th class="px-4 py-3">Non-Conformity Findings</th>
-                                        <th class="px-4 py-3">PIC Name</th>
+                                        <th class="px-4 py-3">SVP Name</th>
                                         <th class="px-4 py-3">Risk Level</th>
                                         <th class="px-4 py-3">Progress Status</th>
                                         <th class="px-4 py-3">Due Date</th>
