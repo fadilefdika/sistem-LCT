@@ -54,9 +54,19 @@
                     </tbody>
                 </table>
 
-                <!-- Estimasi Budget -->
-                <div class="mt-4 p-4 bg-gray-100 rounded-lg">
-                    <h3 class="text-lg font-semibold mb-2">Estimasi Budget</h3>
+               <!-- Estimasi Budget -->
+                <div class="mt-4 p-4 bg-gray-100 rounded-lg" 
+                    x-data="{
+                    estimatedBudget: '{{ $laporan->estimated_budget ?? '' }}',
+                    formattedBudget: '',
+                    showError: false,
+                    formatCurrency() {
+                        this.formattedBudget = this.estimatedBudget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                    }"
+                    x-init="formatCurrency()">
+
+                    <h3 class="text-lg font-semibold mb-2">Estimated Budget</h3>
                     <div class="flex items-center">
                         <span class="font-medium mr-3">Total Budget (Rp):</span>
                         <input type="text" x-model="formattedBudget" class="w-40 p-2 border border-gray-300 rounded-lg text-right">
