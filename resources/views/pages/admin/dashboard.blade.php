@@ -27,7 +27,7 @@
                     
                     <!-- Medium & High Risk Reports Table -->
                     <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
-                        @include('partials.dashboard-tabel', [
+                        @include('partials.dashboard-tabel-medium-high',[
                             'title' => 'Medium & High Risk Reports',
                             'laporans' => $laporanMediumHigh
                         ])
