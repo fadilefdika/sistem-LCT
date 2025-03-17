@@ -7,6 +7,7 @@
                     <th class="py-3 px-4">Non-Conformity Findings</th>
                     <th class="py-3 px-4">Date of Finding</th>
                     <th class="py-3 px-4">SVP Name</th>
+                    <th class="py-3 px-4">Risk Level</th>
                     <th class="py-3 px-4">Final Status</th>
                     <th class="px-4 py-3">Completion Date</th>
                     <th class="py-3 px-4">Action</th>
@@ -24,6 +25,9 @@
                     </td>
                     <td class="py-4 px-6 border-b text-gray-800">
                         {{ $laporan->picUser->fullname ?? '-' }}
+                    </td>
+                    <td class="py-4 px-6 border-b text-gray-800">
+                        {{ $laporan->tingkat_bahaya ?? '-' }}
                     </td>
 
                     <!-- Status Akhir dengan Badge Warna -->

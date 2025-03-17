@@ -64,7 +64,7 @@
                     </li>
 
                     <!-- Laporan LCT -->
-                    @role('ehs')
+                    @hasanyrole(['ehs', 'manajer'])
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('laporan-lct') || Request::is('laporan-lct/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if(!Request::is('laporan-lct') || Request::is('laporan-lct/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.laporan-lct') }}">
                             <div class="flex items-center">

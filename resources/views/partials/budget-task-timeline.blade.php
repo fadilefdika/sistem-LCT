@@ -17,7 +17,7 @@
     @endif
 
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
-@if(!in_array($laporan->status_lct, ['approved_permanent', 'closed']))
+    @if(!in_array($laporan->status_lct, ['approved_permanent', 'closed']))
     <div x-show="!isApproved">
         <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST">
             @csrf
@@ -37,47 +37,92 @@
                             <th class="border px-3 py-2 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody> 
                         <template x-for="(task, index) in tasks" :key="index">
                             <tr>
                                 <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
                                 <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
-                                <td class="border"><input type="text" x-model="task.taskName" class="w-full border-gray-100" :name="'tasks['+index+'][taskName]'"></td>
-                                <td class="border"><input type="text" x-model="task.namePic" class="w-full border-gray-100" :name="'tasks['+index+'][namePic]'"></td>
-                                <td class="border"><input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'"></td>
-                                <td class="border"><input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'"></td>
+                            
+                                <!-- Task Name -->
+                                <td class="border">
+                                    <input type="text" x-model="task.taskName"
+                                        @click="addRow(index)"
+                                        class="w-full border-gray-100"
+                                        :name="'tasks['+index+'][taskName]'">
+                                </td>
+                        
+                                <!-- PIC Selection -->
+                                <td class="border">
+                                    <select 
+                                        class="w-full border-gray-100"
+                                        x-model="task.picId" 
+                                        :name="'tasks['+index+'][picId]'"
+                                        @change="console.log('Task ID:', task.id, 'PIC Terpilih:', task.picId)"
+                                    >
+                                        <option value="">Pilih PIC</option>
+                                        @foreach($picList as $pic)
+                                            <option value="{{ $pic['id'] }}" x-bind:selected="task.picId == {{ $pic['id'] }}">
+                                                {{ $pic['fullname'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                        
+                                <td class="border">
+                                    <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
+                                </td>
+                                <td class="border">
+                                    <input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'">
+                                </td>
                                 <td class="border text-center">
                                     <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
                                 </td>
                             </tr>
                         </template>
+                        
                     </tbody>
                 </table>
 
-               <!-- Estimasi Budget -->
                 <div class="mt-4 p-4 bg-gray-100 rounded-lg" 
-                    x-data="{
-                    estimatedBudget: '{{ $laporan->estimated_budget ?? '' }}',
+                x-data="{
+                    estimatedBudget: '{{ intval($laporan->estimated_budget ?? 0) }}', // Pastikan jadi integer
                     formattedBudget: '',
                     showError: false,
                     formatCurrency() {
                         this.formattedBudget = this.estimatedBudget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                     }
-                    }"
-                    x-init="formatCurrency()">
-
-                    <h3 class="text-lg font-semibold mb-2">Estimated Budget</h3>
-                    <div class="flex items-center">
-                        <span class="font-medium mr-3">Total Budget (Rp):</span>
-                        <input type="text" x-model="formattedBudget" class="w-40 p-2 border border-gray-300 rounded-lg text-right">
-                        <input type="hidden" name="estimatedBudget" :value="estimatedBudget">
-                    </div>
+                }"
+                x-init="formatCurrency()"
+            >
+                <h3 class="text-lg font-semibold mb-2">Estimated Budget</h3>
+                <div class="flex items-center">
+                    <span class="font-medium mr-3">Estimated Budget (Rp):</span>
+                    <input 
+                        type="text" 
+                        x-model="formattedBudget" 
+                        class="w-40 p-2 border border-gray-300 rounded-lg text-right" 
+                        @input="
+                            estimatedBudget = $event.target.value.replace(/\D/g, '');
+                            formatCurrency();
+                            showError = false;
+                        "
+                        @blur="showError = estimatedBudget === ''"
+                        placeholder="0"
+                        required
+                    >
+                    
+                    <!-- Hidden input untuk mengirimkan nilai ke controller -->
+                    <input type="hidden" name="estimatedBudget" :value="estimatedBudget">
                 </div>
-
+            
+                <!-- Pesan Error -->
+                <p x-show="showError" class="text-red-500 text-sm mt-1">Estimasi budget wajib diisi!</p>
+            </div>
+            
                 <!-- Submit button -->
-                @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision']))
+                @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'taskbudget_revision']))
                 <div class="flex justify-end">
-                    <button type="submit" class="text-white bg-blue-700 px-5 py-3 rounded-lg mt-4">
+                    <button type="submit" class="text-white bg-blue-700 px-5 py-3 rounded-lg mt-4 cursor-pointer">
                         Submit Report
                     </button>
                 </div>
@@ -179,26 +224,46 @@
     }
 
     document.addEventListener('alpine:init', () => {
-        Alpine.data('taskData', () => ({
-            isApproved: @json($laporan->status_lct === 'approved_taskbudget'),
-            tasks: @json($tasks ?? []),
-            estimatedBudget: '{{ $laporan->estimated_budget ?? 0 }}',
-            
-            get formattedBudget() {
-                return new Intl.NumberFormat("id-ID").format(this.estimatedBudget);
-            },
+    Alpine.data('taskData', () => ({
+        isApproved: @json($laporan->status_lct === 'approved_taskbudget'),
+        tasks: @json($tasks ?? []), 
+        estimatedBudget: '{{ $laporan->estimated_budget ?? 0 }}',
 
-            set formattedBudget(value) {
-                this.estimatedBudget = value.replace(/\D/g, '');
-            },
+        get formattedBudget() {
+            return new Intl.NumberFormat("id-ID").format(this.estimatedBudget);
+        },
+        set formattedBudget(value) {
+            this.estimatedBudget = value.replace(/\D/g, '');
+        },
 
-            removeTask(index) {
+        init() {
+            if (this.tasks.length === 0) {
+                this.tasks.push({ taskName: '', picId: '', dueDate: '', notes: '' });
+            }
+        },
+
+        addRow(index) {
+            if (index === this.tasks.length - 1) {
+                this.tasks.push({ taskName: '', picId: '', dueDate: '', notes: '' });
+            }
+        },
+
+        removeTask(index) {
+            if (this.tasks.length > 1) {
                 this.tasks.splice(index, 1);
-            },
-        }));
-    });
-</script>
+            }
+        },
 
+        validatePicId(index) {
+            console.log("Validasi PIC:", this.tasks[index].picId);
+            if (!this.tasks[index].picId) {
+                console.warn(`Task ${index + 1}: PIC belum dipilih!`);
+            }
+        }
+    }));
+});
+
+</script>
 
 
 <script>

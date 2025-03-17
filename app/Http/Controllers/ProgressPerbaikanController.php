@@ -67,6 +67,7 @@ class ProgressPerbaikanController extends Controller
                 // Jika sudah tahap perbaikan permanen, set ke approved_permanent
                 elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision', 'approved_taskbudget'])) {
                     $laporan->status_lct = 'approved_permanent';
+                    $laporan->date_completion = Carbon::now();
                 }
                 break;
 

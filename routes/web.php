@@ -39,6 +39,9 @@ Route::middleware(['auth', 'verified', 'role:manajer,ehs'])->group(function () {
     Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
     Route::get('/progress-perbaikan/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('admin.progress-perbaikan.show');
 
+    Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct');
+    Route::get('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('admin.laporan-lct.show');
+
     Route::get('/manajemen-pic', [ManajemenPicController::class, 'index'])->name('admin.manajemen-pic');
 });
 
@@ -56,8 +59,6 @@ Route::middleware(['auth', 'verified', 'role:manajer'])->group(function () {
 
 // Middleware khusus EHS
 Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
-    Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct');
-    Route::get('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('admin.laporan-lct.show');
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
 
     Route::post('/progress-perbaikan/{id_laporan_lct}/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('admin.progress-perbaikan.approve');

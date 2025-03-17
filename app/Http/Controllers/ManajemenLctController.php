@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pic;
+use App\Models\User;
 use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class ManajemenLctController extends Controller
             'picUser', 
             'rejectLaporan', 
             'kategori',
-            'tasks.pic' // Langsung ambil tasks dan relasinya
+            'tasks.pic',
         ])->where('id_laporan_lct', $id_laporan_lct)->first();
 
         if (!$laporan) {
@@ -41,20 +42,31 @@ class ManajemenLctController extends Controller
 
         // Ambil tasks langsung dari relasi tanpa query tambahan
         $tasks = LctTasks::where('id_laporan_lct', $laporan->id_laporan_lct)
-            ->orderBy('due_date', 'asc') // Urutkan berdasarkan due_date terdekat
-            ->get()
-            ->map(function ($task) {
-                return [
-                    'id' => $task->id,
-                    'taskName' => $task->task_name,
-                    'namePic' => $task->name_pic,
-                    'dueDate' => $task->due_date,
-                    'notes' => $task->notes,
-                    'status' => $task->status ?? 'pending',
-                ];
-            });
+        ->orderBy('due_date', 'asc')
+        ->get()
+        ->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'taskName' => $task->task_name,
+                'namePic' => $task->name_pic,
+                'picId' => $task->pic_id, // Pastikan pic_id diambil
+                'dueDate' => $task->due_date,
+                'notes' => $task->notes,
+                'status' => $task->status ?? 'pending',
+            ];
+        });
+    
 
         $tasks[] = ['id'=> '','taskName' => '', 'namePic' => '', 'dueDate' => '', 'notes' => '', 'status' => '']; // Tambah 1 baris kosong
+
+        $picList = Pic::with('user:id,fullname')
+            ->get()
+            ->map(function ($pic) {
+                return [
+                    'id' => $pic->id,
+                    'fullname' => $pic->user->fullname ?? 'Unknown'
+                ];
+            });
 
             
         // dd($tasks, $laporan->estimated_budget);
@@ -62,7 +74,8 @@ class ManajemenLctController extends Controller
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
 
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan'));
+        // dd($tasks);
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan','picList'));
     }
 
 
@@ -121,89 +134,75 @@ class ManajemenLctController extends Controller
     }
 
 
-
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
-        // dd($request->all());
         $data = $request->all();
-
-        // Filter hanya task yang memiliki nilai
-        $filteredTasks = array_filter($data['tasks'], function ($task) {
-            return !empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']);
-        });
-
-        // Gantilah 'tasks' dengan data yang sudah difilter
-        $data['tasks'] = array_values($filteredTasks);
-
-        // Jika setelah filtering tidak ada task yang valid, hentikan proses
-        if (empty($data['tasks'])) {
-            return redirect()->back()->with('error', 'Tidak ada task yang valid untuk disimpan.');
+    
+        // Validasi input
+        $validator = Validator::make($data, [
+            'estimatedBudget' => 'required|numeric|min:0',
+            'tasks' => 'nullable|array',
+            'tasks.*.id' => 'nullable|integer|exists:lct_tasks,id',
+            'tasks.*.taskName' => 'nullable|string|max:255',
+            'tasks.*.picId' => 'nullable|integer|exists:lct_pic,id',
+            'tasks.*.dueDate' => 'nullable|date',
+            'tasks.*.notes' => 'nullable|string|max:500',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal!',
+                'errors' => $validator->errors()
+            ], 422);
         }
-
-        // Validasi setelah filtering
-        $validatedData = Validator::make($data, [
-            'tasks' => 'array|required',
-            'tasks.*.taskName' => 'required|string',
-            'tasks.*.namePic' => 'required|string',
-            'tasks.*.dueDate' => 'required|date',
-            'tasks.*.notes' => 'nullable|string',
-            'estimatedBudget' => 'required|numeric',
-        ])->validate();
-        
-        $pic = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->value('pic_id');
-
+    
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            // Ambil semua ID task yang ada di database untuk laporan ini
-            $existingTaskIds = LctTasks::where('id_laporan_lct', $id_laporan_lct)
-                ->pluck('id')
-                ->toArray();
-
-            // Ambil ID task yang dikirim dalam request (jika ada)
-            $submittedTaskIds = array_filter(array_column($filteredTasks, 'id'));
-
-            // Cari task yang ada di database tetapi tidak ada di request → ini yang harus dihapus
-            $tasksToDelete = array_diff($existingTaskIds, $submittedTaskIds);
-
-            // Hapus task yang tidak lagi ada di request
-            if (!empty($tasksToDelete)) {
-                LctTasks::whereIn('id', $tasksToDelete)->delete();
-            }
-
-            // Simpan atau update task yang dikirim
-            foreach ($filteredTasks as $task) {
-                LctTasks::updateOrCreate(
-                    [
-                        'id' => $task['id'] ?? null, // Gunakan ID jika ada
-                    ],
-                    [
-                        'id_laporan_lct' => $id_laporan_lct,
-                        'task_name' => $task['taskName'],
-                        'name_pic' => $task['namePic'],
-                        'due_date' => $task['dueDate'],
-                        'notes' => $task['notes'] ?? null,
-                        'pic_id' => $pic,
-                        'status' => 'pending',
-                    ]
-                );
-            }
-
-            // Update estimated budget
+            // Update estimated budget & status LCT
             LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
-                'estimated_budget' => $validatedData['estimatedBudget'],
-                'status_lct' => 'waiting_approval_taskbudget',
+                'estimated_budget' => $data['estimatedBudget'],
+                'status_lct' => 'waiting_approval_taskbudget'
             ]);
-
+    
+            // Proses tasks
+            $existingTaskIds = []; // Untuk melacak task yang tersimpan
+            if (!empty($data['tasks'])) {
+                foreach ($data['tasks'] as $task) {
+                    // Abaikan task yang tidak memiliki taskName, picId, atau dueDate
+                    if (empty($task['taskName']) || empty($task['picId']) || empty($task['dueDate'])) {
+                        continue;
+                    }
+    
+                    // Simpan atau update task
+                    $taskModel = LctTasks::updateOrCreate(
+                        ['id' => $task['id'] ?? null], // Jika ID ada, update, jika tidak, buat baru
+                        [
+                            'id_laporan_lct' => $id_laporan_lct,
+                            'task_name' => $task['taskName'],
+                            'pic_id' => $task['picId'],
+                            'due_date' => $task['dueDate'],
+                            'notes' => $task['notes'] ?? null
+                        ]
+                    );
+    
+                    // Simpan ID task yang diproses
+                    $existingTaskIds[] = $taskModel->id;
+                }
+            }
+    
+            // Hapus task yang tidak ada dalam request (opsional)
+            LctTasks::where('id_laporan_lct', $id_laporan_lct)
+                ->whereNotIn('id', $existingTaskIds)
+                ->delete();
+    
             DB::commit();
-
-            return redirect()->back()->with('success', 'Tasks successfully submitted!');
+    
+            return redirect()->back()->with('success', 'Data saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred, please try again.');
         }
     }
-
     
-
 }
