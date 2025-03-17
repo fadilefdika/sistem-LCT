@@ -16,4 +16,9 @@ class LctDepartement extends Model
     {
         return $this->belongsToMany(Pic::class, 'lct_departement_pic', 'departemen_id', 'pic_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // Kolom yang menghubungkan dengan User
+    }
 }

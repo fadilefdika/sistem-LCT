@@ -47,5 +47,10 @@ class User extends Authenticatable
     {
         return $this->userRoleLct?->role->name ?? 'user';
     }
+
+    public function departemen()
+    {
+        return $this->hasMany(LctDepartement::class, 'user_id'); // Kolom yang menghubungkan dengan Departemen
+    }
 }
 

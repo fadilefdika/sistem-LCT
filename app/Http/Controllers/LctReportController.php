@@ -164,19 +164,4 @@ class LctReportController extends Controller
             return redirect()->back()->with('error', 'An error occurred while submitting the report.');
         }
     }
-
-
-    // public function kirimEmail()
-    // {
-    //     $laporan = [
-    //         'judul' => 'Ketidaksesuaian Mesin Produksi',
-    //         'deskripsi' => 'Ada masalah pada mesin produksi yang perlu segera diperbaiki.',
-    //         'tanggal' => now()->format('d-m-Y'),
-    //         'url' => url('/laporan/123'), // Ganti dengan link laporan yang benar
-    //     ];
-
-    //     Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
-
-    //     return "Email laporan ketidaksesuaian berhasil dikirim!";
-    // }
 }
