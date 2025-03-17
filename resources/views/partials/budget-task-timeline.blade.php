@@ -1,7 +1,4 @@
-<div x-data="{ 
-    isApproved: @json($laporan->status_lct === 'approved_taskbudget') 
-}">
-
+<div x-data="taskData()">
     @if($laporan->status_lct === 'taskbudget_revision')
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
             <p class="font-bold">Revision Required</p>
@@ -16,55 +13,53 @@
 
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
     <div x-show="!isApproved">
-        <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" id="taskForm">
+        <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST">
             @csrf
             <input type="hidden" name="deletedTasks" id="deletedTasksInput">
 
-            <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg relative h-full mb-4 overflow-x-auto">
+            <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4 overflow-x-auto">
                 <h3 class="text-lg font-semibold mb-4">Task Management and Timeline</h3>
-
-                <div class="mt-4 overflow-x-auto">
-                    <table class="min-w-full border-collapse border border-gray-300">
-                        <thead class="bg-gray-100">
+                
+                <table class="min-w-full border-collapse border border-gray-300">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border px-3 py-2 text-center">No</th>
+                            <th class="border px-3 py-2 text-left">Task Name</th>
+                            <th class="border px-3 py-2 text-left">SVP Name</th>
+                            <th class="border px-3 py-2 text-left">Due Date</th>
+                            <th class="border px-3 py-2 text-left">Notes</th>
+                            <th class="border px-3 py-2 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(task, index) in tasks" :key="index">
                             <tr>
-                                <th class="border px-3 py-2 text-center">No</th>
-                                <th class="border px-3 py-2 text-left">Task Name</th>
-                                <th class="border px-3 py-2 text-left">SVP Name</th>
-                                <th class="border px-3 py-2 text-left">Due Date</th>
-                                <th class="border px-3 py-2 text-left">Notes</th>
-                                <th class="border px-3 py-2 text-center">Action</th>
+                                <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
+                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
+                                <td class="border"><input type="text" x-model="task.taskName" class="w-full border-gray-100" :name="'tasks['+index+'][taskName]'"></td>
+                                <td class="border"><input type="text" x-model="task.namePic" class="w-full border-gray-100" :name="'tasks['+index+'][namePic]'"></td>
+                                <td class="border"><input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'"></td>
+                                <td class="border"><input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'"></td>
+                                <td class="border text-center">
+                                    <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <template x-for="(task, index) in tasks" :key="index">
-                                <tr>
-                                    <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
-                                    <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
-                                    <td class="border px-3 py-2"><input type="text" x-model="task.taskName" class="w-full"></td>
-                                    <td class="border px-3 py-2"><input type="text" x-model="task.namePic" class="w-full"></td>
-                                    <td class="border px-3 py-2"><input type="date" x-model="task.dueDate" class="w-full"></td>
-                                    <td class="border px-3 py-2"><input type="text" x-model="task.notes" class="w-full"></td>
-                                    <td class="border px-3 py-2 text-center">
-                                        <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
+                        </template>
+                    </tbody>
+                </table>
 
                 <!-- Estimasi Budget -->
                 <div class="mt-4 p-4 bg-gray-100 rounded-lg">
                     <h3 class="text-lg font-semibold mb-2">Estimasi Budget</h3>
                     <div class="flex items-center">
                         <span class="font-medium mr-3">Total Budget (Rp):</span>
-                        <input type="text" x-model="estimatedBudget" class="w-40 p-2 border border-gray-300 rounded-lg text-right">
-                        <input type="hidden" name="estimatedBudget" :value="estimatedBudget ? estimatedBudget.replace(/\./g, '') : ''">
+                        <input type="text" x-model="formattedBudget" class="w-40 p-2 border border-gray-300 rounded-lg text-right">
+                        <input type="hidden" name="estimatedBudget" :value="estimatedBudget">
                     </div>
                 </div>
 
                 <!-- Submit button -->
-                @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'waiting_approval_taskbudget']))
+                @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision']))
                 <div class="flex justify-end">
                     <button type="submit" class="text-white bg-blue-700 px-5 py-3 rounded-lg mt-4">
                         Submit Report
@@ -74,9 +69,10 @@
             </div>
         </form>
     </div>
+</div>
 
-<!-- VIEW APPROVED TASKS -->
-<div x-show="isApproved" class="mt-6">
+@if($laporan->status_lct === 'approved_taskbudget')
+<div class="mt-6">
     <h3 class="text-xl font-bold text-gray-800 mb-4">✅ Approved Tasks List</h3>
 
     <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
@@ -100,7 +96,8 @@
                         <div class="text-gray-600">{{ $task['namePic'] }}</div>
                         <div class="text-gray-600">{{ $task['dueDate'] }}</div>
                         <div>
-                            <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none">
+                            <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
+                                data-task-id="{{ $task['id'] }}">
                                 <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
                                 <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option>
                                 <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
@@ -113,6 +110,9 @@
         </div>
     </div>
 </div>
+@endif
+
+
 
 
     <!-- Reject History -->
@@ -154,24 +154,32 @@
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('taskData', () => ({
-            tasks: @json($tasks ?? []), // Pastikan jika $tasks null, set default ke []
-            estimatedBudget: '{{ number_format($laporan->estimated_budget ?? 0, 0, ',', '.') }}',
+            isApproved: @json($laporan->status_lct === 'approved_taskbudget'),
+            tasks: @json($tasks ?? []),
+            estimatedBudget: '{{ $laporan->estimated_budget ?? 0 }}',
+            
+            get formattedBudget() {
+                return new Intl.NumberFormat("id-ID").format(this.estimatedBudget);
+            },
+
+            set formattedBudget(value) {
+                this.estimatedBudget = value.replace(/\D/g, '');
+            },
+
             removeTask(index) {
                 this.tasks.splice(index, 1);
             },
-            canSubmit() {
-                return this.tasks.length > 0 && this.estimatedBudget !== '';
-            }
         }));
     });
 </script>
 
 
+
 <script>
    document.querySelectorAll('.status-dropdown').forEach((dropdown) => {
     dropdown.addEventListener('change', async function () {
-        const taskId = dropdown.getAttribute('data-task-id');
-        const newStatus = dropdown.value;
+        const taskId = this.getAttribute('data-task-id');
+        const newStatus = this.value;
         const updateUrl = `/manajemen-lct/${taskId}/updateStatus`;
 
         try {
@@ -192,8 +200,16 @@
             const data = await response.json();
             console.log("Status updated:", data);
 
-        } 
+            // Tambahkan efek sukses (misalnya warna hijau)
+            this.classList.add('bg-green-100');
+            setTimeout(() => this.classList.remove('bg-green-100'), 2000);
+
+        } catch (error) {
+            console.error("Failed to update status:", error);
+            alert("Gagal memperbarui status. Silakan coba lagi.");
+        }
     });
 });
 
 </script>
+

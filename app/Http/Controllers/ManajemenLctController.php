@@ -57,7 +57,7 @@ class ManajemenLctController extends Controller
         $tasks[] = ['id'=> '','taskName' => '', 'namePic' => '', 'dueDate' => '', 'notes' => '', 'status' => '']; // Tambah 1 baris kosong
 
             
-        // dd($tasks);
+        // dd($tasks, $laporan->estimated_budget);
         // Konversi bukti_temuan dan bukti_perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
