@@ -35,7 +35,7 @@
                         alt="Logo" 
                         class="w-32 h-10 object-contain">
                 </a>
-                <h2 class="text-lg font-semibold text-gray-800">LCT System</h2>
+                {{-- <h2 class="text-lg font-semibold text-gray-800">LCT System</h2> --}}
             </div>
         </div>
 

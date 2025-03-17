@@ -9,9 +9,15 @@
             <p class="font-bold">Awaiting Manager Approval</p>
             <p>Your revision has been submitted. Please wait for approval.</p>
         </div>
+    @elseif($laporan->status_lct === 'approved_permanent')
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4" role="alert">
+            <p class="font-bold">Permanent Approved</p>
+            <p>Your task request has been permanently approved.</p>
+        </div>
     @endif
 
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
+@if(!in_array($laporan->status_lct, ['approved_permanent', 'closed']))
     <div x-show="!isApproved">
         <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST">
             @csrf
@@ -70,50 +76,60 @@
         </form>
     </div>
 </div>
-
-@if($laporan->status_lct === 'approved_taskbudget')
-<div class="mt-6">
-    <h3 class="text-xl font-bold text-gray-800 mb-4">✅ Approved Tasks List</h3>
-
-    <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
-        <!-- Header -->
-        <div class="grid grid-cols-6 gap-4 font-semibold text-gray-900 border-b pb-3">
-            <div>No</div>
-            <div>Nama Task</div>
-            <div>Nama PIC</div>
-            <div>Due Date</div>
-            <div>Status</div>
-            <div>Notes</div>
-        </div>
-
-        <!-- Data Rows -->
-        <div class="divide-y divide-gray-200">
-            @foreach($tasks as $index => $task)
-                @if(!empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']))
-                    <div class="grid grid-cols-6 gap-4 py-4 items-center hover:bg-gray-100 transition duration-200 rounded-lg">
-                        <div class="font-medium text-gray-900">{{ $index + 1 }}</div>
-                        <div class="text-gray-900 font-medium">{{ $task['taskName'] }}</div>
-                        <div class="text-gray-600">{{ $task['namePic'] }}</div>
-                        <div class="text-gray-600">{{ $task['dueDate'] }}</div>
-                        <div>
-                            <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
-                                data-task-id="{{ $task['id'] }}">
-                                <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option>
-                                <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
-                            </select>
-                        </div>
-                        <div class="text-gray-500 italic">{{ $task['notes'] ?? '-' }}</div>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-</div>
 @endif
 
+@if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
+    <div class="mt-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">✅ Approved Tasks List</h3>
+        
+        @if($laporan->status_lct === 'approved_permanent')
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Permanent Approval Granted</p>
+                <p>Task has been permanently approved. You may now proceed to close.</p>
+            </div>
+        @elseif($laporan->status_lct === 'closed')
+            <div class="bg-gray-200 border-l-4 border-gray-500 text-gray-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Case Closed</p>
+                <p>This case has been closed. No further actions required.</p>
+            </div>
+        @endif
 
+        <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
+            <!-- Header -->
+            <div class="grid grid-cols-6 gap-4 font-semibold text-gray-900 border-b pb-3">
+                <div>No</div>
+                <div>Nama Task</div>
+                <div>Nama PIC</div>
+                <div>Due Date</div>
+                <div>Status</div>
+                <div>Notes</div>
+            </div>
 
+            <!-- Data Rows -->
+            <div class="divide-y divide-gray-200">
+                @foreach($tasks as $index => $task)
+                    @if(!empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']))
+                        <div class="grid grid-cols-6 gap-4 py-4 items-center hover:bg-gray-100 transition duration-200 rounded-lg">
+                            <div class="font-medium text-gray-900">{{ $index + 1 }}</div>
+                            <div class="text-gray-900 font-medium">{{ $task['taskName'] }}</div>
+                            <div class="text-gray-600">{{ $task['namePic'] }}</div>
+                            <div class="text-gray-600">{{ $task['dueDate'] }}</div>
+                            <div>
+                                <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
+                                    data-task-id="{{ $task['id'] }}">
+                                    <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                                    <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option>
+                                    <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
+                                </select>
+                            </div>
+                            <div class="text-gray-500 italic">{{ $task['notes'] ?? '-' }}</div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    </div>
+@endif
 
     <!-- Reject History -->
 <div class="bg-white shadow-md rounded-lg p-6 mt-5">

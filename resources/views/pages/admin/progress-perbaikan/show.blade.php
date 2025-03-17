@@ -5,7 +5,7 @@
             'waiting_approval_temporary', 'temporary_revision'
         ]) ? 'pic' : (in_array($laporan->status_lct, [
             'approved_temporary', 'taskbudget_revision', 
-            'waiting_approval_taskbudget', 'approved_taskbudget'
+            'waiting_approval_taskbudget', 'approved_taskbudget', 'approved_permanent', 'closed'
         ]) ? 'task-pic' : 'user') }}' 
     }"
      class="px-5 pt-2">
@@ -23,7 +23,7 @@
                 PIC
             </button>
         
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','approved_taskbudget','taskbudget_revision','waiting_approval_taskbudget']))
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','approved_taskbudget','taskbudget_revision','waiting_approval_taskbudget','approved_permanent','closed']))
                 <button @click="activeTab = 'task-pic'" 
                         :class="activeTab === 'task-pic' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                         class="px-4 py-2 focus:outline-none cursor-pointer">

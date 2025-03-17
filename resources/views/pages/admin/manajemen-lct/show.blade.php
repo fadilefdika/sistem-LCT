@@ -1,6 +1,6 @@
 <x-app-layout>
 
-    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent']) ? 'task-and-timeline' : 'laporan'}}' }"
+    <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent', 'closed']) ? 'task-and-timeline' : 'laporan'}}' }"
         class="px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
@@ -9,7 +9,7 @@
                 LCT Report
             </button>
             <!-- Menampilkan tombol Task & Timeline hanya jika status LCT adalah 'approved' dan tingkat bahaya Medium atau High -->
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent']))
+            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent', 'closed']))
             <button @click="activeTab = 'task-and-timeline'" 
                     :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                     class="px-4 py-2 focus:outline-none cursor-pointer">

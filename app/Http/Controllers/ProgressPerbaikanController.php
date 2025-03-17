@@ -42,10 +42,6 @@ class ProgressPerbaikanController extends Controller
         return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan', 'allTasksCompleted'));
     }
 
-    
-
-
-
     public function approveLaporan($id_laporan_lct)
     {
         $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
@@ -69,7 +65,7 @@ class ProgressPerbaikanController extends Controller
                     $laporan->status_lct = 'approved_temporary';
                 }
                 // Jika sudah tahap perbaikan permanen, set ke approved_permanent
-                elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision'])) {
+                elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision', 'approved_taskbudget'])) {
                     $laporan->status_lct = 'approved_permanent';
                 }
                 break;
@@ -82,10 +78,6 @@ class ProgressPerbaikanController extends Controller
 
         return redirect()->back()->with('approve', 'The repair report has been successfully approved.');
     }
-
-
-
-
 
     public function rejectLaporan(Request $request, $id_laporan_lct)
     {
@@ -140,7 +132,6 @@ class ProgressPerbaikanController extends Controller
     }
 
     
-
     public function closeLaporan($id_laporan_lct)
     {
         // dd("masuk close");

@@ -1,5 +1,5 @@
 <div class="mx-auto">
-    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">📌 Approved Tasks List</h3>
+    <h3 class="text-2xl font-bold text-gray-800 mb-4 mt-3 flex items-center">📌 Approved Tasks List</h3>
 
     <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
         @if($laporan->tasks->isEmpty())
@@ -30,28 +30,56 @@
                     </div>
                 @endforeach
             </div>
-      
 
-        <!-- Tombol Approve & Close -->
-        <div class="mt-6 flex gap-4">
-            <form action="{{-- route('admin.lct.approve', $laporan->id_laporan_lct) --}}" method="POST">
-                @csrf
-                <button type="submit"
-                    class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition"
-                    {{ !$allTasksCompleted ? 'disabled' : '' }}>
-                    ✅ Approve
-                </button>
-            </form>
-            
-            <form action="{{-- route('admin.lct.close', $laporan->id_laporan_lct) --}}" method="POST">
-                @csrf
-                <button type="submit"
-                    class="px-4 py-2 text-white font-semibold rounded-lg bg-red-500 hover:bg-red-600 transition"
-                    {{ !$allTasksCompleted ? 'disabled' : '' }}>
-                    ❌ Close Case
-                </button>
-            </form>
-        </div>
+            <!-- Tombol Approve & Close -->
+            @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent']))
+                <div class="mt-6 flex gap-4">
+                    <!-- Tombol Approve -->
+                    @if($laporan->status_lct === 'approved_taskbudget')
+                        <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer"
+                                {{ !$allTasksCompleted ? 'disabled' : '' }}>
+                                ✅ Approve
+                            </button>
+                        </form>
+                    @endif
+
+                    <!-- Tombol Close -->
+                    @if($laporan->status_lct === 'approved_permanent')
+                        <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                            @csrf 
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">
+                                🔒 Close
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            @endif
         @endif
     </div>
+
+    <!-- Notifikasi Status di Bagian Bawah -->
+    @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
+        <div class="mt-6 bg-white px-6 py-4 rounded-xl shadow-lg border border-gray-200">
+            @if($laporan->status_lct === 'approved_taskbudget')
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+                    <p class="font-bold">📝 Approval in Progress</p>
+                    <p>The tasks are still in the budget approval stage. Please review before final approval.</p>
+                </div>
+            @elseif($laporan->status_lct === 'approved_permanent')
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+                    <p class="font-bold">✅ Permanently Approved</p>
+                    <p>All tasks have been permanently approved. You may proceed with closure.</p>
+                </div>
+            @elseif($laporan->status_lct === 'closed')
+                <div class="bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4" role="alert">
+                    <p class="font-bold">🔒 Case Closed</p>
+                    <p>This case has been closed. No further actions are required.</p>
+                </div>
+            @endif
+        </div>
+    @endif
 </div>
