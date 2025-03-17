@@ -149,42 +149,68 @@
             </div>
         @endif
 
-        <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
-            <!-- Header -->
-            <div class="grid grid-cols-6 gap-4 font-semibold text-gray-900 border-b pb-3">
-                <div>No</div>
-                <div>Nama Task</div>
-                <div>Nama PIC</div>
-                <div>Due Date</div>
-                <div>Status</div>
-                <div>Notes</div>
-            </div>
+        <div class="bg-white px-6 py-6 rounded-xl shadow-lg">
+            <!-- Wrapper with overflow handling -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <!-- Table Header -->
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[50px]">No</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[200px]">Nama Task</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Nama PIC</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Due Date</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Status</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[250px]">Notes</th>
+                        </tr>
+                    </thead>
 
-            <!-- Data Rows -->
-            <div class="divide-y divide-gray-200">
-                @foreach($tasks as $index => $task)
-                    @if(!empty($task['taskName']) && !empty($task['namePic']) && !empty($task['dueDate']))
-                        <div class="grid grid-cols-6 gap-4 py-4 items-center hover:bg-gray-100 transition duration-200 rounded-lg">
-                            <div class="font-medium text-gray-900">{{ $index + 1 }}</div>
-                            <div class="text-gray-900 font-medium">{{ $task['taskName'] }}</div>
-                            <div class="text-gray-600">{{ $task['namePic'] }}</div>
-                            <div class="text-gray-600">{{ $task['dueDate'] }}</div>
-                            <div>
-                                <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
-                                    data-task-id="{{ $task['id'] }}">
-                                    <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                    <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option>
-                                    <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
-                                </select>
-                            </div>
-                            <div class="text-gray-500 italic">{{ $task['notes'] ?? '-' }}</div>
-                        </div>
-                    @endif
-                @endforeach
+                    <!-- Table Body -->
+                    <tbody>
+                        @foreach($tasks as $index => $task)
+                            @if(!empty($task['taskName']) && !empty($task['picId']) && !empty($task['dueDate']))
+                                <tr class="hover:bg-gray-100 transition duration-200">
+                                    <!-- No -->
+                                    <td class="px-4 py-2 text-gray-900 min-w-[50px]">{{ $index + 1 }}</td>
+                                    <!-- Task Name -->
+                                    <td class="px-4 py-2 text-gray-900 overflow-x-auto whitespace-normal min-w-[200px] max-w-[200px] break-words">
+                                        {{ $task['taskName'] }}
+                                    </td>
+                                    <!-- PIC Name -->
+                                    <td class="px-4 py-2 text-gray-600 min-w-[150px]">
+                                        @php
+                                            // Ambil nama PIC berdasarkan picId
+                                            $pic = $picList->firstWhere('id', $task['picId']);
+                                        @endphp
+                                        {{ $pic ? $pic['fullname'] : 'No PIC Assigned' }}
+                                    </td>
+                                    <!-- Due Date -->
+                                    <td class="px-4 py-2 text-gray-600 min-w-[150px]">{{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}</td>
+                                    <!-- Status -->
+                                    <td class="px-4 py-2 min-w-[150px]">
+                                        <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
+                                                data-task-id="{{ $task['id'] }}">
+                                            <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
+                                            {{-- <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option> --}}
+                                            <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
+                                        </select>
+                                    </td>
+                                    <!-- Notes -->
+                                    <td class="px-4 py-2 text-gray-500 italic overflow-x-auto whitespace-normal min-w-[250px] max-w-[250px] break-words">
+                                        {{ $task['notes'] ?? '-' }} 
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </div>        
     </div>
 @endif
+
+
+
 
     <!-- Reject History -->
 <div class="bg-white shadow-md rounded-lg p-6 mt-5">

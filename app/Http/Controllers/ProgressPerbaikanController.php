@@ -35,7 +35,7 @@ class ProgressPerbaikanController extends Controller
         // Ambil bukti temuan & perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn($path) => asset('storage/' . $path));
-
+        // dd($laporan->tasks->first()->pic->user->fullname); 
         // Cek apakah semua task sudah selesai
         $allTasksCompleted = $laporan->tasks->every(fn($task) => $task->status === 'completed');
 

@@ -47,9 +47,18 @@
                 <div>
                     <h3 class="text-lg font-semibold text-gray-800">Approval Status</h3>
                     <span class="inline-block px-4 py-2 text-sm font-medium text-white rounded-lg
-                        {{ $taskBudget->status_lct == 'approved_taskbudget' ? 'bg-green-500' : ($taskBudget->status_lct == 'taskbudget_revision' ? 'bg-red-500' : 'bg-gray-500') }}">
-                        {{ ucfirst(str_replace('_', ' ', $taskBudget->status_lct)) }}
+                        {{ $taskBudget->status_lct == 'approved_taskbudget' ? 'bg-green-500' : 
+                        ($taskBudget->status_lct == 'taskbudget_revision' ? 'bg-red-500' : 'bg-gray-500') }}">
+                        {{ 
+                            match($taskBudget->status_lct) {
+                                'approved_taskbudget' => 'Approved',
+                                'taskbudget_revision' => 'Revision Required',
+                                'waiting_approval_taskbudget' => 'Awaiting Approval',
+                                default => ucfirst(str_replace('_', ' ', $taskBudget->status_lct)),
+                            }
+                        }}
                     </span>
+
         
                     @if ($taskBudget->manager_notes)
                         <div class="mt-4">
@@ -82,7 +91,7 @@
                                     <tr class="border-t">
                                         <td class="px-4 py-3">{{ $index + 1 }}</td> 
                                         <td class="px-4 py-3">{{ $task->task_name ?? '-' }}</td>
-                                        <td class="px-4 py-3">{{ $task->name_pic ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $task->pic ? $task->pic->user->fullname : 'No PIC assigned' }}</td>
                                         <td class="px-4 py-3">{{ \Carbon\Carbon::parse($task->due_date)->locale('en')->translatedFormat('d F Y') ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $task->notes ?? '-' }}</td>
                                     </tr>

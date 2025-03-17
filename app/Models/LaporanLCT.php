@@ -84,10 +84,12 @@ class LaporanLct extends Model
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
+    // Model LaporanLct
     public function tasks()
     {
         return $this->hasMany(LctTasks::class, 'id_laporan_lct', 'id_laporan_lct');
     }
+
 
     public function rejectLaporan()
     {

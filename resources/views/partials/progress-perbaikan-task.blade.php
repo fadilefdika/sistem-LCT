@@ -1,3 +1,11 @@
+<div class="w-full bg-[#F3F4F6] max-h-[calc(100vh)] pb-32 overflow-y-auto 
+                    [&::-webkit-scrollbar]:w-1
+                    [&::-webkit-scrollbar-track]:rounded-full
+                    [&::-webkit-scrollbar-track]:bg-gray-100
+                    [&::-webkit-scrollbar-thumb]:rounded-full
+                    [&::-webkit-scrollbar-thumb]:bg-gray-300
+                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
 <div class="mx-auto">
     <h3 class="text-2xl font-bold text-gray-800 mb-4 mt-3 flex items-center">📌 Approved Tasks List</h3>
 
@@ -13,39 +21,49 @@
                 <div class="flex-1 px-4">Task Name</div>
                 <div class="w-40 px-4">PIC</div>
                 <div class="w-32 px-4">Due Date</div>
-                <div class="w-24 px-4">Status</div>
+                <div class="w-32 px-4">Status</div>
                 <div class="w-40 px-4">Notes</div>
             </div>
-
+    
             <!-- Data Rows -->
             <div class="divide-y divide-gray-200">
                 @foreach($laporan->tasks as $index => $task)
                     <div class="flex items-center py-4 hover:bg-gray-100 transition duration-200 rounded-lg">
                         <div class="w-10 text-center font-medium text-gray-900">{{ $index + 1 }}</div>
                         <div class="flex-1 px-4 font-medium text-gray-900">{{ $task->task_name }}</div>
-                        <div class="w-40 px-4 text-gray-600">{{ $task->name_pic }}</div>
-                        <div class="w-32 px-4 text-gray-600">{{ \Carbon\Carbon::parse($task->due_date)->format('F j, Y') }}</div>
-                        <div class="w-24 px-4 text-gray-600">{{ $task->status }}</div>
-                        <div class="w-40 px-4 text-gray-500 italic">{{ $task->notes ?? '-' }}</div>
+                        <div class="w-40 px-4 text-gray-800">{{ $task->pic->user->fullname }}</div>
+                        <div class="w-32 px-4 text-gray-800">{{ \Carbon\Carbon::parse($task->due_date)->format('F j, Y') }}</div>
+                        
+                        <!-- Status with better visibility -->
+                        <div class="w-32 px-4 text-center">
+                            <span class="px-3 py-1 text-sm rounded-full 
+                                        {{ $task->status == 'pending' ? 'bg-yellow-200 text-yellow-700' : '' }}
+                                        {{ $task->status == 'in_progress' ? 'bg-blue-200 text-blue-700' : '' }}
+                                        {{ $task->status == 'completed' ? 'bg-green-200 text-green-700' : '' }}">
+                                {{ ucfirst($task->status) }}
+                            </span>
+                        </div>
+    
+                        <div class="w-40 px-4 text-gray-600 italic">{{ $task->notes ?? '-' }}</div>
                     </div>
                 @endforeach
             </div>
-
+    
             <!-- Tombol Approve & Close -->
             @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent']))
-                <div class="mt-6 flex gap-4">
+                <div class="mt-6 flex justify-end">
                     <!-- Tombol Approve -->
                     @if($laporan->status_lct === 'approved_taskbudget')
                         <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                             @csrf
                             <button type="submit"
-                                class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer"
-                                {{ !$allTasksCompleted ? 'disabled' : '' }}>
-                                ✅ Approve
+                                    class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer"
+                                    {{ !$allTasksCompleted ? 'disabled' : '' }}>
+                                ✅ Approve All
                             </button>
                         </form>
                     @endif
-
+    
                     <!-- Tombol Close -->
                     @if($laporan->status_lct === 'approved_permanent')
                         <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
@@ -60,6 +78,7 @@
             @endif
         @endif
     </div>
+    
 
     <!-- Notifikasi Status di Bagian Bawah -->
     @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
@@ -82,4 +101,5 @@
             @endif
         </div>
     @endif
+</div>
 </div>

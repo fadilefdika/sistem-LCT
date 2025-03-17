@@ -24,16 +24,16 @@ class LctTasks extends Model
         'status' => 'pending',
     ];
 
-    // Relasi ke Laporan LCT
     public function laporan()
     {
         return $this->belongsTo(LaporanLct::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
 
-    // Relasi ke PIC
     public function pic()
     {
-        return $this->belongsTo(User::class, 'pic_id', 'id');
+        return $this->belongsTo(Pic::class, 'pic_id', 'id'); // Menghubungkan task dengan pic
     }
+
+
 }
