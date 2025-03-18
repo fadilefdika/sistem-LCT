@@ -12,4 +12,13 @@ export default defineConfig({
             valetTls: false,
         }),
     ],
+    // server: {
+    //     host: "192.168.101.192", // Ganti dengan IP server
+    //     port: 5173, // Port default Vite
+    //     strictPort: true,
+    //     hmr: {
+    //         host: "192.168.101.192",
+    //         protocol: "ws", // Gunakan WebSocket, bukan Secure WebSocket (wss)
+    //     },
+    // },
 });

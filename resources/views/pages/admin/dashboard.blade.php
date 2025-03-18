@@ -2,7 +2,7 @@
     
     <div class="p-3 sm:p-5">
         <div class="mx-auto max-w-screen-2xl">
-            <div class="container mx-auto px-6 py-4">
+            <div class="container mx-auto">
 
                 <!-- Main Grid Layout -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">

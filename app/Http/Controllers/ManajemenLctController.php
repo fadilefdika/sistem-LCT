@@ -113,7 +113,7 @@ class ManajemenLctController extends Controller
             ? 'waiting_approval_temporary' 
             : 'waiting_approval';
             
-            // dd("masuk sin");
+            
             // Update laporan dengan data terbaru
             $laporan->update([
                 'date_completion' => $request->date_completion,
@@ -126,7 +126,7 @@ class ManajemenLctController extends Controller
             return redirect()->route('admin.manajemen-lct')->with('success', 'The repair results have been sent to EHS.');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
+            // dd($e);
             Log::error('Gagal mengirim hasil perbaikan ke EHS: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'An error occurred, please try again.');

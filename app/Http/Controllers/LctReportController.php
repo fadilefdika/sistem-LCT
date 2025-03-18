@@ -156,12 +156,12 @@ class LctReportController extends Controller
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
-            dd($e);
-            return redirect()->back()->with('error', 'Report not found.');
+            // dd($e);
+            return redirect()->back()->with('error', 'Report not found.', $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
-            return redirect()->back()->with('error', 'An error occurred while submitting the report.');
+            // dd($e);
+            return redirect()->back()->with('error', 'An error occurred while submitting the report.', $e->getMessage());
         }
     }
 }
