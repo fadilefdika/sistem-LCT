@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Pic;
@@ -69,8 +68,6 @@ class ManajemenLctController extends Controller
             });
 
             
-        // dd($tasks, $laporan->estimated_budget);
-        // Konversi bukti_temuan dan bukti_perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
 

@@ -10,7 +10,7 @@
     <div class="overflow-hidden rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
-                <tr class="text-left text-sm font-semibold text-gray-600">
+                <tr class="text-left text-sm font-semibold text-gray-600"> 
                     <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">SVP Name</th> 
                     <th class="px-4 py-3">Risk Level</th> 
