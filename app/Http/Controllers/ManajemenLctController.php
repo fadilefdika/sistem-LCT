@@ -120,7 +120,7 @@ class ManajemenLctController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.manajemen-lct')->with('success', 'The repair results have been sent to EHS.');
+            return redirect()->route('admin.manajemen-lct.index')->with('success', 'The repair results have been sent to EHS.');
         } catch (\Exception $e) {
             DB::rollBack();
             // dd($e);

@@ -3,37 +3,45 @@
         <div class="flex items-center justify-between h-16 {{ $variant === 'v2' || $variant === 'v3' ? '' : 'lg:border-b border-gray-200 dark:border-gray-700/60' }}">
             <div class="flex">               
                     <!-- Hamburger button untuk role admin, EHS, PIC, Manajer -->
-                    <button
-                        class="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
-                        @click.stop="sidebarOpen = !sidebarOpen"
-                        aria-controls="sidebar"
-                        :aria-expanded="sidebarOpen"
-                    >
-                        <span class="sr-only">Open sidebar</span>
-                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="4" y="5" width="16" height="2" />
-                            <rect x="4" y="11" width="16" height="2" />
-                            <rect x="4" y="17" width="16" height="2" />
-                        </svg>
-                    </button>
+                    @if(Request::is('report-form'))
+                        <a href="{{ route('admin.dashboard') }}" 
+                        class="px-4 py-2 text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300">
+                            Go To Dashboard
+                        </a>
+                    @else
+                        <button
+                            class="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 lg:hidden"
+                            @click.stop="sidebarOpen = !sidebarOpen"
+                            aria-controls="sidebar"
+                            :aria-expanded="sidebarOpen"
+                        >
+                            <span class="sr-only">Open sidebar</span>
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="4" y="5" width="16" height="2" />
+                                <rect x="4" y="11" width="16" height="2" />
+                                <rect x="4" y="17" width="16" height="2" />
+                            </svg>
+                        </button>
+                    @endif
+
 
                     <!-- Breadcrumbs -->
                 <div class="block">
                     @if (Route::currentRouteName() === 'admin.dashboard')
                         {{ Breadcrumbs::render('dashboard') }}
-                    @elseif (Route::currentRouteName() === 'admin.laporan-lct')
+                    @elseif (Route::currentRouteName() === 'admin.laporan-lct.index')
                         {{ Breadcrumbs::render('laporan-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct.show')
                         {{ Breadcrumbs::render('laporan-lct.show', $laporan) }}
-                    @elseif (Route::currentRouteName() === 'admin.manajemen-lct')
+                    @elseif (Route::currentRouteName() === 'admin.manajemen-lct.index')
                         {{ Breadcrumbs::render('manajemen-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.show')
                         {{ Breadcrumbs::render('manajemen-lct.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan')
+                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.index')
                         {{ Breadcrumbs::render('progress-perbaikan') }}
                     @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.show')
                         {{ Breadcrumbs::render('progress-perbaikan.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'admin.budget-approval')
+                    @elseif(Route::currentRouteName() === 'admin.budget-approval.index')
                         {{ Breadcrumbs::render('budget-approval') }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.show')
                         {{ Breadcrumbs::render('budget-approval.show', $laporan) }}
@@ -41,7 +49,7 @@
                         {{ Breadcrumbs::render('budget-approval-history') }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval-history.show')
                         {{ Breadcrumbs::render('budget-approval-history.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'admin.riwayat-lct')
+                    @elseif(Route::currentRouteName() === 'admin.riwayat-lct.index')
                         {{ Breadcrumbs::render('riwayat-lct') }}
                     @elseif(Route::currentRouteName() === 'admin.riwayat-lct.show')
                         {{ Breadcrumbs::render('riwayat-lct.show', $laporan) }}

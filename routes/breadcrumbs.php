@@ -17,7 +17,7 @@ Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
 // laporan lct
 Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('LCT Reports', route('admin.laporan-lct'));
+    $trail->push('LCT Reports', route('admin.laporan-lct.index'));
 });
 
 Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
@@ -29,7 +29,7 @@ Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan)
 // activity approval
 Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Approval', route('admin.budget-approval'));
+    $trail->push('Activity Approval', route('admin.budget-approval.index'));
 });
 
 // activity approval detail
@@ -41,7 +41,7 @@ Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $lapo
 // activity approval history
 Breadcrumbs::for('budget-approval-history', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Approval History', route('admin.budget-approval-history'));
+    $trail->push('Activity Approval History', route('admin.budget-approval-history.index'));
 });
 
 // activity approval history detail
@@ -53,7 +53,7 @@ Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trai
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Progress', route('admin.progress-perbaikan'));
+    $trail->push('Activity Progress', route('admin.progress-perbaikan.index'));
 });
 
 // progress perbaikan detail 
@@ -66,7 +66,7 @@ Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $l
 // laporan perbaikan lct
 Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('LCT Management', route('admin.manajemen-lct'));
+    $trail->push('LCT Management', route('admin.manajemen-lct.index'));
 });
 
 // laporan perbaikan lct detail
@@ -78,7 +78,7 @@ Breadcrumbs::for('manajemen-lct.show', function (BreadcrumbTrail $trail, $lapora
 // laporan riwayat lct
 Breadcrumbs::for('riwayat-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('LCT History', route('admin.riwayat-lct'));
+    $trail->push('LCT History', route('admin.riwayat-lct.index'));
 });
 
 Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan) {

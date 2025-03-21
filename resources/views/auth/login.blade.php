@@ -13,7 +13,7 @@
         <div class="md:flex md:items-center md:space-x-4 border-2 border-white/50 rounded-full py-4 px-6 bg-white/30 backdrop-blur-md w-full max-w-2xl mx-auto">
             <x-label for="npk" value="{{ __('NPK') }}" 
                 class="md:w-40 bg-white text-black font-bold text-2xl rounded-full px-6 py-3 flex items-center shadow-md tracking-wide" />
-            
+             
             <x-input id="npk" type="text" name="npk" :value="old('npk')" required autofocus 
                 placeholder="Masukkan NPK Anda"
                 class="w-full bg-transparent border-none focus:ring-white/50 focus:border-white placeholder-gray-600 text-black font-bold text-xl tracking-wide" />

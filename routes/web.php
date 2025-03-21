@@ -27,66 +27,81 @@ use App\Http\Controllers\ProgressPerbaikanController;
 // Route::get('/kirim-email', [LctReportController::class, 'kirimEmail']);
 
 Route::redirect('/', 'login');
-Route::middleware(['auth','verified', 'role:ehs,pic,manajer'])->group(function () {
+
+Route::middleware(['auth', 'verified'])->get('/choose-destination', function () {
+    return view('pages.choose-destination');
+})->name('choose-destination');
+
+
+// Middleware untuk Semua Role yang Dapat Akses Dashboard
+Route::middleware(['auth', 'verified', 'role:ehs,pic,manajer,user'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('/riwayat-lct', [RiwayatLctController::class, 'index'])->name('admin.riwayat-lct');
-    Route::get('/riwayat-lct/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('admin.riwayat-lct.show');
+    // Form Laporan LCT
+    Route::get('/report-form', [UserController::class, 'index'])->name('report-form');  
+    Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('laporan-lct.store');
+
+    // Progress Perbaikan
+    Route::prefix('progress-perbaikan')->name('admin.progress-perbaikan.')->group(function () {
+        Route::get('/', [ProgressPerbaikanController::class, 'index'])->name('index');
+        Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
+    });
+
+    // Riwayat LCT
+    Route::prefix('riwayat-lct')->name('admin.riwayat-lct.')->group(function () {
+        Route::get('/', [RiwayatLctController::class, 'index'])->name('index');
+        Route::get('/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('show');
+    });
 });
 
-// Middleware untuk Manajer & EHS 
+// Middleware untuk Manajer & EHS
 Route::middleware(['auth', 'verified', 'role:manajer,ehs'])->group(function () {
-    Route::get('/progress-perbaikan', [ProgressPerbaikanController::class, 'index'])->name('admin.progress-perbaikan');
-    Route::get('/progress-perbaikan/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('admin.progress-perbaikan.show');
-
-    Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct');
+    Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct.index');
     Route::get('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('admin.laporan-lct.show');
 
     Route::get('/manajemen-pic', [ManajemenPicController::class, 'index'])->name('admin.manajemen-pic');
 });
 
-
 // Middleware khusus Manajer
 Route::middleware(['auth', 'verified', 'role:manajer'])->group(function () {
-    Route::get('/budget-approval',[BudgetApprovalController::class, 'index'])->name('admin.budget-approval');
-    Route::get('/budget-approval/{id_laporan_lct}',[BudgetApprovalController::class, 'show'])->name('admin.budget-approval.show');
-    Route::post('/budget-approval/{id_laporan_lct}/approve',[BudgetApprovalController::class, 'approve'])->name('admin.budget-approval.approve');
-    Route::post('/budget-approval/{id_laporan_lct}/reject',[BudgetApprovalController::class, 'reject'])->name('admin.budget-approval.reject'); 
+    // Budget Approval
+    Route::prefix('budget-approval')->name('admin.budget-approval.')->group(function () {
+        Route::get('/', [BudgetApprovalController::class, 'index'])->name('index');
+        Route::get('/{id_laporan_lct}', [BudgetApprovalController::class, 'show'])->name('show');
+        Route::post('/{id_laporan_lct}/approve', [BudgetApprovalController::class, 'approve'])->name('approve');
+        Route::post('/{id_laporan_lct}/reject', [BudgetApprovalController::class, 'reject'])->name('reject');
+    });
 
-    Route::get('/budget-approval-history',[BudgetApprovalController::class, 'history'])->name('admin.budget-approval-history');
-    Route::get('/budget-approval-history/{id_laporan_lct}',[BudgetApprovalController::class, 'showHistory'])->name('admin.budget-approval-history.show');
+    // Budget Approval History (Menggunakan nama yang diinginkan)
+    Route::prefix('budget-approval-history')->name('admin.budget-approval-history.')->group(function () {
+        Route::get('/', [BudgetApprovalController::class, 'history'])->name('index');
+        Route::get('/{id_laporan_lct}', [BudgetApprovalController::class, 'showHistory'])->name('show');
+    });
 });
+
 
 // Middleware khusus EHS
 Route::middleware(['auth', 'verified', 'role:ehs'])->group(function () {
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('admin.laporan-lct.assignToPic');
 
-    Route::post('/progress-perbaikan/{id_laporan_lct}/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('admin.progress-perbaikan.approve');
-    Route::post('/progress-perbaikan/{id_laporan_lct}/reject', [ProgressPerbaikanController::class, 'rejectLaporan'])->name('admin.progress-perbaikan.reject');
-    Route::post('/progress-perbaikan/{id_laporan_lct}/close', [ProgressPerbaikanController::class, 'closeLaporan'])->name('admin.progress-perbaikan.close');
-
+    Route::prefix('progress-perbaikan/{id_laporan_lct}')->name('admin.progress-perbaikan.')->group(function () {
+        Route::post('/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('approve');
+        Route::post('/reject', [ProgressPerbaikanController::class, 'rejectLaporan'])->name('reject');
+        Route::post('/close', [ProgressPerbaikanController::class, 'closeLaporan'])->name('close');
+    });
 });
-
-
 
 // Middleware untuk PIC
-Route::middleware(['auth', 'verified', 'role:pic'])->group(function () {
-    Route::get('/manajemen-lct', [ManajemenLctController::class, 'index'])->name('admin.manajemen-lct');
-    Route::get('/manajemen-lct/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('admin.manajemen-lct.show');
-    Route::post('/manajemen-lct/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('admin.manajemen-lct.store');
-    Route::post('/manajemen-lct/{id_laporan_lct}/submitTaskBudget', [ManajemenLctController::class, 'submitTaskBudget'])->name('admin.manajemen-lct.submitTaskBudget');
+Route::middleware(['auth', 'verified', 'role:pic'])->prefix('manajemen-lct')->name('admin.manajemen-lct.')->group(function () {
+    Route::get('/', [ManajemenLctController::class, 'index'])->name('index');
+    Route::get('/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('show');
+    Route::post('/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('store');
+    Route::post('/{id_laporan_lct}/submitTaskBudget', [ManajemenLctController::class, 'submitTaskBudget'])->name('submitTaskBudget');
     
-    Route::post('/manajemen-lct/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('admin.manajemen-lct.storeTask');
-    Route::post('/manajemen-lct/{id_task}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('admin.manajemen-lct.updateStatus');
-
-
+    Route::post('/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('storeTask');
+    Route::post('/{id_task}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('updateStatus');
 });
 
-// Middleware untuk User
-Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
-    Route::get('/users', [UserController::class, 'index'])->name('users');
-    Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('laporan-lct.store');
-});  
 
 // Cek Koneksi Database
 Route::get('/test-db', function () {

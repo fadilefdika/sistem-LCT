@@ -23,17 +23,9 @@ class RouteServiceProvider extends ServiceProvider
             return '/login';
         }
 
-        // Load ulang user dari database agar trait HasRoles dapat dikenali
-        $user = User::find($user->id);
-
-        if ($user->hasRole('ehs') || $user->hasRole('pic') || $user->hasRole('manajer')) {
-            return '/dashboard';
-        } elseif ($user->hasRole('user')) {
-            return '/users';
-        }
-
-        return '/login';
+        return '/choose-destination'; // Arahkan ke halaman pemilihan tujuan
     }
+
 
 
 

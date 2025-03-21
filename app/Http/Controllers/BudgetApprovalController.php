@@ -60,7 +60,7 @@ class BudgetApprovalController extends Controller
     
             DB::commit(); 
             
-            return redirect()->route('admin.budget-approval-history')->with('success', 'Budget request has been approved.');
+            return redirect()->route('admin.budget-approval-history.index')->with('success', 'Budget request has been approved.');
         } catch (\Exception $e) {
             DB::rollBack(); // Kembalikan perubahan jika ada error
     

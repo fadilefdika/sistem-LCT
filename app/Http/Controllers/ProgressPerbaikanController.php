@@ -144,7 +144,7 @@ class ProgressPerbaikanController extends Controller
         $laporan->status_lct = 'closed';
         $laporan->save();
 
-        return redirect()->route('admin.riwayat-lct')->with('closed', 'The repair report has been successfully approved.');
+        return redirect()->route('admin.riwayat-lct.index')->with('closed', 'The repair report has been successfully approved.');
     }
 
 

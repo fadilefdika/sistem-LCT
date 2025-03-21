@@ -152,7 +152,7 @@ class LctReportController extends Controller
             
             Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
 
-            return redirect()->route('admin.progress-perbaikan')->with('success', 'The report has been successfully submitted to the PIC.');
+            return redirect()->route('admin.progress-perbaikan.index')->with('success', 'The report has been successfully submitted to the PIC.');
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();

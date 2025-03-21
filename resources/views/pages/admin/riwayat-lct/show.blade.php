@@ -1,14 +1,20 @@
 <x-app-layout>
     <div x-data="{ 
-        activeTab: '{{ in_array($laporan->status_lct, [
-            'approved', 'waiting_approval', 'revision', 
-            'waiting_approval_temporary', 'temporary_revision'
-        ]) ? 'pic' : (in_array($laporan->status_lct, [
-            'approved_temporary', 'taskbudget_revision', 
-            'waiting_approval_taskbudget', 'approved_taskbudget', 'approved_permanent', 'closed'
-        ]) ? 'task-pic' : 'user') }}' 
-    }"
-     class="px-5 pt-2">
+        activeTab: '{{ 
+            ($laporan->tingkat_bahaya === 'Low') ? 'pic' : 
+            (($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') ? 'task-pic' :
+                (in_array($laporan->status_lct, [
+                    'approved', 'waiting_approval', 'revision', 
+                    'waiting_approval_temporary', 'temporary_revision', 'closed'
+                ]) ? 'pic' : 
+                (in_array($laporan->status_lct, [
+                    'approved_temporary', 'taskbudget_revision', 
+                    'waiting_approval_taskbudget', 'approved_taskbudget', 'approved_permanent', 'closed'
+                ]) ? 'task-pic' : 'user'))
+            ) 
+        }}' 
+    }" class="px-5 pt-2">
+
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'user'" 

@@ -9,7 +9,7 @@ Route::prefix('auth')->group(function () {
     
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/user', function (Request $request) {
+        Route::get('/report-form', function (Request $request) {
             return response()->json($request->user());
         });
     });
