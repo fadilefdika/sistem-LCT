@@ -14,6 +14,11 @@
             <p class="font-bold">Permanent Approved</p>
             <p>Your task request has been permanently approved.</p>
         </div>
+    @elseif($laporan->status_lct === 'approved_temporary')
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            <p class="font-bold">Temporary & Permanent Task</p>
+            <p>Please complete this task within 2 days after the temporary approval.</p>
+        </div>
     @endif
 
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
@@ -41,14 +46,16 @@
                         <template x-for="(task, index) in tasks" :key="index">
                             <tr>
                                 <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
-                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
+                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'" placeholder="">
                             
                                 <!-- Task Name -->
                                 <td class="border">
                                     <input type="text" x-model="task.taskName"
                                         @click="addRow(index)"
                                         class="w-full border-gray-100"
-                                        :name="'tasks['+index+'][taskName]'">
+                                        :name="'tasks['+index+'][taskName]'"
+                                        placeholder="Create a New Task..."
+                                        >
                                 </td>
                         
                                 <!-- PIC Selection -->
@@ -72,7 +79,7 @@
                                     <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
                                 </td>
                                 <td class="border">
-                                    <input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'">
+                                    <input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'" placeholder="Notes (Optional)...">
                                 </td>
                                 <td class="border text-center">
                                     <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
@@ -112,7 +119,7 @@
                     >
                     
                     <!-- Hidden input untuk mengirimkan nilai ke controller -->
-                    <input type="hidden" name="estimatedBudget" :value="estimatedBudget">
+                    <input type="hidden" name="estimatedBudget" :value="estimatedBudget" required>
                 </div>
             
                 <!-- Pesan Error -->

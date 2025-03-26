@@ -29,7 +29,7 @@ class StoreLaporanRequest extends FormRequest
             'temuan_ketidaksesuaian' => 'required|string|max:1000', // Bisa disesuaikan dengan kebutuhan
             'rekomendasi_safety' => 'required|string|max:255',
             'bukti_temuan' => 'required|array|max:5', // Maksimal 5 file
-            'bukti_temuan.*' => 'required|file|image|mimes:webp,jpeg,png,jpg|max:2048', // Setiap file harus berupa gambar dengan ukuran maksimal 2MB
+            'bukti_temuan.*' => 'required|file|image|mimes:webp,jpeg,png,jpg|max:5012', // Setiap file harus berupa gambar dengan ukuran maksimal 2MB
         ];
         
     }
