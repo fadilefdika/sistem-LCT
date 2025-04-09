@@ -46,7 +46,7 @@ class LctReportController extends Controller
             return asset('storage/' . $path);
         });
 
-        // dd($departemen);
+        // dd($bukti_temuan);
 
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan', 'kategori'));
     }
@@ -55,7 +55,6 @@ class LctReportController extends Controller
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 
     { 
-        // dd($request->all(), $request->files->all());
         
         try {
             DB::beginTransaction(); // Mulai transaksi
@@ -71,8 +70,6 @@ class LctReportController extends Controller
             if (!$kategori) {
                 return redirect()->back()->with('error', 'Kategori tidak valid.');
             }
-
-            // dd($kategori->id);
     
             // Simpan gambar ke storage public
             $buktiFotoPaths = [];
@@ -90,20 +87,25 @@ class LctReportController extends Controller
             }
     
             // Simpan data ke database
-            LaporanLct::create([
+            $laporan = LaporanLct::create([
                 'id_laporan_lct' => $idLCT,
                 'user_id' => $user->id,
                 'tanggal_temuan' => $request->tanggal_temuan,
                 'area' => $request->area,
                 'detail_area' => $request->detail_area,
-                'kategori_id' => $kategori->id, // Simpan ID kategori, bukan nama
+                'kategori_id' => $kategori->id,
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'rekomendasi_safety' => $request->rekomendasi_safety,
-                'bukti_temuan' => json_encode($buktiFotoPaths), // Simpan sebagai JSON
+                'bukti_temuan' => json_encode($buktiFotoPaths),
                 'status_lct' => 'open',
             ]);
-    
+            
+            $laporan->load('user', 'kategori');
+            // Kirim email ke EHS
+            Mail::to('efdika1102@gmail.com')->queue(new LaporanKetidaksesuaian($laporan));
+            
             DB::commit(); // Simpan perubahan
+
             return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
     
         } catch (\Exception $e) {

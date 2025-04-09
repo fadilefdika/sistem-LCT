@@ -1,5 +1,69 @@
 <div class="bg-white dark:bg-gray-800 p-6 relative shadow-md sm:rounded-lg overflow-y-auto">
-    <div class="overflow-x-auto rounded-lg border border-gray-200">
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <!-- Date Range Selector -->
+        <div class="mb-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Select Report Period</label>
+            <div class="flex flex-wrap gap-3">
+                <select wire:model="rangeType"
+                        class="px-4 py-2 border border-gray-300 rounded-md text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-auto">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="semester">Semester</option>
+                    <option value="yearly">Yearly</option>
+                    {{-- <option value="custom">Custom Date Range</option> --}}
+                </select>
+        
+                {{-- @if($rangeType === 'custom')
+                    <div class="flex gap-3 w-full sm:w-auto">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Start Date</label>
+                            <input type="date" wire:model="startDate"
+                                   class="px-3 py-2 border rounded-md text-sm border-gray-300">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">End Date</label>
+                            <input type="date" wire:model="endDate"
+                                   class="px-3 py-2 border rounded-md text-sm border-gray-300">
+                        </div>
+                    </div>
+                @endif --}}
+            </div>
+        </div>
+        
+        <!-- Export Buttons with Clear Distinction -->
+        <div class="border-t pt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Export Reports</label>
+            <div class="flex flex-wrap gap-3">
+                <!-- PPT Button with PowerPoint styling -->
+                <div class="export-option ppt-option">
+                    <span class="block text-xs font-semibold text-orange-600 mb-1">Presentation Format</span>
+                    <button wire:click="exportToPPT"
+                            class="flex cursor-pointer items-center px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-md transition duration-200 shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                        </svg>
+                        Download PPT Report
+                    </button>
+                </div>
+                
+                <!-- Excel Button with Excel styling -->
+                <div class="export-option excel-option">
+                    <span class="block text-xs font-semibold text-green-600 mb-1">Data Format</span>
+                    <button wire:click="exportToExcel"
+                            class="flex cursor-pointer items-center px-4 py-2 text-sm font-medium text-white bg-green-500 hover:bg-green-600 rounded-md transition duration-200 shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        Export Excel Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="overflow-x-auto rounded-lg border border-gray-200"> 
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">

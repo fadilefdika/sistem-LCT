@@ -86,8 +86,20 @@ Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan)
     $trail->push("Detail LCT History #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
 });
 
-// laporan manajemen pic
-Breadcrumbs::for('manajemen-pic', function (BreadcrumbTrail $trail) {
+// laporan master data
+Breadcrumbs::for('master-data.role-data', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Master Data', route('admin.manajemen-pic'));
+    $trail->push('Role Data', route('admin.master-data.role-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('master-data.category-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Category Data', route('admin.master-data.category-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('master-data.department-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Department Data', route('admin.master-data.department-data.index'));
 });

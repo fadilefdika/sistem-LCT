@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use TaskBudgetApproved;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
+use App\Mail\RevisiLaporanLCT;
 use App\Models\BudgetApproval;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Mail\TaskBudgetRevisionMail;
+use Illuminate\Support\Facades\Mail;
 
 class BudgetApprovalController extends Controller
 {
@@ -56,14 +60,17 @@ class BudgetApprovalController extends Controller
             DB::beginTransaction(); // Mulai transaksi
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
-            $laporan = $laporan->update(['status_lct' => 'approved_taskbudget']);
-    
+            $laporan->update(['status_lct' => 'approved_taskbudget']);
+
+            // Kirim email ke user yang bersangkutan
+            Mail::to('efdika1102@gmail.com')->queue(new TaskBudgetApproved($laporan));
+
             DB::commit(); 
             
             return redirect()->route('admin.budget-approval-history.index')->with('success', 'Budget request has been approved.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Kembalikan perubahan jika ada error
-    
+            DB::rollBack();
+
             return redirect()->back()->with('error', 'An error occurred while approving the budget request.');
         }
     }
@@ -92,8 +99,17 @@ class BudgetApprovalController extends Controller
             $laporan->update([
                 'status_lct' => 'taskbudget_revision',
             ]);
-
+            
             DB::commit(); // Simpan perubahan
+            // Ambil alasan terbaru
+            $alasanReject = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
+            ->where('tipe_reject', 'budget_approval')
+            ->latest()
+            ->first();
+
+            // Kirim email ke PIC
+            Mail::to('efdika1102@gmail.com')->queue(new TaskBudgetRevisionMail($laporan, $alasanReject));
+
 
             return redirect()->back()->with('success', 'Budget request needs revision.');
         } catch (\Exception $e) {

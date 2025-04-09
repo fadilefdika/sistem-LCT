@@ -154,7 +154,7 @@
                                     
                                      <!-- Recommendation -->
                                      <div class="mb-4">
-                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Recommendation</label>
+                                        <label for="rekomendasi" class="block text-sm font-medium text-gray-700 mb-1">Recommendation <span class="text-red-500">*</span></label>
                                         <textarea class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="rekomendasi" name="rekomendasi" rows="4" required></textarea>
                                     </div>
 

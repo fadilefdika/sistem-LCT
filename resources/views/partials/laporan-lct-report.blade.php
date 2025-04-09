@@ -82,11 +82,13 @@
         <p class="text-gray-700 text-lg font-semibold">Non-Conformity Image</p>
         <div class="grid grid-cols-5 gap-2 mt-2">
             @foreach ($bukti_temuan->take(5) as $gambar)
+
                 <img src="{{ $gambar }}" 
                     class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
                     alt="Bukti Temuan"
                     onclick="openModal('{{ $gambar }}')">
             @endforeach
+
         </div>
     </div>
 

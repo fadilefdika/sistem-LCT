@@ -53,8 +53,12 @@
                         {{ Breadcrumbs::render('riwayat-lct') }}
                     @elseif(Route::currentRouteName() === 'admin.riwayat-lct.show')
                         {{ Breadcrumbs::render('riwayat-lct.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'admin.manajemen-pic')
-                        {{ Breadcrumbs::render('manajemen-pic') }}
+                    @elseif(Route::currentRouteName() === 'admin.master-data.role-data.index')
+                        {{ Breadcrumbs::render('master-data.role-data') }}
+                    @elseif(Route::currentRouteName() === 'admin.master-data.department-data.index')
+                        {{ Breadcrumbs::render('master-data.department-data') }}
+                    @elseif(Route::currentRouteName() === 'admin.master-data.category-data.index')
+                        {{ Breadcrumbs::render('master-data.category-data') }}
                     @endif
 
                 </div>

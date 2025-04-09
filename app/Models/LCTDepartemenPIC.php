@@ -1,20 +1,25 @@
 <?php
-
 namespace App\Models;
 
-use App\Models\LctDepartement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes; // Tambahkan ini
+use App\Models\LctDepartement;
+use App\Models\PIC;
 
 class LctDepartemenPic extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Gunakan SoftDeletes di sini
 
     protected $table = 'lct_departement_pic'; // Sesuaikan dengan nama tabel di database
 
-    public $timestamps = false; // Jika tabel tidak punya created_at & updated_at
+    protected $fillable = [
+        'departemen_id',
+        'pic_id',
+    ];
 
+    public $timestamps = false; // Jika tabel tidak punya created_at & updated_at
+    protected $dates = ['deleted_at'];
     // Relasi ke Departemen
     public function departemen()
     {

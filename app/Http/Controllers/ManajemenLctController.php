@@ -8,8 +8,11 @@ use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\BudgetApproval;
 use Illuminate\Support\Facades\DB;
+use App\Mail\LaporanHasilPerbaikan;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TaskBudgetApprovalRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AssignToEhsRequest;
 use Illuminate\Support\Facades\Validator;
@@ -118,6 +121,8 @@ class ManajemenLctController extends Controller
                 'bukti_perbaikan' => json_encode($buktiPerbaikan), // Simpan dalam format JSON
             ]);
 
+            Mail::to('efdika1102@gmail.com')->queue(new LaporanHasilPerbaikan($laporan));
+
             DB::commit();
 
             return redirect()->route('admin.manajemen-lct.index')->with('success', 'The repair results have been sent to EHS.');
@@ -194,6 +199,9 @@ class ManajemenLctController extends Controller
                 ->delete();
     
             DB::commit();
+            $laporan = LaporanLct::with(['picUser'])->find($id_laporan_lct);
+            $tasks = LctTasks::where('id_laporan_lct', $id_laporan_lct)->with('pic')->get();
+            Mail::to('efdika1102@gmail.com')->queue(new TaskBudgetApprovalRequest($laporan, $tasks));
     
             return redirect()->back()->with('success', 'Data saved successfully!');
         } catch (\Exception $e) {

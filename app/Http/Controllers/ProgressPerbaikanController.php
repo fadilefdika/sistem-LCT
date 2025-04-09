@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use ApprovalNotification;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
+use App\Mail\CloseNotification;
+use App\Mail\LaporanRevisiToPic;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 
 class ProgressPerbaikanController extends Controller
 {
@@ -76,6 +80,7 @@ class ProgressPerbaikanController extends Controller
         }
 
         $laporan->save();
+        Mail::to('efdika1102@gmail.com')->queue(new ApprovalNotification($laporan));
 
         return redirect()->back()->with('approve', 'The repair report has been successfully approved.');
     }
@@ -96,17 +101,14 @@ class ProgressPerbaikanController extends Controller
             // Tentukan status reject berdasarkan tingkat bahaya
             switch ($laporan->tingkat_bahaya) {
                 case 'Low':
-                    $laporan->status_lct = 'revision'; // Langsung ke revisi
+                    $laporan->status_lct = 'revision';
                     break;
 
                 case 'Medium':
                 case 'High':
-                    // Jika masih dalam tahap perbaikan sementara, set ke rejected_temporary
                     if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
                         $laporan->status_lct = 'temporary_revision';
-                    }
-                    // Jika sudah tahap perbaikan permanen, set ke rejected_permanent
-                    elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision'])) {
+                    } elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision'])) {
                         $laporan->status_lct = 'permanent_revision';
                     }
                     break;
@@ -117,22 +119,38 @@ class ProgressPerbaikanController extends Controller
 
             $laporan->save();
 
+            // Tentukan tipe reject berdasarkan status_lct SEKARANG
+            $tipeReject = match ($laporan->status_lct) {
+                'revision' => 'lct_perbaikan_low',
+                'temporary_revision' => 'lct_perbaikan_temporary',
+                default => 'lct_perbaikan_unknown',
+            };
+
             // Simpan alasan ke tabel lct_laporan_reject
             RejectLaporan::create([
                 'id_laporan_lct' => $id_laporan_lct,
                 'alasan_reject' => $request->alasan_reject,
+                'tipe_reject' => $tipeReject, // 🛠️ TAMBAHKAN INI!
             ]);
 
-            DB::commit(); // ✅ Simpan perubahan ke database sebelum redirect
+            // Ambil alasan revisi berdasarkan tipe reject
+            $alasanRevisi = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
+                ->where('tipe_reject', $tipeReject)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Kirim email ke user pelapor
+            Mail::to('efdika1102@gmail.com')->queue(new LaporanRevisiToPic($laporan, $alasanRevisi));
+
+            DB::commit();
 
             return redirect()->back()->with('reject', 'The revision report has been successfully sent to the PIC.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua perubahan jika ada error
+            DB::rollBack();
             return response()->json(['error' => 'Terjadi kesalahan saat menolak laporan.', 'message' => $e->getMessage()], 500);
         }
     }
 
-    
     public function closeLaporan($id_laporan_lct)
     {
         // dd("masuk close");
@@ -143,6 +161,8 @@ class ProgressPerbaikanController extends Controller
         }
         $laporan->status_lct = 'closed';
         $laporan->save();
+
+        Mail::to('efdika1102@gmail.com')->queue(new CloseNotification($laporan));
 
         return redirect()->route('admin.riwayat-lct.index')->with('closed', 'The repair report has been successfully approved.');
     }

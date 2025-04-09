@@ -26,7 +26,7 @@ class LaporanDikirimKePic extends Mailable
      */
     public function build()
     {
-        return $this->subject('Laporan Ketidaksesuaian Dikirim ke PIC')
-                    ->view('emails.laporan_ke_pic');
+        return $this->subject('🔧 LCT Repair Result Report')
+                ->view('emails.laporan_ke_pic');
     }
 }
