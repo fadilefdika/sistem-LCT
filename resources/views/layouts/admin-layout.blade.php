@@ -60,7 +60,7 @@
                 x-ref="contentarea"
                 :class="{ 
                     'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show','admin.progress-perbaikan.show'].includes(page), 
-                    'overflow-y-auto': ['admin.dashboard','admin.progress-perbaikan.index','admin.master-data.role-data.index','admin.master-data.department-data.index','admin.master-data.category-data.index','admin.manajemen-lct.index','admin.laporan-lct.index','admin.riwayat-lct.index','admin.budget-approval','admin.budget-approval.show','admin.budget-approval-history.show','admin.master-data','admin.budget-approval-history'].includes(page) 
+                    'overflow-y-auto': ['admin.dashboard','admin.progress-perbaikan.index','admin.master-data.role-data.index','admin.master-data.department-data.index','admin.master-data.category-data.index','admin.manajemen-lct.index','admin.laporan-lct.index','admin.riwayat-lct.index','admin.budget-approval.index','admin.budget-approval.show','admin.budget-approval-history.show','admin.master-data','admin.budget-approval-history.index'].includes(page) 
                 }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />

@@ -22,7 +22,7 @@ Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('laporan-lct');
-    $trail->push("Detail LCT Report #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
+    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
 });
 
 
@@ -35,7 +35,7 @@ Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
 // activity approval detail
 Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval');
-    $trail->push("Detail Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
+    $trail->push("Activity Approval #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
 // activity approval history
@@ -47,7 +47,7 @@ Breadcrumbs::for('budget-approval-history', function (BreadcrumbTrail $trail) {
 // activity approval history detail
 Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval-history');
-    $trail->push("Detail History Activity Approval LCT #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
+    $trail->push("History Approval #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
 });
 
 // progress perbaikan
@@ -59,7 +59,7 @@ Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Detail Activity Progress LCT #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Activity Progress #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
 });
 
 
@@ -72,7 +72,7 @@ Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
 // laporan perbaikan lct detail
 Breadcrumbs::for('manajemen-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('manajemen-lct');
-    $trail->push("Detail LCT Report #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
+    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
 });
 
 // laporan riwayat lct
@@ -83,7 +83,7 @@ Breadcrumbs::for('riwayat-lct', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('riwayat-lct');
-    $trail->push("Detail LCT History #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
+    $trail->push("LCT History #{$laporan->id_laporan_lct}", route('admin.riwayat-lct.show', $laporan));
 });
 
 // laporan master data

@@ -40,7 +40,7 @@
         </div>
 
         <!-- Links -->
-        <div class="space-y-8">
+        <div class="space-y-8 mb-6">
             <!-- Pages group -->
             <div>
                 <h3 class="text-xs uppercase text-gray-400 dark:text-gray-900 font-semibold pl-3">
@@ -120,7 +120,7 @@
                     @endrole
 
                     <!-- Progress Perbaikan -->
-                    @hasanyrole(['ehs', 'manajer'])
+                    @hasanyrole(['ehs', 'manajer','user'])
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
                         <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.progress-perbaikan.index') }}">
                             <div class="flex items-center">

@@ -2,7 +2,7 @@
     @php
         $user = auth()->user();
         $canAccessDashboard = $user && ($user->hasRole('ehs') || $user->hasRole('pic') || $user->hasRole('manajer') || $user->hasRole('user'));
-        $canAccessLctReportForm = $user && ($user->hasRole('ehs') || $user->hasRole('pic') || $user->hasRole('manajer'));
+        $canAccessLctReportForm = $user && ($user->hasRole('ehs') || $user->hasRole('pic') || $user->hasRole('manajer')|| $user->hasRole('user'));
     @endphp
 
     <div class="container mx-auto flex flex-col items-center justify-center min-h-screen text-center">

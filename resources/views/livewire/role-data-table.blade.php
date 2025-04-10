@@ -2,75 +2,77 @@
     <!-- Add PIC Button -->
     <div class="flex justify-between items-center">
         <h2 class="text-xl font-semibold text-gray-700">Manage PIC</h2>
-        <button id="openModal" class="bg-blue-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-blue-700 transition-all cursor-pointer">
+        <button id="openModal" class="bg-blue-600 text-white py-2 px-4 text-xs rounded-lg shadow-sm hover:bg-blue-700 transition-all cursor-pointer">
             + Add PIC
         </button>
     </div>
 
     <!-- Table -->
-    <div class="rounded-lg border border-gray-300 overflow-hidden">
-        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead class="bg-gray-100 text-gray-600 text-sm font-semibold border-b border-gray-300">
-                <tr>
-                    <th class="py-3 px-4">No</th>
-                    <th class="py-3 px-4">Name</th>
-                    <th class="py-3 px-4">Email</th>
-                    <th class="py-3 px-4">Department</th>
-                    <th class="py-3 px-4 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white text-sm">
-                @foreach($data as $index => $row)
-                    <tr class="hover:bg-gray-50 transition duration-200 ease-in-out">
-                        <td class="py-3 px-4 text-gray-800">{{ $pics->firstItem() + $index }}</td>
-                        <td class="py-3 px-4 text-gray-800">{{ $row['user_name'] }}</td>
-                        <td class="py-3 px-4 text-gray-600">{{ $row['user_email'] }}</td>
-                        <td class="py-3 px-4 text-gray-600">{{ $row['departments'] }}</td>
-                        <td class="py-3 px-4 text-center">
-                            <div class="flex justify-center gap-2">
-                                <!-- Tombol Edit -->
-                                <button onclick="openModal(true, {
-                                    id: {{ $row['id'] ?? 'null' }},
-                                    pic_id: {{ $row['pic_id'] ?? 'null' }},
-                                    department_id: {{ $row['department_id'] ?? 'null' }},
-                                    department_name: '{{ $row['departments'] ?? '' }}',
-                                    user_id: {{ $row['user_id'] ?? 'null' }},
-                                    user_name: '{{ $row['user_name'] ?? '' }}',
-                                })"
-                                class="flex items-center gap-1 text-blue-600 border border-blue-600 rounded-md px-3 py-1.5 transition-all duration-200 ease-in-out 
-                                    hover:bg-blue-600 hover:text-white hover:shadow-md hover:scale-105 cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536l-10.036 10.036H7v-3.036L16.464 3.464z" />
-                                    </svg>
-                                    Edit
-                                </button>                                
-                                <!-- Tombol Delete -->
-                                <button onclick="deletePic({{ $row['id'] }})"
-                                class="flex items-center gap-1 text-red-600 border border-red-600 rounded-md px-3 py-1.5 transition-all duration-200 ease-in-out 
-                                    hover:bg-red-600 hover:text-white hover:shadow-md hover:scale-105 cursor-pointer"
-                                    data-id="{{ $row['id'] }}" 
-                                    aria-label="Delete">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Delete
-                                </button>
-                            </div>
-                        </td>
+    <div class="border border-gray-300 rounded-lg overflow-hidden">
+        <div class="overflow-x-auto rounded-lg border border-gray-300 overflow-hidden"> 
+            <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100 text-gray-600 text-sm font-semibold border-b border-gray-300">
+                    <tr>
+                        <th class="py-3 px-4">No</th>
+                        <th class="py-3 px-4">Name</th>
+                        <th class="py-3 px-4">Email</th>
+                        <th class="py-3 px-4">Department</th>
+                        <th class="py-3 px-4 text-center">Actions</th>
                     </tr>
-                @endforeach
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white text-sm">
+                    @foreach($data as $index => $row)
+                        <tr class="hover:bg-gray-50 transition duration-200 ease-in-out">
+                            <td class="py-3 px-4 text-gray-800">{{ $pics->firstItem() + $index }}</td>
+                            <td class="py-3 px-4 text-gray-800">{{ $row['user_name'] }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $row['user_email'] }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $row['departments'] }}</td>
+                            <td class="py-3 px-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <!-- Tombol Edit -->
+                                    <button onclick="openModal(true, {
+                                        id: {{ $row['id'] ?? 'null' }},
+                                        pic_id: {{ $row['pic_id'] ?? 'null' }},
+                                        department_id: {{ $row['department_id'] ?? 'null' }},
+                                        department_name: '{{ $row['departments'] ?? '' }}',
+                                        user_id: {{ $row['user_id'] ?? 'null' }},
+                                        user_name: '{{ $row['user_name'] ?? '' }}',
+                                    })"
+                                    class="flex items-center gap-1 text-blue-600 border border-blue-600 rounded-md px-3 py-1.5 transition-all duration-200 ease-in-out 
+                                        hover:bg-blue-600 hover:text-white hover:shadow-md hover:scale-105 cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536l-10.036 10.036H7v-3.036L16.464 3.464z" />
+                                        </svg>
+                                        Edit
+                                    </button>                                
+                                    <!-- Tombol Delete -->
+                                    <button onclick="deletePic({{ $row['id'] }})"
+                                    class="flex items-center gap-1 text-red-600 border border-red-600 rounded-md px-3 py-1.5 transition-all duration-200 ease-in-out 
+                                        hover:bg-red-600 hover:text-white hover:shadow-md hover:scale-105 cursor-pointer"
+                                        data-id="{{ $row['id'] }}" 
+                                        aria-label="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
 
-            </tbody>            
-        </table>
-        
-        
+                </tbody>            
+            </table>
+            
+            
+        </div>
         <!-- Pagination -->
         <div class="mt-4 flex justify-between items-center border-t px-5 py-3 text-gray-600 text-sm">
             <span>Showing {{ $pics->firstItem() }} to {{ $pics->lastItem() }} of {{ $pics->total() }} entries</span>
             <div>{{ $pics->links('pagination::tailwind') }}</div>
         </div>
-    </div>
 
+    </div>
     <!-- Modal Tambah/Edit PIC -->
 <div id="picModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
     <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">

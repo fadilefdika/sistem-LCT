@@ -1,51 +1,54 @@
 <div class="overflow-x-auto bg-white p-4 shadow-sm rounded-lg border border-gray-200">
     <div class="flex justify-between items-center mb-3">
         <h2 class="text-lg font-medium text-gray-800">Department List</h2>
-        <button id="openModal" class="bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-500 transition cursor-pointer">
+        <button id="openModal" class="bg-blue-600 text-white text-xs py-2 px-3 rounded-md hover:bg-blue-500 transition cursor-pointer">
             + Add Department
         </button>        
     </div>
 
-    <div class="rounded-lg border border-gray-200">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 text-gray-700 text-sm font-medium">
-                <tr>
-                    <th class="py-2 px-4 text-left">No</th>
-                    <th class="py-2 px-4 text-left">Manajer Name</th>
-                    <th class="py-2 px-4 text-left">Department Name</th>
-                    <th class="py-2 px-4 text-center">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white text-sm">
-                @foreach ($departments as $index => $department)
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="py-3 px-4">{{ ($departments->currentPage() - 1) * $departments->perPage() + $index + 1 }}</td>
-                        <td class="py-3 px-4">{{ optional($department->user)->fullname ?? '-' }}</td>
-                        <td class="py-3 px-4">{{ $department->nama_departemen }}</td>
-                        <td class="py-3 px-4 text-center">
-                            <div class="flex justify-center space-x-2">
-                                <button onclick="openModal(true, {
-                                    id: {{ $department->id }},
-                                    nama_departemen: '{{ $department->nama_departemen }}',
-                                    user_id: '{{ $department->user_id }}',
-                                    manager_name: '{{ $department->user->fullname ?? '' }}'
-                                })"
-                                    class="bg-yellow-500 text-white py-1.5 px-3 rounded hover:bg-yellow-400 transition text-xs cursor-pointer">
-                                    ✏️ Edit
-                                </button>
-                            
-                                <button onclick="deleteDepartment({{ $department->id }})"
-                                    class="bg-red-500 text-white py-1.5 px-3 rounded hover:bg-red-400 transition text-xs cursor-pointer">
-                                    🗑️ Delete
-                                </button>
-                                
-                            </div>                            
-                        </td>
+    
+    <div class="border border-gray-300 rounded-lg overflow-hidden">
+        <div class="rounded-lg overflow-x-auto border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 text-gray-700 text-sm font-medium">
+                    <tr>
+                        <th class="py-2 px-4 text-left">No</th>
+                        <th class="py-2 px-4 text-left">Manajer Name</th>
+                        <th class="py-2 px-4 text-left">Department Name</th>
+                        <th class="py-2 px-4 text-center">Action</th>
                     </tr>
-                @endforeach
-            </tbody>            
-        </table>
-        
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white text-sm">
+                    @foreach ($departments as $index => $department)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-3 px-4">{{ ($departments->currentPage() - 1) * $departments->perPage() + $index + 1 }}</td>
+                            <td class="py-3 px-4">{{ optional($department->user)->fullname ?? '-' }}</td>
+                            <td class="py-3 px-4">{{ $department->nama_departemen }}</td>
+                            <td class="py-3 px-4 text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <button onclick="openModal(true, {
+                                        id: {{ $department->id }},
+                                        nama_departemen: '{{ $department->nama_departemen }}',
+                                        user_id: '{{ $department->user_id }}',
+                                        manager_name: '{{ $department->user->fullname ?? '' }}'
+                                    })"
+                                        class="bg-yellow-500 text-white py-1.5 px-3 rounded hover:bg-yellow-400 transition text-xs cursor-pointer">
+                                        ✏️ Edit
+                                    </button>
+                                
+                                    <button onclick="deleteDepartment({{ $department->id }})"
+                                        class="bg-red-500 text-white py-1.5 px-3 rounded hover:bg-red-400 transition text-xs cursor-pointer">
+                                        🗑️ Delete
+                                    </button>
+                                    
+                                </div>                            
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>            
+            </table>
+            
+        </div>
         <div class="mt-3 flex flex-col sm:flex-row justify-between items-center border-t px-4 py-3 text-gray-700 text-sm">
             <span>Showing {{ $departments->firstItem() }} - {{ $departments->lastItem() }} of {{ $departments->total() }} records</span>
             <div class="mt-2 sm:mt-0">{{ $departments->links('pagination::tailwind') }}</div>

@@ -12,12 +12,12 @@
                    id="budget_amount" 
                    value="{{ old('budget_amount', number_format($budget->budget ?? 0, 0, ',', '.')) }}" 
                    required 
-                   placeholder="Masukkan jumlah budget (contoh: 1.000.000)"
+                   placeholder="Enter the budget amount (contoh: 1.000.000)"
                    class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
                    aria-describedby="budget_help"
                    oninput="formatNumberInput(this)">
             <p id="budget_help" class="text-sm text-gray-500 mt-1">
-                Masukkan jumlah dalam format angka tanpa simbol mata uang.
+                Enter the amount in numeric format without currency symbols.
             </p>
         </div>     
 

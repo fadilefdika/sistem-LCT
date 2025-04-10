@@ -1,12 +1,14 @@
 <div class="overflow-x-auto bg-white p-4 shadow-sm rounded-lg border border-gray-200">
     <div class="flex justify-between items-center mb-3">
         <h2 class="text-lg font-medium text-gray-800">Category List</h2>
-        <button id="openModal" class="bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-500 transition cursor-pointer">
+        <button id="openModal" class="bg-blue-600 text-white py-2 px-3 text-xs rounded-md hover:bg-blue-500 transition cursor-pointer">
             + Add Category
         </button>        
     </div>
+    
 
-    <div class="rounded-lg border border-gray-200">
+    <div class="border border-gray-300 rounded-lg overflow-hidden">
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full table-auto text-sm text-left text-gray-700">
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                 <tr>
@@ -47,11 +49,13 @@
         </table>
         
 
+    </div>
     <div class="mt-3 flex flex-col sm:flex-row justify-between items-center border-t px-4 py-3 text-gray-700 text-sm">
         <span>Showing {{ $categories->firstItem() }} - {{ $categories->lastItem() }} of {{ $categories->total() }} records</span>
         <div class="mt-2 sm:mt-0">{{ $categories->links('pagination::tailwind') }}</div>
     </div> 
     </div>
+
     <!-- Modal Tambah/Edit Category -->
     <div id="categoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
         <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">

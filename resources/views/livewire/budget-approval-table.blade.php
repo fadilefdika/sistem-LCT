@@ -1,9 +1,6 @@
 <div class="bg-white p-6 shadow-sm rounded-xl">
 
-    
-    
-    <!-- Tabel (Notion-style) -->
-    <div class="overflow-hidden rounded-lg border border-gray-200">
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
@@ -62,7 +59,7 @@
                                 <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
                                 </svg>
-                                <p class="text-sm">Tidak ada data budget request yang tersedia.</p>
+                                <p class="text-sm">No budget request data available.</p>
                             </div>
                         </td>
                     </tr>

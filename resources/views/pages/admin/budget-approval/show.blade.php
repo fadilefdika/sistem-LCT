@@ -126,7 +126,7 @@
                     @csrf
                     <textarea name="alasan_reject" rows="3" 
                         class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
-                        placeholder="Masukkan alasan penolakan..." required></textarea>
+                        placeholder="Enter reason for rejection..." required></textarea>
         
                     <button type="submit" formaction="{{ route('admin.budget-approval.reject', $taskBudget->id_laporan_lct) }}" 
                         class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition cursor-pointer">

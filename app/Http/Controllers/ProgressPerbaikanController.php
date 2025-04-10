@@ -160,6 +160,7 @@ class ProgressPerbaikanController extends Controller
             return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
         }
         $laporan->status_lct = 'closed';
+        $laporan->date_closed = Carbon::now();
         $laporan->save();
 
         Mail::to('efdika1102@gmail.com')->queue(new CloseNotification($laporan));
