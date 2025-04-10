@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\LaporanLct;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ProgressPerbaikanTable extends Component
 {
@@ -16,40 +17,52 @@ class ProgressPerbaikanTable extends Component
 
     private function filterData()
     {
-        return LaporanLct::whereIn('status_lct', [
-            // Status dalam tahap pengerjaan
+        $user = Auth::user();
+        $roleName = optional($user->roleLct->first())->name;
+
+        $query = LaporanLct::whereIn('status_lct', [
             'in_progress', 
             'progress_work', 
-        
-            // Status terkait approval/revisi
             'waiting_approval', 
             'approved', 
             'revision',
-        
-            // Status terkait persetujuan sementara (temporary)
             'waiting_approval_temporary', 
             'approved_temporary', 
             'temporary_revision',
-        
-            // Status terkait task budget
             'approved_taskbudget',
             'waiting_approval_taskbudget', 
             'taskbudget_revision',
-        
-            // Status terkait pengerjaan permanen
             'work_permanent', 
             'waiting_approval_permanent', 
             'approved_permanent', 
             'permanent_revision'
-        ])        
-        ->when($this->riskLevel, fn($query) => $query->where('tingkat_bahaya', $this->riskLevel))
-        ->when($this->statusLct, function ($query) {
-            $statuses = explode(',', $this->statusLct); 
-            return $query->whereIn('status_lct', $statuses);
-        })
-        ->latest() 
-        ->paginate(10);
+        ]);
+
+        // Filter berdasarkan peran
+        if ($roleName === 'user') {
+            $query->where('user_id', $user->id);
+        }elseif ($roleName === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+        
+            if ($departemenId) {
+                $query->where('departemen_id', $departemenId);
+            } else {
+                $query->whereRaw('1 = 0'); // biar kosong kalau gak ketemu
+            }
+        }
+        
+        // EHS tidak dibatasi apa pun
+
+        // Filter tambahan jika ada
+        $query->when($this->riskLevel, fn($q) => $q->where('tingkat_bahaya', $this->riskLevel));
+        $query->when($this->statusLct, function ($q) {
+            $statuses = explode(',', $this->statusLct);
+            return $q->whereIn('status_lct', $statuses);
+        });
+
+        return $query->latest()->paginate(10);
     }
+
 
     public function updatedRiskLevel($value)
     {
@@ -67,7 +80,6 @@ class ProgressPerbaikanTable extends Component
         $this->statusLct = '';
         $this->resetPage();
     }
-
 
     public function render()
     {

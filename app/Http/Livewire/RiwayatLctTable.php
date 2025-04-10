@@ -27,32 +27,39 @@ class RiwayatLctTable extends Component
 
     public function render()
     {
-        // Mengambil user dengan relasi roleLct
         $user = User::with('roleLct')->find(Auth::id());
-
-        // Ambil satu role jika roleLct hasMany
         $role = optional($user->roleLct->first())->name;
 
-        if ($role === 'ehs' || $role === 'manajer') {
-            // Jika role-nya "ehs", ambil semua laporan dengan status "closed"
-            $laporans = LaporanLct::where('status_lct', 'closed')
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
-        } else {
-            // Jika bukan "ehs", ambil laporan berdasarkan pic_id masing-masing
-            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+        $query = LaporanLct::where('status_lct', 'closed');
 
-            $laporans = LaporanLct::where('status_lct', 'closed')
-                ->where('pic_id', $picId)
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+        if ($role === 'user') {
+            $query->where('user_id', $user->id);
+        } elseif ($role === 'manajer') {
+            // Ambil departemen yang di-manage oleh user ini
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+    
+            // Filter berdasarkan departemen_id
+            if ($departemenId) {
+                $query->where('departemen_id', $departemenId);
+            } else {
+                // Jika tidak ditemukan, pastikan tidak ada data yang tampil
+                $query->whereRaw('1 = 0');
+            }
+    
+        } elseif (!in_array($role, ['ehs'])) {
+            // Fallback jika bukan ehs, manajer, atau user
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+            $query->where('pic_id', $picId);
         }
+
+        $laporans = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('livewire.riwayat-lct-table', [
             'laporans' => $laporans,
-            'role' => $role
+            'role' => $role,
         ]);
     }
+
 
     public function exportToPPT()
     {

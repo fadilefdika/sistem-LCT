@@ -74,7 +74,7 @@ return [
     |
     */
 
-    'home' => fn() => RouteServiceProvider::home(),
+    'home' => [RouteServiceProvider::class, 'home'],
 
     /*
     |--------------------------------------------------------------------------

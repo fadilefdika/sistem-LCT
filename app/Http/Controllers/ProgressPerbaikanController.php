@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use ApprovalNotification;
+use App\Mail\ApprovalNotification;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;

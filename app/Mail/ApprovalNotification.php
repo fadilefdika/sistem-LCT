@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Mail;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +19,7 @@ class ApprovalNotification extends Mailable
 
     public function build()
     {
-        return $this->subject('Approval Notification - Laporan Perbaikan')
-                    ->view('emails.approval_notification');
+        return $this->subject('New Nonconformity Report Submitted')
+                    ->view('emails.approval_notification'); // Ganti dengan path view kamu
     }
 }

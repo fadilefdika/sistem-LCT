@@ -37,18 +37,16 @@
                         <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Risk Level</td>
                         <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->tingkat_bahaya }}</td>
                     </tr>                    
-                    <tr bgcolor="#f9f9f9">
-                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Repair Actions</td>
-                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->tindakan_perbaikan }}</td>
-                    </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Completion Date</td>
-                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->tanggal_selesai }}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->date_completion }}</td>
                     </tr>
-                    <tr bgcolor="#f9f9f9">
-                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Notes</td>
-                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->catatan }}</td>
-                    </tr>
+                    @if ($laporan->bukti_perbaikan)
+                        <div style="margin-top: 20px;">
+                            <p style="font-size: 14px; font-weight: bold; color: #333;">📷 Repair Photo:</p>
+                            <img src="{{ asset('storage/' . $laporan->foto_perbaikan) }}" alt="Repair Photo" style="max-width: 100%; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    @endif
                 </tbody>
             </table>
         </div>
@@ -56,9 +54,9 @@
         <!-- Link to Detailed Report -->
         <div style="margin-top: 20px;">
             <p style="font-size: 14px; font-weight: bold; color: #333;">🔗 Report Details:</p>
-            <a href="{{ url('/manajemen-lct/' . $laporan->id_laporan_lct) }}" 
+            <a href="{{ url('/progress-perbaikan/' . $laporan->id_laporan_lct) }}" 
                style="font-size: 14px; color: #007BFF; text-decoration: underline; word-wrap: break-word;">
-                {{ url('/manajemen-lct/' . $laporan->id_laporan_lct) }}
+                {{ url('/progress-perbaikan/' . $laporan->id_laporan_lct) }}
             </a>
         </div>
 
