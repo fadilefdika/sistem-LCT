@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verified', 'role:ehs,pic,manajer,user'])->group(func
 Route::middleware(['auth', 'verified', 'role:manajer,ehs'])->group(function () {
     Route::get('/laporan-lct', [LctReportController::class, 'index'])->name('admin.laporan-lct.index');
     Route::get('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('admin.laporan-lct.show');
+    Route::delete('/laporan-lct/{id_laporan_lct}', [LctReportController::class, 'destroy'])->name('admin.laporan-lct.destroy');
 
     Route::get('/master-data/role-data', [RoleDataController::class,'index'])->name('admin.master-data.role-data.index');
 

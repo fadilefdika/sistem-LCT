@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LaporanLct extends Model
 {
+    use HasFactory, SoftDeletes;
     protected $table = 'lct_laporan'; // Pastikan sesuai dengan tabel di database
     protected $primaryKey = 'id';
     protected $fillable = [

@@ -34,7 +34,7 @@
                         <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->temuan_ketidaksesuaian }}</td>
                     </tr>
                     <tr>
-                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Risk Level</td>
+                        <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Hazard Level</td>
                         <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->tingkat_bahaya }}</td>
                     </tr>                    
                     <tr>

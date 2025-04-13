@@ -26,7 +26,7 @@
     
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Risk Level</h3>
+                    <h3 class="text-lg font-semibold text-gray-800">Hazard Level</h3>
                     <span class="inline-block px-3 py-1 text-sm font-medium text-white rounded-lg
                         {{ $taskBudget->tingkat_bahaya == 'High' ? 'bg-red-500' : 'bg-yellow-500' }}">
                         {{ ucfirst($taskBudget->tingkat_bahaya) }}

@@ -4,9 +4,9 @@
         
         <!-- Filter Tingkat Bahaya -->
         <div class="flex flex-col" style="min-width: 180px;">
-            <label class="form-label fw-bold text-muted mb-1">Risk Level</label>
+            <label class="form-label fw-bold text-muted mb-1">Hazard Level</label>
             <select wire:model="riskLevel" wire:change="applyFilter" class="form-select">
-                @foreach (['' => 'All Risk Level', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
+                @foreach (['' => 'All Hazard Level', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
             </select>
@@ -53,7 +53,7 @@
                     <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">Non-Conformity Findings</th>
                     <th class="px-4 py-3">SVP Name</th>
-                    <th class="px-4 py-3">Risk Level</th>
+                    <th class="px-4 py-3">Hazard Level</th>
                     <th class="px-4 py-3">Progress Status</th>
                     <th class="px-4 py-3">Tracking Status</th>
                     <th class="px-4 py-3">Due Date</th>

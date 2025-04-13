@@ -221,7 +221,7 @@
                 'text-yellow-500 fa-exclamation-triangle': level === 'Medium',
                 'text-red-500 fa-skull-crossbones': level === 'High'
             }" class="fa-solid text-lg"></i>
-            <p class="text-gray-500 text-xs">Risk Level</p>
+            <p class="text-gray-500 text-xs">Hazard Level</p>
         </div>
         <p :class="{
             'bg-green-100 text-green-900 hover:bg-green-200': level === 'Low',

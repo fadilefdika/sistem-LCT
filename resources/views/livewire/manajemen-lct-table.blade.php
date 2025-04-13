@@ -7,7 +7,7 @@
                     <th scope="col" class="px-4 py-3">No</th>
                     <th scope="col" class="px-4 py-3">Non-Conformity Findings</th>
                     <th scope="col" class="px-4 py-3">Area Details</th>
-                    <th scope="col" class="px-4 py-3">Risk Level</th>
+                    <th scope="col" class="px-4 py-3">Hazard Level</th>
                     <th scope="col" class="px-4 py-3">Due Date</th>
                     <th scope="col" class="px-4 py-3">Progress Status</th>
                     <th scope="col" class="px-4 py-3">Tracking Status</th>

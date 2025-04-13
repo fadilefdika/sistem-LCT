@@ -82,11 +82,33 @@
                     </td>
             
                     <!-- Aksi -->
-                    <td class="px-4 py-3 text-center w-24">
-                        <div class="flex items-center justify-center">
-                            <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}" class="text-blue-600 hover:underline">
+                    <td class="px-4 py-3 text-center w-32">
+                        <div class="flex flex-row items-center justify-center space-x-3">
+                            <!-- Tombol Detail -->
+                            <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}"
+                            class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
                                 Detail
                             </a>
+
+                            <!-- Tombol Delete -->
+                            <a href="javascript:void(0)" 
+                            class="text-red-600 hover:text-red-800 hover:underline flex items-center gap-1 delete-laporan" 
+                            data-id="{{ $laporan->id_laporan_lct }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                Delete
+                            </a>
+
+
+
                         </div>
                     </td>
                     
@@ -137,3 +159,53 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.delete-laporan').forEach(btn => {
+        btn.addEventListener('click', () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This report will be deleted and cannot be recovered.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/laporan-lct/${btn.dataset.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Failed to delete");
+                        return res.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 2000, // Modal auto-close in 2 seconds
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.reload(); // Refresh after success
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops!',
+                            text: 'Something went wrong while deleting.'
+                        });
+                    });
+                }
+            });
+        });
+    });
+</script>
+

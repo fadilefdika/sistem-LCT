@@ -51,6 +51,19 @@ class LctReportController extends Controller
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan', 'kategori'));
     }
 
+    public function destroy($id_laporan_lct)
+    {
+        $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+
+        // Tidak perlu hapus file kalau belum mau delete permanen
+        // Bisa dihapus saat force delete nanti
+
+        $laporan->delete(); // ini hanya mengisi kolom deleted_at
+
+        return response()->json(['message' => 'Report successfully deleted']);
+    }
+
+
 
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 

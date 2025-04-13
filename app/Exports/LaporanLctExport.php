@@ -33,7 +33,7 @@ class LaporanLctExport implements FromCollection, WithHeadings
                 'Location' => $laporan->lokasi_temuan ?? '-',
                 'Due Date' => $laporan->due_date ?? '-',
                 'SVP Name' => $laporan->picUser->fullname ?? '-',
-                'Risk Level' => $laporan->tingkat_bahaya,
+                'Hazard Level' => $laporan->tingkat_bahaya,
                 'Completion Date' => $laporan->date_completion ?? '-',
             ];
         });
@@ -50,7 +50,7 @@ class LaporanLctExport implements FromCollection, WithHeadings
             'Location',
             'Due Date',
             'SVP Name',
-            'Risk Level',
+            'Hazard Level',
             'Completion Date',
         ];
     }

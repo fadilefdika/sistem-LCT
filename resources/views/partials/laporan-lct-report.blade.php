@@ -41,21 +41,18 @@
             </div>
             <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->tanggal_temuan}}</p>
         </div>
-
-        <!-- Garis Pemisah -->
-        <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-
-        <!-- Area Temuan -->
-        <div class="flex flex-col items-start">
-            <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                <i class="fas fa-map-marker-alt text-red-500"></i> <!-- Ikon Lokasi -->
-                <p>Finding Area</p>
-            </div>
-            <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
-        </div>
-
+        
     </div>
 
+    <!-- Card Area Temuan -->
+    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500 mt-3">
+        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
+            <i class="fas fa-map-marker-alt text-red-500"></i>
+            <p>Finding Area</p>
+        </div>
+        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
+    </div>
+    
     <!-- Card Kategori Temuan -->
     <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-500 mt-3">
         <div class="flex items-center space-x-2">

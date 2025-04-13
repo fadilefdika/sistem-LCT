@@ -133,8 +133,8 @@
                                     </div>
 
                                 <div x-data="dropdownData()">
-                                    {{-- Risk Level --}}
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Risk Level <span class="text-red-500">*</span></label>
+                                    {{-- Hazard Level --}}
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Hazard Level <span class="text-red-500">*</span></label>
                                     <div class="relative">
                                         <select 
                                             name="tingkat_bahaya"
@@ -142,13 +142,13 @@
                                             class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
                                             :class="{ 'border-red-500': errorTingkatBahaya }"
                                             required>
-                                            <option value="">Please Select a Risk Level</option>
+                                            <option value="">Please Select a Hazard Level</option>
                                             <template x-for="tingkat in ['Low', 'Medium', 'High']" :key="tingkat">
                                                 <option :value="tingkat" x-text="tingkat"></option>
                                             </template>
                                         </select>
                                     </div>
-                                    <p x-show="errorTingkatBahaya" class="text-red-500 text-xs mt-1">Please Select a Risk Level.</p>
+                                    <p x-show="errorTingkatBahaya" class="text-red-500 text-xs mt-1">Please Select a Hazard Level.</p>
                                 </div>
 
                                     

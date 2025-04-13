@@ -5,15 +5,22 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Kategori;
 use App\Models\LaporanLct;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\LctDepartement;
+use App\Models\Pic;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+        $roleName = optional($user->roleLct->first())->name;
+        
         $monthNames = [
             1 => "January", 2 => "February", 3 => "March", 4 => "April",
             5 => "May", 6 => "June", 7 => "July", 8 => "August",
@@ -35,19 +42,18 @@ class DashboardController extends Controller
             ->groupBy('lct_kategori.nama_kategori')
             ->pluck('laporan_count', 'nama_kategori');
 
-        // Alias untuk kategori panjang
-        $categoryAliases = [
-            "Kondisi Tidak Aman (Unsafe Condition)" => "Unsafe Condition",
-            "Tindakan Tidak Aman (Unsafe Act)" => "Unsafe Act",
-            "5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)" => "5S",
-            "Near miss" => "Near Miss"
-        ];
+        $categories = Kategori::all();
 
-        // Ubah nama kategori menggunakan alias
-        $categoryCounts = collect($categoryCounts)->mapWithKeys(function ($count, $name) use ($categoryAliases) {
-            return [$categoryAliases[$name] ?? $name => $count];
-        });
-
+        $categoryAliases = $categories->mapWithKeys(function ($item) {
+            $name = $item->nama_kategori;
+        
+            if ($name === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)') {
+                return [$name => '5S']; // pakai huruf kapital sesuai preferensimu
+            }
+        
+            return [$name => $name]; 
+        })->toArray();
+        
         // Jumlah temuan berdasarkan area
         $areaCounts = DB::table('lct_laporan')
             ->selectRaw('area, COUNT(id) as count')
@@ -58,129 +64,60 @@ class DashboardController extends Controller
         $statusCounts = [
             'open' => LaporanLct::where('status_lct', 'open')->count(),
             'close' => LaporanLct::where('status_lct', 'closed')->count(),
+            'in_progress' => LaporanLct::whereNotIn('status_lct', ['open', 'closed'])->count(),
         ];
 
-        // Tabel pertama: laporan dengan tingkat_bahaya Medium dan High dan status_lct bukan 'closed'
-        $laporanMediumHigh = LaporanLct::whereIn('tingkat_bahaya', ['Medium', 'High'])
-            ->where('status_lct', '!=', 'closed')
-            ->take(5)
-            ->get();
+       // Base query untuk Medium dan High
+        $laporanMediumHighQuery = LaporanLct::whereIn('tingkat_bahaya', ['Medium', 'High'])
+        ->where('status_lct', '!=', 'closed');
 
+        // Base query untuk Overdue
         $now = Carbon::now()->toDateString();
+        $laporanOverdueQuery = LaporanLct::where('due_date', '<', $now)
+        ->where('status_lct', '!=', 'closed')
+        ->where(function ($query) {
+            $query->whereNull('date_completion')
+                ->orWhereColumn('date_completion', '>', 'due_date');
+        });
 
-        $laporanOverdue = LaporanLct::where('due_date', '<', $now) // Pastikan due_date sudah lewat
-            ->where('status_lct', '!=', 'closed') // Status tidak closed
-            ->where(function ($query) {
-                // Kondisi untuk date_completion: jika NULL, tetap ambil, jika tidak, pastikan melewati due_date
-                $query->whereNull('date_completion') // Ambil data yang date_completion NULL
-                    ->orWhere('date_completion', '>', DB::raw('due_date')); // Atau yang date_completion > due_date
-            })
-            ->take(5) // Ambil 5 data teratas
-            ->get();
+        // Tambahkan filter berdasarkan role
+        if ($roleName === 'pic') {
+        $picId = Pic::where('user_id', $user->id)->value('id');
+
+        if ($picId) {
+            $laporanMediumHighQuery->where('pic_id', $picId);
+            $laporanOverdueQuery->where('pic_id', $picId);
+        } else {
+            // Jika tidak ditemukan, kosongkan hasil
+            $laporanMediumHighQuery->whereRaw('1 = 0');
+            $laporanOverdueQuery->whereRaw('1 = 0');
+        }
+        } elseif ($roleName === 'user') {
+        $laporanMediumHighQuery->where('user_id', $user->id);
+        $laporanOverdueQuery->where('user_id', $user->id);
+        } elseif ($roleName === 'manajer') {
+        $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
+
+        if ($departemenId) {
+            $laporanMediumHighQuery->where('departemen_id', $departemenId);
+            $laporanOverdueQuery->where('departemen_id', $departemenId);
+        } else {
+            $laporanMediumHighQuery->whereRaw('1 = 0');
+            $laporanOverdueQuery->whereRaw('1 = 0');
+        }
+        }
+
+        // Ambil 5 data
+        $laporanMediumHigh = $laporanMediumHighQuery->take(5)->get();
+        $laporanOverdue = $laporanOverdueQuery->take(5)->get();
 
 
-    
-            // $laporanMediumHighh = collect([
-            //     (object)[
-            //         'id_laporan_lct' => 1,
-            //         'temuan_ketidaksesuaian' => 'Machine malfunction due to overheating.',
-            //         'picUser' => (object)['fullname' => 'John Doe'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'open',
-            //         'due_date' => '2025-03-20',
-            //         'date_completion' => null
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 2,
-            //         'temuan_ketidaksesuaian' => 'Chemical spill in the factory.',
-            //         'picUser' => (object)['fullname' => 'Jane Smith'],
-            //         'tingkat_bahaya' => 'Medium',
-            //         'status_lct' => 'in_progress',
-            //         'due_date' => '2025-02-15',
-            //         'date_completion' => '2025-02-12'
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 3,
-            //         'temuan_ketidaksesuaian' => 'Electrical short circuit in the warehouse.',
-            //         'picUser' => (object)['fullname' => 'Alice Johnson'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'waiting_approval',
-            //         'due_date' => '2025-03-10',
-            //         'date_completion' => null
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 4,
-            //         'temuan_ketidaksesuaian' => 'Lack of safety equipment in storage.',
-            //         'picUser' => (object)['fullname' => 'Tom White'],
-            //         'tingkat_bahaya' => 'Medium',
-            //         'status_lct' => 'approved',
-            //         'due_date' => '2025-03-15',
-            //         'date_completion' => '2025-03-14'
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 5,
-            //         'temuan_ketidaksesuaian' => 'Hazardous materials improperly stored.',
-            //         'picUser' => (object)['fullname' => 'Emily Brown'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'closed',
-            //         'due_date' => '2025-03-01',
-            //         'date_completion' => '2025-02-28'
-            //     ]
-            // ]);
-        
-            // // Dummy data for Overdue Reports
-            // $laporanOverduee = collect([
-            //     (object)[
-            //         'id_laporan_lct' => 6,
-            //         'temuan_ketidaksesuaian' => 'Broken emergency exit sign.',
-            //         'picUser' => (object)['fullname' => 'Charlie Davis'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'in_progress',
-            //         'due_date' => '2025-02-10',
-            //         'date_completion' => null
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 7,
-            //         'temuan_ketidaksesuaian' => 'Uncalibrated equipment in the lab.',
-            //         'picUser' => (object)['fullname' => 'Linda Williams'],
-            //         'tingkat_bahaya' => 'Medium',
-            //         'status_lct' => 'review',
-            //         'due_date' => '2025-01-25',
-            //         'date_completion' => '2025-02-01'
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 8,
-            //         'temuan_ketidaksesuaian' => 'Expired safety equipment.',
-            //         'picUser' => (object)['fullname' => 'Greg Harris'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'waiting_approval',
-            //         'due_date' => '2025-02-05',
-            //         'date_completion' => null
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 9,
-            //         'temuan_ketidaksesuaian' => 'Improper chemical storage.',
-            //         'picUser' => (object)['fullname' => 'Sophia Clark'],
-            //         'tingkat_bahaya' => 'Medium',
-            //         'status_lct' => 'approved',
-            //         'due_date' => '2025-01-30',
-            //         'date_completion' => '2025-02-10'
-            //     ],
-            //     (object)[
-            //         'id_laporan_lct' => 10,
-            //         'temuan_ketidaksesuaian' => 'Non-compliance with safety protocols.',
-            //         'picUser' => (object)['fullname' => 'James Lee'],
-            //         'tingkat_bahaya' => 'High',
-            //         'status_lct' => 'closed',
-            //         'due_date' => '2025-02-01',
-            //         'date_completion' => '2025-02-02'
-            //     ]
-            // ]);
 
         return view('pages.admin.dashboard', [
             'layout' => 'layouts.admin',
             'monthlyReports' => $monthlyReports,
             'categoryCounts' => $categoryCounts,
+            'categoryAliases' => $categoryAliases,
             'areaCounts' => $areaCounts,
             'statusCounts' => $statusCounts,
             'laporanMediumHigh' => $laporanMediumHigh,
