@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use TaskBudgetApproved;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
 use App\Mail\RevisiLaporanLCT;
 use App\Models\BudgetApproval;
+use App\Mail\TaskBudgetApproved;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;

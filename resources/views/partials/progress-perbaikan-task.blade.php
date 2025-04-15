@@ -22,7 +22,7 @@
                 <div class="w-40 px-4">PIC</div>
                 <div class="w-32 px-4">Due Date</div>
                 <div class="w-32 px-4">Status</div>
-                <div class="w-40 px-4">Notes</div>
+                <div class="w-40 px-4">Attachment</div>
             </div>
     
             <!-- Data Rows -->

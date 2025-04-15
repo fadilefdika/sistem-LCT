@@ -20,7 +20,7 @@
         <!-- Budget Details -->
         <div class="space-y-4">
             <div>
-                <h3 class="text-lg font-semibold text-gray-800">Nonconformity Findings</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Finding Report</h3>
                 <p class="text-gray-600">{{ $taskBudget->temuan_ketidaksesuaian }}</p>
             </div>
     
@@ -73,7 +73,7 @@
                                 <th class="px-4 py-3 text-left">Task Name</th>
                                 <th class="px-4 py-3 text-left">SVP Name</th>
                                 <th class="px-4 py-3 text-left">Due Date</th>
-                                <th class="px-4 py-3 text-left">Notes</th>
+                                <th class="px-4 py-3 text-left">Attachment</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-700">
@@ -83,7 +83,19 @@
                                     <td class="px-4 py-3">{{ $task->task_name ?? '-' }}</td>
                                     <td class="px-4 py-3">{{ $task->name_pic ?? '-' }}</td>
                                     <td class="px-4 py-3">{{ \Carbon\Carbon::parse($task->due_date)->locale('en')->translatedFormat('d F Y') ?? '-' }}</td>
-                                    <td class="px-4 py-3">{{ $task->notes ?? '-' }}</td>
+                                    <td class="px-4 py-3">
+                                        @if ($task->attachment_path)
+                                            <a 
+                                                href="{{ asset('storage/' . Str::after($task->attachment_path, 'public/')) }}" 
+                                                target="_blank" 
+                                                class="text-blue-500 hover:underline"
+                                            >
+                                                View Attachment
+                                            </a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>                            

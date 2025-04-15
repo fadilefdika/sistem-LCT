@@ -174,6 +174,17 @@
                         <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
                     </div>
 
+                    <!-- TIndakan perbaikan Temuan -->
+                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-500">
+                        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
+                            <i class="fas fa-map-marker-alt text-gray-500"></i>
+                            <p>corrective action</p>
+                        </div>
+                        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->tindakan_perbaikan}}</p>
+                    </div>
+
+                    
+
                     <!-- Corrective Action Image Card -->
                     <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
                         <p class="text-gray-700 text-lg font-semibold text-center">Corrective Action Image</p>
@@ -231,13 +242,17 @@
                     <p class="text-gray-700 font-semibold mb-2">Approve this report?</p>
 
                     <div x-data="{ revision: false, reason: '', closed: false }">
-                        @if($laporan->status_lct !== 'closed')
-                            
+                        @if($laporan->status_lct !== 'closed')   
                             @if($notAllowed)
-                                <!-- Notifikasi Role Tidak Diizinkan -->
-                                <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                                    <p class="text-gray-700 font-semibold">⚠️ You cannot take action on this report.</p>
-                                </div>
+                            <!-- Notifikasi Role Tidak Diizinkan -->
+                            <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
+                                <p class="text-gray-700 font-semibold">⚠️ You cannot take action on this report.</p>
+                            </div>
+                        @elseif(in_array($laporan->status_lct, ['in_progress', 'progress_work']))
+                            <!-- Notifikasi PIC Belum Selesai -->
+                            <div class="mt-3 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+                                <p class="text-yellow-800 font-semibold">⚠️ PIC belum menyelesaikan progres perbaikan. Anda tidak dapat memberikan keputusan sekarang.</p>
+                            </div>
                             @else
                                 <div class="flex space-x-4">
                                     <!-- Approve Button -->

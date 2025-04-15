@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Mail;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -16,7 +19,7 @@ class TaskBudgetApproved extends Mailable
 
     public function build()
     {
-        return $this->subject('Your Task & Budget Has Been Approved')
+        return $this->subject('Pengajuan Budget Disetujui')
                     ->view('emails.task_budget_approved');
     }
 }

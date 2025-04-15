@@ -38,7 +38,7 @@
                             <th class="border px-3 py-2 text-left">Task Name</th>
                             <th class="border px-3 py-2 text-left">SVP Name</th>
                             <th class="border px-3 py-2 text-left">Due Date</th>
-                            <th class="border px-3 py-2 text-left">Notes</th>
+                            <th class="border px-3 py-2 text-left">Attachment</th>
                             <th class="border px-3 py-2 text-center">Action</th>
                         </tr>
                     </thead>
@@ -79,8 +79,25 @@
                                     <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
                                 </td>
                                 <td class="border">
-                                    <input type="text" x-model="task.notes" class="w-full border-gray-100" :name="'tasks['+index+'][notes]'" placeholder="Notes (Optional)...">
+                                    <!-- Menampilkan attachment yang sudah ada (jika ada) -->
+                                    <template x-if="task.attachment && typeof task.attachment === 'string'">
+                                        <div>
+                                            <a :href="'{{ asset('storage') }}/' + task.attachment.split('public/')[1]" target="_blank" class="text-blue-500">
+                                                View Attachment
+                                            </a>                                                                                                                                                                         
+                                        </div>
+                                    </template>
+                                
+                                    <!-- Input file untuk attachment baru -->
+                                    <input 
+                                        type="file" 
+                                        class="w-full border-gray-100" 
+                                        :name="'attachments['+index+']'" 
+                                        accept="application/pdf"
+                                        @change="task.attachment = $event.target.files[0]"
+                                    />
                                 </td>
+                                     
                                 <td class="border text-center">
                                     <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
                                 </td>
@@ -168,7 +185,7 @@
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Nama PIC</th>
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Due Date</th>
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Status</th>
-                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[250px]">Notes</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[250px]">Attachment</th>
                         </tr>
                     </thead>
 
@@ -202,9 +219,9 @@
                                             <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
                                         </select>
                                     </td>
-                                    <!-- Notes -->
+                                    <!-- attachment -->
                                     <td class="px-4 py-2 text-gray-500 italic overflow-x-auto whitespace-normal min-w-[250px] max-w-[250px] break-words">
-                                        {{ $task['notes'] ?? '-' }} 
+                                        {{ $task['attachment'] ?? '-' }} 
                                     </td>
                                 </tr>
                             @endif
@@ -271,13 +288,13 @@
 
         init() {
             if (this.tasks.length === 0) {
-                this.tasks.push({ taskName: '', picId: '', dueDate: '', notes: '' });
+                this.tasks.push({ taskName: '', picId: '', dueDate: '', attachment: '' });
             }
         },
 
         addRow(index) {
             if (index === this.tasks.length - 1) {
-                this.tasks.push({ taskName: '', picId: '', dueDate: '', notes: '' });
+                this.tasks.push({ taskName: '', picId: '', dueDate: '', attachment: '' });
             }
         },
 

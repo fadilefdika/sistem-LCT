@@ -46,6 +46,10 @@
                     >
                 </div>
                 
+                @php
+                    use Carbon\Carbon;
+                @endphp
+
                 <div>
                     <label for="date_completion" class="block text-sm font-medium text-gray-700">
                         Completion Date <span class="text-red-500">*</span>
@@ -54,11 +58,19 @@
                         type="date" 
                         id="date_completion" 
                         name="date_completion" 
-                        class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                        class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+                        value="{{ old('date_completion', Carbon::now()->toDateString()) }}" 
                         required
                     >
-                    <!-- Tempat untuk menampilkan tanggal dalam format yang lebih mudah dibaca -->
-                    <p id="formatted_date" class="mt-2 text-gray-600"></p>
+                    <p class="mt-2 text-gray-600">
+                        Tanggal default: {{ Carbon::now()->format('d-m-Y') }}
+                    </p>
+                </div>
+
+
+                <div class="mb-4">
+                    <label for="tindakan_perbaikan" class="block text-sm font-medium text-gray-700">Tindakan Perbaikan</label>
+                    <textarea name="tindakan_perbaikan" id="tindakan_perbaikan" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>{{ old('tindakan_perbaikan') }}</textarea>
                 </div>
         
                 <!-- Bukti Perbaikan Foto -->

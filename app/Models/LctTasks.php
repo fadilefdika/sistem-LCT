@@ -15,7 +15,7 @@ class LctTasks extends Model
         'task_name', 
         'name_pic', 
         'due_date', 
-        'notes', 
+        'attachment_path', 
         'pic_id', 
         'status'
     ];
