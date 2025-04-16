@@ -22,20 +22,22 @@ class BudgetApprovalController extends Controller
     }
 
     public function show($id_laporan_lct)
-{
-    $taskBudget = LaporanLct::with([
-        'tasks' => function ($query) {
-            $query->orderBy('due_date', 'asc'); // Urutkan dari due_date terdekat
-        },
-        'tasks.pic.user',  // Memuat user melalui pic yang terkait dengan task
-        'rejectLaporan'
-    ])
-    ->where('id_laporan_lct', $id_laporan_lct)
-    ->whereIn('status_lct', ['waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision'])
-    ->first();
+    {
+        $taskBudget = LaporanLct::with([
+            'tasks' => function ($query) {
+                $query->orderBy('due_date', 'asc'); // Urutkan dari due_date terdekat
+            },
+            'tasks.pic.user',  // Memuat user melalui pic yang terkait dengan task
+            'rejectLaporan'
+        ])
+        ->where('id_laporan_lct', $id_laporan_lct)
+        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision'])
+        ->first();
 
-    return view('pages.admin.budget-approval.show', compact('taskBudget'));
-}
+        // dd($taskBudget);
+
+        return view('pages.admin.budget-approval.show', compact('taskBudget'));
+    }
 
 
     public function showHistory($id_laporan_lct)

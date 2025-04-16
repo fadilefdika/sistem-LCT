@@ -83,19 +83,6 @@
                                     <td class="px-4 py-3">{{ $task->task_name ?? '-' }}</td>
                                     <td class="px-4 py-3">{{ $task->name_pic ?? '-' }}</td>
                                     <td class="px-4 py-3">{{ \Carbon\Carbon::parse($task->due_date)->locale('en')->translatedFormat('d F Y') ?? '-' }}</td>
-                                    <td class="px-4 py-3">
-                                        @if ($task->attachment_path)
-                                            <a 
-                                                href="{{ asset('storage/' . Str::after($task->attachment_path, 'public/')) }}" 
-                                                target="_blank" 
-                                                class="text-blue-500 hover:underline"
-                                            >
-                                                View Attachment
-                                            </a>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>                            
@@ -105,6 +92,67 @@
                 <p class="text-gray-600">No tasks available.</p>
             @endif
         </div>
+        
+        <div x-data="fileUpload" class="mt-6 p-4 border rounded-lg shadow-md bg-white">
+            <h3 class="text-lg font-semibold mb-4 text-gray-800">Attachments</h3>
+            
+            <!-- Existing Attachments -->
+            @php
+                $existingAttachments = json_decode($laporan->attachments ?? '[]', true);
+            @endphp
+            
+            @if (!empty($existingAttachments))
+            <div class="mb-6">
+                <p class="text-sm font-medium text-gray-700 mb-2">Submitted Documents </p>
+                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                    @foreach ($existingAttachments as $index => $attachment)
+                        <li class="flex items-center justify-between">
+                            <a href="{{ Storage::url($attachment['path']) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                {{ $attachment['original_name'] }}
+                            </a>
+                            {{-- <form action="{{ route('admin.manajemen-lct.deleteAttachment', ['id_laporan_lct' => $laporan->id_laporan_lct, 'index' => $index]) }}" method="POST" onsubmit="return confirm('Hapus file ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-xs font-medium ml-4">Hapus</button>
+                            </form>                                         --}}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>                    
+            @else
+                <p class="text-sm text-gray-500 mb-4">No files uploaded yet.</p>
+            @endif
+            
+            {{-- <!-- Custom File Upload -->
+            <label for="file-upload" class="block mb-2 text-sm font-medium text-gray-700">Upload New Files</label>
+            
+            <!-- Upload Input -->
+            <div class="flex items-center space-x-4">
+                <input 
+                    type="file" 
+                    name="attachments[]"
+                    id="file-upload"
+                    multiple
+                    accept="application/pdf, image/*"
+                    class="hidden"
+                    @change="handleFileChange"
+                />
+                <label for="file-upload" class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">
+                    Choose Files
+                </label>
+            </div> --}}
+            
+            <!-- Display selected file names -->
+            <div x-show="selectedFiles.length > 0" class="mt-4">
+                <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                    <template x-for="(file, index) in selectedFiles" :key="index">
+                        <li x-text="file.name"></li>
+                    </template>
+                </ul>
+            </div>
+            
+        </div>
+
         <div class="mx-auto bg-white shadow-md rounded-xl p-6 mt-5 space-y-6">
             <!-- Reject History Card -->
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">Reject History</h3>

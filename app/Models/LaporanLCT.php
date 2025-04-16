@@ -34,6 +34,7 @@ class LaporanLct extends Model
         'budget_approval',
         'bukti_perbaikan',
         'tindakan_perbaikan',
+        'attachments'
     ];
     
     protected $casts = [

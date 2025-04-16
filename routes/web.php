@@ -127,7 +127,8 @@ Route::middleware(['auth', 'verified', 'role:pic'])->prefix('manajemen-lct')->na
     Route::get('/{id_laporan_lct}', [ManajemenLctController::class, 'show'])->name('show');
     Route::post('/{id_laporan_lct}/store', [ManajemenLctController::class, 'store'])->name('store');
     Route::post('/{id_laporan_lct}/submitTaskBudget', [ManajemenLctController::class, 'submitTaskBudget'])->name('submitTaskBudget');
-    
+    // Route::delete('/{id_laporan_lct}/attachment/{index}', [ManajemenLctController::class, 'deleteAttachment'])->name('deleteAttachment');
+
     Route::post('/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('storeTask');
     Route::post('/{id_task}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('updateStatus');
 });

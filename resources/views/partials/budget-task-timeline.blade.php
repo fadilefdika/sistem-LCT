@@ -24,7 +24,7 @@
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
     @if(!in_array($laporan->status_lct, ['approved_permanent', 'closed']))
     <div x-show="!isApproved">
-        <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST">
+        <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="deletedTasks" id="deletedTasksInput">
 
@@ -38,7 +38,6 @@
                             <th class="border px-3 py-2 text-left">Task Name</th>
                             <th class="border px-3 py-2 text-left">SVP Name</th>
                             <th class="border px-3 py-2 text-left">Due Date</th>
-                            <th class="border px-3 py-2 text-left">Attachment</th>
                             <th class="border px-3 py-2 text-center">Action</th>
                         </tr>
                     </thead>
@@ -46,7 +45,7 @@
                         <template x-for="(task, index) in tasks" :key="index">
                             <tr>
                                 <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
-                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'" placeholder="">
+                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
                             
                                 <!-- Task Name -->
                                 <td class="border">
@@ -54,8 +53,7 @@
                                         @click="addRow(index)"
                                         class="w-full border-gray-100"
                                         :name="'tasks['+index+'][taskName]'"
-                                        placeholder="Create a New Task..."
-                                        >
+                                        placeholder="Create a New Task...">
                                 </td>
                         
                                 <!-- PIC Selection -->
@@ -63,9 +61,7 @@
                                     <select 
                                         class="w-full border-gray-100"
                                         x-model="task.picId" 
-                                        :name="'tasks['+index+'][picId]'"
-                                        @change="console.log('Task ID:', task.id, 'PIC Terpilih:', task.picId)"
-                                    >
+                                        :name="'tasks['+index+'][picId]'">
                                         <option value="">Pilih PIC</option>
                                         @foreach($picList as $pic)
                                             <option value="{{ $pic['id'] }}" x-bind:selected="task.picId == {{ $pic['id'] }}">
@@ -78,89 +74,134 @@
                                 <td class="border">
                                     <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
                                 </td>
-                                <td class="border">
-                                    <!-- Menampilkan attachment yang sudah ada (jika ada) -->
-                                    <template x-if="task.attachment && typeof task.attachment === 'string'">
-                                        <div>
-                                            <a :href="'{{ asset('storage') }}/' + task.attachment.split('public/')[1]" target="_blank" class="text-blue-500">
-                                                View Attachment
-                                            </a>                                                                                                                                                                         
-                                        </div>
-                                    </template>
-                                
-                                    <!-- Input file untuk attachment baru -->
-                                    <input 
-                                        type="file" 
-                                        class="w-full border-gray-100" 
-                                        :name="'attachments['+index+']'" 
-                                        accept="application/pdf"
-                                        @change="task.attachment = $event.target.files[0]"
-                                    />
-                                </td>
-                                     
+
                                 <td class="border text-center">
                                     <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
                                 </td>
                             </tr>
                         </template>
-                        
                     </tbody>
                 </table>
-
+                
                 <div class="mt-4 p-4 bg-gray-100 rounded-lg" 
-                x-data="{
-                    estimatedBudget: '{{ intval($laporan->estimated_budget ?? 0) }}', // Pastikan jadi integer
-                    formattedBudget: '',
-                    showError: false,
-                    formatCurrency() {
-                        this.formattedBudget = this.estimatedBudget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    }
-                }"
-                x-init="formatCurrency()"
-            >
-                <h3 class="text-lg font-semibold mb-2">Estimated Budget</h3>
-                <div class="flex items-center">
-                    <span class="font-medium mr-3">Estimated Budget (Rp):</span>
-                    <input 
-                        type="text" 
-                        x-model="formattedBudget" 
-                        class="w-40 p-2 border border-gray-300 rounded-lg text-right" 
-                        @input="
-                            estimatedBudget = $event.target.value.replace(/\D/g, '');
-                            formatCurrency();
-                            showError = false;
-                        "
-                        @blur="showError = estimatedBudget === ''"
-                        placeholder="0"
-                        required
-                    >
-                    
-                    <!-- Hidden input untuk mengirimkan nilai ke controller -->
-                    <input type="hidden" name="estimatedBudget" :value="estimatedBudget" required>
+                    x-data="{
+                        estimatedBudget: '{{ intval($laporan->estimated_budget ?? 0) }}', // Pastikan jadi integer
+                        formattedBudget: '',
+                        showError: false,
+                        formatCurrency() {
+                            this.formattedBudget = this.estimatedBudget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.' );
+                        }
+                    }"
+                    x-init="formatCurrency()">
+                    <h3 class="text-lg font-semibold mb-2">Estimated Budget</h3>
+                    <div class="flex items-center">
+                        <span class="font-medium mr-3">Estimated Budget (Rp):</span>
+                        <input 
+                            type="text" 
+                            x-model="formattedBudget" 
+                            class="w-40 p-2 border border-gray-300 rounded-lg text-right" 
+                            @input="
+                                estimatedBudget = $event.target.value.replace(/\D/g, '' );
+                                formatCurrency();
+                                showError = false;
+                            "
+                            @blur="showError = estimatedBudget === ''"
+                            placeholder="0"
+                            required
+                        >
+                        
+                        <!-- Hidden input untuk mengirimkan nilai ke controller -->
+                        <input type="hidden" name="estimatedBudget" :value="estimatedBudget" required>
+                    </div>
+                
+                    <!-- Pesan Error -->
+                    <p x-show="showError" class="text-red-500 text-sm mt-1">Estimasi budget wajib diisi!</p>
                 </div>
-            
-                <!-- Pesan Error -->
-                <p x-show="showError" class="text-red-500 text-sm mt-1">Estimasi budget wajib diisi!</p>
-            </div>
-            
+
+                <div x-data="fileUpload" class="mt-6 p-4 border rounded-lg shadow-md bg-white">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Attachments</h3>
+                    
+                    <!-- Existing Attachments -->
+                    @php
+                        $existingAttachments = json_decode($laporan->attachments ?? '[]', true);
+                    @endphp
+                    
+                    @if (!empty($existingAttachments))
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Submitted Documents</p>
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                            @foreach ($existingAttachments as $index => $attachment)
+                                <li class="flex items-center justify-between">
+                                    <a href="{{ Storage::url($attachment['path']) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                        {{ $attachment['original_name'] }}
+                                    </a>
+                                    {{-- <form action="{{ route('admin.manajemen-lct.deleteAttachment', ['id_laporan_lct' => $laporan->id_laporan_lct, 'index' => $index]) }}" method="POST" onsubmit="return confirm('Hapus file ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-800 text-xs font-medium ml-4">Hapus</button>
+                                    </form>                                         --}}
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>                    
+                   
+                    @endif
+                    
+                    <!-- Custom File Upload -->
+                    <label for="file-upload" class="block mb-2 text-sm font-medium text-gray-700">Upload New Files</label>
+                    
+                    <!-- Upload Input -->
+                    <div class="flex items-center space-x-4">
+                        <input 
+                            type="file" 
+                            name="attachments[]"
+                            id="file-upload"
+                            multiple
+                            accept="application/pdf, image/*"
+                            class="hidden"
+                            @change="handleFileChange"
+                        />
+                        <label for="file-upload" class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">
+                            Choose Files
+                        </label>
+                    </div>
+                    
+                    <!-- Display selected file names -->
+                    <div x-show="selectedFiles.length > 0" class="mt-4">
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                            <template x-for="(file, index) in selectedFiles" :key="index">
+                                <li x-text="file.name"></li>
+                            </template>
+                        </ul>
+                    </div>
+                    
+                    @if($laporan->status_lct == 'approved_temporary')
+                    <!-- Feedback Text -->
+                    <p class="text-sm text-gray-500 mt-2">You can upload multiple files (PDF, Images).</p>
+                    @endif
+                </div>
+                
+                
                 <!-- Submit button -->
                 @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'taskbudget_revision']))
                 <div class="flex justify-end">
                     <button type="submit" class="text-white bg-blue-700 px-5 py-3 rounded-lg mt-4 cursor-pointer">
-                        Submit Report
+                        Send to Approver
                     </button>
                 </div>
                 @endif
             </div>
         </form>
     </div>
-</div>
 @endif
 
+
+<!-- Approved Tasks Wrapper -->
 @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
     <div class="mt-6">
         <h3 class="text-xl font-bold text-gray-800 mb-4">✅ Approved Tasks List</h3>
-        
+
+        {{-- Status Info --}}
         @if($laporan->status_lct === 'approved_permanent')
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
                 <p class="font-bold">Permanent Approval Granted</p>
@@ -174,54 +215,54 @@
         @endif
 
         <div class="bg-white px-6 py-6 rounded-xl shadow-lg">
-            <!-- Wrapper with overflow handling -->
+            {{-- Estimated Budget --}}
+            @if($laporan->estimated_budget)
+                <div class="mb-6">
+                    <div class="border border-gray-300 rounded-lg bg-gray-50 px-6 py-4 shadow-sm">
+                        <h4 class="text-base font-bold text-gray-900 mb-1 uppercase tracking-wide">
+                            Estimated Budget
+                        </h4>
+                        <p class="text-lg text-gray-800 font-semibold">
+                            Rp {{ number_format($laporan->estimated_budget, 0, ',', '.') }}
+                        </p>
+                    </div>
+                </div>
+            @endif
+
+
+
+            <!-- Task Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full table-auto">
-                    <!-- Table Header -->
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[50px]">No</th>
-                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[200px]">Nama Task</th>
-                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Nama PIC</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[200px]">Task Name</th>
+                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">PIC Name</th>
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Due Date</th>
                             <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[150px]">Status</th>
-                            <th class="px-4 py-2 text-left text-gray-900 font-semibold min-w-[250px]">Attachment</th>
                         </tr>
                     </thead>
-
-                    <!-- Table Body -->
                     <tbody>
                         @foreach($tasks as $index => $task)
                             @if(!empty($task['taskName']) && !empty($task['picId']) && !empty($task['dueDate']))
                                 <tr class="hover:bg-gray-100 transition duration-200">
-                                    <!-- No -->
-                                    <td class="px-4 py-2 text-gray-900 min-w-[50px]">{{ $index + 1 }}</td>
-                                    <!-- Task Name -->
-                                    <td class="px-4 py-2 text-gray-900 overflow-x-auto whitespace-normal min-w-[200px] max-w-[200px] break-words">
-                                        {{ $task['taskName'] }}
-                                    </td>
-                                    <!-- PIC Name -->
-                                    <td class="px-4 py-2 text-gray-600 min-w-[150px]">
+                                    <td class="px-4 py-2 text-gray-900">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-2 text-gray-900 break-words max-w-[200px]">{{ $task['taskName'] }}</td>
+                                    <td class="px-4 py-2 text-gray-600">
                                         @php
-                                            // Ambil nama PIC berdasarkan picId
                                             $pic = $picList->firstWhere('id', $task['picId']);
                                         @endphp
                                         {{ $pic ? $pic['fullname'] : 'No PIC Assigned' }}
                                     </td>
-                                    <!-- Due Date -->
-                                    <td class="px-4 py-2 text-gray-600 min-w-[150px]">{{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}</td>
-                                    <!-- Status -->
-                                    <td class="px-4 py-2 min-w-[150px]">
-                                        <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 transition duration-200 text-gray-700 w-full appearance-none" 
-                                                data-task-id="{{ $task['id'] }}">
+                                    <td class="px-4 py-2 text-gray-600">
+                                        {{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 text-gray-700 w-full">
                                             <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                            {{-- <option value="in_progress" {{ $task['status'] == 'in_progress' ? 'selected' : '' }}>🚀 In Progress</option> --}}
                                             <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
                                         </select>
-                                    </td>
-                                    <!-- attachment -->
-                                    <td class="px-4 py-2 text-gray-500 italic overflow-x-auto whitespace-normal min-w-[250px] max-w-[250px] break-words">
-                                        {{ $task['attachment'] ?? '-' }} 
                                     </td>
                                 </tr>
                             @endif
@@ -229,11 +270,34 @@
                     </tbody>
                 </table>
             </div>
-        </div>        
+
+            <!-- Submitted Documents -->
+            <div x-data="fileUpload" class="mt-6 p-4 border rounded-lg shadow-md bg-white">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Submitted Documents</h3>
+
+                @php
+                    $existingAttachments = json_decode($laporan->attachments ?? '[]', true);
+                @endphp
+
+                @if (!empty($existingAttachments))
+                    <div class="mb-6">
+                        <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                            @foreach ($existingAttachments as $index => $attachment)
+                                <li class="flex items-center justify-between">
+                                    <a href="{{ Storage::url($attachment['path']) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                        {{ $attachment['original_name'] }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @else
+                    <p class="text-sm text-gray-500 mb-4">There are no submitted documents associated with this task.</p>
+                @endif
+            </div>
+        </div>
     </div>
 @endif
-
-
 
 
     <!-- Reject History -->
@@ -314,6 +378,41 @@
 });
 
 </script>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('fileUpload', () => ({
+            selectedFiles: [],
+
+            handleFileChange(event) {
+                this.selectedFiles = Array.from(event.target.files);
+            }
+        }));
+    });
+</script>
+
+{{-- <script>
+    document.getElementById('delete-form-{{ $index }}').addEventListener('submit', function(event) {
+        event.preventDefault(); // Mencegah form dikirimkan langsung
+
+        // Menampilkan SweetAlert konfirmasi
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "File ini akan dihapus secara permanen.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Jika user memilih "Hapus!", kirimkan form menggunakan metode DELETE
+                this.submit(); // Pastikan form dikirim dengan benar
+            }
+        });
+    });
+</script> --}}
 
 
 <script>

@@ -105,7 +105,6 @@
                                     <th class="text-left px-4 py-2">Task Name</th>
                                     <th class="text-left px-4 py-2">SVP</th>
                                     <th class="text-left px-4 py-2">Due Date</th>
-                                    <th class="text-left px-4 py-2">Attachment</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white text-gray-800">
@@ -115,13 +114,6 @@
                                         <td class="px-4 py-2">{{ $task->task_name ?? '-' }}</td>
                                         <td class="px-4 py-2">{{ $task->pic->user->fullname ?? 'Unassigned' }}</td>
                                         <td class="px-4 py-2">{{ \Carbon\Carbon::parse($task->due_date)->translatedFormat('d F Y') }}</td>
-                                        <td class="px-4 py-2">
-                                            @if ($task->attachment_path)
-                                                <a href="{{ asset('storage/' . Str::after($task->attachment_path, 'public/')) }}" target="_blank" class="text-blue-600 hover:underline">View</a>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -131,18 +123,54 @@
                     <p class="text-gray-500 italic">No tasks assigned yet.</p>
                 @endif
             </div>
+
+            <div x-data="fileUpload" class="mt-6 p-4 border rounded-lg shadow-md bg-white">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Attachments</h3>
+                
+                <!-- Existing Attachments -->
+                @php
+                    $existingAttachments = json_decode($taskBudget->attachments ?? '[]', true);
+                @endphp
+                
+                @if (!empty($existingAttachments))
+                <div class="mb-6">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Submitted Documents</p>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                        @foreach ($existingAttachments as $index => $attachment)
+                            <li class="flex items-center justify-between">
+                                <a href="{{ Storage::url($attachment['path']) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+                                    {{ $attachment['original_name'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>                    
+                @else
+                    <p class="text-sm text-gray-500 mb-4">No files uploaded yet.</p>
+                @endif
+                
+                <!-- Display selected file names -->
+                <div x-show="selectedFiles.length > 0" class="mt-4">
+                    <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1">
+                        <template x-for="(file, index) in selectedFiles" :key="index">
+                            <li x-text="file.name"></li>
+                        </template>
+                    </ul>
+                </div>
+                
+            </div>
     
             <!-- Approval Actions -->
             @if($taskBudget->status_lct === 'waiting_approval_taskbudget')
                 <div class="flex flex-col sm:flex-row justify-end gap-4">
                     <form method="POST" action="{{ route('admin.budget-approval.approve', $taskBudget->id_laporan_lct) }}">
                         @csrf
-                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm">
+                        <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm cursor-pointer">
                             Approve
                         </button>
                     </form>
-                    <button id="rejectBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
-                        Request Revision
+                    <button id="rejectBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm cursor-pointer">
+                        Revision
                     </button>
                 </div>
     

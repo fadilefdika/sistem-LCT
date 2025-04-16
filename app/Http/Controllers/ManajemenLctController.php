@@ -53,7 +53,6 @@ class ManajemenLctController extends Controller
                 'namePic' => $task->name_pic,
                 'picId' => $task->pic_id, // Pastikan pic_id diambil
                 'dueDate' => $task->due_date,
-                'attachment' => $task->attachment_path ?? '-', // Menambahkan attachment
                 'status' => $task->status ?? 'pending',
             ];
         });
@@ -137,15 +136,11 @@ class ManajemenLctController extends Controller
         }
     }
 
-
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
         $data = $request->all();
-        Log::info('Request Data:', $data);
-
         $uploadedFiles = $request->file('attachments') ?? [];
-        Log::info('Uploaded Files:', $uploadedFiles);
-
+    
         $validator = Validator::make($data, [
             'estimatedBudget' => 'required|numeric|min:0',
             'tasks' => 'nullable|array',
@@ -153,9 +148,8 @@ class ManajemenLctController extends Controller
             'tasks.*.taskName' => 'nullable|string|max:255',
             'tasks.*.picId' => 'nullable|integer|exists:lct_pic,id',
             'tasks.*.dueDate' => 'nullable|date',
-            'tasks.*.attachment' => 'nullable|file|mimes:pdf,jpeg,png,docx|max:10240',
         ]);
-
+    
         if ($validator->fails()) {
             Log::error('Validation Failed:', $validator->errors()->toArray());
             return response()->json([
@@ -164,76 +158,119 @@ class ManajemenLctController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
+    
         DB::beginTransaction();
         try {
-            // Update estimated budget & status
+            // Simpan semua file attachment
+            $attachmentPaths = [];
+            foreach ($uploadedFiles as $index => $uploadedFile) {
+                if ($uploadedFile instanceof \Illuminate\Http\UploadedFile) {
+                    // Mengambil nama asli file
+                    $originalFileName = $uploadedFile->getClientOriginalName();
+                    
+                    // Menyimpan file dengan nama yang sudah diubah, tetapi bisa menyimpan nama asli di database
+                    $fileName = "{$id_laporan_lct}_attachment_{$index}." . $uploadedFile->getClientOriginalExtension();
+                    $filePath = $uploadedFile->storeAs('public/task_attachments', $fileName);
+                    
+                    // Menyimpan nama asli file dalam array attachment
+                    $attachmentPaths[] = [
+                        'path' => $filePath,
+                        'original_name' => $originalFileName
+                    ];
+                }
+            }
+
+    
+            // Update laporan
             LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
                 'estimated_budget' => $data['estimatedBudget'],
-                'status_lct' => 'waiting_approval_taskbudget'
+                'status_lct' => 'waiting_approval_taskbudget',
+                'attachments' => json_encode($attachmentPaths),
             ]);
-
+    
             $existingTaskIds = [];
-
+    
             if (!empty($data['tasks'])) {
                 foreach ($data['tasks'] as $index => $task) {
                     if (empty($task['taskName']) || empty($task['picId']) || empty($task['dueDate'])) {
                         continue;
                     }
-
-                    // Menghubungkan attachment dengan task yang sesuai
-                    $uploadedFile = $uploadedFiles[$index] ?? null;
-                    $filePath = null;
-
-                    if ($uploadedFile && $uploadedFile instanceof \Illuminate\Http\UploadedFile) {
-                        // Mendapatkan ekstensi file
-                        $extension = $uploadedFile->getClientOriginalExtension();
-                        // Membuat nama file menggunakan id_laporan_lct dan index
-                        $fileName = "{$id_laporan_lct}_task_{$index}.{$extension}";
-                        // Menyimpan file dengan nama yang diinginkan
-                        $filePath = $uploadedFile->storeAs('public/task_attachments', $fileName);
-                    }
-
+    
                     $taskData = [
                         'id_laporan_lct' => $id_laporan_lct,
                         'task_name' => $task['taskName'],
                         'pic_id' => $task['picId'],
                         'due_date' => $task['dueDate'],
-                        'attachment_path' => $filePath,
+                        // Tidak ada lagi attachment_path di task
                     ];
-
+    
                     Log::info("Saving Task #{$index}:", $taskData);
-
-                    // Menggunakan updateOrCreate untuk menyimpan atau mengupdate task
-                    $taskModel = LctTasks::updateOrCreate(
-                        ['id' => $task['id'] ?? null],
-                        $taskData
-                    );
-
-                    $existingTaskIds[] = $taskModel->id;
+    
+                    if (!empty($task['id'])) {
+                        $taskModel = LctTasks::find($task['id']);
+                        if ($taskModel) {
+                            $taskModel->update($taskData);
+                            $existingTaskIds[] = $taskModel->id;
+                        }
+                    } else {
+                        $taskModel = LctTasks::create($taskData);
+                        $existingTaskIds[] = $taskModel->id;
+                    }
                 }
             }
-
+    
             Log::info('Existing Task IDs:', $existingTaskIds);
-
-            // Hapus task yang tidak ada di input
+    
             LctTasks::where('id_laporan_lct', $id_laporan_lct)
                 ->whereNotIn('id', $existingTaskIds)
                 ->delete();
-
+    
             DB::commit();
-            
-
+    
             return redirect()->back()->with('success', 'Data saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Exception caught during submitTaskBudget:', ['message' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'An error occurred, please try again.');
+            Log::error('Exception caught during submitTaskBudget:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+    
+            return redirect()->back()->with('error', 'An error occurred while saving data.');
         }
     }
 
+    // public function deleteAttachment($id_laporan_lct, $index)
+    // {
+    //     try {
+    //         // Cari LaporanLct berdasarkan id_laporan_lct
+    //         $laporanLct = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
+    //         // Pastikan ada data attachments
+    //         if (!$laporanLct->attachments || count($laporanLct->attachments) <= $index) {
+    //             return response()->json(['error' => 'Attachment not found.'], 404);
+    //         }
 
+    //         // Ambil attachment yang akan dihapus
+    //         $attachmentPath = $laporanLct->attachments[$index];
 
+    //         // Hapus file dari storage
+    //         if (Storage::exists($attachmentPath)) {
+    //             Storage::delete($attachmentPath);
+    //         }
+
+    //         // Hapus attachment path dari array attachments
+    //         unset($laporanLct->attachments[$index]);
+
+    //         // Update kolom attachments di database
+    //         $laporanLct->attachments = array_values($laporanLct->attachments);
+    //         $laporanLct->save();
+
+    //         return response()->json(['success' => 'Attachment deleted successfully.']);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => 'Failed to delete attachment.', 'message' => $e->getMessage()], 500);
+    //     }
+    // }
+
+    
     
 }
