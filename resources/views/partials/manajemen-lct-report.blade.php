@@ -116,7 +116,7 @@
             <p>Finding Area Details</p>
         </div>
         <p class="text-gray-900 font-semibold text-sm mt-1 whitespace-normal break-words overflow-hidden text-ellipsis max-h-[3rem]">
-            {{ $laporan->area }} - {{ $laporan->detail_area }}
+            {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
         </p>
     </div>
 

@@ -102,4 +102,9 @@ class LaporanLct extends Model
         return $this->hasMany(RejectLaporan::class, 'id_laporan_lct', 'id_laporan_lct');
     }
 
+    public function area()
+    {
+        return $this->belongsTo(AreaLct::class, 'area_id');
+    }
+
 }

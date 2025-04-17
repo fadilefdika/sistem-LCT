@@ -24,6 +24,7 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\AssignToPicRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreLaporanRequest;
+use App\Models\AreaLct;
 
 class LctReportController extends Controller
 {
@@ -35,7 +36,7 @@ class LctReportController extends Controller
     //untuk di show detail laporan lct tampilan ehs 
     public function show($id_laporan_lct)
     {
-        $laporan = LaporanLct::with('user','kategori')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+        $laporan = LaporanLct::with('user','kategori','area')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
         $kategori = Kategori::all();
         $departemen = LctDepartement::all()->map(fn($d) => [
             'id' => $d->id,
@@ -68,7 +69,6 @@ class LctReportController extends Controller
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 
     { 
-        
         try {
             DB::beginTransaction(); // Mulai transaksi
     
@@ -81,9 +81,14 @@ class LctReportController extends Controller
             // Konversi kategori temuan ke kategori_id
             $kategori = Kategori::where('nama_kategori', $request->kategori_temuan)->first();
             if (!$kategori) {
-                return redirect()->back()->with('error', 'Kategori tidak valid.');
+                return redirect()->back()->with('error', 'Kategori is not valid.');
             }
     
+            $area = AreaLct::where('nama_area',$request->area)->first();
+            if(!$area){
+                return redirect()->back()->with('error', 'Area is not valid.');
+            }
+
             // Simpan gambar ke storage public
             $buktiFotoPaths = [];
             if ($request->hasFile('bukti_temuan')) {
@@ -104,7 +109,7 @@ class LctReportController extends Controller
                 'id_laporan_lct' => $idLCT,
                 'user_id' => $user->id,
                 'tanggal_temuan' => $request->tanggal_temuan,
-                'area' => $request->area,
+                'area_id' => $area->id,
                 'detail_area' => $request->detail_area,
                 'kategori_id' => $kategori->id,
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,

@@ -14,7 +14,7 @@
                                     {{-- Area Temuan --}}
                                     <div class="mb-4">
                                         <label for="area_temuan" class="block text-sm font-medium text-gray-700 mb-1">Finding Area</label>
-                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area}} - {{$laporan->detail_area}}" readonly required>
+                                        <input type="text" class="flex justify-between w-full p-3 border border-gray-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="area_temuan" name="area_temuan" value="{{$laporan->area->nama_area}} - {{$laporan->detail_area}}" readonly required>
                                     </div>
 
                                     <!-- Kategori Temuan -->

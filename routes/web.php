@@ -5,6 +5,7 @@ use App\Http\Livewire\RoleDataTable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AreaLctController;
 use App\Http\Controllers\LctTaskController;
 use App\Http\Controllers\DataFeedController;
 use App\Http\Controllers\RoleDataController;
@@ -90,6 +91,14 @@ Route::middleware(['auth', 'verified', 'role:manajer,ehs'])->group(function () {
         Route::put('/{id}', [CategoryDataController::class, 'update'])->name('update');
         Route::delete('/{id}', [CategoryDataController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('master-data/area-data')->name('admin.master-data.area-data.')->group(function () {
+        Route::get('/', [AreaLctController::class, 'index'])->name('index');
+        Route::post('/', [AreaLctController::class, 'store'])->name('store');
+        Route::put('/{id}', [AreaLctController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AreaLctController::class, 'destroy'])->name('destroy');
+    });
+    
 });
 
 // Middleware khusus Manajer

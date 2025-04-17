@@ -49,7 +49,7 @@
                     <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
                 </p>
                 <p class="text-gray-900 font-semibold mt-2 text-sm md:text-base leading-snug">
-                    {{ $laporan->area }} - {{ $laporan->detail_area }}
+                    {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
                 </p>
             </div>
         

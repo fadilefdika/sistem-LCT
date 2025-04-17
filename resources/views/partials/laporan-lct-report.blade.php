@@ -50,7 +50,7 @@
             <i class="fas fa-map-marker-alt text-red-500"></i>
             <p>Finding Area</p>
         </div>
-        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area}} - {{$laporan->detail_area}}</p>
+        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area->nama_area}} - {{$laporan->detail_area}}</p>
     </div>
     
     <!-- Card Kategori Temuan -->

@@ -23,7 +23,7 @@
                                     $rows = [
                                         ['Report ID', $laporan->id_laporan_lct],
                                         ['Finding Date', \Carbon\Carbon::parse($laporan->tanggal_temuan)->translatedFormat('F j, Y')],
-                                        ['Area/Detail Area', $laporan->area . '/' . $laporan->detail_area],
+                                        ['Area/Detail Area', $laporan->area->nama_area . '/' . $laporan->detail_area],
                                         ['Category', $laporan->kategori->nama_kategori ?? '-'],
                                         ['Finding', $laporan->temuan_ketidaksesuaian],
                                         ['Safety Recommendation', $laporan->rekomendasi_safety],

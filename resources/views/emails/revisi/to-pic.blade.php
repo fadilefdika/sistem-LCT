@@ -8,7 +8,7 @@ The report with ID **{{ $laporan->id_laporan_lct }}** you submitted has been rev
 **Report Details:**
 - **Finding Date:** {{ $laporan->tanggal_temuan->format('d M Y') }}
 - **Category:** {{ $laporan->kategori->nama_kategori }}
-- **Area:** {{ $laporan->area }} - {{ $laporan->detail_area }}
+- **Area:** {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
 
 **Latest Revision Reasons @if($laporan->tingkat_bahaya == 'Low')(Low Level)@elseif($laporan->status_lct == 'temporary_revision')(Temporary)@else(Permanent)@endif:**
 

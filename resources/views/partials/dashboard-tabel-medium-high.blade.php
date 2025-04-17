@@ -36,7 +36,7 @@
                             <p class="text-gray-500 text-xs">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('F j, Y') }}</p>
                             <p class="text-gray-800">
                                 {{ $laporan->temuan_ketidaksesuaian }} found in 
-                                <strong>{{ $laporan->area }}</strong>
+                                <strong>{{ $laporan->area->nama_area }}</strong>
                                 <span class="text-gray-600">— {{ $laporan->detail_area }}</span>
                             </p>
                         </div>

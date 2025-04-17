@@ -33,7 +33,7 @@
                     </tr>
                     <tr>
                         <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Area</td>
-                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->area }}</td>
+                        <td style="border: 1px solid #000; padding: 8px;">{{ $laporan->area->nama_area }}</td>
                     </tr>
                     <tr bgcolor="#f9f9f9">
                         <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Detail Area</td>

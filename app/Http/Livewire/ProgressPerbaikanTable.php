@@ -19,7 +19,7 @@ class ProgressPerbaikanTable extends Component
     public $tanggalAwal = null;
     public $tanggalAkhir = null;
     public $departemenId = '';
-    public $area = '';
+    public $areaId = '';
     public $search = '';
 
     private function filterData()
@@ -83,8 +83,8 @@ class ProgressPerbaikanTable extends Component
             $query->where('departemen_id', $this->departemenId);
         }
         
-        if ($this->area) {
-            $query->where('area', 'like', '%' . $this->area . '%');
+        if ($this->areaId) {
+            $query->where('id', $this->areaId);
         }
         
         if ($this->search) {
@@ -96,8 +96,8 @@ class ProgressPerbaikanTable extends Component
 
         // === Urutan: Progress (order_type 0) dulu, lalu Closed (order_type 1) ===
         return $query->orderBy('order_type')
-                    ->orderByDesc('created_at')
-                    ->paginate(10);
+             ->orderByDesc('updated_at') 
+             ->paginate(10);
     }
 
     public function updatedRiskLevel($value)
@@ -117,7 +117,7 @@ class ProgressPerbaikanTable extends Component
         $this->tanggalAwal = null;
         $this->tanggalAkhir = null;
         $this->departemenId = '';
-        $this->area = '';
+        $this->areaId = '';
         $this->search = '';
         $this->resetPage(); // Reset halaman pagination
     }
@@ -126,6 +126,7 @@ class ProgressPerbaikanTable extends Component
     {
         $departments = \App\Models\LctDepartement::pluck('id', 'nama_departemen');
 
+        $area = \App\Models\AreaLct::pluck('id', 'nama_area');
         // Defining $statusGroups in the render method
         $statusGroups = [
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
@@ -137,7 +138,8 @@ class ProgressPerbaikanTable extends Component
         return view('livewire.progress-perbaikan-table', [
             'laporans' => $this->filterData(),
             'departments' => $departments,
-            'statusGroups' => $statusGroups // Passing the statusGroups to the view
+            'statusGroups' => $statusGroups, 
+            'areas' => $area 
         ]);
     }
 }

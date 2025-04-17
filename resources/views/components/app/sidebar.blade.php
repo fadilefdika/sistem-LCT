@@ -133,21 +133,6 @@
                     </li>
                     @endrole
 
-                    {{-- <!-- Riwayat LCT -->
-                    @hasanyrole('pic|ehs|manajer|user') 
-                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
-                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.riwayat-lct.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                    <path d="M12 8v5h5v-2h-3V8h-2zM12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 0 0 1-8 8z"/>
-                                </svg>                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">LCT History</span>
-                            </div>
-                        </a>
-                    </li>
-                    @endhasanyrole --}}
-
-
                     <!-- Master Data -->
                     @hasanyrole('ehs|manajer')
                     @php
@@ -192,6 +177,12 @@
                                 {{ Request::is('master-data/category-data') || Request::is('master-data/category-data/*') ? 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' : '' }}">
                                 <a href="{{ route('admin.master-data.category-data.index') }}" class="px-3 py-1 text-xs rounded-lg text-gray-600 flex items-center">
                                     <i class="fas fa-tags mr-2 shrink-0 fill-current @if(Request::is('master-data/category-data')|| Request::is('master-data/category-data/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif""></i> Category Data
+                                </a>
+                            </li>
+                            <li class="pl-1 pr-3 py-1 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r text-[5px] text-gray-400 
+                                {{ Request::is('master-data/area-data') || Request::is('master-data/area-data/*') ? 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' : '' }}">
+                                <a href="{{ route('admin.master-data.area-data.index') }}" class="px-3 py-1 text-xs rounded-lg text-gray-600 flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2 shrink-0 fill-current @if(Request::is('master-data/area-data')|| Request::is('master-data/area-data/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif""></i> Area Data
                                 </a>
                             </li>
                         </ul>

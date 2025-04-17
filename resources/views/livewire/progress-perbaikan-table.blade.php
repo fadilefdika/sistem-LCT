@@ -49,16 +49,13 @@
         <!-- Area -->
         <div class="flex flex-col w-full sm:w-auto min-w-[180px] space-y-1">
             <label class="text-sm font-medium text-gray-700">Area</label>
-            <input type="text" wire:model="area" placeholder="Search by area..."
-                class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+            <select wire:model="areaId" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="">All Areas</option>
+                @foreach ($areas as $nama => $id)
+                    <option value="{{ $id }}">{{ $nama }}</option>
+                @endforeach
+            </select>
         </div>
-    
-        <!-- Search -->
-        {{-- <div class="flex flex-col w-full sm:w-auto min-w-[200px] space-y-1">
-            <label class="text-sm font-medium text-gray-700">Search</label>
-            <input type="text" wire:model="search" placeholder="Title / Location"
-                class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
-        </div> --}}
     
         <!-- Tombol Filter -->
         <div class="flex flex-col justify-end">

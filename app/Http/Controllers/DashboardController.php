@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Pic;
+use App\Models\AreaLct;
 use App\Models\Kategori;
 use App\Models\LaporanLct;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\LctDepartement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\LctDepartement;
-use App\Models\Pic;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -54,11 +55,7 @@ class DashboardController extends Controller
             return [$name => $name]; 
         })->toArray();
         
-        // Jumlah temuan berdasarkan area
-        $areaCounts = DB::table('lct_laporan')
-            ->selectRaw('area, COUNT(id) as count')
-            ->groupBy('area')
-            ->pluck('count', 'area');
+        $areaCounts = AreaLct::withCount('laporan')->pluck('laporan_count', 'nama_area');
 
         // Jumlah open & close
         $statusCounts = [

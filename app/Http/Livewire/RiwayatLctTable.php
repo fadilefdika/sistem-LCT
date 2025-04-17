@@ -102,7 +102,7 @@ class RiwayatLctTable extends Component
             // Data
             $data = [
                 "Report ID" => $laporan->id_laporan_lct,
-                "Area" => "{$laporan->area}/{$laporan->detail_area}",
+                "Area" => "{$laporan->area->nama_area}/{$laporan->detail_area}",
                 "Finding Date" => $laporan->tanggal_temuan,
                 "Risk Hazard" => $laporan->tingkat_bahaya,
                 "Finding Item" => $laporan->temuan_ketidaksesuaian,
