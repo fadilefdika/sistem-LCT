@@ -6,6 +6,7 @@ use App\Models\Pic;
 use Livewire\Component;
 use App\Models\LaporanLct;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ManajemenLCTTable extends Component
@@ -30,16 +31,32 @@ class ManajemenLCTTable extends Component
     {
         $user = Auth::user(); // Ambil user yang login
 
-        // Ambil ID PIC yang terkait dengan user ini (subquery)
+        // Ambil ID PIC yang terkait dengan user ini
         $picId = Pic::where('user_id', $user->id)->value('id');
 
-        // Query untuk mengambil laporan yang hanya sesuai dengan PIC dan Departemennya
-        $laporans = LaporanLct::whereIn('status_lct', ['in_progress', 'progress_work', 'waiting_approval', 'revision', 'approved','waiting_approval_temporary','waiting_approval_taskbudget', 'approved_temporary', 'temporary_revision', 'work_permanent','taskbudget_revision', 'approved_taskbudget', 'waiting_approval_permanent', 'approved_permanent', 'permanent_revision']) // Hanya yang dikirim EHS
-            ->where('pic_id', $picId) // Hanya laporan yang ditugaskan ke PIC ini
-            ->orderBy('created_at', 'desc')
+        // Daftar status yang dianggap progress
+        $progressStatuses = [
+            'in_progress', 'progress_work', 'waiting_approval', 'revision', 'approved',
+            'waiting_approval_temporary', 'approved_temporary', 'temporary_revision',
+            'waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision',
+            'work_permanent', 'waiting_approval_permanent', 'approved_permanent', 'permanent_revision',
+            'closed'
+        ];
+
+        // Query utama
+        $laporans = LaporanLct::select('*', DB::raw("
+                CASE 
+                    WHEN status_lct = 'closed' THEN 1 
+                    ELSE 0 
+                END as order_type
+            "))
+            ->whereIn('status_lct', $progressStatuses)
+            ->where('pic_id', $picId)
+            ->orderBy('order_type') // Urutkan progress dulu, lalu closed
+            ->orderByDesc('created_at') // Urutkan berdasarkan tanggal
             ->paginate(10);
 
-        // Jika tidak ada laporan, kirimkan pesan ke view
+        // Pesan jika kosong
         $message = $laporans->isEmpty() ? 'Data belum ada' : null;
 
         return view('livewire.manajemen-lct-table', [
@@ -47,6 +64,4 @@ class ManajemenLCTTable extends Component
             'message' => $message
         ]);
     }
-
-
 }

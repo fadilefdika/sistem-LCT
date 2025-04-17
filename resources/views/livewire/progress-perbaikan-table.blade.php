@@ -1,51 +1,95 @@
 <div class="bg-white p-6 relative shadow-md rounded-xl overflow-x-auto">
     
-    <div class="flex flex-row flex-wrap align-items-center gap-3 p-3 border rounded shadow-sm bg-white mb-4">
-        
-        <!-- Filter Tingkat Bahaya -->
-        <div class="flex flex-col" style="min-width: 180px;">
-            <label class="form-label fw-bold text-muted mb-1">Hazard Level</label>
-            <select wire:model="riskLevel" wire:change="applyFilter" class="form-select">
-                @foreach (['' => 'All Hazard Level', 'Low' => 'Low', 'Medium' => 'Medium', 'High' => 'High'] as $value => $label)
-                    <option value="{{ $value }}">{{ $label }}</option>
-                @endforeach
+    <div class="flex flex-wrap gap-4 p-4 border rounded-xl shadow-sm bg-white mb-6">
+        <!-- Hazard Level -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[180px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Hazard Level</label>
+            <select wire:model="riskLevel" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="">All Hazard Level</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
             </select>
         </div>
     
-        <!-- Filter Status LCT -->
-        <div class="flex flex-col min-w-[220px]">
-            <label class="form-label fw-bold text-muted mb-1">LCT Status</label>
-            <select wire:model="statusLct" wire:change="applyFilter" class="form-select">
+        <!-- LCT Status -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[220px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">LCT Status</label>
+            <select wire:model="statusLct" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black">
                 <option value="">All statuses</option>
-                @php
-                    // Kelompok status
-                    $statusGroups = [
-                        'In Progress' => ['in_progress', 'progress_work', 'work_permanent'],
-                        'Waiting Approval' => ['waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent', 'waiting_approval_taskbudget'],
-                        'Approved' => ['approved', 'approved_temporary', 'approved_permanent', 'approved_taskbudget'],
-                        'Revision' => ['revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision']
-                    ];
-                @endphp
-                
                 @foreach ($statusGroups as $label => $statuses)
                     <option value="{{ implode(',', $statuses) }}">{{ $label }}</option>
                 @endforeach
             </select>
         </div>
     
-        <!-- Tombol Reset -->
-            <div class="flex flex-col">
-                <button wire:click="resetFilters" class="btn btn-outline-secondary px-3 cursor-pointer shadow mt-[23px] bg-black text-white">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset
-                </button>
-            </div>
-            
-            <!-- Loading Indicator -->
-            <div wire:loading wire:target="riskLevel, statusLct, resetFilters" class="text-sm text-muted mt-8">
-                <i class="spinner-border spinner-border-sm"></i> Loading...
-            </div>
-    </div>
+        <!-- Date From -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[160px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Date From</label>
+            <input type="date" wire:model="tanggalAwal" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div>
+    
+        <!-- Date To -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[160px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Date To</label>
+            <input type="date" wire:model="tanggalAkhir" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div>
+    
+        <!-- Department -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[180px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Department</label>
+            <select wire:model="departemenId" class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black">
+                <option value="">All Departments</option>
+                @foreach ($departments as $nama => $id)
+                    <option value="{{ $id }}">{{ $nama }}</option>
+                @endforeach
+            </select>
+        </div>
+    
+        <!-- Area -->
+        <div class="flex flex-col w-full sm:w-auto min-w-[180px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Area</label>
+            <input type="text" wire:model="area" placeholder="Search by area..."
+                class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div>
+    
+        <!-- Search -->
+        {{-- <div class="flex flex-col w-full sm:w-auto min-w-[200px] space-y-1">
+            <label class="text-sm font-medium text-gray-700">Search</label>
+            <input type="text" wire:model="search" placeholder="Title / Location"
+                class="border rounded-lg px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div> --}}
+    
+        <!-- Tombol Filter -->
+        <div class="flex flex-col justify-end">
+            <button wire:click="applyFilter"
+                    class="inline-flex items-center gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                Filter
+            </button>
+        </div>
 
+        <!-- Tombol Reset -->
+        <div class="flex flex-col justify-end">
+            <button wire:click="resetFilters"
+                    class="inline-flex items-center gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                Reset
+            </button>
+        </div>
+        
+        <!-- Loading Indicator -->
+        <div wire:loading wire:target="riskLevel, statusLct, resetFilters, tanggalAwal, tanggalAkhir, departemenId, area, search"
+            class="flex items-center text-sm text-gray-500 mt-2">
+            {{-- <svg class="animate-spin h-4 w-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg> --}}
+            Loading...
+        </div>
+    </div>
+    
+    
+    
     <div class="overflow-x-auto rounded-lg border border-gray-200">
         <table class="min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg overflow-hidden">
             <thead class="bg-gray-100">
@@ -57,6 +101,7 @@
                     <th class="px-4 py-3">Progress Status</th>
                     <th class="px-4 py-3">Tracking Status</th>
                     <th class="px-4 py-3">Due Date</th>
+                    <th class="px-4 py-3">Due Date Permanent</th>
                     <th class="px-4 py-3">Completion Date</th>
                     <th class="px-4 py-3">Action</th>
                 </tr>                
@@ -154,7 +199,20 @@
                     
                     <!-- Tenggat Waktu -->
                     <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
-                        {{ \Carbon\Carbon::parse($laporan->due_date)->format('F d, Y') }}
+                        @if($laporan->tingkat_bahaya !== 'Low')
+                            {{ \Carbon\Carbon::parse($laporan->due_date)->format('F d, Y') }}
+                        @else
+                            {{ \Carbon\Carbon::parse($laporan->due_date_temp)->format('F d, Y') }}
+                        @endif
+                    </td>
+
+                    <!-- Tenggat Waktu -->
+                    <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
+                        @if($laporan->tingkat_bahaya !== 'Low')
+                            {{ \Carbon\Carbon::parse($laporan->due_date_perm)->format('F d, Y') }}
+                        @else
+                            <p>-</p>
+                        @endif
                     </td>
 
                     <!-- Tanggal Selesai / Overdue -->

@@ -51,11 +51,11 @@ Route::middleware(['auth', 'verified', 'role:ehs,pic,manajer,user'])->group(func
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
     });
 
-    // Riwayat LCT
-    Route::prefix('riwayat-lct')->name('admin.riwayat-lct.')->group(function () {
-        Route::get('/', [RiwayatLctController::class, 'index'])->name('index');
-        Route::get('/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('show');
-    });
+    // // Riwayat LCT
+    // Route::prefix('riwayat-lct')->name('admin.riwayat-lct.')->group(function () {
+    //     Route::get('/', [RiwayatLctController::class, 'index'])->name('index');
+    //     Route::get('/{id_laporan_lct}', [RiwayatLctController::class, 'show'])->name('show');
+    // });
 });
 
 // Middleware untuk Manajer & EHS

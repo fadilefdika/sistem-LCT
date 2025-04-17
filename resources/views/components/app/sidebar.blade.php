@@ -133,7 +133,7 @@
                     </li>
                     @endrole
 
-                    <!-- Riwayat LCT -->
+                    {{-- <!-- Riwayat LCT -->
                     @hasanyrole('pic|ehs|manajer|user') 
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
                         <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('riwayat-lct') || Request::is('riwayat-lct/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.riwayat-lct.index') }}">
@@ -145,7 +145,7 @@
                             </div>
                         </a>
                     </li>
-                    @endhasanyrole
+                    @endhasanyrole --}}
 
 
                     <!-- Master Data -->
