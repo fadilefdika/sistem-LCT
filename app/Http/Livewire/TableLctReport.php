@@ -28,7 +28,7 @@ class TableLctReport extends Component
     public function filterData()
     {
         // Ambil laporan LCT dengan kategori yang statusnya 'open'
-        $query = LaporanLct::with('kategori')->where('status_lct', 'open');
+        $query = LaporanLct::with('kategori','area')->where('status_lct', 'open');
 
         // Pastikan menggunakan paginate sebelum return
         return $query->orderBy('created_at', 'desc')
@@ -41,9 +41,12 @@ class TableLctReport extends Component
     {
         $categories = Kategori::all();  
 
+        $areas = $this->filterData()->pluck('area.nama_area')->all();
+
         return view('livewire.table-lct-report', [
             'laporans' => $this->filterData(), // Perbaiki koma berlebih
             'categories' => $categories,
+            'areas' => $areas
         ]);
     }
 

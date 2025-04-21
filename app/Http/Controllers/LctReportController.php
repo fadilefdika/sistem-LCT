@@ -89,6 +89,7 @@ class LctReportController extends Controller
                 return redirect()->back()->with('error', 'Area is not valid.');
             }
 
+
             // Simpan gambar ke storage public
             $buktiFotoPaths = [];
             if ($request->hasFile('bukti_temuan')) {

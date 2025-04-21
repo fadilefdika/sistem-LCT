@@ -20,7 +20,7 @@
                     <tr class="hover:bg-gray-100 text-sm transition duration-200 ease-in-out">
                         <td class="px-6 py-4 text-gray-800">{{ $index + 1 }}</td>
                         <td class="px-6 py-4 text-gray-800 whitespace-nowrap">{{ $laporan->temuan_ketidaksesuaian }}</td>
-                        <td class="px-6 py-4 text-gray-800 whitespace-nowrap">{{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}</td>
+                        <td class="px-6 py-4 text-gray-800 whitespace-nowrap">{{ $laporan->area->nama_area ?? '-' }} - {{ $laporan->detail_area }}</td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 rounded-full text-white text-xs font-semibold
                                 {{ $laporan->tingkat_bahaya === 'High' ? 'bg-red-600' : ($laporan->tingkat_bahaya === 'Medium' ? 'bg-yellow-500' : 'bg-green-500') }}">

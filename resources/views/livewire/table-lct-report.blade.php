@@ -57,7 +57,7 @@
             
                     <!-- Area -->
                     <td class="px-4 py-3 text-gray-800 whitespace-nowrap">
-                        {{ $laporan->area->nama_area }}
+                        {{ $laporan->area->nama_area ?? '-' }}
                     </td>
             
                     <!-- Bukti Temuan -->

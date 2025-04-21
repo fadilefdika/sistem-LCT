@@ -165,7 +165,7 @@ class ProgressPerbaikanController extends Controller
 
         Mail::to('efdika1102@gmail.com')->queue(new CloseNotification($laporan));
 
-        return redirect()->route('admin.riwayat-lct.index')->with('closed', 'The repair report has been successfully approved.');
+        return redirect()->route('admin.progress-perbaikan.index')->with('closed', 'The repair report has been successfully approved.');
     }
 
 

@@ -28,60 +28,62 @@
             @csrf
             <input type="hidden" name="deletedTasks" id="deletedTasksInput">
 
-            <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4 overflow-x-auto">
+            <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4">
                 <h3 class="text-lg font-semibold mb-4">Task Management and Timeline</h3>
                 
-                <table class="min-w-full border-collapse border border-gray-300">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="border px-3 py-2 text-center">No</th>
-                            <th class="border px-3 py-2 text-left">Task Name</th>
-                            <th class="border px-3 py-2 text-left">SVP Name</th>
-                            <th class="border px-3 py-2 text-left">Due Date</th>
-                            <th class="border px-3 py-2 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody> 
-                        <template x-for="(task, index) in tasks" :key="index">
+                <div class="overflow-x-auto"> <!-- Wrapping the table in a div for horizontal scrolling -->
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead class="bg-gray-100">
                             <tr>
-                                <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
-                                <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
-                            
-                                <!-- Task Name -->
-                                <td class="border">
-                                    <input type="text" x-model="task.taskName"
-                                        @click="addRow(index)"
-                                        class="w-full border-gray-100"
-                                        :name="'tasks['+index+'][taskName]'"
-                                        placeholder="Create a New Task...">
-                                </td>
-                        
-                                <!-- PIC Selection -->
-                                <td class="border">
-                                    <select 
-                                        class="w-full border-gray-100"
-                                        x-model="task.picId" 
-                                        :name="'tasks['+index+'][picId]'">
-                                        <option value="">Pilih PIC</option>
-                                        @foreach($picList as $pic)
-                                            <option value="{{ $pic['id'] }}" x-bind:selected="task.picId == {{ $pic['id'] }}">
-                                                {{ $pic['fullname'] }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                        
-                                <td class="border">
-                                    <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
-                                </td>
-
-                                <td class="border text-center">
-                                    <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
-                                </td>
+                                <th class="border px-3 py-2 text-center">No</th>
+                                <th class="border px-3 py-2 text-left">Task Name</th>
+                                <th class="border px-3 py-2 text-left">SVP Name</th>
+                                <th class="border px-3 py-2 text-left">Due Date</th>
+                                <th class="border px-3 py-2 text-center">Action</th>
                             </tr>
-                        </template>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody> 
+                            <template x-for="(task, index) in tasks" :key="index">
+                                <tr>
+                                    <td class="border px-3 py-2 text-center" x-text="index + 1"></td>
+                                    <input type="hidden" x-model="task.id" :name="'tasks['+index+'][id]'">
+                                
+                                    <!-- Task Name -->
+                                    <td class="border">
+                                        <input type="text" x-model="task.taskName"
+                                            @click="addRow(index)"
+                                            class="w-full border-gray-100"
+                                            :name="'tasks['+index+'][taskName]'"
+                                            placeholder="Create a New Task...">
+                                    </td>
+                            
+                                    <!-- PIC Selection -->
+                                    <td class="border">
+                                        <select 
+                                            class="w-full border-gray-100"
+                                            x-model="task.picId" 
+                                            :name="'tasks['+index+'][picId]'">
+                                            <option value="">Pilih PIC</option>
+                                            @foreach($picList as $pic)
+                                                <option value="{{ $pic['id'] }}" x-bind:selected="task.picId == {{ $pic['id'] }}">
+                                                    {{ $pic['fullname'] }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                            
+                                    <td class="border">
+                                        <input type="date" x-model="task.dueDate" class="w-full border-gray-100" :name="'tasks['+index+'][dueDate]'">
+                                    </td>
+            
+                                    <td class="border text-center">
+                                        <button type="button" @click="removeTask(index)" class="text-red-600">×</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div> <!-- End of overflow-x-auto -->
                 
                 <div class="mt-4 p-4 bg-gray-100 rounded-lg" 
                     x-data="{
@@ -117,7 +119,7 @@
                     <!-- Pesan Error -->
                     <p x-show="showError" class="text-red-500 text-sm mt-1">Estimasi budget wajib diisi!</p>
                 </div>
-
+            
                 <div x-data="fileUpload" class="mt-6 p-4 border rounded-lg shadow-md bg-white">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Attachments</h3>
                     
@@ -135,16 +137,10 @@
                                     <a href="{{ Storage::url($attachment['path']) }}" target="_blank" class="text-blue-600 underline hover:text-blue-800">
                                         {{ $attachment['original_name'] }}
                                     </a>
-                                    {{-- <form action="{{ route('admin.manajemen-lct.deleteAttachment', ['id_laporan_lct' => $laporan->id_laporan_lct, 'index' => $index]) }}" method="POST" onsubmit="return confirm('Hapus file ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 text-xs font-medium ml-4">Hapus</button>
-                                    </form>                                         --}}
                                 </li>
                             @endforeach
                         </ul>
                     </div>                    
-                   
                     @endif
                     
                     <!-- Custom File Upload -->
@@ -183,7 +179,7 @@
                 
                 
                 <!-- Submit button -->
-                @if(in_array($laporan->status_lct ?? '', ['approved_temporary', 'taskbudget_revision']))
+                @if(in_array($laporan->status_lct ?? '', ['waiting_approval_temporary','approved_temporary', 'taskbudget_revision']))
                 <div class="flex justify-end">
                     <button type="submit" class="text-white bg-blue-700 px-5 py-3 rounded-lg mt-4 cursor-pointer">
                         Send to Approver
@@ -191,6 +187,7 @@
                 </div>
                 @endif
             </div>
+            
         </form>
     </div>
 @endif
@@ -259,7 +256,7 @@
                                         {{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}
                                     </td>
                                     <td class="px-4 py-2">
-                                        <select class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 text-gray-700 w-full">
+                                        <select data-task-id="{{ $task['id'] }}" class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 text-gray-700 w-full">
                                             <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
                                             <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
                                         </select>
@@ -391,28 +388,6 @@
     });
 </script>
 
-{{-- <script>
-    document.getElementById('delete-form-{{ $index }}').addEventListener('submit', function(event) {
-        event.preventDefault(); // Mencegah form dikirimkan langsung
-
-        // Menampilkan SweetAlert konfirmasi
-        Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: "File ini akan dihapus secara permanen.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Jika user memilih "Hapus!", kirimkan form menggunakan metode DELETE
-                this.submit(); // Pastikan form dikirim dengan benar
-            }
-        });
-    });
-</script> --}}
 
 
 <script>
@@ -446,7 +421,7 @@
 
         } catch (error) {
             console.error("Failed to update status:", error);
-            alert("Gagal memperbarui status. Silakan coba lagi.");
+            alert("Gagal memperbarui status. Silakan coba lagi.", error);
         }
     });
 });

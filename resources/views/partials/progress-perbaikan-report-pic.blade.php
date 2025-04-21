@@ -1,9 +1,9 @@
 <div x-data="{
-    tab: window.innerWidth >= 768 ? 'laporan' : 'laporan',
-    isDesktop: window.innerWidth >= 768
-}" x-init="window.addEventListener('resize', () => {
-    isDesktop = window.innerWidth >= 768;
-})" class="flex flex-col w-full h-full">
+        tab: window.innerWidth >= 768 ? 'laporan' : 'laporan',
+        isDesktop: window.innerWidth >= 768
+    }" x-init="window.addEventListener('resize', () => {
+        isDesktop = window.innerWidth >= 768;
+    })" class="flex flex-col w-full h-full">
 
     <div class="md:hidden flex justify-around bg-white shadow-sm border-b">
         <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'" class="px-4 py-2 text-sm font-semibold">

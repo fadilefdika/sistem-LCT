@@ -80,6 +80,7 @@ class ManajemenLctController extends Controller
 
     public function store(Request $request, $id_laporan_lct)
     {
+        // dd($request->all());
         $request->validate([
             'date_completion' => ['required', 'date'],
             'bukti_perbaikan' => ['required', 'array', 'max:5'], // Maksimal 5 file

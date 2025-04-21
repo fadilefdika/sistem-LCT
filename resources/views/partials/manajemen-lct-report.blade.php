@@ -121,7 +121,6 @@
     </div>
 
 
-    <!-- Card  Date -->
     <div x-data="{ 
         rawDueDate: '{{$laporan->due_date}}', 
         rawCompletionDate: '{{$laporan->date_completion}}',
@@ -136,24 +135,24 @@
             let due = new Date(rawDueDate);
             let completion = new Date(rawCompletionDate);
             let now = today;
-
+    
             if (!isNaN(due)) {
                 formattedDueDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(due);
             } else {
                 formattedDueDate = 'Tanggal tidak valid';
             }
-
+    
             if (!isNaN(completion)) {
                 formattedCompletionDate = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(completion);
-                now = completion; // Jika sudah selesai, gunakan date_completion sebagai batas overdue
+                now = completion;
             } else {
                 formattedCompletionDate = '-';
             }
-
+    
             if (!isNaN(due)) {
                 let diffTime = due - now;
                 daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+    
                 if (daysLeft < 0) {
                     overdueDays = Math.abs(daysLeft);
                 } else {
@@ -162,10 +161,10 @@
             }
         "
         :class="overdueDays > 0 ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'"
-        class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-row items-start justify-evenly flex-wrap gap-4">
+        class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3 flex flex-col sm:flex-row items-stretch justify-between gap-4 sm:gap-2">
         
-        <!-- Due Date -->
-        <div class="flex flex-col items-start w-1/3 min-w-[120px] max-w-[200px]">
+        <!-- Due Date Section -->
+        <div class="flex-1 flex flex-col">
             <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-calendar-alt"
                     :class="overdueDays > 0 ? 'text-red-500' : 'text-green-500'"></i>
@@ -182,22 +181,22 @@
                     <span>Overdue by <span x-text="overdueDays"></span> days</span>
                 </template>
                 <template x-if="overdueDays === 0 && daysLeft >= 0">
-                    <span><span x-text="daysLeft"></span> days left before overdue</span>
+                    <span><span x-text="daysLeft"></span> days left</span>
                 </template>
                 <template x-if="formattedDueDate === 'Tanggal tidak valid'">
                     <span class="text-gray-500">Invalid date</span>
                 </template>
             </p>
         </div>
-
-        <!-- Separator -->
-        <div class="w-[2px] bg-gray-300 h-12 rounded-full flex-shrink-0"></div>
-
-        <!-- Date of Completion -->
-        <div class="flex flex-col items-start w-1/3 min-w-[120px] max-w-[200px]">
-            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide whitespace-nowrap">
+    
+        <!-- Separator - Horizontal on mobile, Vertical on desktop -->
+        <div class="w-full h-[1px] sm:w-[1px] sm:h-12 bg-gray-200 my-2 sm:my-0"></div>
+    
+        <!-- Completion Date Section -->
+        <div class="flex-1 flex flex-col">
+            <div class="flex items-center gap-2 text-gray-500 text-xs tracking-wide">
                 <i class="fas fa-calendar-check text-blue-500"></i>
-                <p class="font-medium">{{$laporan->tingkat_bahaya == 'Low'?'Completion Date':'Completion Date (termporary)'}}</p>
+                <p class="font-medium">{{$laporan->tingkat_bahaya == 'Low'?'Completion Date':'Completion Date (temporary)'}}</p>
             </div>
             <p class="text-sm font-semibold mt-1 text-gray-900" x-text="formattedCompletionDate"></p>
         </div>

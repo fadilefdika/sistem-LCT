@@ -17,7 +17,7 @@ class LaporanLct extends Model
         'id_laporan_lct',
         'user_id', 
         'tanggal_temuan', 
-        'area', 
+        'area_id', 
         'detail_area', 
         'kategori_id', 
         'temuan_ketidaksesuaian', 

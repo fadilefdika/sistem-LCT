@@ -53,7 +53,7 @@ class ManajemenLCTTable extends Component
             ->whereIn('status_lct', $progressStatuses)
             ->where('pic_id', $picId)
             ->orderBy('order_type') // Urutkan progress dulu, lalu closed
-            ->orderByDesc('update_at') // Urutkan berdasarkan tanggal
+            ->orderByDesc('updated_at') // Urutkan berdasarkan tanggal
             ->paginate(10);
 
         // Pesan jika kosong

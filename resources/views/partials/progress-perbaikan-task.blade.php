@@ -53,12 +53,11 @@
             @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent']))
                 <div class="mt-6 flex justify-end">
                     <!-- Tombol Approve -->
-                    @if($laporan->status_lct === 'approved_taskbudget')
+                    @if($laporan->status_lct === 'approved_taskbudget' && $allTasksCompleted)
                         <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                             @csrf
                             <button type="submit"
-                                    class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer"
-                                    {{ !$allTasksCompleted ? 'disabled' : '' }}>
+                                    class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
                                 ✅ Approve All
                             </button>
                         </form>
