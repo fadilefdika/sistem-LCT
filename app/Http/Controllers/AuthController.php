@@ -55,7 +55,26 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Jika menggunakan token (untuk API misalnya), hapus semua token yang terhubung dengan user
         $request->user()->tokens()->delete();
+    
+        // Logout dari guard 'web' jika ada
+        Auth::guard('web')->logout();
+    
+        // Logout dari guard 'ehs' jika ada
+        Auth::guard('ehs')->logout();
+    
+        // Invalidasi sesi untuk memastikan data sesi tidak tertinggal
+        $request->session()->invalidate();
+    
+        // Regenerasi token CSRF untuk keamanan setelah logout
+        $request->session()->regenerateToken();
+    
+        // Jika menggunakan API, kembalikan response JSON
         return response()->json(['message' => 'Logout berhasil']);
+        
+        // Jika menggunakan tampilan web, redirect ke halaman login
+        // return redirect('/login');
     }
+    
 }

@@ -14,7 +14,7 @@
         :aria-expanded="open"                        
     >
         <div class="flex items-center truncate">
-            <span class="truncate ml-2 text-xs md:text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 cursor-pointer dark:group-hover:text-white">{{ $user->fullname }}</span>
+            <span class="truncate ml-2 text-xs md:text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 cursor-pointer dark:group-hover:text-white">{{ $user->fullname ?? 'Admin EHS' }}</span>
             <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 12 12">
                 <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
             </svg>
@@ -34,9 +34,25 @@
         x-cloak                    
     >
         <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-gray-200 dark:border-gray-700/60">
-            <div class="font-medium text-gray-800 dark:text-gray-100">{{$user->fullname}}</div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 italic uppercase">{{ $user->roleLct->first()->name ?? 'Tidak Ada Role' }}</div>
-        </div>
+            <div class="font-medium text-gray-800 dark:text-gray-100">
+                {{ $user->fullname ?? 'Admin Ehs' }}
+            </div>            
+                <div class="text-xs text-gray-500 dark:text-gray-400 italic uppercase">
+                    @php
+                        if (Auth::guard('ehs')->check()) {
+                            // Jika pengguna adalah EHS
+                            $user = Auth::guard('ehs')->user();
+                            $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
+                        } else {
+                            // Jika pengguna adalah User biasa
+                            $user = Auth::user();
+                            $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
+                        }
+                    @endphp
+                    {{ $roleName }}
+                </div>
+                
+            </div>
         <ul>
             <li>
                 <form method="POST" action="{{ route('logout') }}" x-data>

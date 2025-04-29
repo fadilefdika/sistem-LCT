@@ -1,4 +1,4 @@
-<div class="max-h-screen">
+<div class="h-screen flex flex-col min-h-0">
     <!-- Mobile Tabs (only show on mobile) -->
     <div class="md:hidden flex border-b border-gray-200 sticky top-0 z-10 bg-white dark:bg-gray-800">
         <button 
@@ -17,19 +17,35 @@
         </button>
     </div>
 
+    @if($laporan->status_lct == 'waiting_approval_temporary')
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4 shadow-sm">
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 mt-1 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M12 8v.01M12 12v.01M12 16v.01M12 20h.01M8 12h.01M16 12h.01M12 4h.01M4 12h.01M20 12h.01"/>
+                </svg>
+                <div>
+                    <p class="font-semibold">Action Required</p>
+                    <p>Click the <strong>"Task & Timeline"</strong> tab to complete the permanent action task and provide the estimated budget immediately.</p>
+                </div>                                              
+            </div>
+        </div>
+    @endif
+
     <!-- Content Area -->
-    <div class="flex flex-col md:grid md:grid-cols-2 h-[calc(100vh-56px)] md:h-screen">
+    <div class="flex flex-col md:grid md:grid-cols-2 flex-grow min-h-0">
         <!-- Card Laporan dari EHS -->
         <div 
             id="report-content"
-            class="w-full bg-[#F3F4F6] md:max-h-[calc(100vh)] pb-28 md:pb-0 h-full overflow-y-auto
-                    [&::-webkit-scrollbar]:w-1
-                    [&::-webkit-scrollbar-track]:rounded-full
-                    [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+            class="relative max-w-full bg-[#F3F4F6] shadow-md p-3 overflow-y-auto flex-grow min-h-0
+                {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }}
+                [&::-webkit-scrollbar]:w-1
+                [&::-webkit-scrollbar-track]:rounded-full
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             @include('partials.manajemen-lct-report', [
                 'laporan' => $laporan,
                 'bukti_temuan' => $bukti_temuan,
@@ -39,7 +55,8 @@
         <!-- Form Laporan Temuan -->
         <div 
             id="form-content"
-            class="w-full bg-[#F3F4F6] px-3 pt-3 pb-32 md:pb-0 md:max-h-[calc(100vh)] h-full overflow-y-auto
+            class="relative max-w-full bg-[#F3F4F6] shadow-md p-3 overflow-y-auto flex-grow min-h-0
+                {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }}
                 [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -53,6 +70,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     function switchTab(tabName) {

@@ -143,7 +143,7 @@
                                 'waiting_approval_temporary' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting for temporary LCT approval from EHS'],
                                 'waiting_approval_permanent' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting for permanent LCT approval from EHS'],
                                 'waiting_approval_taskbudget' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting for task and budget approval from the manager'],
-                                'approved' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'LCT Low has been approved by PIC'],
+                                'approved' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'LCT Low has been approved by EHS'],
                                 'approved_temporary' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Temporary LCT has been approved by EHS'],
                                 'approved_permanent' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Permanent LCT has been approved by EHS'],
                                 'approved_taskbudget' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Task and budget for permanent LCT has been approved by the manager'],
@@ -189,14 +189,20 @@
                     <!-- Tracking Status Column -->
                     <td>
                         <span class="inline-flex items-center justify-center px-3 py-1 text-black rounded-full whitespace-nowrap">
-                            {{ $status['tracking'] }}
+                            @if ($laporan->status_lct === 'closed' && !empty($laporan->catatan_ehs))
+                                {{ $laporan->catatan_ehs }}
+                            @else
+                                {{ $status['tracking'] }}
+                            @endif
                         </span>
                     </td>
 
                     
                     <!-- Tenggat Waktu -->
                     <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
-                        @if($laporan->tingkat_bahaya !== 'Low')
+                        @if($laporan->status_lct == 'open')
+                            <p>-</p>
+                        @elseif($laporan->tingkat_bahaya !== 'Low')
                             {{ \Carbon\Carbon::parse($laporan->due_date)->format('F d, Y') }}
                         @else
                             {{ \Carbon\Carbon::parse($laporan->due_date_temp)->format('F d, Y') }}
@@ -205,7 +211,9 @@
 
                     <!-- Tenggat Waktu -->
                     <td class="px-4 py-3 text-gray-800 w-32 whitespace-nowrap">
-                        @if($laporan->tingkat_bahaya !== 'Low')
+                        @if($laporan->status_lct == 'open')
+                            <p>-</p>
+                        @elseif($laporan->tingkat_bahaya !== 'Low')
                             {{ \Carbon\Carbon::parse($laporan->due_date_perm)->format('F d, Y') }}
                         @else
                             <p>-</p>
@@ -239,12 +247,18 @@
 
 
                     <!-- Tombol Aksi -->
+                    @php
+                        $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+                        $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+                    @endphp
+
                     <td class="px-4 py-3 flex items-center gap-2 w-28">
-                        <a href="{{ route('admin.progress-perbaikan.show', $laporan->id_laporan_lct) }}"
+                        <a href="{{ route($roleName === 'ehs' ? 'ehs.progress-perbaikan.show' : 'admin.progress-perbaikan.show', $laporan->id_laporan_lct) }}"
                             class="text-blue-600 hover:underline">
                             Detail
                         </a>
                     </td>
+
                 </tr>
                 @empty
                 <tr>

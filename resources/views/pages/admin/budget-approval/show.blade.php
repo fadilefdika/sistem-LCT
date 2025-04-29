@@ -184,24 +184,11 @@
                 </form>
             @endif
     
-            <!-- Revision History -->
-            <div class="mt-6 bg-gray-50 rounded-lg p-6 shadow">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Revision History</h3>
-                <div class="space-y-4">
-                    @forelse ($taskBudget->rejectLaporan as $reject)
-                        <div class="border-l-4 border-red-500 bg-white p-4 rounded shadow-sm">
-                            <p class="text-sm text-gray-600">
-                                <strong>Date:</strong> {{ $reject->created_at->timezone('Asia/Jakarta')->format('F j, Y') }} at {{ $reject->created_at->format('h:i A') }} WIB
-                            </p>
-                            <p class="text-sm text-gray-600 mt-1">
-                                <strong>Reason:</strong> {{ $reject->alasan_reject }}
-                            </p>
-                        </div>
-                    @empty
-                        <p class="text-sm text-gray-500 italic">No revision history available.</p>
-                    @endforelse
-                </div>
-            </div>
+            <a href="{{ route('admin.budget-approval.history', $taskBudget->id_laporan_lct) }}" class="inline-block">
+                <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                    <i class="fas fa-history mr-2"></i>History
+                </button>
+            </a>
         </div>
     </section>
     

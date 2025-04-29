@@ -1,11 +1,9 @@
-<h2 class="text-xl font-bold mb-4">{{ $title }}</h2>
-
 <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
     <div class="min-w-full divide-y divide-gray-300 bg-white rounded-lg">
         @if($laporans->isEmpty())
-            <div class="flex flex-col items-center justify-center px-6 py-12 text-gray-500">
-                <i class="fa-solid fa-face-smile text-4xl mb-3"></i>
-                <p class="text-sm font-medium">All in good condition 🎉</p>
+            <div class="flex flex-col items-center justify-center px-4 py-8 text-gray-500">
+                <i class="fa-solid fa-face-smile text-3xl mb-2"></i>
+                <p class="text-xs font-medium">All in good condition 🎉</p>
                 <p class="text-xs text-gray-400">There are no reports at this time. Enjoy your day!</p>
             </div>
         @else
@@ -15,54 +13,69 @@
                     $bukti_temuan_urls = collect($bukti_temuan)->map(fn($path) => asset('storage/' . $path));
                 @endphp
 
-                <div class="hover:bg-gray-50 text-sm transition duration-200 ease-in-out">
-                    <div class="flex items-center px-4 py-3 space-x-4">
+                <div class="hover:bg-gray-50 text-xs transition duration-200 ease-in-out">
+                    <div class="flex items-center px-3 py-2 space-x-3">
                         <!-- Number -->
-                        <div class="w-10 text-center font-semibold text-gray-800">
+                        <div class="w-8 text-center font-semibold text-gray-800">
                             {{ $loop->iteration }}
                         </div>
 
                         <!-- Image -->
                         @if($bukti_temuan_urls->isNotEmpty())
-                            <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image" class="w-20 h-20 object-cover rounded-md shadow-sm border border-gray-100">
+                            <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image" class="w-16 h-16 object-cover rounded-md shadow-sm border border-gray-100">
                         @else
-                            <div class="w-20 h-20 flex items-center justify-center bg-gray-100 text-xs text-gray-400 rounded-md border">
+                            <div class="w-16 h-16 flex items-center justify-center bg-gray-100 text-xs text-gray-400 rounded-md border">
                                 No Image
                             </div>
                         @endif
 
                         <!-- Text Details -->
                         <div class="flex-1">
-                            <p class="text-gray-500 text-xs">{{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('F j, Y') }}</p>
-                            <p class="text-gray-800">
+                            <p class="text-gray-500 text-xs">Finding date: {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('F j, Y') }}</p>
+                            <p class="text-gray-800 text-xs">
                                 {{ $laporan->temuan_ketidaksesuaian }} found in 
-                                <strong>{{ $laporan->area->nama_area }}</strong>
-                                <span class="text-gray-600">— {{ $laporan->detail_area }}</span>
+                                <br>
+                                <strong class="text-xs">{{ $laporan->area->nama_area }}</strong>
+                                <span class="text-gray-600 text-xs">— {{ $laporan->detail_area }}</span>
                             </p>
                         </div>
 
                         @php
-                            $user = Auth::user();
-                            $roleName = optional($user->roleLct->first())->name;
+                            // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+                            if (Auth::guard('ehs')->check()) {
+                                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                                $user = Auth::guard('ehs')->user();
+                                $roleName = optional($user->roles->first())->name;
+                            } else {
+                                // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                                $user = Auth::user();
+                                $roleName = optional($user->roleLct->first())->name;
+                            }
                         @endphp
                         
                         <!-- Action -->
-                        <div class="w-24 text-right">
-                            @if(in_array($roleName, ['ehs', 'manajer','user']))
-                                <a href="{{ route('admin.progress-perbaikan.show', $laporan->id_laporan_lct) }}" 
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <td class="w-20 text-right">
+                            @if (in_array($roleName, ['ehs', 'manajer', 'user']))
+                                <a href="{{ route(
+                                    $roleName === 'ehs' 
+                                        ? 'ehs.progress-perbaikan.show' 
+                                        : 'admin.progress-perbaikan.show', 
+                                    $laporan->id_laporan_lct
+                                ) }}" 
+                                class="text-blue-600 hover:text-blue-800 text-xs font-medium">
                                     View Details
                                 </a>
                             @else
                                 <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}" 
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                class="text-blue-600 hover:text-blue-800 text-xs font-medium">
                                     View Details
                                 </a>
                             @endif
-                        </div>
+                        </td>                        
                     </div>
                 </div>
             @endforeach
         @endif
     </div>
 </div>
+

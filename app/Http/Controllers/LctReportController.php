@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Pic;
 use App\Models\User;
 
+use App\Models\AreaLct;
 use App\Models\Kategori;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
+use App\Models\RejectLaporan;
 use App\Models\LctDepartement;
 use PhpParser\Node\Expr\Assign;
 use App\Models\LctDepartemenPic;
@@ -24,7 +26,6 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\AssignToPicRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreLaporanRequest;
-use App\Models\AreaLct;
 
 class LctReportController extends Controller
 {
@@ -36,6 +37,17 @@ class LctReportController extends Controller
     //untuk di show detail laporan lct tampilan ehs 
     public function show($id_laporan_lct)
     {
+        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $roleName = optional($user->roles->first())->name;
+        } else {
+            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+            $user = Auth::user();
+            $roleName = optional($user->roleLct->first())->name;
+        }
+        
         $laporan = LaporanLct::with('user','kategori','area')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
         $kategori = Kategori::all();
         $departemen = LctDepartement::all()->map(fn($d) => [
@@ -47,24 +59,26 @@ class LctReportController extends Controller
             return asset('storage/' . $path);
         });
 
+        // Cek apakah role adalah EHS dan apakah EHS pertama kali melihat laporan
+        if ($roleName === 'ehs' && !$laporan->first_viewed_by_ehs_at) {
+            // Catat waktu pertama kali EHS melihat laporan
+            $laporan->update(['first_viewed_by_ehs_at' => now()]);
+
+            // Log pengiriman laporan ke EHS (sebagai contoh: pertama kali dilihat)
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,
+                'status_lct' => 'open_ehs',  
+                'alasan_reject' => null,  
+                'tipe_reject' => null,  
+            ]);
+        }
+
         // dd($bukti_temuan);
 
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan', 'kategori'));
     }
-
-    public function destroy($id_laporan_lct)
-    {
-        $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
-
-        // Tidak perlu hapus file kalau belum mau delete permanen
-        // Bisa dihapus saat force delete nanti
-
-        $laporan->delete(); // ini hanya mengisi kolom deleted_at
-
-        return response()->json(['message' => 'Report successfully deleted']);
-    }
-
-
 
     //laporan dari user ke ehs 
     public function store(StoreLaporanRequest $request) 
@@ -72,9 +86,17 @@ class LctReportController extends Controller
         try {
             DB::beginTransaction(); // Mulai transaksi
     
-            // Ambil user yang sedang login
-            $user = Auth::user();
-    
+           // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+            if (Auth::guard('ehs')->check()) {
+                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                $user = Auth::guard('ehs')->user();
+                $roleName = optional($user->roles->first())->name;
+            } else {
+                // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                $user = Auth::user();
+                $roleName = optional($user->roleLct->first())->name;
+            }
+
             // Buat ID unik untuk laporan
             $idLCT = LaporanLct::generateLCTId();
     
@@ -88,8 +110,7 @@ class LctReportController extends Controller
             if(!$area){
                 return redirect()->back()->with('error', 'Area is not valid.');
             }
-
-
+    
             // Simpan gambar ke storage public
             $buktiFotoPaths = [];
             if ($request->hasFile('bukti_temuan')) {
@@ -116,15 +137,26 @@ class LctReportController extends Controller
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'rekomendasi_safety' => $request->rekomendasi_safety,
                 'bukti_temuan' => json_encode($buktiFotoPaths),
-                'status_lct' => 'open',
+                'status_lct' => 'open',  // Status pertama adalah "open"
             ]);
             
             $laporan->load('user', 'kategori');
+            
             // Kirim email ke EHS
             Mail::to('efdika1102@gmail.com')->queue(new LaporanKetidaksesuaian($laporan));
-            
+    
+            // Log pengiriman laporan ke EHS
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,  // Role user yang mengirimkan laporan
+                'status_lct' => 'open',  // Status saat laporan baru dikirim
+                'alasan_reject' => null,  // Tidak ada alasan reject pada tahap ini
+                'tipe_reject' => null,  // Mengindikasikan ini adalah pengiriman ke EHS
+            ]);
+    
             DB::commit(); // Simpan perubahan
-
+    
             return redirect()->back()->with('success', 'Laporan berhasil disimpan!');
     
         } catch (\Exception $e) {
@@ -133,10 +165,22 @@ class LctReportController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
     }
+    
 
     // dari ehs ke pic
     public function assignToPic(Request $request, $id_laporan_lct)
     {
+        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $roleName = optional($user->roles->first())->name;
+        } else {
+            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+            $user = Auth::user();
+            $roleName = optional($user->roleLct->first())->name;
+        }
+
         // Validasi request
         $validator = Validator::make($request->all(), [
             'temuan_ketidaksesuaian' => 'required|string|max:255',
@@ -170,6 +214,15 @@ class LctReportController extends Controller
             // dd("masuk sini");
             
             DB::commit();
+
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,  // Role user yang mengirimkan laporan
+                'status_lct' => 'in_progress',  // Status saat laporan baru dikirim
+                'alasan_reject' => null,  // Tidak ada alasan reject pada tahap ini
+                'tipe_reject' => null,  // Mengindikasikan ini adalah pengiriman ke EHS
+            ]);
             
             Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
 
@@ -185,4 +238,17 @@ class LctReportController extends Controller
             return redirect()->back()->with('error', 'An error occurred while submitting the report.', $e->getMessage());
         }
     }
+
+    public function closed(Request $request, $id_laporan_lct)
+    {
+        $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+        $laporan->status_lct = 'closed';
+        $laporan->date_closed = now();
+        $laporan->catatan_ehs = "This report has been closed because another similar report has been processed first.";
+        $laporan->update();
+    
+        return response()->json(['success' => true]);
+
+    }
+    
 }

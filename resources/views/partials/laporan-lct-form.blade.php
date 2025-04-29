@@ -6,7 +6,7 @@
                         <div class="w-full h-[2px] bg-gray-200 px-3"></div>
 
                         <div class="p-6">
-                            <form action="{{ route('admin.laporan-lct.assignToPic', ['id_laporan_lct' => $laporan->id_laporan_lct]); }}" method="POST">
+                            <form action="{{ route('ehs.laporan-lct.assignToPic', ['id_laporan_lct' => $laporan->id_laporan_lct]); }}" method="POST">
                                 @csrf
                                 <div class="space-y-6">
                                     <!-- Form fields -->

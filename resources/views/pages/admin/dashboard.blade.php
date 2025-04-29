@@ -4,8 +4,125 @@
         <div class="mx-auto max-w-screen-2xl">
             <div class="container mx-auto">
 
+                @php
+                    // Cek apakah pengguna adalah EHS atau bukan
+                    if (Auth::guard('ehs')->check()) {
+                        // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
+                        $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                    } else {
+                        // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
+                        $userRole = optional(auth()->user()->roleLct->first())->name;
+                    }
+                @endphp
+
+
+                @php
+                    $isEhs = $userRole === 'ehs';
+                    $isUser = $userRole === 'user';
+                    $isPic = $userRole === 'pic';
+                    $isManajer = $userRole === 'manajer';
+
+                    // Hitung jumlah tabel
+                    $tableCount = 0;
+                    if ($isEhs) $tableCount += 2;
+                    if ($isManajer) $tableCount += 1;
+                    if ($isUser) $tableCount += 1;
+                    if ($isPic) $tableCount += 1;
+
+                    $gridColsClass = $tableCount > 1 ? 'lg:grid-cols-2' : 'lg:grid-cols-1';
+                @endphp
+
+                <!-- Tabel Reports Section -->
+                <div class="grid grid-cols-1 {{ $gridColsClass }} gap-3 items-start">
+
+                    {{-- EHS --}}
+                    @if($isEhs)
+                        <!-- New Finding -->
+                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                            <h2 class="text-xl font-semibold mb-2">New Finding</h2>
+                            <div class="overflow-auto h-[435px]"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel-new', [
+                                    'laporans' => $laporanNew
+                                ])
+                            </div>
+                        </div>
+
+                        <!-- Report Awaiting Approval -->
+                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                            <h2 class="text-xl font-semibold mb-2">Report Awaiting Approval</h2>
+                            <div class="overflow-auto h-[435px]"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel', [
+                                    'laporans' => $laporanNeedApproval
+                                ])
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Manager --}}
+                    @if($isManajer)
+                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                            <h2 class="text-xl font-semibold mb-2">Report Awaiting Approval</h2>
+                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel-approval-taskbudget', [
+                                    'laporans' => $laporanNeedApprovalBudget
+                                ])
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($isUser)
+                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                            <h2 class="text-xl font-semibold mb-2">Progress</h2>
+                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel', [
+                                    'laporans' => $laporanUser
+                                ])
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($isPic)
+                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                            <h2 class="text-xl font-semibold mb-2">Progress</h2>
+                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel', [
+                                    'laporans' => $laporanInProgress
+                                ])
+                            </div>
+                        </div>
+                    @endif
+
+                </div>
+
+
+
+                <!-- Tabel Reports Section (Overdue & Medium-High Risk) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4 items-start">
+                    
+                    <!-- Overdue Reports Table -->
+                    <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                        <h2 class="text-xl font-semibold mb-2">Overdue Reports</h2>
+                        <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
+                            @include('partials.dashboard-tabel', [
+                                'laporans' => $laporanOverdue
+                            ])
+                        </div>
+                    </div>
+                    
+                    <!-- Medium & High Risk Reports Table -->
+                    <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                        <h2 class="text-xl font-semibold mb-2">Medium & High Risk Reports</h2>
+                        <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
+                            @include('partials.dashboard-tabel-medium-high',[
+                                'laporans' => $laporanMediumHigh
+                            ])
+                        </div>
+                    </div>
+
+                </div>
+
                 <!-- Main Grid Layout -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-4">
                     
                     <!-- Grafik Garis: LCT Per Bulan (2/3 width) -->
                     <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-2 flex flex-col">
@@ -21,28 +138,6 @@
 
                 </div>
 
-            
-                <!-- Tabel Reports Section (Medium & High Risk Reports and Overdue Reports) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
-                    
-                    <!-- Medium & High Risk Reports Table -->
-                    <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
-                        @include('partials.dashboard-tabel-medium-high',[
-                            'title' => 'Medium & High Risk Reports',
-                            'laporans' => $laporanMediumHigh
-                        ])
-                    </div>
-            
-                    <!-- Overdue Reports Table -->
-                    <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
-                        @include('partials.dashboard-tabel', [
-                            'title' => 'Overdue Reports',
-                            'laporans' => $laporanOverdue
-                        ])
-                    </div>
-            
-                </div>
-            
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
                     <!-- Grafik Batang Horizontal: Berdasarkan Area -->
                     <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
@@ -58,8 +153,6 @@
                 </div>
             
             </div>
-            
-            
         </div>
     </div>
     

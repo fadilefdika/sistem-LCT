@@ -84,10 +84,14 @@
                     <!-- Aksi -->
                     <td class="px-4 py-3 text-center w-32">
                         <div class="flex flex-row items-center justify-center space-x-3">
-                            <!-- Tombol Detail -->
-                            <a href="{{ route('admin.laporan-lct.show', $laporan->id_laporan_lct) }}"
-                            class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                         @php
+                            $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+                            $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+                        @endphp
+
+                            <a href="{{ route($roleName === 'ehs' ? 'ehs.laporan-lct.show' : 'admin.laporan-lct.show', $laporan->id_laporan_lct) }}"
+                                class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -95,17 +99,36 @@
                                 Detail
                             </a>
 
-                            <!-- Tombol Delete -->
-                            <a href="javascript:void(0)" 
-                            class="text-red-600 hover:text-red-800 hover:underline flex items-center gap-1 delete-laporan" 
-                            data-id="{{ $laporan->id_laporan_lct }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                                Delete
-                            </a>
+                            @php
+                                // Cek apakah pengguna adalah EHS atau bukan
+                                if (Auth::guard('ehs')->check()) {
+                                    // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
+                                    $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                                } else {
+                                    // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
+                                    $userRole = optional(auth()->user()->roleLct->first())->name;
+                                }
+                            @endphp
+
+                            @if ($userRole == 'ehs')
+                            <!-- Tombol Closed (dengan SweetAlert2) -->
+                                <form id="form-close-{{ $laporan->id_laporan_lct }}"
+                                    action="{{ route('admin.laporan-lct.closed', $laporan->id_laporan_lct) }}"
+                                    method="POST" class="inline-block">
+                                @csrf
+                                <button type="button"
+                                        class="text-green-700 hover:text-green-900 hover:underline flex items-center gap-1"
+                                        onclick="confirmClose('{{ $laporan->id_laporan_lct }}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Closed
+                                </button>
+                                </form>
+
+                            @endif
 
 
 
@@ -161,51 +184,50 @@
 </div>
 
 <script>
-    document.querySelectorAll('.delete-laporan').forEach(btn => {
-        btn.addEventListener('click', () => {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This report will be deleted and cannot be recovered.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/laporan-lct/${btn.dataset.id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(res => {
-                        if (!res.ok) throw new Error("Failed to delete");
-                        return res.json();
-                    })
-                    .then(data => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: data.message,
-                            showConfirmButton: false,
-                            timer: 2000, // Modal auto-close in 2 seconds
-                            timerProgressBar: true
-                        }).then(() => {
-                            window.location.reload(); // Refresh after success
-                        });
-                    })
-                    .catch(error => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops!',
-                            text: 'Something went wrong while deleting.'
-                        });
+    function confirmClose(id) {
+        Swal.fire({
+            title: 'Are you sure you want to close this report?',
+            text: "The report will be marked as closed.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, close it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Ambil action dan token dari form
+                const form = document.getElementById(`form-close-${id}`);
+                const action = form.getAttribute('action');
+                const csrf = form.querySelector('input[name="_token"]').value;
+
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed");
+                    return res.json(); // opsional, tergantung response controller kamu
+                })
+                .then(data => {
+                    Swal.fire({
+                        title: 'Closed!',
+                        text: 'The report has been successfully closed.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Refresh halaman setelah modal sukses ditutup
                     });
-                }
-            });
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Failed to close the report.', 'error');
+                });
+            }
         });
-    });
+    }
+
 </script>
 

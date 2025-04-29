@@ -24,6 +24,7 @@ class LaporanLct extends Model
         'rekomendasi_safety', 
         'bukti_temuan',
         'pic_id',   
+        'catatan_ehs',
         'departemen_id',   
         'tingkat_bahaya',  
         'rekomendasi',  
@@ -34,6 +35,9 @@ class LaporanLct extends Model
         'budget_approval',
         'bukti_perbaikan',
         'tindakan_perbaikan',
+        'first_viewed_by_ehs_at',
+        'first_viewed_by_manager_at',
+        'first_viewed_by_pic_at',
         'attachments'
     ];
     

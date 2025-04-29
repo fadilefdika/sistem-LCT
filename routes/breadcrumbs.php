@@ -14,7 +14,11 @@ Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
     $trail->push('Dashboard', route('admin.dashboard'));
 });
 
-// laporan lct
+Breadcrumbs::for('ehs dashboard', function (BreadcrumbTrail $trail) {
+    $trail->push('Dashboard', route('ehs.dashboard'));
+});
+
+// ehs laporan lct
 Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('LCT Reports', route('admin.laporan-lct.index'));
@@ -25,6 +29,16 @@ Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan)
     $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
 });
 
+// laporan lct
+Breadcrumbs::for('ehs laporan-lct', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('LCT Reports', route('ehs.laporan-lct.index'));
+});
+
+Breadcrumbs::for('ehs laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('laporan-lct');
+    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('ehs.laporan-lct.show', $laporan));
+});
 
 // activity approval
 Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
@@ -60,6 +74,18 @@ Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
     $trail->push("Activity Progress #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+});
+
+// progress perbaikan
+Breadcrumbs::for('ehs progress-perbaikan', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Activity Progress', route('ehs.progress-perbaikan.index'));
+});
+
+// progress perbaikan detail 
+Breadcrumbs::for('ehs progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('progress-perbaikan');
+    $trail->push("Activity Progress #{$laporan->id_laporan_lct}", route('ehs.progress-perbaikan.show', $laporan));
 });
 
 
@@ -102,4 +128,33 @@ Breadcrumbs::for('master-data.category-data', function (BreadcrumbTrail $trail) 
 Breadcrumbs::for('master-data.department-data', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Department Data', route('admin.master-data.department-data.index'));
+});
+// laporan master data
+Breadcrumbs::for('master-data.area-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Department Data', route('admin.master-data.area-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('ehs.master-data.role-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Role Data', route('ehs.master-data.role-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('ehs.master-data.category-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Category Data', route('ehs.master-data.category-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('ehs.master-data.department-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Department Data', route('ehs.master-data.department-data.index'));
+});
+
+// laporan master data
+Breadcrumbs::for('ehs.master-data.area-data', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Area Data', route('ehs.master-data.area-data.index'));
 });

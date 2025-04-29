@@ -29,10 +29,16 @@
                 <div class="block">
                     @if (Route::currentRouteName() === 'admin.dashboard')
                         {{ Breadcrumbs::render('dashboard') }}
+                    @elseif (Route::currentRouteName() === 'ehs.dashboard')
+                        {{ Breadcrumbs::render('ehs dashboard') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct.index')
                         {{ Breadcrumbs::render('laporan-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct.show')
                         {{ Breadcrumbs::render('laporan-lct.show', $laporan) }}
+                    @elseif (Route::currentRouteName() === 'ehs.laporan-lct.index')
+                        {{ Breadcrumbs::render('ehs laporan-lct') }}
+                    {{-- @elseif (Route::currentRouteName() === 'ehs.laporan-lct.show')
+                        {{ Breadcrumbs::render('ehs laporan-lct.show', $laporan) }} --}}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.index')
                         {{ Breadcrumbs::render('manajemen-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.show')
@@ -41,6 +47,10 @@
                         {{ Breadcrumbs::render('progress-perbaikan') }}
                     @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.show')
                         {{ Breadcrumbs::render('progress-perbaikan.show', $laporan) }}
+                    @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.index')
+                        {{ Breadcrumbs::render('ehs progress-perbaikan') }}
+                    {{-- @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.show')
+                        {{ Breadcrumbs::render('ehs progress-perbaikan.show', $laporan) }} --}}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.index')
                         {{ Breadcrumbs::render('budget-approval') }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.show')
@@ -59,6 +69,16 @@
                         {{ Breadcrumbs::render('master-data.department-data') }}
                     @elseif(Route::currentRouteName() === 'admin.master-data.category-data.index')
                         {{ Breadcrumbs::render('master-data.category-data') }}
+                    @elseif(Route::currentRouteName() === 'admin.master-data.area-data.index')
+                        {{ Breadcrumbs::render('master-data.area-data') }}
+                    @elseif(Route::currentRouteName() === 'ehs.master-data.role-data.index')
+                        {{ Breadcrumbs::render('ehs.master-data.role-data') }}
+                    @elseif(Route::currentRouteName() === 'ehs.master-data.department-data.index')
+                        {{ Breadcrumbs::render('ehs.master-data.department-data') }}
+                    @elseif(Route::currentRouteName() === 'ehs.master-data.category-data.index')
+                        {{ Breadcrumbs::render('ehs.master-data.category-data') }}
+                    @elseif(Route::currentRouteName() === 'ehs.master-data.area-data.index')
+                        {{ Breadcrumbs::render('ehs.master-data.area-data') }}
                     @endif
 
                 </div>

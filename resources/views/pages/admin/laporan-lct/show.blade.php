@@ -1,6 +1,13 @@
 <x-app-layout class="h-screen md:overflow-hidden">
     @php
-        $userRole = optional(auth()->user()->roleLct->first())->name;
+        // Cek apakah pengguna adalah EHS atau bukan
+        if (Auth::guard('ehs')->check()) {
+        // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
+            $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+        } else {
+                    // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
+            $userRole = optional(auth()->user()->roleLct->first())->name;
+        }
     @endphp
 
     <div x-data="tabs()" x-init="init()" class="h-full flex flex-col">

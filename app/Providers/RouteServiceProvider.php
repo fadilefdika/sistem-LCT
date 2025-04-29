@@ -17,17 +17,19 @@ class RouteServiceProvider extends ServiceProvider
      */
     public static function home(): string
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return '/login';
+        // Cek jika user terautentikasi dengan guard 'web'
+        if (Auth::guard('web')->check()) {
+            return route('choose-destination-user'); // Arahkan ke choose-destination-user
         }
 
-        return '/choose-destination'; // Arahkan ke halaman pemilihan tujuan
+        // Cek jika user terautentikasi dengan guard 'ehs'
+        if (Auth::guard('ehs')->check()) {
+            return route('choose-destination-ehs'); // Arahkan ke choose-destination-ehs
+        }
+
+        // Jika tidak ada user yang terautentikasi, redirect ke halaman login
+        return '/';
     }
-
-
-
 
     /**
      * Define route model bindings, pattern filters, and other route configurations.

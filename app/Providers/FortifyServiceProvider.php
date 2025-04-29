@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\ServiceProvider;
@@ -37,13 +38,26 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Mengubah login dari email ke NPK
         Fortify::authenticateUsing(function (Request $request) {
-            $user = User::where('npk', $request->npk)->first();
+            $npk = $request->npk;
+            $password = $request->password;
         
-            if ($user && Hash::check($request->password, $user->password_hash)) {
-                return $user;
+            Log::info('Attempting login for NPK: ' . $npk);
+        
+            $user = User::where('npk', $npk)->first();
+        
+            if (!$user) {
+                Log::warning('Login failed: User not found for NPK ' . $npk);
+                return null;
             }
         
-            return null;
+            if (!Hash::check($password, $user->password_hash)) {
+                Log::warning('Login failed: Password mismatch for NPK ' . $npk);
+                return null;
+            }
+        
+            Log::info('Login successful for NPK: ' . $npk);
+        
+            return $user;
         });
 
         // Menetapkan 'npk' sebagai username

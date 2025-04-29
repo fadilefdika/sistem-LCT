@@ -19,96 +19,109 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $roleName = optional($user->roleLct->first())->name;
+        // Mengecek guard yang digunakan dan mengambil pengguna yang sesuai
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $roleName = optional($user->roleLct->first())->name ?? 'guest';
+        }
         
+
         $monthNames = [
             1 => "January", 2 => "February", 3 => "March", 4 => "April",
             5 => "May", 6 => "June", 7 => "July", 8 => "August",
             9 => "September", 10 => "October", 11 => "November", 12 => "December"
         ];
 
-        // Query dengan SQL Server-friendly syntax
+        $currentYear = now()->year;
+
         $monthlyReports = LaporanLct::selectRaw('MONTH(tanggal_temuan) as month_num, COUNT(*) as count')
-            ->whereRaw('YEAR(tanggal_temuan) = ?', [now()->year])
+            ->whereYear('tanggal_temuan', $currentYear)
             ->groupByRaw('MONTH(tanggal_temuan)')
             ->orderByRaw('MONTH(tanggal_temuan)')
             ->get()
             ->mapWithKeys(fn($item) => [$monthNames[$item->month_num] => $item->count]);
 
-        // Jumlah temuan berdasarkan kategori
         $categoryCounts = DB::table('lct_laporan')
             ->join('lct_kategori', 'lct_laporan.kategori_id', '=', 'lct_kategori.id')
             ->selectRaw('lct_kategori.nama_kategori, COUNT(lct_laporan.id) as laporan_count')
             ->groupBy('lct_kategori.nama_kategori')
-            ->pluck('laporan_count', 'nama_kategori');
+            ->pluck('laporan_count', 'nama_kategori') ?? collect();
 
         $categories = Kategori::all();
-
         $categoryAliases = $categories->mapWithKeys(function ($item) {
-            $name = $item->nama_kategori;
-        
-            if ($name === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)') {
-                return [$name => '5S']; // pakai huruf kapital sesuai preferensimu
-            }
-        
-            return [$name => $name]; 
+            return [$item->nama_kategori => $item->nama_kategori === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' ? '5S' : $item->nama_kategori];
         })->toArray();
-        
-        $areaCounts = AreaLct::withCount('laporan')->pluck('laporan_count', 'nama_area');
 
-        // Jumlah open & close
+        $areaCounts = AreaLct::withCount('laporan')->pluck('laporan_count', 'nama_area') ?? collect();
+
         $statusCounts = [
             'open' => LaporanLct::where('status_lct', 'open')->count(),
             'close' => LaporanLct::where('status_lct', 'closed')->count(),
             'in_progress' => LaporanLct::whereNotIn('status_lct', ['open', 'closed'])->count(),
         ];
 
-       // Base query untuk Medium dan High
         $laporanMediumHighQuery = LaporanLct::whereIn('tingkat_bahaya', ['Medium', 'High'])
-        ->where('status_lct', '!=', 'closed');
+            ->where('status_lct', '!=', 'closed');
 
-        // Base query untuk Overdue
+        $laporanUserQuery = null;
+        $laporanNewQuery = LaporanLct::where('status_lct', 'open');
+
+        $laporanNeedApprovalQuery = LaporanLct::whereIn('status_lct', [
+            'waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent',
+        ])->where('status_lct', '!=', 'closed');
+
+        $laporanNeedReviseQuery = LaporanLct::whereIn('status_lct', [
+            'revision', 'taskbudget_revision', 'permanent_revision',
+        ])->where('status_lct', '!=', 'closed');
+
+        $laporanNeedApprovalBudgetQuery = LaporanLct::where('status_lct', 'waiting_approval_taskbudget');
+
+        $laporanInProgressQuery = LaporanLct::where('status_lct', 'in_progress');
+
         $now = Carbon::now()->toDateString();
         $laporanOverdueQuery = LaporanLct::where('due_date', '<', $now)
-        ->where('status_lct', '!=', 'closed')
-        ->where(function ($query) {
-            $query->whereNull('date_completion')
-                ->orWhereColumn('date_completion', '>', 'due_date');
-        });
+            ->where('status_lct', '!=', 'closed')
+            ->where(function ($query) {
+                $query->whereNull('date_completion')
+                    ->orWhereColumn('date_completion', '>', 'due_date');
+            });
 
-        // Tambahkan filter berdasarkan role
+        // Role-based filter
         if ($roleName === 'pic') {
-        $picId = Pic::where('user_id', $user->id)->value('id');
-
-        if ($picId) {
-            $laporanMediumHighQuery->where('pic_id', $picId);
-            $laporanOverdueQuery->where('pic_id', $picId);
-        } else {
-            // Jika tidak ditemukan, kosongkan hasil
-            $laporanMediumHighQuery->whereRaw('1 = 0');
-            $laporanOverdueQuery->whereRaw('1 = 0');
-        }
+            $picId = Pic::where('user_id', $user->id)->value('id');
+            if ($picId) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
+                    $query->where('pic_id', $picId);
+                }
+            } else {
+                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
+                    $query->whereRaw('1 = 0');
+                }
+            }
         } elseif ($roleName === 'user') {
-        $laporanMediumHighQuery->where('user_id', $user->id);
-        $laporanOverdueQuery->where('user_id', $user->id);
+            $laporanMediumHighQuery->where('user_id', $user->id);
+            $laporanOverdueQuery->where('user_id', $user->id);
+            $laporanNeedApprovalQuery->where('user_id', $user->id);
+
+            // Tambahan: Semua laporan milik user
+            $laporanUserQuery = LaporanLct::where('user_id', $user->id)
+            ->where('status_lct', '!=', 'closed');
+
         } elseif ($roleName === 'manajer') {
-        $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
-
-        if ($departemenId) {
-            $laporanMediumHighQuery->where('departemen_id', $departemenId);
-            $laporanOverdueQuery->where('departemen_id', $departemenId);
-        } else {
-            $laporanMediumHighQuery->whereRaw('1 = 0');
-            $laporanOverdueQuery->whereRaw('1 = 0');
+            $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
+            if ($departemenId) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
+                    $query->where('departemen_id', $departemenId);
+                }
+            } else {
+                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
+                    $query->whereRaw('1 = 0');
+                }
+            }
         }
-        }
-
-        // Ambil 5 data
-        $laporanMediumHigh = $laporanMediumHighQuery->take(5)->get();
-        $laporanOverdue = $laporanOverdueQuery->take(5)->get();
-
-
 
         return view('pages.admin.dashboard', [
             'layout' => 'layouts.admin',
@@ -117,8 +130,15 @@ class DashboardController extends Controller
             'categoryAliases' => $categoryAliases,
             'areaCounts' => $areaCounts,
             'statusCounts' => $statusCounts,
-            'laporanMediumHigh' => $laporanMediumHigh,
-            'laporanOverdue' => $laporanOverdue,
+            'laporanMediumHigh' => $laporanMediumHighQuery->take(5)->get(),
+            'laporanOverdue' => $laporanOverdueQuery->take(5)->get(),
+            'laporanNew' => $laporanNewQuery->take(5)->get(),
+            'laporanNeedApproval' => $laporanNeedApprovalQuery->take(5)->get(),
+            'laporanNeedRevise' => $laporanNeedReviseQuery->take(5)->get(),
+            'laporanNeedApprovalBudget' => $laporanNeedApprovalBudgetQuery->take(5)->get(),
+            'laporanInProgress' => $laporanInProgressQuery->take(5)->get(),
+            'laporanUser' => $laporanUserQuery?->latest()->take(5)->get() ?? collect(), 
+            'roleName' => $roleName,
         ]);
     }
 }

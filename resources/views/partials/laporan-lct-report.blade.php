@@ -50,7 +50,13 @@
             <i class="fas fa-map-marker-alt text-red-500"></i>
             <p>Finding Area</p>
         </div>
-        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area->nama_area}} - {{$laporan->detail_area}}</p>
+        <p class="text-gray-900 font-semibold text-sm mt-1">
+            @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
+                {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
+            @else
+                <span class="text-gray-400">No area details available</span>
+            @endif
+        </p>        
     </div>
     
     <!-- Card Kategori Temuan -->

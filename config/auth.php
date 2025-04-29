@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+use App\Models\EhsUser;
+
 return [
 
     /*
@@ -36,11 +39,19 @@ return [
     */
 
     'guards' => [
+        // Guard untuk user biasa
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        
+        // Guard untuk EhsUser
+        'ehs' => [
+            'driver' => 'session',
+            'provider' => 'ehs_users',
+        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -65,11 +76,12 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'ehs_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\EhsUser::class,
+        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------

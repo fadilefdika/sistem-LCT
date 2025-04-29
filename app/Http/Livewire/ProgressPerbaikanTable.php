@@ -24,8 +24,15 @@ class ProgressPerbaikanTable extends Component
 
     private function filterData()
     {
-        $user = Auth::user();
-        $role = optional($user->roleLct->first())->name;
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;  // Ambil role dari model EhsUser
+        } else {
+            // Jika pengguna adalah User biasa (guard 'web')
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;  // Ambil role dari model User
+        }
 
         // === Status progress dan closed ===
         $progressStatuses = [
@@ -35,17 +42,26 @@ class ProgressPerbaikanTable extends Component
             'work_permanent', 'waiting_approval_permanent', 'approved_permanent', 'permanent_revision', 'closed'
         ];
 
+        if ($role == 'user') {
+            array_unshift($progressStatuses, 'review', 'open'); // Bisa juga pakai array_merge()
+        }
         // === Base query untuk semua data (progress dan closed) ===
         $query = LaporanLct::query()
             ->select('*', DB::raw("
                 CASE 
                     WHEN status_lct = 'closed' THEN 1
                     ELSE 0
-                END as order_type
+                END as order_type,
+                CASE 
+                    WHEN status_lct = 'closed' AND CAST(catatan_ehs AS VARCHAR(MAX)) IS NOT NULL AND CAST(catatan_ehs AS VARCHAR(MAX)) != '' THEN 1
+                    ELSE 0
+                END as order_note
             "));
 
+
+
         // === Filter berdasarkan role ===
-        if ($role === 'user') {
+        if ($role === 'user') { 
             $query->where('user_id', $user->id);
         } elseif ($role === 'manajer') {
             $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
@@ -95,9 +111,11 @@ class ProgressPerbaikanTable extends Component
         }        
 
         // === Urutan: Progress (order_type 0) dulu, lalu Closed (order_type 1) ===
-        return $query->orderBy('order_type')
-             ->orderByDesc('updated_at') 
+        return $query->orderBy('order_type')       // closed di akhir
+             ->orderBy('order_note')       // catatan_ehs yang tidak kosong di paling akhir
+             ->orderByDesc('updated_at')   // urut dari yang terbaru
              ->paginate(10);
+
     }
 
     public function updatedRiskLevel($value)

@@ -34,16 +34,28 @@
                                 'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
                                 'taskbudget_revision' => 'The Task and Budget Require Revision by PIC.',
                                 'approved_taskbudget' => 'Budget Approved',
+                                'work_permanent' => 'Budget Approved',
+                                'waiting_approval_permanent' => 'Budget Approved',
+                                'permanent_revision' => 'Budget Approved',
+                                'approved_permanent' => 'Budget Approved',
                             ];
 
                             $statusLabel = $statusMapping[$budget->status_lct] ?? ucfirst(str_replace('_', ' ', $budget->status_lct));
+
+                            $bgClass = match ($budget->status_lct) {
+                                'waiting_approval_taskbudget' => 'bg-red-100 text-red-700',
+                                'taskbudget_revision' => 'bg-yellow-100 text-yellow-800',
+                                'approved_taskbudget', 'work_permanent', 'waiting_approval_permanent', 'permanent_revision', 'approved_permanent' => 'bg-green-100 text-green-800',
+                                default => 'bg-gray-100 text-gray-800',
+                            };
                         @endphp
 
-                        <td class="px-4 py-4 text-sm text-gray-800">
-                            <p class="truncate block max-w-xs font-medium">
+                        <td class="px-4 py-4 text-sm">
+                            <p class="truncate block max-w-xs font-medium px-2 py-1 rounded {{ $bgClass }}">
                                 {{ $statusLabel }}
                             </p>
                         </td>
+
 
                         <td class="px-4 py-4 text-center">
                             <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}" 

@@ -60,7 +60,40 @@
                 x-ref="contentarea"
                 :class="{ 
                     'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show','admin.progress-perbaikan.show'].includes(page), 
-                    'overflow-y-auto': ['admin.dashboard','admin.progress-perbaikan.index','admin.master-data.role-data.index','admin.master-data.area-data.index','admin.master-data.department-data.index','admin.master-data.category-data.index','admin.manajemen-lct.index','admin.laporan-lct.index','admin.riwayat-lct.index','admin.budget-approval.index','admin.budget-approval.show','admin.budget-approval-history.show','admin.master-data','admin.budget-approval-history.index'].includes(page) 
+                    'overflow-y-auto': [
+                            'admin.dashboard',
+                            'admin.progress-perbaikan.index',
+                            'admin.progress-perbaikan.history',
+                            'admin.manajemen-lct.history',
+                            'admin.budget-approval.history',
+                            'admin.master-data.role-data.index',
+                            'admin.master-data.area-data.index',
+                            'admin.master-data.department-data.index',
+                            'admin.master-data.category-data.index',
+                            'admin.manajemen-lct.index',
+                            'admin.laporan-lct.index',
+                            'admin.riwayat-lct.index',
+                            'admin.budget-approval.index',
+                            'admin.budget-approval.show',
+                            'admin.budget-approval-history.show',
+                            'admin.budget-approval-history.index',
+
+                            // Menambahkan route untuk ehs
+                            'ehs.dashboard',
+                            'ehs.progress-perbaikan.index',
+                            'ehs.progress-perbaikan.show',
+                            'ehs.progress-perbaikan.history',
+
+                            'ehs.laporan-lct.index',
+                            'ehs.laporan-lct.show',
+                            'ehs.laporan-lct.closed',
+
+                            'ehs.master-data.department-data.index',
+                            'ehs.master-data.role-data.index',
+                            'ehs.master-data.category-data.index',
+                            'ehs.master-data.area-data.index'
+                        ].includes(page)
+
                 }">
 
                 <x-app.header :variant="$attributes['headerVariant']" />
@@ -110,7 +143,7 @@
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     Swal.fire({
-                        icon: 'info', // Bisa diganti ke 'success' jika ingin warna hijau
+                        icon: 'success', // Bisa diganti ke 'success' jika ingin warna hijau
                         title: 'Report Closed!',
                         text: '{{ session('closed') }}',
                         showConfirmButton: false,

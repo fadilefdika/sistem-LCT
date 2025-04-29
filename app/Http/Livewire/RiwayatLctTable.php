@@ -3,19 +3,21 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use App\Models\EhsUser;
 use Livewire\Component;
 use App\Models\LaporanLct;
 use Livewire\WithPagination;
+use App\Models\LctDepartement;
 use Illuminate\Support\Carbon;
 use App\Exports\LaporanLctExport;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpPresentation\IOFactory;
+use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpPresentation\Style\Font;
 use PhpOffice\PhpPresentation\Style\Color;
-use PhpOffice\PhpPresentation\Style\Alignment;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpPresentation\Style\Fill;
 use PhpOffice\PhpPresentation\Style\Border;
+use PhpOffice\PhpPresentation\Style\Alignment;
 
 
 class RiwayatLctTable extends Component
@@ -27,8 +29,16 @@ class RiwayatLctTable extends Component
 
     public function render()
     {
-        $user = User::with('roleLct')->find(Auth::id());
-        $role = optional($user->roleLct->first())->name;
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS
+            $user = EhsUser::with('roles')->find(Auth::guard('ehs')->id());
+            $role = optional($user->roles->first())->name;  // Ambil role dari relasi 'roles' di model EhsUser
+        } else {
+            // Jika pengguna adalah User biasa (guard 'web')
+            $user = User::with('roleLct')->find(Auth::id());
+            $role = optional($user->roleLct->first())->name;  // Ambil role dari relasi 'roleLct' di model User
+        }
+
 
         $query = LaporanLct::where('status_lct', 'closed');
 

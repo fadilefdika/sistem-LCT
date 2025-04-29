@@ -50,11 +50,11 @@
             </div>
     
             <!-- Tombol Approve & Close -->
-            @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent']))
+            @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
                 <div class="mt-6 flex justify-end">
                     <!-- Tombol Approve -->
-                    @if($laporan->status_lct === 'approved_taskbudget' && $allTasksCompleted)
-                        <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                    @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
+                        <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                             @csrf
                             <button type="submit"
                                     class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
@@ -65,7 +65,7 @@
     
                     <!-- Tombol Close -->
                     @if($laporan->status_lct === 'approved_permanent')
-                        <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                        <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
                             @csrf 
                             <button type="submit"
                                     class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">

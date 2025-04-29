@@ -5,6 +5,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\BudgetApproval; // Sesuaikan dengan model yang digunakan
 use App\Models\LaporanLct;
+use Illuminate\Support\Facades\Auth;
 
 class BudgetApprovalTable extends Component
 {
@@ -31,21 +32,45 @@ class BudgetApprovalTable extends Component
         $this->resetPage();
     }
 
-    public function render() 
+    public function render()
     {
-        $taskBudget = LaporanLct::with([
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;  // Ambil role dari model EhsUser
+        } else {
+            // Jika pengguna adalah User biasa (guard 'web')
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;  // Ambil role dari model User
+        }
+
+
+
+        $query = LaporanLct::with([
             'picUser',
-            'tasks' => function ($query) {
-                $query->select('id', 'id_laporan_lct', 'created_at');
-            }
+            'tasks:id,id_laporan_lct,updated_at', // lebih ringkas
         ])
-        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision'])
-        ->orderBy($this->sortField, $this->sortDirection)
-        ->paginate($this->perPage);
-    
-    
+        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'taskbudget_revision','work_permanent','approved_taskbudget','waiting_approval_permanent','permanent_revision','approved_permanent']);
+
+        // Filter berdasarkan role 'manajer'
+        if ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+
+            if ($departemenId) {
+                $query->where('departemen_id', $departemenId);
+            } else {
+                $query->whereRaw('1=0'); // tidak mengembalikan data
+            }
+        }
+
+        // Ambil data dengan sorting dan pagination
+        $taskBudget = $query
+            ->orderBy($this->sortField ?? 'created_at', $this->sortDirection ?? 'desc')
+            ->paginate($this->perPage ?? 10);
 
         return view('livewire.budget-approval-table', compact('taskBudget'));
     }
+
+
 
 }

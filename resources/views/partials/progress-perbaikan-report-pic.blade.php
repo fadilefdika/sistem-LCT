@@ -66,22 +66,6 @@
                         </div>
                     </div>
 
-                
-                    <!-- Card Informasi Pelapor -->
-                    @php
-                        $dueDate = \Carbon\Carbon::parse($laporan->due_date);
-                        $now = \Carbon\Carbon::now();
-                        $diffInHours = $now->diffInHours($dueDate, false);
-                        $diffInDays = floor($diffInHours / 24);
-                        $remainingHours = $diffInHours % 24;
-
-                        $borderClass = 'border-green-500';
-                        if ($diffInDays < 0) {
-                            $borderClass = 'border-red-500';
-                        } elseif ($diffInDays === 0 && $remainingHours < 24) {
-                            $borderClass = 'border-yellow-500';
-                        }
-                    @endphp
                     <div class="bg-white p-5 rounded-xl shadow-md border-l-4 border-blue-500">
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-2 items-center">
@@ -93,14 +77,34 @@
                                     <p>SVP Name</p>
                                 </div>
                                 <p class="text-gray-900 font-semibold text-sm mt-1">
-                                    {{ $laporan->picUser->fullname }}
-                                </p>
+                                    @if($laporan->picUser && $laporan->picUser->fullname)
+                                        {{ $laporan->picUser->fullname }}
+                                    @else
+                                        <span class="text-gray-400">No PIC available</span>
+                                    @endif
+                                </p>                                
                             </div>
 
                             <!-- Garis Pemisah (Hanya Muncul di Layar Lebar) -->
                             <div class="hidden sm:flex justify-center">
                                 <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
                             </div>
+
+                             <!-- Card Informasi Pelapor -->
+                             @php
+                                $dueDate = $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date) : null; // Pastikan hanya parsing jika due_date tidak NULL
+                                $now = \Carbon\Carbon::now();
+                                $diffInHours = $dueDate ? $now->diffInHours($dueDate, false) : 0;
+                                $diffInDays = $dueDate ? floor($diffInHours / 24) : 0;
+                                $remainingHours = $dueDate ? $diffInHours % 24 : 0;
+                            
+                                $borderClass = 'border-green-500';
+                                if ($dueDate && $diffInDays < 0) {
+                                    $borderClass = 'border-red-500';
+                                } elseif ($dueDate && $diffInDays === 0 && $remainingHours < 24) {
+                                    $borderClass = 'border-yellow-500';
+                                }
+                            @endphp
 
                             <!-- Due Date -->
                             <div class="flex flex-col">
@@ -109,26 +113,29 @@
                                     <p>Due Date</p>
                                 </div>
                                 <p class="text-gray-900 font-semibold text-sm mt-1">
-                                    {{ $dueDate->translatedFormat('d F Y') }}
-                                </p>
-                                
+                                    <!-- Hanya tampilkan tanggal jika $dueDate ada -->
+                                    {{ $dueDate ? $dueDate->translatedFormat('d F Y') : '-' }}
+                                </p>                                
                                 <!-- Status -->
                                 <p class="text-xs mt-1 font-semibold 
                                     {{ in_array($laporan->status_lct, ['approved', 'closed']) ? 'text-green-500' : 
-                                    ($diffInDays < 0 ? 'text-red-500' : 
-                                    ($diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
-
-                                    @if (in_array($laporan->status_lct, ['approved', 'closed']))
+                                    ($dueDate && $diffInDays < 0 ? 'text-red-500' : 
+                                    ($dueDate && $diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
+                                    @if ($laporan->status_lct == 'approved'))
                                         ✅ Completed
-                                    @elseif ($diffInDays < 0)
+                                    @elseif ($dueDate && $diffInDays < 0)
                                         ⚠️ Overdue
-                                    @elseif ($diffInDays === 0 && $remainingHours < 24)
+                                    @elseif ($dueDate && $diffInDays === 0 && $remainingHours < 24)
                                         ⏳ Deadline Approaching
-                                    @else
+                                    @elseif ($dueDate) <!-- Pastikan $dueDate ada -->
                                         ✅ Within Deadline
+                                    @else
+                                        <p></p> <!-- Jika tidak ada due_date, kosongkan -->
                                     @endif
                                 </p>
+
                             </div>
+
                         </div>
                     </div>
                 
@@ -171,7 +178,13 @@
                             <i class="fas fa-map-marker-alt text-red-500"></i>
                             <p>Finding Area</p>
                         </div>
-                        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->area->nama_area}} - {{$laporan->detail_area}}</p>
+                        <p class="text-gray-900 font-semibold text-sm mt-1">
+                            @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
+                                {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
+                            @else
+                                <span class="text-gray-400">No area details available</span>
+                            @endif
+                        </p>                        
                     </div>
 
                     <!-- TIndakan perbaikan Temuan -->
@@ -207,12 +220,22 @@
             </div>
         </div>
         
-
         @php
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' (untuk pengguna biasa)
+            if (Auth::guard('ehs')->check()) {
+                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                $user = Auth::guard('ehs')->user();
+                $roleName = optional($user->roles->first())->name;
+            } else {
+                // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                $user = Auth::user();
+                $roleName = optional($user->roleLct->first())->name;
+            }
+        
+            // Tentukan role yang tidak diizinkan
             $notAllowed = in_array($roleName, ['user', 'manajer']);
         @endphp
+    
 
         <!-- Form Card -->
         <div 
@@ -256,7 +279,7 @@
                             @else
                                 <div class="flex space-x-4">
                                     <!-- Approve Button -->
-                                    <form action="{{ route('admin.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                    <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <button type="submit" 
                                             class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -275,7 +298,7 @@
                             
                                 <!-- Alasan Penolakan -->
                                 <div x-show="revision" class="mt-4">
-                                    <form @submit="revision = false" action="{{ route('admin.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                    <form @submit="revision = false" action="{{ route('ehs.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <label class="block text-gray-700 font-semibold">Revision Reason:</label>
                                         <textarea x-model="reason" name="alasan_reject" rows="3"
@@ -298,7 +321,7 @@
                                 @if($laporan->status_lct === "approved" && $laporan->tingkat_bahaya === 'Low')
                                     <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
                                         <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
-                                        <form action="{{ route('admin.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                                        <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
                                             @csrf 
                                             <button type="submit" @click="closed = true"
                                                     class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
@@ -314,31 +337,18 @@
                             </div>
                         @endif
 
-                        <!-- Notifikasi Revisi -->
-                        @if($laporan->rejectLaporan->isNotEmpty())
-                            <div class="mt-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="text-red-500 text-xl">❌</span>
-                                    <p class="text-red-800 font-semibold text-lg">The report needs revision.</p>
-                                </div>
-                                <table class="w-full border-collapse">
-                                    <thead>
-                                        <tr class="bg-red-200 text-red-800 text-sm font-semibold">
-                                            <th class="p-2 text-left">Reason</th>
-                                            <th class="p-2 text-left">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($laporan->rejectLaporan as $reject)
-                                            <tr class="border-t border-red-300 text-gray-700">
-                                                <td class="p-2 text-sm">{{ $reject->alasan_reject }}</td>
-                                                <td class="p-2 text-sm">{{ \Carbon\Carbon::parse($reject->created_at)->format('d M Y') }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
+                        <a href="{{ route(
+                            $roleName === 'ehs' 
+                                ? 'ehs.progress-perbaikan.history' 
+                                : 'admin.progress-perbaikan.history', 
+                            $laporan->id_laporan_lct
+                        ) }}" class="inline-block">
+                            <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                                <i class="fas fa-history mr-2"></i>History
+                            </button>
+                        </a>
+                        
+                        
 
                         <!-- Notifikasi Laporan Ditutup -->
                         <div x-show="closed" class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">

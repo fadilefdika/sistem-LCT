@@ -48,8 +48,12 @@
                 <p class="text-gray-500 text-xs flex items-center gap-1">
                     <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
                 </p>
-                <p class="text-gray-900 font-semibold mt-2 text-sm md:text-base leading-snug">
-                    {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
+                <p class="text-gray-900 font-semibold text-sm mt-1 whitespace-normal break-words overflow-hidden text-ellipsis max-h-[3rem]">
+                    @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
+                        {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
+                    @else
+                        <span class="text-gray-400">No area details available</span>
+                    @endif
                 </p>
             </div>
         

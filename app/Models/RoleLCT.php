@@ -26,4 +26,11 @@ class RoleLct extends SpatieRole
     {
         $this->attributes['name'] = $value;
     }
+
+    public function assignedUsers()
+    {
+        // Menghubungkan RoleLct dengan EhsUser melalui tabel pivot lct_user_roles
+        return $this->belongsToMany(EhsUser::class, 'lct_user_roles', 'role_id', 'model_id')
+                    ->withTimestamps();
+    }
 }

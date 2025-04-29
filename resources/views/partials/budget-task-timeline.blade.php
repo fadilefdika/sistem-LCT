@@ -22,7 +22,7 @@
     @endif
 
     <!-- FORM TASK (DITAMPILKAN SAAT BELUM DI APPROVE) -->
-    @if(!in_array($laporan->status_lct, ['approved_permanent', 'closed']))
+    @if(!in_array($laporan->status_lct, ['approved_permanent', 'waiting_approval_permanent', 'closed']))
     <div x-show="!isApproved">
         <form action="{{ route('admin.manajemen-lct.submitTaskBudget', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -194,12 +194,12 @@
 
 
 <!-- Approved Tasks Wrapper -->
-@if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
+@if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent', 'closed']))
     <div class="mt-6">
         <h3 class="text-xl font-bold text-gray-800 mb-4">✅ Approved Tasks List</h3>
 
         {{-- Status Info --}}
-        @if($laporan->status_lct === 'approved_permanent')
+        @if($laporan->status_lct === 'waiting_approval_permanent')
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
                 <p class="font-bold">Permanent Approval Granted</p>
                 <p>Task has been permanently approved. You may now proceed to close.</p>
@@ -297,32 +297,11 @@
 @endif
 
 
-    <!-- Reject History -->
-<div class="bg-white shadow-md rounded-lg p-6 mt-5">
-    <h3 class="text-xl font-semibold text-gray-800 mb-4">Revision History</h3>
-    <div class="space-y-4">
-        @if ($laporan->rejectLaporan->isNotEmpty())
-        @foreach ($laporan->rejectLaporan as $reject)
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-red-500">
-                <p class="text-sm text-gray-600">
-                    <strong class="text-gray-800">Revision on:</strong> 
-                    <span class="font-medium">
-                        {{ $reject->created_at->setTimezone('Asia/Jakarta')->format('F j, Y') }} at 
-                        {{ $reject->created_at->setTimezone('Asia/Jakarta')->format('h:i A') }} WIB
-                    </span>                                
-                </p>
-                <p class="text-sm text-gray-600">
-                    <strong class="text-gray-800">Reason:</strong> 
-                    <span class="font-medium">{{ $reject->alasan_reject }}</span>
-                </p>
-            </div>
-        @endforeach
-        @else
-            <p class="text-sm text-gray-500 italic">No revision history available.</p>
-        @endif
-    </div>
-</div>
-</div>
+<a href="{{ route('admin.manajemen-lct.history', $laporan->id_laporan_lct) }}" class="inline-block">
+    <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+        <i class="fas fa-history mr-2"></i>History
+    </button>
+</a>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

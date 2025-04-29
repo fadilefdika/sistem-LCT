@@ -6,11 +6,13 @@ use App\Models\User;
 use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
+use App\Models\RejectLaporan;
 use App\Models\BudgetApproval;
 use Illuminate\Support\Facades\DB;
 use App\Mail\LaporanHasilPerbaikan;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TaskBudgetApprovalRequest;
 use Illuminate\Support\Facades\Storage;
@@ -26,40 +28,70 @@ class ManajemenLctController extends Controller
 
     public function show($id_laporan_lct)
     {
+        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $roleName = optional($user->roles->first())->name;
+        } else {
+            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+            $user = Auth::user();
+            $roleName = optional($user->roleLct->first())->name;
+        }
+        
+        // Ambil laporan dengan relasi terkait
         $laporan = LaporanLct::with([
             'picUser', 
             'rejectLaporan', 
             'kategori',
             'tasks.pic',
         ])->where('id_laporan_lct', $id_laporan_lct)->first();
-
+    
+        // Cek jika laporan tidak ditemukan
         if (!$laporan) {
-            abort(404, 'Laporan tidak ditemukan tiga');
+            abort(404, 'Laporan tidak ditemukan.');
         }
-
-        // Perbarui status jika masih 'in_progress'
+    
+        // Logika ketika role adalah 'pic' dan belum pernah melihat laporan
+        if ($roleName === 'pic' && !$laporan->first_viewed_by_pic_at) {
+            // Catat waktu pertama kali PIC melihat laporan
+            $laporan->update(['first_viewed_by_pic_at' => now()]);
+    
+            // Log pengiriman laporan ke EHS (sebagai contoh: pertama kali dilihat)
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,
+                'status_lct' => 'progress_work',  // Status pengiriman laporan
+                'alasan_reject' => null,  
+                'tipe_reject' => null,  
+            ]);
+        }
+    
+        // Jika status laporan 'in_progress', perbarui menjadi 'progress_work'
         if ($laporan->status_lct === 'in_progress') {
             $laporan->update(['status_lct' => 'progress_work']);
         }
-
-        // Ambil tasks langsung dari relasi tanpa query tambahan
+    
+        // Ambil semua task terkait laporan tersebut
         $tasks = LctTasks::where('id_laporan_lct', $laporan->id_laporan_lct)
-        ->orderBy('due_date', 'asc')
-        ->get()
-        ->map(function ($task) {
-            return [
-                'id' => $task->id,
-                'taskName' => $task->task_name,
-                'namePic' => $task->name_pic,
-                'picId' => $task->pic_id, // Pastikan pic_id diambil
-                'dueDate' => $task->due_date,
-                'status' => $task->status ?? 'pending',
-            ];
-        });
+            ->orderBy('due_date', 'asc')
+            ->get()
+            ->map(function ($task) {
+                return [
+                    'id' => $task->id,
+                    'taskName' => $task->task_name,
+                    'namePic' => $task->name_pic,
+                    'picId' => $task->pic_id, // Pastikan pic_id diambil
+                    'dueDate' => $task->due_date,
+                    'status' => $task->status ?? 'pending',
+                ];
+            });
     
-         // Menambahkan baris kosong
-        $tasks[] = ['id'=> '', 'taskName' => '', 'namePic' => '', 'dueDate' => '', 'attachment' => '', 'status' => ''];
+        // Menambahkan baris kosong untuk task baru
+        $tasks[] = ['id' => '', 'taskName' => '', 'namePic' => '', 'dueDate' => '', 'attachment' => '', 'status' => ''];
     
+        // Ambil daftar PIC terkait dengan laporan
         $picList = Pic::with('user:id,fullname')
             ->get()
             ->map(function ($pic) {
@@ -68,18 +100,29 @@ class ManajemenLctController extends Controller
                     'fullname' => $pic->user->fullname ?? 'Unknown'
                 ];
             });
-
-            
-        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn ($path) => asset('storage/' . $path));
-        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn ($path) => asset('storage/' . $path));
-
-        // dd($tasks);
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan','picList'));
+    
+        // Mengambil bukti temuan dan perbaikan
+        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
+        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn($path) => asset('storage/' . $path));
+    
+        // Kembalikan tampilan dengan data yang sudah diproses
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'bukti_perbaikan', 'picList'));
     }
-
+    
 
     public function store(Request $request, $id_laporan_lct)
     {
+        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $roleName = optional($user->roles->first())->name;
+        } else {
+            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+            $user = Auth::user();
+            $roleName = optional($user->roleLct->first())->name;
+        }
+
         // dd($request->all());
         $request->validate([
             'date_completion' => ['required', 'date'],
@@ -123,11 +166,20 @@ class ManajemenLctController extends Controller
                 'tindakan_perbaikan' => $request->tindakan_perbaikan,
             ]);
 
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,
+                'status_lct' => $statusLct,  // Status pengiriman laporan
+                'alasan_reject' => null,  
+                'tipe_reject' => null,  
+            ]);
+
             Mail::to('efdika1102@gmail.com')->queue(new LaporanHasilPerbaikan($laporan));
 
             DB::commit();
 
-            return redirect()->route('admin.manajemen-lct.index')->with('success', 'The repair results have been sent to EHS.');
+            return redirect()->back()->with('success', 'The repair results have been sent to EHS.');
         } catch (\Exception $e) {
             DB::rollBack();
             // dd($e);
@@ -139,6 +191,17 @@ class ManajemenLctController extends Controller
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
+        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
+        if (Auth::guard('ehs')->check()) {
+            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $roleName = optional($user->roles->first())->name;
+        } else {
+            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+            $user = Auth::user();
+            $roleName = optional($user->roleLct->first())->name;
+        }
+        
         $data = $request->all();
         $uploadedFiles = $request->file('attachments') ?? [];
     
@@ -180,14 +243,16 @@ class ManajemenLctController extends Controller
                     ];
                 }
             }
+            
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
-    
             // Update laporan
-            LaporanLct::where('id_laporan_lct', $id_laporan_lct)->update([
+            $laporan->update([
                 'estimated_budget' => $data['estimatedBudget'],
                 'status_lct' => 'waiting_approval_taskbudget',
                 'attachments' => json_encode($attachmentPaths),
             ]);
+            
     
             $existingTaskIds = [];
     
@@ -225,6 +290,16 @@ class ManajemenLctController extends Controller
             LctTasks::where('id_laporan_lct', $id_laporan_lct)
                 ->whereNotIn('id', $existingTaskIds)
                 ->delete();
+
+                
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => $user->id,
+                'role' => $roleName,
+                'status_lct' => 'waiting_approval_taskbudget',  // Status pengiriman laporan
+                'alasan_reject' => null,  
+                'tipe_reject' => null,  
+            ]);
     
             DB::commit();
     
@@ -240,38 +315,12 @@ class ManajemenLctController extends Controller
         }
     }
 
-    // public function deleteAttachment($id_laporan_lct, $index)
-    // {
-    //     try {
-    //         // Cari LaporanLct berdasarkan id_laporan_lct
-    //         $laporanLct = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+    public function history($id_laporan_lct)
+    {
+        $history = RejectLaporan::with('laporanLct','user')->where('id_laporan_lct', $id_laporan_lct)->get();
 
-    //         // Pastikan ada data attachments
-    //         if (!$laporanLct->attachments || count($laporanLct->attachments) <= $index) {
-    //             return response()->json(['error' => 'Attachment not found.'], 404);
-    //         }
-
-    //         // Ambil attachment yang akan dihapus
-    //         $attachmentPath = $laporanLct->attachments[$index];
-
-    //         // Hapus file dari storage
-    //         if (Storage::exists($attachmentPath)) {
-    //             Storage::delete($attachmentPath);
-    //         }
-
-    //         // Hapus attachment path dari array attachments
-    //         unset($laporanLct->attachments[$index]);
-
-    //         // Update kolom attachments di database
-    //         $laporanLct->attachments = array_values($laporanLct->attachments);
-    //         $laporanLct->save();
-
-    //         return response()->json(['success' => 'Attachment deleted successfully.']);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => 'Failed to delete attachment.', 'message' => $e->getMessage()], 500);
-    //     }
-    // }
-
+        return view('pages.admin.history.index', compact('history'));
+    }
     
     
 }
