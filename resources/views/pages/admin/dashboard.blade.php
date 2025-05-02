@@ -72,7 +72,7 @@
 
                     @if($isUser)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Progress</h2>
+                            <h2 class="text-xl font-semibold mb-2">Activity Progress</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanUser
@@ -83,7 +83,7 @@
 
                     @if($isPic)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Progress</h2>
+                            <h2 class="text-xl font-semibold mb-2">Unread Reports</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanInProgress

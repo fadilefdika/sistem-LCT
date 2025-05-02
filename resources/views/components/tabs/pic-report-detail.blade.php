@@ -33,7 +33,7 @@
     @endif
 
     <!-- Content Area -->
-    <div class="flex flex-col md:grid md:grid-cols-2 flex-grow min-h-0">
+    <div class="flex flex-col md:grid md:grid-cols-2 flex-grow pb-1 min-h-0">
         <!-- Card Laporan dari EHS -->
         <div 
             id="report-content"

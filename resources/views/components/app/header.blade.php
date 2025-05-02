@@ -49,8 +49,8 @@
                         {{ Breadcrumbs::render('progress-perbaikan.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.index')
                         {{ Breadcrumbs::render('ehs progress-perbaikan') }}
-                    {{-- @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.show')
-                        {{ Breadcrumbs::render('ehs progress-perbaikan.show', $laporan) }} --}}
+                    @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.show')
+                        {{ Breadcrumbs::render('ehs progress-perbaikan.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.index')
                         {{ Breadcrumbs::render('budget-approval') }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.show')
@@ -89,7 +89,8 @@
             <div class="flex items-center space-x-3">
 
                 <!-- Notifications button -->
-                <x-dropdown-notifications align="right" />            
+                <x-dropdown-notifications align="right" :roleName="$roleName" :notifikasiLCT="$notifikasiLCT" />
+            
 
                 <!-- Divider -->
                 <hr class="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />

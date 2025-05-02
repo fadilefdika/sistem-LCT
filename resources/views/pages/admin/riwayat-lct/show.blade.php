@@ -13,7 +13,7 @@
                 ]) ? 'task-pic' : 'user'))
             ) 
         }}' 
-    }" class="px-5 pt-2">
+    }" class="px-0 md:px-5 pt-2">
 
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">

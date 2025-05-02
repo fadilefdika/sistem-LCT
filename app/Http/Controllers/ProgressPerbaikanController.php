@@ -44,9 +44,10 @@ class ProgressPerbaikanController extends Controller
         $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn($path) => asset('storage/' . $path));
 
         // Cek apakah semua task sudah selesai
-        $allTasksCompleted = $laporan->tasks->every(fn($task) => $task->status === 'completed');
+        $tasks = $laporan->tasks;
 
-        // Update status hanya jika belum approved_permanent
+        $allTasksCompleted = $tasks->isNotEmpty() && $tasks->every(fn($task) => $task->status === 'completed');
+
         if (
             $allTasksCompleted &&
             $laporan->status_lct !== 'approved_permanent'
@@ -54,6 +55,7 @@ class ProgressPerbaikanController extends Controller
             $laporan->status_lct = 'waiting_approval_permanent';
             $laporan->save();
         }
+
 
         
         return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan', 'allTasksCompleted'));

@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div x-data="{ activeTab: '{{ in_array($laporan->status_lct, ['approved_temporary','waiting_approval_taskbudget', 'taskbudget_revision','approved_taskbudget', 'work_permanent','waiting_approval_permanent','permanent_revision', 'approved_permanent', 'closed']) ? 'task-and-timeline' : 'laporan'}}' }"
-        class="px-5 pt-2 pb-8">
+        class="px-0 md:px-5 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex space-x-4 border-b">
             <button @click="activeTab = 'laporan'" :class="activeTab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"

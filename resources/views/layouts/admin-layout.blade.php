@@ -59,7 +59,8 @@
                 x-init="page = '{{ Route::currentRouteName() }}'"
                 x-ref="contentarea"
                 :class="{ 
-                    'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show','admin.progress-perbaikan.show'].includes(page), 
+                    'overflow-hidden': ['admin.laporan-lct.show','admin.manajemen-lct.show',
+                            'ehs.laporan-lct.show','admin.progress-perbaikan.show','ehs.progress-perbaikan.show'].includes(page), 
                     'overflow-y-auto': [
                             'admin.dashboard',
                             'admin.progress-perbaikan.index',
@@ -81,11 +82,9 @@
                             // Menambahkan route untuk ehs
                             'ehs.dashboard',
                             'ehs.progress-perbaikan.index',
-                            'ehs.progress-perbaikan.show',
                             'ehs.progress-perbaikan.history',
 
                             'ehs.laporan-lct.index',
-                            'ehs.laporan-lct.show',
                             'ehs.laporan-lct.closed',
 
                             'ehs.master-data.department-data.index',
