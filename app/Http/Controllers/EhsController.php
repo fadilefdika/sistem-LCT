@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EhsUser;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +31,6 @@ class EhsController extends Controller
         if (!$user) {
             // Jika user tidak ditemukan
             Log::warning('User tidak ditemukan: ' . $request->username);
-            dd('User tidak ditemukan');
         }
     
         // Debug: Menampilkan user yang ditemukan
@@ -48,7 +48,6 @@ class EhsController extends Controller
             // Debug: Cek role pengguna
             Log::info('Role pengguna: ' . ($roleName ? $roleName : 'Tidak ada role'));
     
-            // dd($roleName);
             // Jika roleName adalah 'ehs', login sebagai admin EHS
             if ($roleName && $roleName === 'ehs') {
                 Auth::guard('ehs')->login($user); // Login menggunakan guard 'ehs'
@@ -71,8 +70,81 @@ class EhsController extends Controller
         ]);
     }
     
-    
+    public function index()
+    {
+        return view('pages.admin.master-data.ehs-data.index'); 
+    }
+    // Store data
+    public function store(Request $request)
+{
+    try {
+        // Validasi data input
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'password' => 'required|string|min:6',
+            'user_id' => 'nullable|exists:users,id',
+        ]);
+
+        // Hash password
+        $hashedPassword = Hash::make($request->password);
+        // Simpan data ke database
+        EhsUser::create([
+            'username' => $request->username,
+            'password_hash' => $hashedPassword, // Pastikan password di-hash sebelum disimpan
+            'user_id' => $request->user_id,
+        ]);
+
+        return response()->json(['message' => 'EHS berhasil ditambahkan!'], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Terjadi kesalahan.',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 
     
+    // Update data
+    public function update(Request $request, $id)
+    {
+        try{
+            $request->validate([
+                'username' => 'required|string|max:255',
+                'user_id' => 'nullable|exists:users,id',
+            ]);
+    
+            $ehs = EhsUser::findOrFail($id);
+            $ehs->update([
+                'username' => $request->username,
+                'user_id' => $request->user_id
+            ]);
+    
+            return response()->json(['message' => 'Ehs berhasil diperbarui!'], 200);
+        }catch(\Exception $e){
+            return response()->json([
+                'error' => 'Terjadi kesalahan.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Hapus data (soft delete)
+    public function destroy($id)
+    {
+        try {
+            $ehs = EhsUser::findOrFail($id);
+            $ehs->delete();
+            return response()->json(['message' => 'Ehs berhasil dihapus!'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal menghapus EHS!'], 500);
+        }
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $users = User::where('username', 'like', '%' . $request->query('q') . '%')->take(5)->get();
+        return response()->json($users);
+    }
 
 }

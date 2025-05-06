@@ -71,6 +71,7 @@
                             'admin.master-data.area-data.index',
                             'admin.master-data.department-data.index',
                             'admin.master-data.category-data.index',
+                            'admin.master-data.ehs-data.index',
                             'admin.manajemen-lct.index',
                             'admin.laporan-lct.index',
                             'admin.riwayat-lct.index',

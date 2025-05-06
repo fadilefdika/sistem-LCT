@@ -16,7 +16,7 @@ class EhsUser extends Authenticatable
     protected $fillable = [
         'user_id',
         'username',
-        'password',
+        'password_hash',
     ];
 
     protected $hidden = [

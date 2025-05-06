@@ -44,7 +44,7 @@
                 </div>
                 <div>
                     <h3 class="text-sm text-gray-500">Repair Evidence</h3>
-                    <p class="text-base text-gray-800 font-medium">{{ $taskBudget->bukti_perbaikan }}</p>
+                    <p class="text-base text-gray-800 font-medium">{{ $taskBudget->tindakan_perbaikan }}</p>
                 </div>
             </div>
     

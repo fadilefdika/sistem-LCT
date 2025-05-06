@@ -1,128 +1,162 @@
-<div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
-    <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
+
+    @php
+            // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' (untuk pengguna biasa)
+            if (Auth::guard('ehs')->check()) {
+                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                $user = Auth::guard('ehs')->user();
+                $roleName = optional($user->roles->first())->name;
+            } else {
+                // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                $user = Auth::user();
+                $roleName = optional($user->roleLct->first())->name;
+            }
+        
+            // Tentukan role yang tidak diizinkan
+            $notAllowed = in_array($roleName, ['user', 'manajer']);
+        @endphp
+    <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
+        <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
+            @php
+                if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                    $formTitle = ($laporan->status_lct === 'revision') 
+                        ? 'Temporary Corrective Action Revision Form to EHS' 
+                        : 'Temporary Corrective Action Report Form to EHS';
+                } elseif ($laporan->tingkat_bahaya === 'Low') {
+                    $formTitle = 'Corrective Action Revision Form to EHS';
+                } elseif ($laporan->status_lct === 'revision') {
+                    $formTitle = 'Corrective Action Revision Form to EHS';
+                }
+            @endphp
+
+            <h5 class="text-xl font-bold">{{ $formTitle }}</h5>
+        </div>
+
+        <div class="w-full h-[2px] bg-gray-200 px-3"></div>
+
+        <div class="p-6">
+            <form action="{{ route('admin.manajemen-lct.store', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+            
+                <div class="space-y-6">
+                    <div class="mb-4">
+                        <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Non-Conformity Finding</label>
+                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" value="{{ $laporan->temuan_ketidaksesuaian }}" required readonly>
+                    </div>
+            
+                    <div class="mb-4">
+                        <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Team Department</label>
+                        <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" value="{{ $laporan->picUser->fullname ?? '' }}" required readonly>
+                    </div>
+            
+                    <!-- Repair Deadline -->
+                    <div class="mb-4">
+                        <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Repair Deadline</label>
+                        <input 
+                            type="text" 
+                            class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" 
+                            id="due_date" 
+                            name="due_date" 
+                            value="{{ $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date)->format('d F Y') : 'No due date set' }}" 
+                            required 
+                            readonly
+                        >
+                    </div>
+                    
+                    @php
+                        use Carbon\Carbon;
+                    @endphp
+
+                    <div>
+                        <label for="date_completion" class="block text-sm font-medium text-gray-700">
+                            Completion Date <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date_completion" 
+                            name="date_completion" 
+                            class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+                            value="{{ old('date_completion', Carbon::now()->toDateString()) }}" 
+                            required
+                        >
+                        <p class="mt-2 text-gray-600">
+                            Tanggal default: {{ Carbon::now()->format('d-m-Y') }}
+                        </p>
+                    </div>
+
+
+                    <div class="mb-4">
+                        <label for="tindakan_perbaikan" class="block text-sm font-medium text-gray-700">Tindakan Perbaikan</label>
+                        <textarea name="tindakan_perbaikan" id="tindakan_perbaikan" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>{{ old('tindakan_perbaikan') }}</textarea>
+                    </div>
+            
+                    <!-- Bukti Perbaikan Foto -->
+                    <div class="order-2">
+                        <label for="dropzone-file" class="block text-sm font-medium text-gray-700">
+                            Upload Photo <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex flex-col items-center justify-center w-full mt-2">
+                            <!-- Opsi memilih gambar dari galeri -->
+                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                                    </svg>
+                                    <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                    <p class="text-xs text-gray-500">SVG, PNG, JPG, atau GIF (MAX. 1MB)</p>
+                                </div>
+                                <input id="dropzone-file" name="bukti_perbaikan[]" type="file" class="hidden" accept="image/*" multiple />
+                            </label>
+
+                            <!-- Opsi akses kamera dengan Webcam.js -->
+                            <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Capture Photo</button>
+
+                            <!-- Area kamera -->
+                            <div id="my_camera" class="mt-2 w-64 h-48 border" style="display: none;"></div>
+
+                            <!-- Tombol ambil foto -->
+                            <button type="button" id="capture-photo" class="mt-2 w-full h-12 bg-green-500 text-white rounded-lg" style="display: none;">Capture</button>
+
+                            <!-- Menampilkan foto yang diambil atau dipilih -->
+                            <div id="preview-container" class="mt-4 flex flex-wrap gap-2"></div>
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-1">
+                            Upload up to 5 photos related to the LCT finding. Ensure that the image file size does not exceed 1MB and is in PNG, JPG, or GIF format.
+                        </p>
+                        </div>
+                    
+                <!-- Submit button -->
+                    <button 
+                        type="submit" 
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
+                        @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
+                        @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) disabled @endif
+                        >
+                        Submit Report
+                    </button>
+
+                </div>
+            </form>
+        </div>
         @php
-            if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
-                $formTitle = ($laporan->status_lct === 'revision') 
-                    ? 'Temporary Corrective Action Revision Form to EHS' 
-                    : 'Temporary Corrective Action Report Form to EHS';
-            } elseif ($laporan->tingkat_bahaya === 'Low') {
-                $formTitle = 'Corrective Action Revision Form to EHS';
-            } elseif ($laporan->status_lct === 'revision') {
-                $formTitle = 'Corrective Action Revision Form to EHS';
+            if ($roleName === 'ehs') {
+                $routeName = 'ehs.progress-perbaikan.history';
+            } elseif ($roleName === 'pic') {
+                $routeName = 'admin.manajemen-lct.history';
+            } else {
+                $routeName = 'admin.progress-perbaikan.history';
             }
         @endphp
-
-        <h5 class="text-xl font-bold">{{ $formTitle }}</h5>
+        
+        <a href="{{ route($routeName, $laporan->id_laporan_lct) }}" class="inline-block">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                <i class="fas fa-history mr-2"></i>History
+            </button>
+        </a>
+    
     </div>
 
-    <div class="w-full h-[2px] bg-gray-200 px-3"></div>
 
-    <div class="p-6">
-        <form action="{{ route('admin.manajemen-lct.store', ['id_laporan_lct' => $laporan->id_laporan_lct]) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-         
-            <div class="space-y-6">
-                <div class="mb-4">
-                    <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700 mb-1">Non-Conformity Finding</label>
-                    <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="temuan_ketidaksesuaian" name="temuan_ketidaksesuaian" value="{{ $laporan->temuan_ketidaksesuaian }}" required readonly>
-                </div>
-        
-                <div class="mb-4">
-                    <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Team Department</label>
-                    <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" value="{{ $laporan->picUser->fullname ?? '' }}" required readonly>
-                </div>
-        
-                <!-- Repair Deadline -->
-                <div class="mb-4">
-                    <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Repair Deadline</label>
-                    <input 
-                        type="text" 
-                        class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" 
-                        id="due_date" 
-                        name="due_date" 
-                        value="{{ $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date)->format('d F Y') : 'No due date set' }}" 
-                        required 
-                        readonly
-                    >
-                </div>
-                
-                @php
-                    use Carbon\Carbon;
-                @endphp
-
-                <div>
-                    <label for="date_completion" class="block text-sm font-medium text-gray-700">
-                        Completion Date <span class="text-red-500">*</span>
-                    </label>
-                    <input 
-                        type="date" 
-                        id="date_completion" 
-                        name="date_completion" 
-                        class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
-                        value="{{ old('date_completion', Carbon::now()->toDateString()) }}" 
-                        required
-                    >
-                    <p class="mt-2 text-gray-600">
-                        Tanggal default: {{ Carbon::now()->format('d-m-Y') }}
-                    </p>
-                </div>
-
-
-                <div class="mb-4">
-                    <label for="tindakan_perbaikan" class="block text-sm font-medium text-gray-700">Tindakan Perbaikan</label>
-                    <textarea name="tindakan_perbaikan" id="tindakan_perbaikan" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>{{ old('tindakan_perbaikan') }}</textarea>
-                </div>
-        
-                <!-- Bukti Perbaikan Foto -->
-                <div class="order-2">
-                    <label for="dropzone-file" class="block text-sm font-medium text-gray-700">
-                        Upload Photo <span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex flex-col items-center justify-center w-full mt-2">
-                        <!-- Opsi memilih gambar dari galeri -->
-                        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                </svg>
-                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                <p class="text-xs text-gray-500">SVG, PNG, JPG, atau GIF (MAX. 1MB)</p>
-                            </div>
-                            <input id="dropzone-file" name="bukti_perbaikan[]" type="file" class="hidden" accept="image/*" multiple />
-                        </label>
-
-                        <!-- Opsi akses kamera dengan Webcam.js -->
-                        <button type="button" id="open-camera" class="mt-4 w-full h-12 bg-blue-500 text-white rounded-lg">Capture Photo</button>
-
-                        <!-- Area kamera -->
-                        <div id="my_camera" class="mt-2 w-64 h-48 border" style="display: none;"></div>
-
-                        <!-- Tombol ambil foto -->
-                        <button type="button" id="capture-photo" class="mt-2 w-full h-12 bg-green-500 text-white rounded-lg" style="display: none;">Capture</button>
-
-                        <!-- Menampilkan foto yang diambil atau dipilih -->
-                        <div id="preview-container" class="mt-4 flex flex-wrap gap-2"></div>
-                    </div>
-
-                    <p class="text-xs text-gray-500 mt-1">
-                        Upload up to 5 photos related to the LCT finding. Ensure that the image file size does not exceed 1MB and is in PNG, JPG, or GIF format.
-                    </p>
-                    </div>
-                
-            <!-- Submit button -->
-                <button 
-                    type="submit" 
-                    class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
-                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
-                    @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) disabled @endif
-                    >
-                    Submit Report
-                </button>
-
-            </div>
-        </form>
-    </div>
-</div>
 
 {{-- Date Picker  --}}
 <script>

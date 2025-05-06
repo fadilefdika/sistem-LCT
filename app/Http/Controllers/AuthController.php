@@ -2,79 +2,141 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\EhsUser;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'npk' => 'required|string',
-    //         'password' => 'required|string',
-    //     ]);
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
 
-    //     // Ambil user berdasarkan NPK
-    //     $user = User::where('npk', $request->npk)->first();
+    public function login(Request $request)
+    {
+        // Validasi input
+        $rules = [
+            'role' => 'required|in:ehs,manajer,pic,pelapor',
+            'password' => 'required|string',
+            'npk_or_username' => ['required'],
+        ];
 
-    //     // Jika user tidak ditemukan atau password salah, kembalikan error
-    //     if (!$user || !Hash::check($request->password, $user->password)) {
-    //         return back()->withInput()->withErrors(['npk' => 'NPK atau password salah!']);
-    //     } 
+        // Tambahkan validasi tergantung role
+        if ($request->role === 'ehs') {
+            $rules['npk_or_username'][] = 'string';
+        } else {
+            $rules['npk_or_username'][] = 'numeric';
+        }
 
-    //     // Login user
-    //     Auth::login($user);
-    //     dd(Auth::user());
-    //     // Cek apakah user memiliki role
-    //     $role = $user->roleLct->pluck('name')->first();
-    //     dd($role);
+        $messages = [
+            'npk_or_username.required' => 'Kolom NPK atau Username wajib diisi.',
+            'npk_or_username.numeric' => 'NPK harus berupa angka.',
+            'npk_or_username.string' => 'Username harus berupa teks.',
+        ];
 
-    //     if (!$role) {
-    //         Auth::logout(); // Logout user jika tidak ada role
-    //         return back()->withErrors(['npk' => 'Akun Anda belum memiliki role yang valid. Hubungi admin.']);
-    //     }
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
-    //     dd($role);
+        // === Login untuk EHS ===
+        if ($request->role === 'ehs') {
+            $username = $request->npk_or_username;
+            $user = EhsUser::where('username', $username)->first();
 
-    //     // Redirect berdasarkan role
-    //     if ($role === 'ehs') {
-    //         return redirect()->intended('/dashboard')->with('success', 'Selamat datang EHS!');
-    //     } elseif ($role === 'pic') {
-    //         return redirect()->intended('/dashboard')->with('success', 'Selamat datang PIC!');
-    //     } else {
-    //         return redirect()->intended('/users')->with('success', 'Selamat datang User!');
-    //     }
-    // }
+            if (!$user || !Hash::check($request->password, $user->password_hash)) {
+                return back()->withErrors([
+                    'npk_or_username' => 'Login failed. Please check your username and password.',
+                ])->withInput();
+            }
 
+            // Cek apakah memiliki role ehs
+            $roleName = $user->roles->first()->name ?? null;
+            if ($roleName !== 'ehs') {
+                return back()->withErrors([
+                    'npk_or_username' => 'Permission denied',
+                ])->withInput();
+            }
 
+            Auth::guard('ehs')->login($user);
+            $request->session()->regenerate();
+            return redirect()->route('choose-destination-ehs'); // ✅ Ini
+
+        }
+
+        // === Login untuk role selain EHS (web guard) ===
+        $npk = $request->npk_or_username;
+
+        $roleMapping = [
+            'pelapor' => 1,
+            'pic' => 2,
+            'manajer' => 4,
+        ];
+
+        $expectedRoleId = $roleMapping[$request->role] ?? null;
+
+        // Ambil user berdasarkan NPK
+        $user = User::with('roleLct')->where('npk', $npk)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'npk_or_username' => 'NPK not found.',
+            ])->withInput();
+        }
+
+        $actualRoleId = $user->roleLct->first()->id ?? null;
+
+        if ($actualRoleId != $expectedRoleId) {
+            return back()->withErrors([
+                'npk_or_username' => 'Permission denied.',
+            ])->withInput();
+        }
+
+        // Login menggunakan Auth Laravel
+        $credentials = [
+            'npk' => $npk,
+            'password' => $request->password,
+        ];
+
+        if ($user && Hash::check($credentials['password'], $user->password_hash)) {
+            // Password cocok
+            Auth::guard('web')->login($user, $request->filled('remember'));
+            
+            $request->session()->regenerate();
     
+            return redirect()->route('choose-destination-user');
+        }
+        
+
+        return back()->withErrors([
+            'npk_or_username' => 'Login failed. Please check your NPK and password.',
+        ])->withInput();
+    }
 
 
     public function logout(Request $request)
     {
-        // Jika menggunakan token (untuk API misalnya), hapus semua token yang terhubung dengan user
-        $request->user()->tokens()->delete();
-    
-        // Logout dari guard 'web' jika ada
+        // Tidak perlu hapus token kalau tidak pakai Sanctum
+        // Logout dari guard 'web'
         Auth::guard('web')->logout();
-    
-        // Logout dari guard 'ehs' jika ada
+
+        // Logout dari guard 'ehs'
         Auth::guard('ehs')->logout();
-    
-        // Invalidasi sesi untuk memastikan data sesi tidak tertinggal
+
+        // Invalidasi sesi
         $request->session()->invalidate();
-    
-        // Regenerasi token CSRF untuk keamanan setelah logout
+
+        // Regenerasi token CSRF
         $request->session()->regenerateToken();
-    
-        // Jika menggunakan API, kembalikan response JSON
-        return response()->json(['message' => 'Logout berhasil']);
-        
-        // Jika menggunakan tampilan web, redirect ke halaman login
-        // return redirect('/login');
+
+        return redirect('login');
     }
+
+
     
 }

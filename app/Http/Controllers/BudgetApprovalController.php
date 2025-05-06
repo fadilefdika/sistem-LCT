@@ -193,7 +193,7 @@ class BudgetApprovalController extends Controller
     {
         $history = RejectLaporan::with('laporanLct','user')->where('id_laporan_lct', $id_laporan_lct)->get();
 
-        return view('pages.admin.history.index', compact('history'));
+        return view('pages.admin.history.index', compact('history','id_laporan_lct'));
     }
 
 }

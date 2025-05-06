@@ -41,8 +41,13 @@ class ProgressPerbaikanController extends Controller
 
         // Ambil bukti temuan & perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
-        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))->map(fn($path) => asset('storage/' . $path));
-
+        $tindakan_perbaikan = collect(json_decode($laporan->tindakan_perbaikan, true))->map(function ($entry) {
+            return [
+                'tanggal' => $entry['tanggal'],
+                'tindakan' => $entry['tindakan'],
+                'bukti' => collect($entry['bukti'])->map(fn($path) => asset('storage/' . $path)),
+            ];
+        });
         // Cek apakah semua task sudah selesai
         $tasks = $laporan->tasks;
 
@@ -58,7 +63,7 @@ class ProgressPerbaikanController extends Controller
 
 
         
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'bukti_perbaikan', 'allTasksCompleted'));
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted'));
     }
 
 

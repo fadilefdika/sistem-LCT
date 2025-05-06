@@ -75,7 +75,6 @@ class LctReportController extends Controller
             ]);
         }
 
-        // dd($bukti_temuan);
 
         return view('pages.admin.laporan-lct.show', compact('laporan', 'departemen', 'picDepartemen', 'bukti_temuan', 'kategori'));
     }
@@ -211,7 +210,7 @@ class LctReportController extends Controller
                 'due_date' => $request->due_date,
                 'status_lct' => 'in_progress',
             ]);
-            // dd("masuk sini");
+       
             
             DB::commit();
 
@@ -230,11 +229,11 @@ class LctReportController extends Controller
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             DB::rollBack();
-            // dd($e);
+         
             return redirect()->back()->with('error', 'Report not found.', $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
-            // dd($e);
+            
             return redirect()->back()->with('error', 'An error occurred while submitting the report.', $e->getMessage());
         }
     }

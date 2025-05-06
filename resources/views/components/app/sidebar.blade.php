@@ -251,6 +251,12 @@
                                         <i class="fas fa-map-marker-alt mr-2 shrink-0 fill-current @if(Request::is('master-data/area-data')|| Request::is('master-data/area-data/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif""></i> Area Data
                                     </a>
                                 </li>
+                                <li class="pl-1 pr-3 py-1 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r text-[5px] text-gray-400 
+                                    {{ Request::is('master-data/ehs-data') || Request::is('master-data/ehs-data/*') ? 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' : '' }}">
+                                    <a href="{{ route('admin.master-data.ehs-data.index') }}" class="px-3 py-1 text-xs rounded-lg text-gray-600 flex items-center">
+                                        <i class="fas fa-user mr-2 shrink-0 fill-current @if(Request::is('master-data/ehs-data')|| Request::is('master-data/ehs-data/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif""></i> Ehs Data
+                                    </a>
+                                </li>
                             </ul>
                             
                         </li>

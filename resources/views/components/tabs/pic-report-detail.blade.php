@@ -64,9 +64,46 @@
                 [&::-webkit-scrollbar-thumb]:bg-gray-300
                 dark:[&::-webkit-scrollbar-track]:bg-neutral-700
                 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-            @include('partials.manajemen-lct-form', [
-                'laporan' => $laporan,
-            ])    
+                @if($laporan->status_lct !== 'closed')
+                    @include('partials.manajemen-lct-form', [
+                        'laporan' => $laporan,
+                    ])    
+                @else
+                @php
+                    if (Auth::guard('ehs')->check()) {
+                    // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                    $user = Auth::guard('ehs')->user();
+                    $roleName = optional($user->roles->first())->name;
+                } else {
+                    // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                    $user = Auth::user();
+                    $roleName = optional($user->roleLct->first())->name;
+                }
+                
+                    if ($roleName === 'ehs') {
+                        $routeName = 'ehs.progress-perbaikan.history';
+                    } elseif ($roleName === 'pic') {
+                        $routeName = 'admin.manajemen-lct.history';
+                    } else {
+                        $routeName = 'admin.progress-perbaikan.history';
+                    }
+                @endphp
+                
+                <!-- History Card -->
+                <div class="bg-white rounded-lg shadow-md p-4 mt-4 border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800">Corrective Action History</h2>
+                            <p class="text-sm text-gray-500">View the detailed progress and corrective actions taken for this case.</p>
+                        </div>
+                        <a href="{{ route($routeName, $laporan->id_laporan_lct) }}">
+                            <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                                <i class="fas fa-history mr-2"></i>View History
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                @endif
         </div>
     </div>
 </div>

@@ -187,35 +187,88 @@
                         </p>                        
                     </div>
 
-                    <!-- TIndakan perbaikan Temuan -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-500">
-                        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                            <i class="fas fa-map-marker-alt text-gray-500"></i>
-                            <p>corrective action</p>
-                        </div>
-                        <p class="text-gray-900 font-semibold text-sm mt-1">{{$laporan->tindakan_perbaikan}}</p>
-                    </div>
+                    @if ($tindakan_perbaikan->isNotEmpty())
+                        <div x-data="{ open: false }" class="mb-4">
+                            <!-- Card utama untuk perbaikan terbaru dan sebelumnya -->
+                            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-gray-500 relative">
+                                <div class="absolute top-2 right-3 text-xs text-gray-400">
+                                    {{ \Carbon\Carbon::parse($tindakan_perbaikan[0]['tanggal'])->format('d M Y') }}
+                                </div>   
+                                <!-- Tindakan Perbaikan Terbaru -->
+                                <div class="mb-4">
+                                    <p class="text-gray-500 text-xs mb-1">
+                                        <span class="text-gray-700 text-lg font-semibold">Corrective Action</span> (Latest):
+                                    </p>
+                                    <div class="flex items-center gap-1">
+                                        <p class="text-gray-600 text-sm font-semibold">Action:</p>
+                                        <p class="text-gray-900 text-sm font-semibold">{{ $tindakan_perbaikan[0]['tindakan'] }}</p>
+                                    </div>
+                                </div>
 
-                    
+                                
+                                <!-- Gambar perbaikan terbaru -->
+                                @if (!empty($tindakan_perbaikan[0]['bukti']))
+                                    <div class="mt-4">
+                                        <p class="text-gray-600 text-sm font-semibold mb-2">Corrective Action Images</p>
+                                        <div class="flex overflow-x-auto gap-2">
+                                            @foreach ($tindakan_perbaikan[0]['bukti'] as $gambar)
+                                                <img src="{{ $gambar }}" 
+                                                    class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                                    alt="Bukti Perbaikan"
+                                                    onclick="openModal('{{ $gambar }}')">
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
 
-                    <!-- Corrective Action Image Card -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-gray-300 mt-3">
-                        <p class="text-gray-700 text-lg font-semibold text-center">Corrective Action Image</p>
-                        <div class="flex justify-center gap-1.5 mt-2">
-                            @if ($bukti_perbaikan->isNotEmpty())
-                                <div class="grid grid-cols-{{ min(5, $bukti_perbaikan->count()) }} gap-2">
-                                    @foreach ($bukti_perbaikan->take(5) as $gambar)
-                                        <img src="{{ $gambar }}" 
-                                            class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                                            alt="Corrective Action Image"
-                                            onclick="openModal('{{ $gambar }}')">
+                                <!-- Tombol dropdown untuk menampilkan perbaikan sebelumnya -->
+                                @if (count($tindakan_perbaikan) > 1)
+                                    <button @click="open = !open" class="mt-4 w-full flex justify-center items-center text-sm text-blue-500 hover:text-blue-700 transition">
+                                        <span x-text="open ? 'Hide Previous Actions' : 'Show Previous Actions'"></span>
+                                    </button>
+                                @endif
+
+                                <!-- Konten dropdown untuk perbaikan sebelumnya -->
+                                <div x-show="open" x-transition class="mt-4 bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-300">
+                                    @foreach ($tindakan_perbaikan->skip(1) as $index => $entry)
+                                        <div class="mb-4 relative">
+                                            <div class="absolute top-2 right-3 text-xs text-gray-400">
+                                                {{ \Carbon\Carbon::parse($entry['tanggal'])->format('d M Y') }}
+                                            </div>   
+
+                                            <!-- Tindakan Perbaikan Sebelumnya -->
+                                            <div class="mb-2">
+                                                <p class="text-gray-500 text-xs mb-1">Corrective Action (Previous #{{ $index + 1 }}):</p>
+                                                <div class="flex items-center gap-1">
+                                                    <p class="text-gray-600 text-sm font-semibold">Action:</p>
+                                                    <p class="text-gray-900 font-semibold text-sm">{{ $entry['tindakan'] }}</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Gambar perbaikan sebelumnya -->
+                                            @if (!empty($entry['bukti']))
+                                                <div class="mt-4">
+                                                    <p class="text-gray-700 text-sm font-semibold mb-2">Corrective Action Images</p>
+                                                    <div class="flex overflow-x-auto gap-2">
+                                                        @foreach ($entry['bukti'] as $gambar)
+                                                            <img src="{{ $gambar }}" 
+                                                                class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
+                                                                alt="Bukti Perbaikan"
+                                                                onclick="openModal('{{ $gambar }}')">
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
                                     @endforeach
                                 </div>
-                            @else
-                                <p class="text-gray-600 text-sm font-semibold text-center">No image available. PIC has not submitted a report.</p>
-                            @endif
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-500">
+                            <p class="text-gray-600 text-sm font-semibold text-center">No corrective actions found.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

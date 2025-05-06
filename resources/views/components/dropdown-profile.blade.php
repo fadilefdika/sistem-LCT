@@ -55,11 +55,11 @@
             </div>
         <ul>
             <li>
-                <form method="POST" action="{{ route('logout') }}" x-data>
+                <form method="POST" action="{{ route('logoutAll') }}" x-data>
                     @csrf
 
                     <a class="font-medium text-sm text-[#048cfb] flex items-center py-1 px-3"
-                        href="{{ route('logout') }}"
+                        href="{{ route('logoutAll') }}"
                         @click.prevent="$root.submit();"
                         @focus="open = true"
                         @focusout="open = false"

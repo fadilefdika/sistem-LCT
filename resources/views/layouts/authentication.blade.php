@@ -27,50 +27,53 @@
                 document.querySelector('html').style.colorScheme = 'dark';
             }
         </script>
+        
 
     </head>
     <body class="font-inter antialiased bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400">
 
-        <main class="dark:bg-gray-900" 
-        style="background: linear-gradient(129deg, rgba(242,255,152,0.5655054258031338) 3%, rgba(4,140,251,0.5627043053549545) 64%);">
+        <main class="dark:bg-gray-900"
+        style="background: linear-gradient(180deg, rgba(241, 247, 250, 0.85) 67%, rgba(224, 242, 250, 1) 100%), url('/images/background.png');
+               background-size: cover;
+               background-position: center;">
     
-        <div class="relative flex h-screen">
-            <!-- Logo di kanan atas -->
-            <div class="absolute top-0 right-0 bg-white p-8 rounded-bl-full shadow-lg">
-                <a href="{{ route('admin.dashboard') }}">
-                    <img src="{{ asset('images/LOGO-AVI-OFFICIAL.png') }}" 
+            <div class="relative flex h-screen overflow-hidden">
+        
+                <!-- Logo kiri atas -->
+                <div class="absolute top-6 left-6 z-20">
+                        <img src="{{ asset('images/LOGO-AVI-OFFICIAL.png') }}" 
+                            alt="Logo" 
+                            class="w-28 h-auto object-contain">
+                </div>
+        
+                <!-- Logo kanan atas -->
+                <div class="absolute top-6 right-6 z-20">
+                    <img src="{{ asset('images/safety.png') }}" 
                         alt="Logo" 
-                        class="w-32 h-auto object-contain">
-                </a>
-            </div>
-
-            <!-- Kontainer Kiri (Form + Logo) -->
-            <div class="w-full md:w-1/2 flex flex-col justify-center items-center px-6 lg:px-12 relative z-10">
-                
-        
-                <!-- Form -->
-                <div class="max-w-lg w-full text-center">
-                    {{ $slot }}
+                        class="w-28 h-auto object-contain">
                 </div>
-                
-            </div>
         
-            <!-- Gambar Kanan -->
-            <div class="hidden md:flex items-center justify-center absolute top-0 bottom-0 right-0 md:w-1/2 px-6">
-                <div class="relative w-[80%] h-[85vh] overflow-hidden rounded-[50%]">
-                    <img class="object-cover w-full h-full" 
-                        src="{{ asset('images/gambar-login.jpg') }}" 
-                        width="760" 
-                        height="1024" 
-                        alt="Authentication image" />
+                <!-- Gambar kiri -->
+                <div class="hidden md:flex items-center justify-center absolute inset-y-0 left-0 w-1/2 px-8">
+                    <div class="w-full h-full flex justify-center items-center">
+                        <img class="object-contain max-w-[85%] max-h-[85%]" 
+                            src="{{ asset('images/gambar-login.png') }}" 
+                            alt="Authentication image" />
+                    </div>
                 </div>
+        
+                <!-- Form kanan -->
+                <div class="w-full md:w-1/2 ml-auto flex flex-col justify-center items-center px-6 lg:px-12 z-10">
+                    <div class="max-w-lg w-full text-left">
+                        {{ $slot }}
+                    </div>
+                </div>
+        
             </div>
         
-        </div>
+        </main>
         
-
-        </main> 
-
         @livewireScriptConfig
-    </body>
+        </body>
+        
 </html>

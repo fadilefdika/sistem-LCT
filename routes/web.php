@@ -5,6 +5,7 @@ use App\Http\Controllers\{
     EhsController,
     UserController,
     AreaLctController,
+    AuthController,
     LctTaskController,
     DataFeedController,
     RoleDataController,
@@ -25,13 +26,20 @@ use App\Http\Controllers\{
 |--------------------------------------------------------------------------
 */
 
-// Pilihan Login
-Route::get('/', fn () => view('auth.choose-login'))->name('choose-login');
-Route::get('/login', fn () => view('auth.login'))->name('login');
+Route::get('/unauthorized', function () {
+    return view('unauthorized');  // Pastikan view ini ada
+})->name('unauthorized');
 
-// Login EHS
-Route::get('/login-ehs', [EhsController::class, 'showLoginForm'])->name('login-ehs');
-Route::post('/login-ehs', [EhsController::class, 'login']);
+Route::get('/', fn()=>view('auth.login'))->name('login');
+Route::post('/', [AuthController::class, 'login'])->name('login');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logoutAll');
+
+
+// Route::get('/login', fn () => view('auth.login'))->name('login');
+// // Login EHS
+// Route::get('/login-ehs', [EhsController::class, 'showLoginForm'])->name('login-ehs');
+// Route::post('/login-ehs', [EhsController::class, 'login']);
 
 // Setelah login memilih tujuan
 Route::middleware(['auth', 'verified','role:user,pic,manajer'])->group(function () {
@@ -178,6 +186,14 @@ Route::middleware(['auth', 'verified', 'role:manajer'])->group(function () {
             Route::post('/', [AreaLctController::class, 'store'])->name('store');
             Route::put('/{id}', [AreaLctController::class, 'update'])->name('update');
             Route::delete('/{id}', [AreaLctController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('ehs-data')->name('admin.master-data.ehs-data.')->group(function () {
+            Route::get('/', [EhsController::class, 'index'])->name('index');
+            Route::post('/', [EhsController::class, 'store'])->name('store');
+            Route::put('/{id}', [EhsController::class, 'update'])->name('update');
+            Route::delete('/{id}', [EhsController::class, 'destroy'])->name('destroy');
+            Route::get('/search-users', [DepartmentDataController::class, 'searchUsers'])->name('search-users');
         });
     });
 
