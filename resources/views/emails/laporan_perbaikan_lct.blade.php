@@ -54,9 +54,9 @@
         <!-- Link to Detailed Report -->
         <div style="margin-top: 20px;">
             <p style="font-size: 14px; font-weight: bold; color: #333;">🔗 Report Details:</p>
-            <a href="{{ url('/progress-perbaikan/' . $laporan->id_laporan_lct) }}" 
+            <a href="{{ url('/ehs/progress-perbaikan/' . $laporan->id_laporan_lct) }}" 
                style="font-size: 14px; color: #007BFF; text-decoration: underline; word-wrap: break-word;">
-                {{ url('/progress-perbaikan/' . $laporan->id_laporan_lct) }}
+                {{ url('/ehs/progress-perbaikan/' . $laporan->id_laporan_lct) }}
             </a>
         </div>
 

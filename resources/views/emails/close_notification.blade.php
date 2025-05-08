@@ -6,7 +6,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
     <div style="max-width: 600px; margin: auto; background-color: #fff; padding: 20px; border: 1px solid #ddd;">
-        <h2 style="color: #000;">🚫 Report Closed</h2>
+        <h2 style="color: #000;">ℹ️ Report Closed</h2>
         <p>Below is a summary of the report that has been closed:</p>
 
         <table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">

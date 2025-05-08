@@ -142,7 +142,14 @@ class LctReportController extends Controller
             $laporan->load('user', 'kategori');
             
             // Kirim email ke EHS
-            Mail::to('efdika1102@gmail.com')->queue(new LaporanKetidaksesuaian($laporan));
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
+            
     
             // Log pengiriman laporan ke EHS
             RejectLaporan::create([
@@ -169,18 +176,14 @@ class LctReportController extends Controller
     // dari ehs ke pic
     public function assignToPic(Request $request, $id_laporan_lct)
     {
-        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
             $user = Auth::guard('ehs')->user();
             $roleName = optional($user->roles->first())->name;
         } else {
-            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
             $user = Auth::user();
             $roleName = optional($user->roleLct->first())->name;
         }
 
-        // Validasi request
         $validator = Validator::make($request->all(), [
             'temuan_ketidaksesuaian' => 'required|string|max:255',
             'kategori_temuan' => 'required|string|max:255',
@@ -190,7 +193,7 @@ class LctReportController extends Controller
             'rekomendasi' => 'required|string|max:255',
             'due_date' => 'required|date|after_or_equal:today',
         ]);
-        
+
         try {
             DB::beginTransaction();
 
@@ -199,7 +202,7 @@ class LctReportController extends Controller
                 abort(404, 'Report data not found');
             }
 
-            
+            // Update data terlebih dahulu termasuk pic_id
             $laporan->update([
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'kategori_temuan' => $request->kategori_temuan,
@@ -210,33 +213,40 @@ class LctReportController extends Controller
                 'due_date' => $request->due_date,
                 'status_lct' => 'in_progress',
             ]);
-       
-            
-            DB::commit();
 
+            // Buat reject log
             RejectLaporan::create([
                 'id_laporan_lct' => $laporan->id_laporan_lct,
                 'user_id' => $user->id,
-                'role' => $roleName,  // Role user yang mengirimkan laporan
-                'status_lct' => 'in_progress',  // Status saat laporan baru dikirim
-                'alasan_reject' => null,  // Tidak ada alasan reject pada tahap ini
-                'tipe_reject' => null,  // Mengindikasikan ini adalah pengiriman ke EHS
+                'role' => $roleName,
+                'status_lct' => 'in_progress',
+                'alasan_reject' => null,
+                'tipe_reject' => null,
             ]);
-            
-            Mail::to('efdika1102@gmail.com')->queue(new LaporanDikirimKePic($laporan));
+
+            DB::commit();
+
+            // Muat ulang laporan dengan relasi agar picUser terisi
+            $laporan->load('picUser');
+
+            // Kirim email hanya jika picUser valid
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
 
             return redirect()->route('ehs.progress-perbaikan.index')->with('success', 'The report has been successfully submitted to the PIC.');
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-         
-            return redirect()->back()->with('error', 'Report not found.', $e->getMessage());
+            
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()->with('error', 'An error occurred while submitting the report.', $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while submitting the report.');
         }
     }
+
+
 
     public function closed(Request $request, $id_laporan_lct)
     {

@@ -19,11 +19,15 @@
         <li><strong>Status:</strong> Task & Budget Revision Required</li>
     </ul>
 
-    <p>Please review the above and make the necessary changes as soon as possible.</p>
-
-    <p>Feel free to contact the administrator if you need any assistance.</p>
-
     <p>Best regards,<br>
     Manajer</p>
+
+    <div style="margin-top: 20px;">
+        <p style="font-size: 14px; font-weight: bold; color: #333;">🔗 Report Detail Link:</p>
+        <a href="{{ config('app.url') . '/manajemen-lct/' . $laporan->id_laporan_lct }}" 
+           style="font-size: 14px; color: #007BFF; text-decoration: underline; word-wrap: break-word;">
+            {{ config('app.url') . '/manajemen-lct/' . $laporan->id_laporan_lct }}
+        </a>
+    </div>
 </body>
 </html>

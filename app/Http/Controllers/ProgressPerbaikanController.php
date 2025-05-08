@@ -131,7 +131,13 @@ class ProgressPerbaikanController extends Controller
                 'tipe_reject' => null,
             ]);
 
-            Mail::to('efdika1102@gmail.com')->queue(new ApprovalNotification($laporan));
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new ApprovalNotification($laporan));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
 
             DB::commit();
 
@@ -215,7 +221,13 @@ class ProgressPerbaikanController extends Controller
                 ->get();
 
             // Kirim email ke PIC atau user terkait
-            Mail::to('efdika1102@gmail.com')->queue(new LaporanRevisiToPic($laporan, $alasanRevisi));
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new LaporanRevisiToPic($laporan,$alasanRevisi));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
 
             DB::commit(); // Commit transaksi
 
@@ -257,7 +269,13 @@ class ProgressPerbaikanController extends Controller
             'tipe_reject' => null,
         ]);
 
-        Mail::to('efdika1102@gmail.com')->queue(new CloseNotification($laporan));
+        try {
+            Mail::to('efdika1102@gmail.com')->send(new CloseNotification($laporan));
+            Log::info('Email berhasil dikirim.');
+        } catch (\Exception $mailException) {
+            Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+        }
 
         return redirect()->back()->with('closed', 'The repair report has been successfully approved.');
     }

@@ -364,12 +364,26 @@
         </div>
 
         <div class="mt-7 w-full">
-            <a href="{{ route('report-form') }}" 
-                class="block w-full px-4 py-2 text-center text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300"
-                aria-label="Go to Report Form LCT">
+            @php
+                if (Auth::guard('ehs')->check()) {
+                    // Jika pengguna adalah EHS
+                    $user = Auth::guard('ehs')->user();
+                    $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
+                    $reportRoute = route('ehs.report-form');
+                } else {
+                    // Jika pengguna adalah User biasa
+                    $user = Auth::user();
+                    $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
+                    $reportRoute = route('report-form');
+                }
+            @endphp
+        
+            <a href="{{ $reportRoute }}"
+               class="block w-full px-4 py-2 text-center text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300"
+               aria-label="Go to Report Form LCT">
                 Report Form LCT
             </a>
-        </div>               
+        </div>                      
     </div>
 </div>
 

@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LaporanLct extends Model
@@ -34,6 +35,7 @@ class LaporanLct extends Model
         'status_lct',  
         'budget_approval',
         'bukti_perbaikan',
+        'estimated_budget',
         'tindakan_perbaikan',
         'first_viewed_by_ehs_at',
         'first_viewed_by_manager_at',
@@ -109,6 +111,16 @@ class LaporanLct extends Model
     public function area()
     {
         return $this->belongsTo(AreaLct::class, 'area_id');
+    }
+
+    public function departemenPic()
+    {
+        return $this->belongsTo(LctDepartemenPic::class, 'pic_id');
+    }
+
+    public function departemen()
+    {
+        return $this->belongsTo(LctDepartement::class, 'departemen_id');
     }
 
 }

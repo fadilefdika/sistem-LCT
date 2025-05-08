@@ -15,11 +15,16 @@
         <li><strong>Status:</strong> {{ str_replace('_', ' ', ucfirst($laporan->status_lct)) }}</li>
     </ul>
 
-    <p>You are kindly requested to proceed with the necessary actions as the assigned Person in Charge (PIC).</p>
-
-    <p>If you have any questions or require further clarification, feel free to reach out.</p>
 
     <p>Best regards,<br>
     Manajer</p>
+
+    <div style="margin-top: 20px;">
+        <p style="font-size: 14px; font-weight: bold; color: #333;">🔗 Report Detail Link:</p>
+        <a href="{{ config('app.url') . '/manajemen-lct/' . $laporan->id_laporan_lct }}" 
+           style="font-size: 14px; color: #007BFF; text-decoration: underline; word-wrap: break-word;">
+            {{ config('app.url') . '/manajemen-lct/' . $laporan->id_laporan_lct }}
+        </a>
+    </div>
 </body>
 </html>

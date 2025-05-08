@@ -27,7 +27,21 @@
 
             <!-- Card Form -->
             <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 w-full">
-                <form action="{{ route('laporan-lct.store') }}" method="POST" enctype="multipart/form-data">
+                @php
+                    if (Auth::guard('ehs')->check()) {
+                        // Jika pengguna adalah EHS
+                        $user = Auth::guard('ehs')->user();
+                        $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
+                        $formAction = route('ehs.laporan-lct.store');
+                    } else {
+                        // Jika pengguna adalah User biasa
+                        $user = Auth::user();
+                        $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
+                        $formAction = route('laporan-lct.store');
+                    }
+                @endphp
+                
+                <form action="{{ $formAction }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="grid grid-cols-1 gap-6">

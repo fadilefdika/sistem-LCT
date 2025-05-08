@@ -15,16 +15,12 @@
                 <td>{{ $laporan->picUser->fullname }}</td>
             </tr>
             <tr>
+                <td><strong>Hazard Level</strong></td>
+                <td>{{ $laporan->tingkat_bahaya }}</td>
+            </tr>
+            <tr>
                 <td><strong>Finding</strong></td>
                 <td>{{ $laporan->temuan_ketidaksesuaian }}</td>
-            </tr>
-            <tr>
-                <td><strong>Corrective Action</strong></td>
-                <td>{{ $laporan->tindakan_perbaikan }}</td>
-            </tr>
-            <tr>
-                <td><strong>Current Status</strong></td>
-                <td>{{ $laporan->status_lct }}</td>
             </tr>
             <tr>
                 <td><strong>Approval Date</strong></td>

@@ -180,7 +180,14 @@ class ManajemenLctController extends Controller
                 'tipe_reject' => null,
             ]);
 
-            Mail::to('efdika1102@gmail.com')->queue(new LaporanHasilPerbaikan($laporan));
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new LaporanHasilPerbaikan($laporan));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
+            
 
             DB::commit();
 
@@ -305,6 +312,20 @@ class ManajemenLctController extends Controller
                 'alasan_reject' => null,  
                 'tipe_reject' => null,  
             ]);
+
+            // Ambil ulang semua task terbaru yang terhubung dengan laporan ini
+            $tasks = LctTasks::with('pic')
+                ->where('id_laporan_lct', $id_laporan_lct)
+                ->get();
+
+
+            try {
+                Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $tasks));
+                Log::info('Email berhasil dikirim.');
+            } catch (\Exception $mailException) {
+                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            }
     
             DB::commit();
     
