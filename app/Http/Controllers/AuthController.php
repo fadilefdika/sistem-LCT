@@ -19,14 +19,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validasi input
         $rules = [
-            'role' => 'required|in:ehs,manajer,pic,pelapor',
+            'role' => 'required|in:ehs,manajer,pic,employee',
             'password' => 'required|string',
             'npk_or_username' => ['required'],
         ];
+        $redirectTo = $request->input('redirect_to');
 
-        // Tambahkan validasi tergantung role
         if ($request->role === 'ehs') {
             $rules['npk_or_username'][] = 'string';
         } else {
@@ -55,7 +54,6 @@ class AuthController extends Controller
                 ])->withInput();
             }
 
-            // Cek apakah memiliki role ehs
             $roleName = $user->roles->first()->name ?? null;
             if ($roleName !== 'ehs') {
                 return back()->withErrors([
@@ -65,22 +63,25 @@ class AuthController extends Controller
 
             Auth::guard('ehs')->login($user);
             $request->session()->regenerate();
-            return redirect()->route('choose-destination-ehs'); // ✅ Ini
 
+            // Redirect berdasarkan pilihan tab
+            if ($redirectTo === 'dashboard') {
+                return redirect()->route('ehs.dashboard');
+            } elseif ($redirectTo === 'form') {
+                return redirect()->route('ehs.report-form');
+            }
+
+            return redirect()->route('ehs.dashboard');
         }
 
         // === Login untuk role selain EHS (web guard) ===
         $npk = $request->npk_or_username;
-
         $roleMapping = [
-            'pelapor' => 1,
+            'employee' => 1,
             'pic' => 2,
             'manajer' => 4,
         ];
-
         $expectedRoleId = $roleMapping[$request->role] ?? null;
-
-        // Ambil user berdasarkan NPK
         $user = User::with('roleLct')->where('npk', $npk)->first();
 
         if (!$user) {
@@ -97,21 +98,19 @@ class AuthController extends Controller
             ])->withInput();
         }
 
-        // Login menggunakan Auth Laravel
-        $credentials = [
-            'npk' => $npk,
-            'password' => $request->password,
-        ];
-
-        if ($user && Hash::check($credentials['password'], $user->password_hash)) {
-            // Password cocok
+        if (Hash::check($request->password, $user->password_hash)) {
             Auth::guard('web')->login($user, $request->filled('remember'));
-            
             $request->session()->regenerate();
-    
-            return redirect()->route('choose-destination-user');
+
+            // Redirect berdasarkan pilihan tab
+            if ($redirectTo === 'dashboard') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($redirectTo === 'form') {
+                return redirect()->route('report-form');
+            }
+
+            return redirect()->route('admin.dashboard');
         }
-        
 
         return back()->withErrors([
             'npk_or_username' => 'Login failed. Please check your NPK and password.',

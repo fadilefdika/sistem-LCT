@@ -126,7 +126,31 @@
                     
                     <!-- Grafik Garis: LCT Per Bulan (2/3 width) -->
                     <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-2 flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-1">Monthly Findings</h2>
+                        <h2 class="text-2xl font-semibold mb-1">Findings</h2>
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex space-x-4">
+                                <!-- Year Select -->
+                                <div class="relative w-40">
+                                    <select id="year-select" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">Select Year</option>
+                                        @foreach ($findings as $year)
+                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            
+                                <!-- Month Select -->
+                                <div class="relative w-48">
+                                    <select id="month-select" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>                           
+                        </div>
+                        
                         <canvas id="monthlyChart" class="flex-grow"></canvas>
                     </div>
 
@@ -137,38 +161,97 @@
                     </div>
 
                 </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4">
+                <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
                     <!-- Grafik Batang Horizontal: Berdasarkan Area -->
-                    <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-4">Most Findings Areas</h2>
-                        <canvas id="areaChart" class="flex-grow"></canvas>
+                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-3 flex flex-col">
+                        <h2 class="text-2xl font-semibold mb-4">Findings by Area</h2>
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex space-x-4">
+                                <!-- Year Select -->
+                                <div class="relative w-40">
+                                    <select id="year-select-area" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">Select Year</option>
+                                        @foreach ($findings as $year)
+                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            
+                                <!-- Month Select -->
+                                <div class="relative w-48">
+                                    <select id="month-select-area" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>                           
+                        </div>
+                        <div style="height: 390px;">
+                            <canvas id="areaChart"></canvas>
+                        </div>
                     </div>
-
+                
                     <!-- Grafik Batang Vertikal: Berdasarkan Kategori -->
-                    <div class="p-6 bg-white rounded-lg shadow-md flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-4">Categories of Findings</h2>
-                        <canvas id="categoryChart"></canvas>
+                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-2 flex flex-col">
+                        <h2 class="text-2xl font-semibold mb-4">Findings by Category</h2>
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex space-x-4">
+                                <!-- Year Select -->
+                                <div class="relative w-40">
+                                    <select id="year-select-category" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">Select Year</option>
+                                        @foreach ($findings as $year)
+                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            
+                                <!-- Month Select -->
+                                <div class="relative w-48">
+                                    <select id="month-select-category" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>                           
+                        </div>
+                        <canvas id="categoryChart" class="max-h-80"></canvas>
                     </div>
                 </div>
-            
+                
             </div>
         </div>
     </div>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        const monthlyLabels = @json(array_keys($monthlyReports->toArray()));
-        const monthlyData = @json(array_values($monthlyReports->toArray()));
+
+    const userRole = @json($roleName);
     
-        new Chart(document.getElementById('monthlyChart'), {
+    let monthlyChart;
+    
+
+    function renderChart(labels, data, isMonthly = true) {
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+        if (monthlyChart) {
+            monthlyChart.destroy();
+        }
+
+        monthlyChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: monthlyLabels,
+                labels: labels,
                 datasets: [{
-                    label: 'Number of Findings per Month',
-                    data: monthlyData,
+                    label: 'Number of Findings',
+                    data: data,
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 2,
@@ -178,130 +261,287 @@
             options: {
                 responsive: true,
                 scales: {
-                    y: {
-                        ticks: {
-                            stepSize: 1,
-                            callback: function(value) {
-                                return Number.isInteger(value) ? value : null;
-                            }
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    
-        const areaLabels = @json(array_keys($areaCounts->toArray()));
-        const areaData = @json(array_values($areaCounts->toArray()));
-    
-        new Chart(document.getElementById('areaChart'), {
-            type: 'bar',
-            data: {
-                labels: areaLabels,
-                datasets: [{
-                    label: 'Number of Findings per Area',
-                    data: areaData,
-                    backgroundColor: areaData.map((_, i) => {
-                        const colors = [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(153, 102, 255, 0.6)',
-                            'rgba(255, 159, 64, 0.6)'
-                        ];
-                        return colors[i % colors.length];
-                    }),
-                    borderColor: areaData.map((_, i) => {
-                        const borderColors = [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ];
-                        return borderColors[i % borderColors.length];
-                    }),
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                scales: {
                     x: {
-                        ticks: {
-                            stepSize: 1,
-                            precision: 0,
-                            callback: function(value) {
-                                return Number.isInteger(value) ? value : '';
-                            }
+                        title: {
+                            display: true,
+                            text: isMonthly ? 'Months' : 'Dates' // Gunakan flag, bukan length
                         },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    
-        const categoryLabels = @json(array_values($categoryAliases));
-        const categoryData = @json(array_map(function($key) use ($categoryCounts) {
-            return $categoryCounts[$key] ?? 0;
-        }, array_keys($categoryAliases)));
-
-    
-        new Chart(document.getElementById('categoryChart'), {
-            type: 'bar',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    label: 'Number of Findings per Category',
-                    data: categoryData,
-                    backgroundColor: categoryData.map((_, i) => {
-                        const colors = [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(153, 102, 255, 0.6)',
-                            'rgba(255, 159, 64, 0.6)'
-                        ];
-                        return colors[i % colors.length];
-                    }),
-                    borderColor: categoryData.map((_, i) => {
-                        const borderColors = [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ];
-                        return borderColors[i % borderColors.length];
-                    }),
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
                         ticks: {
-                            autoSkip: false,
-                            maxRotation: 45,
-                            minRotation: 0
+                            callback: function(value, index, ticks) {
+                                const label = this.getLabelForValue(value);
+                                if (isMonthly) {
+                                    return label; // langsung tampilkan nama bulan
+                                } else {
+                                    const date = new Date(label);
+                                    return date.getDate().toString().padStart(2, '0'); // hanya tanggal
+                                }
+                            }
                         }
                     },
                     y: {
                         beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Findings'
+                        },
                         ticks: {
-                            stepSize: 1,
-                            precision: 0
+                            stepSize: 1
                         }
                     }
                 }
             }
         });
+    }
+
+
+    function fetchChartData(year, month = '') {
+        const url = userRole === 'ehs' ? '/ehs/dashboard/chart-data' : '/dashboard/chart-data';
+
+        $.ajax({
+            url: url,
+            data: { year, month },
+            success: function (res) {
+                const isMonthly = !month; 
+                renderChart(res.labels, res.data, isMonthly);
+            },
+            error: function (xhr) {
+                console.error('Error fetching chart data:', xhr.responseText);
+            }
+        });
+    }
+
+    // Event dropdown
+    $('#year-select').change(function () {
+        const year = $(this).val();
+        $('#month-select').prop('disabled', !year).val('');
+        if (year) {
+            fetchChartData(year);
+        }
+    });
+
+    $('#month-select').change(function () {
+        const year = $('#year-select').val();
+        const month = $(this).val();
+        if (year) {
+            fetchChartData(year, month); // bulan kosong => all month
+        }
+    });
+
+    // Initial load (optional)
+    @if(count($findings))
+        fetchChartData({{ $findings->max() }});
+    @endif
+    
+
+        let areaChart;
+        // Fungsi untuk menggambar chart area
+        function renderAreaChart(data) {
+            const ctx = document.getElementById('areaChart').getContext('2d');
+
+            // Hancurkan chart lama jika ada
+            if (areaChart) {
+                areaChart.destroy();
+            }
+
+            const areaLabels = Object.keys(data);
+            const closedData = areaLabels.map(label => data[label].closed_count);
+            const nonClosedData = areaLabels.map(label => data[label].non_closed_count);
+
+            areaChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: areaLabels,
+                    datasets: [
+                        {
+                            label: 'Closed',
+                            data: closedData,
+                            backgroundColor: 'rgba(75, 192, 75, 0.6)',
+                            borderColor: 'rgba(75, 192, 75, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Non-Closed',
+                            data: nonClosedData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false, 
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Findings'
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0,
+                                callback: function (value) {
+                                    return Number.isInteger(value) ? value : '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        // Fungsi untuk mengambil data berdasarkan tahun dan bulan
+        function fetchAreaChartData(year, month) {
+            const url = userRole === 'ehs' ? '/ehs/dashboard/area-chart-data' : '/dashboard/area-chart-data';
+            
+            $.ajax({
+                url: url,
+                data: { year, month },
+                success: function (res) {
+                    renderAreaChart(res.areaStatusCounts);
+                },
+                error: function (xhr) {
+                    console.error('Error fetching area chart data:', xhr.responseText);
+                }
+            });
+        }
+
+        // Event listener untuk dropdown tahun
+        $('#year-select-area').change(function () {
+            const year = $(this).val();
+            $('#month-select-area').prop('disabled', !year).val('');
+            if (year) {
+                fetchAreaChartData(year);
+            }
+        });
+
+        // Event listener untuk dropdown bulan
+        $('#month-select-area').change(function () {
+            const year = $('#year-select-area').val();
+            const month = $(this).val();
+            if (year) {
+                fetchAreaChartData(year, month); // Filter berdasarkan tahun dan bulan
+            }
+        });
+
+            // Initial load (optional)
+        @if(count($findings))
+            fetchAreaChartData({{ $findings->max() }});
+        @endif
+
+    
+        let categoryChart; // Simpan chart agar bisa di-destroy
+
+
+        function renderCategoryChart(categoryStatusCounts, categoryAliases) {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+
+            if (categoryChart) categoryChart.destroy();
+
+            const categoryLabels = Object.values(categoryAliases);
+
+            const closedData = categoryLabels.map(label => {
+                const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
+                return categoryStatusCounts[originalLabel]?.closed_count || 0;
+            });
+
+            const nonClosedData = categoryLabels.map(label => {
+                const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
+                return categoryStatusCounts[originalLabel]?.non_closed_count || 0;
+            });
+
+            categoryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [
+                        {
+                            label: 'Closed',
+                            data: closedData,
+                            backgroundColor: 'rgba(75, 192, 75, 0.6)',
+                            borderColor: 'rgba(75, 192, 75, 1)',
+                            borderWidth: 1,
+                            barThickness: 40,
+                        },
+                        {
+                            label: 'Non-Closed',
+                            data: nonClosedData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            barThickness: 40,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 0.1,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function fetchCategoryChartData(year, month) {
+            const url = userRole === 'ehs' ? '/ehs/dashboard/category-chart-data' : '/dashboard/category-chart-data';
+            
+            $.ajax({
+                url: url,
+                data: { year, month },
+                success: function (res) {
+                    // Gunakan renderCategoryChart untuk memperbarui grafik kategori
+                    renderCategoryChart(res.categoryStatusCounts, res.categoryAliases);
+                },
+                error: function (xhr) {
+                    console.error('Error fetching category chart data:', xhr.responseText);
+                }
+            });
+        }
+
+
+        // Event listener untuk dropdown tahun
+        $('#year-select-category').change(function () {
+            const year = $(this).val();
+            $('#month-select-category').prop('disabled', !year).val('');
+            if (year) {
+                fetchCategoryChartData(year);
+            }
+        });
+
+        // Event listener untuk dropdown bulan
+        $('#month-select-category').change(function () {
+            const year = $('#year-select-category').val();
+            const month = $(this).val();
+            if (year) {
+                fetchCategoryChartData(year, month); // Filter berdasarkan tahun dan bulan
+            }
+        });
+        
+        // Initial load (optional)
+        @if(count($findings))
+            fetchCategoryChartData({{ $findings->max() }});
+        @endif
+
     
         const statusCounts = [
             {{ $statusCounts['open'] }},
@@ -333,10 +573,23 @@
                 plugins: {
                     legend: {
                         position: 'bottom'
+                    },
+                    datalabels: {
+                        formatter: (value, context) => {
+                            const sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = (value / sum * 100).toFixed(1) + '%';
+                            return percentage;
+                        },
+                        color: '#000',
+                        font: {
+                            weight: 'bold'
+                        }
                     }
                 }
-            }
+            },
+            plugins: [ChartDataLabels]
         });
+
     </script>
     
     

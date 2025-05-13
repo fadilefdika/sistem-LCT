@@ -53,6 +53,9 @@ Route::middleware(['auth:ehs', 'verified','role:ehs'])->group(function () {
 // =================== ROUTE UNTUK USER (role: pic, manajer, user) ===================
 Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
+    Route::get('/dashboard/area-chart-data', [DashboardController::class, 'getAreaChartData']);
+    Route::get('/dashboard/category-chart-data', [DashboardController::class, 'getCategoryChartData']);
 
     // Form Laporan LCT
     Route::get('/report-form', [UserController::class, 'index'])->name('report-form');  
@@ -84,6 +87,10 @@ Route::middleware(['auth', 'verified', 'role:pic'])->prefix('manajemen-lct')->na
 // =================== ROUTE UNTUK EHS ===================
 Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('ehs.dashboard');
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
+    Route::get('/dashboard/area-chart-data', [DashboardController::class, 'getAreaChartData']);
+    Route::get('/dashboard/category-chart-data', [DashboardController::class, 'getCategoryChartData']);
+    
 
     // Form Laporan LCT
     Route::get('/report-form', [UserController::class, 'index'])->name('ehs.report-form');  
