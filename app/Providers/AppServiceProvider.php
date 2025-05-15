@@ -69,18 +69,22 @@ class AppServiceProvider extends ServiceProvider
 
             if ($roleName === 'ehs') {
                 $query->where(function ($subQuery) {
-                    $subQuery->whereIn('status_lct', [
-                        'open',
-                        'in_progress',
-                        'progress_work',
-                        'waiting_approval',
-                        'waiting_approval_permanent'
-                    ])
-                    ->orWhere(function ($q) {
+                    $subQuery->where(function ($q) {
+                        // Filter status dengan pengecualian 'open' yang sudah dilihat
+                        $q->whereIn('status_lct', [
+                            'in_progress',
+                            'progress_work',
+                            'waiting_approval',
+                            'waiting_approval_permanent'
+                        ]);
+                    })->orWhere(function ($q) {
+                        // 'open' tapi belum pernah dilihat
+                        $q->where('status_lct', 'open')
+                          ->whereNull('first_viewed_by_ehs_at');
+                    })->orWhere(function ($q) {
                         $q->where('status_lct', 'waiting_approval_temporary')
                           ->where('approved_temporary_by_ehs', false);
-                    })
-                    ->orWhere(function ($subSubQuery) {
+                    })->orWhere(function ($subSubQuery) {
                         $subSubQuery->whereIn('status_lct', [
                             'waiting_approval_taskbudget',
                             'taskbudget_revision',
@@ -89,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
                         ->where('approved_temporary_by_ehs', false);
                     });
                 });
-            }
+            }            
              elseif ($roleName === 'pic') {
                 $query->whereIn('status_lct', ['in_progress','progress_work','revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision']);
                 $picId = Pic::where('user_id', $user->id)->value('id');

@@ -52,7 +52,9 @@
                                         {{ $item->created_at ? $item->created_at->timezone('Asia/Jakarta')->format('d M Y H:i') : '-' }} WIB
                                     </td>                                    
                                     <td class="px-6 py-4 text-gray-700">{{ $item->user->fullname ?? '-' }}</td>
-                                    <td class="px-6 py-4 text-gray-700">{{ $item->role ?? '-' }}</td>
+                                    <td class="px-6 py-4 text-gray-700">
+                                        {{ $item->status_lct === 'open' ? 'finder' : ($item->role ?? '-') }}
+                                    </td>                                    
                                     <td class="px-6 py-4">
                                         @php
                                             $statusMapping = [
