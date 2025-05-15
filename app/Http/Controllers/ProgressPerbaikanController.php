@@ -55,11 +55,13 @@ class ProgressPerbaikanController extends Controller
 
         if (
             $allTasksCompleted &&
-            $laporan->status_lct !== 'approved_permanent'
+            $laporan->status_lct !== 'approved_permanent' &&
+            $laporan->status_lct !== 'closed'
         ) {
             $laporan->status_lct = 'waiting_approval_permanent';
             $laporan->save();
         }
+        
 
 
         
@@ -69,6 +71,7 @@ class ProgressPerbaikanController extends Controller
 
     public function approveLaporan($id_laporan_lct)
     {
+        
         // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
             // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
@@ -81,47 +84,81 @@ class ProgressPerbaikanController extends Controller
         }
 
         $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
-
+   
         if (!$laporan) {
             return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
         }
 
         try {
             DB::beginTransaction();
-
-
+            Log::info('Mulai proses approval', [
+                'laporan_id' => $laporan->id_laporan_lct,
+                'tingkat_bahaya' => $laporan->tingkat_bahaya,
+                'status_awal' => $laporan->status_lct
+            ]);
+        
             // Tentukan status berdasarkan tingkat bahaya
             switch ($laporan->tingkat_bahaya) {
                 case 'Low':
+                    Log::info('Tingkat bahaya: Low - langsung approved');
                     $laporan->status_lct = 'approved';
                     $statusLog = 'approved';
                     break;
-
+        
                 case 'Medium':
                 case 'High':
+                    Log::info('Tingkat bahaya: Medium/High - pengecekan status saat ini');
+        
                     if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
+                        Log::info('Status sekarang: waiting_approval_temporary / temporary_revision');
                         $laporan->status_lct = 'approved_temporary';
                         $statusLog = 'approved_temporary';
-                    } elseif (in_array($laporan->status_lct, ['waiting_approval_permanent'])) {
+                        $laporan->approved_temporary_by_ehs = true;
+        
+                    } elseif ($laporan->status_lct == 'waiting_approval_taskbudget') {
+                        Log::info('Status sekarang: waiting_approval_taskbudget');
+                        $laporan->status_lct = 'waiting_approval_taskbudget';
+                        $statusLog = 'approved_temporary';
+                        $laporan->approved_temporary_by_ehs = true;
+        
+                    } elseif ($laporan->status_lct == 'taskbudget_revision') {
+                        Log::info('Status sekarang: taskbudget_revision');
+                        $laporan->status_lct = 'taskbudget_revision';
+                        $statusLog = 'approved_temporary';
+                        $laporan->approved_temporary_by_ehs = true;
+        
+                    } elseif ($laporan->status_lct == 'approved_taskbudget') {
+                        Log::info('Status sekarang: approved_taskbudget');
+                        $laporan->status_lct = 'approved_taskbudget';
+                        $statusLog = 'approved_temporary';
+                        $laporan->approved_temporary_by_ehs = true;
+        
+                    } elseif ($laporan->status_lct == 'waiting_approval_permanent') {
+                        Log::info('Status sekarang: waiting_approval_permanent - akan disetujui permanen');
                         $laporan->status_lct = 'approved_permanent';
                         $laporan->date_completion = Carbon::now();
                         $statusLog = 'approved_permanent';
-                        // dd('masuk sini');
+        
                     } else {
+                        Log::warning('Status tidak valid untuk tingkat bahaya ini', [
+                            'status' => $laporan->status_lct
+                        ]);
                         return redirect()->back()->with('error', 'Status tidak valid untuk tingkat bahaya tersebut.');
                     }
                     break;
-
+        
                 default:
+                    Log::error('Tingkat bahaya tidak valid', [
+                        'tingkat_bahaya' => $laporan->tingkat_bahaya
+                    ]);
                     return redirect()->back()->with('error', 'Tingkat bahaya tidak valid.');
             }
-
-            Log::info('Sebelum simpan', ['status' => $laporan->status_lct]);
+        
+            Log::info('Sebelum simpan status laporan', ['status_baru' => $laporan->status_lct]);
             $laporan->save();
-            Log::info('Sesudah simpan', ['status' => $laporan->fresh()->status_lct]);
-
-
-            // Log history ke tabel reject_laporan (sebagai histori status, bukan hanya penolakan)
+            Log::info('Setelah simpan status laporan', ['status_baru_aktual' => $laporan->fresh()->status_lct]);
+        
+            // Simpan ke tabel log (RejectLaporan) sebagai histori status
             RejectLaporan::create([
                 'id_laporan_lct' => $laporan->id_laporan_lct,
                 'user_id' => $user->id,
@@ -130,17 +167,11 @@ class ProgressPerbaikanController extends Controller
                 'alasan_reject' => null,
                 'tipe_reject' => null,
             ]);
-
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new ApprovalNotification($laporan));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
-
+            Log::info('Log status tersimpan di tabel reject_laporan', ['status_log' => $statusLog]);
+        
             DB::commit();
-
+            Log::info('Proses approval selesai dan transaksi dikomit.');
+        
             return redirect()->back()->with('approve', 'The repair report has been successfully approved.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -221,13 +252,13 @@ class ProgressPerbaikanController extends Controller
                 ->get();
 
             // Kirim email ke PIC atau user terkait
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new LaporanRevisiToPic($laporan,$alasanRevisi));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new LaporanRevisiToPic($laporan,$alasanRevisi));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
 
             DB::commit(); // Commit transaksi
 
@@ -258,7 +289,10 @@ class ProgressPerbaikanController extends Controller
         }
         $laporan->status_lct = 'closed';
         $laporan->date_closed = Carbon::now();
+        
+        Log::info('Sebelum simpan', ['status' => $laporan->status_lct]);
         $laporan->save();
+        Log::info('sesudah simpan', ['status' => $laporan->status_lct]);
 
         RejectLaporan::create([
             'id_laporan_lct' => $laporan->id_laporan_lct,
@@ -269,13 +303,13 @@ class ProgressPerbaikanController extends Controller
             'tipe_reject' => null,
         ]);
 
-        try {
-            Mail::to('efdika1102@gmail.com')->send(new CloseNotification($laporan));
-            Log::info('Email berhasil dikirim.');
-        } catch (\Exception $mailException) {
-            Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-            return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-        }
+        // try {
+        //     Mail::to('efdika1102@gmail.com')->send(new CloseNotification($laporan));
+        //     Log::info('Email berhasil dikirim.');
+        // } catch (\Exception $mailException) {
+        //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+        //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+        // }
 
         return redirect()->back()->with('closed', 'The repair report has been successfully approved.');
     }

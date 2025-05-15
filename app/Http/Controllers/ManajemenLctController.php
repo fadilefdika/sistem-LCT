@@ -180,13 +180,13 @@ class ManajemenLctController extends Controller
                 'tipe_reject' => null,
             ]);
 
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new LaporanHasilPerbaikan($laporan));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new LaporanHasilPerbaikan($laporan));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
             
 
             DB::commit();
@@ -319,13 +319,13 @@ class ManajemenLctController extends Controller
                 ->get();
 
 
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $tasks));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $tasks));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
     
             DB::commit();
     

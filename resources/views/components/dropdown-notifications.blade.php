@@ -53,7 +53,35 @@
                 'closed' => ['label' => 'Closed', 'color' => 'bg-green-700', 'tracking' => 'Report has been closed by PIC'],
             ];
 
-            $notifikasiGroupedByStatus = $notifikasiLCT->groupBy('status_lct');
+             // Lakukan mapping status untuk grouping yang lebih akurat
+               $notifikasiGroupedByStatus = $notifikasiLCT->map(function ($item) {
+                // Tangani khusus untuk status yang perlu digabung ke waiting_approval_temporary
+                $pendingTemporaryStatuses = [
+                    'waiting_approval_taskbudget',
+                    'taskbudget_revision',
+                    'approved_taskbudget',
+                ];
+
+                // Alihkan status sesuai logika
+                if (
+                    in_array($item->status_lct, $pendingTemporaryStatuses) &&
+                    $item->approved_temporary_by_ehs == false
+                ) {
+                    // Alihkan grouping ke waiting_approval_temporary
+                    $item->status_lct = 'waiting_approval_temporary';
+                }
+
+                // Jika status_lct adalah 'waiting_approval_temporary' dan disetujui
+                if (
+                    $item->status_lct === 'waiting_approval_temporary' &&
+                    $item->approved_temporary_by_ehs == true
+                ) {
+                    $item->status_lct = 'approved_temporary';
+                }
+
+                return $item; // Kembalikan item yang sudah dimodifikasi
+            })->groupBy('status_lct'); // Kemudian, kelompokkan berdasarkan status_lct
+
         @endphp
 
         <div class="space-y-3">

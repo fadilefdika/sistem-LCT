@@ -256,11 +256,16 @@
                                         {{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}
                                     </td>
                                     <td class="px-4 py-2">
-                                        <select data-task-id="{{ $task['id'] }}" class="status-dropdown border rounded-lg px-3 py-1 bg-gray-50 focus:ring focus:ring-blue-300 text-gray-700 w-full">
-                                            <option value="pending" {{ $task['status'] == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                            <option value="completed" {{ $task['status'] == 'completed' ? 'selected' : '' }}>✅ Completed</option>
-                                        </select>
-                                    </td>
+                                        <label class="flex items-center space-x-2 cursor-pointer">
+                                            <input type="checkbox"
+                                                data-task-id="{{ $task['id'] }}"
+                                                class="status-checkbox form-checkbox h-5 w-5 text-green-600"
+                                                {{ $task['status'] == 'completed' ? 'checked' : '' }}>
+                                            <span class="text-sm text-gray-700">
+                                                {{ $task['status'] == 'completed' ? '✅ Completed' : '⏳ Pending' }}
+                                            </span>
+                                        </label>
+                                    </td>                                    
                                 </tr>
                             @endif
                         @endforeach
@@ -370,40 +375,44 @@
 
 
 <script>
-   document.querySelectorAll('.status-dropdown').forEach((dropdown) => {
-    dropdown.addEventListener('change', async function () {
-        const taskId = this.getAttribute('data-task-id');
-        const newStatus = this.value;
-        const updateUrl = `/manajemen-lct/${taskId}/updateStatus`;
+    document.querySelectorAll('.status-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', async function () {
+            const taskId = this.getAttribute('data-task-id');
+            const isChecked = this.checked;
+            const newStatus = isChecked ? 'completed' : 'pending';
+            const updateUrl = `/manajemen-lct/${taskId}/updateStatus`;
 
-        try {
-            const response = await fetch(updateUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status: newStatus }),
-            });
+            try {
+                const response = await fetch(updateUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Status updated:", data);
+
+                // Update label teks sesuai status
+                const label = this.closest('label').querySelector('span');
+                label.textContent = isChecked ? '✅ Completed' : '⏳ Pending';
+
+                // Efek sukses
+                this.closest('td').classList.add('bg-green-100');
+                setTimeout(() => this.closest('td').classList.remove('bg-green-100'), 2000);
+
+            } catch (error) {
+                console.error("Failed to update status:", error);
+                alert("Gagal memperbarui status. Silakan coba lagi.");
             }
-
-            const data = await response.json();
-            console.log("Status updated:", data);
-
-            // Tambahkan efek sukses (misalnya warna hijau)
-            this.classList.add('bg-green-100');
-            setTimeout(() => this.classList.remove('bg-green-100'), 2000);
-
-        } catch (error) {
-            console.error("Failed to update status:", error);
-            alert("Gagal memperbarui status. Silakan coba lagi.", error);
-        }
+        });
     });
-});
-
 </script>
 

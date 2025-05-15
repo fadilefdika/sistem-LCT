@@ -116,13 +116,13 @@ class BudgetApprovalController extends Controller
             ]);
 
             // Kirim email ke user yang bersangkutan\
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApproved($laporan));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApproved($laporan));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
             
 
             DB::commit();
@@ -184,13 +184,13 @@ class BudgetApprovalController extends Controller
                 ->first();
 
             // Kirim email ke PIC
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new TaskBudgetRevisionMail($laporan, $alasanReject));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new TaskBudgetRevisionMail($laporan, $alasanReject));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
             
 
             return redirect()->back()->with('success', 'Budget request needs revision.');

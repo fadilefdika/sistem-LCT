@@ -40,6 +40,7 @@ class LaporanLct extends Model
         'first_viewed_by_ehs_at',
         'first_viewed_by_manager_at',
         'first_viewed_by_pic_at',
+        'approved_temporary_by_ehs',
         'attachments'
     ];
     

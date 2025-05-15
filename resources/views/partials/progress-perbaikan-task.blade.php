@@ -48,32 +48,46 @@
                     </div>
                 @endforeach
             </div>
-    
-            <!-- Tombol Approve & Close -->
-            @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
-                <div class="mt-6 flex justify-end">
-                    <!-- Tombol Approve -->
-                    @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
-                        <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
-                                ✅ Approve All
-                            </button>
-                        </form>
-                    @endif
-    
-                    <!-- Tombol Close -->
-                    @if($laporan->status_lct === 'approved_permanent')
-                        <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
-                            @csrf 
-                            <button type="submit"
-                                    class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">
-                                🔒 Close
-                            </button>
-                        </form>
-                    @endif
-                </div>
+
+            @php
+                if (Auth::guard('ehs')->check()) {
+                    // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
+                    $user = Auth::guard('ehs')->user();
+                    $roleName = optional($user->roles->first())->name;
+                } else {
+                    // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
+                    $user = Auth::user();
+                    $roleName = optional($user->roleLct->first())->name;
+                }
+            @endphp
+            
+            <!-- Tombol Approve & Close, hanya untuk EHS -->
+            @if(Auth::guard('ehs')->check())
+                @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
+                    <div class="mt-6 flex justify-end gap-4">
+                        <!-- Tombol Approve -->
+                        @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
+                            <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
+                                    ✅ Approve All
+                                </button>
+                            </form>
+                        @endif
+            
+                        <!-- Tombol Close -->
+                        @if($laporan->status_lct === 'approved_permanent')
+                            <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                                @csrf 
+                                <button type="submit"
+                                        class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">
+                                    🔒 Close
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @endif
             @endif
         @endif
     </div>

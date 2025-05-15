@@ -65,31 +65,45 @@ class AppServiceProvider extends ServiceProvider
                 $laporan = LaporanLct::with('tasks')->where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
             }
 
-            // Define the relevant statuses for each role
-            $relevantStatuses = match ($roleName) {
-                'ehs' => ['open','in_progress','progress_work', 'waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent'],
-                'pic' => ['in_progress','progress_work','revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision'],
-                'manajer' => ['waiting_approval_taskbudget'],
-                default => [],
-            };
+            $query = LaporanLct::query();
 
-            // Initialize query to fetch relevant LCT statuses
-            $query = LaporanLct::query()->whereIn('status_lct', $relevantStatuses);
-
-            // Filter based on the role
-            if ($roleName === 'pic') {
+            if ($roleName === 'ehs') {
+                $query->where(function ($subQuery) {
+                    $subQuery->whereIn('status_lct', [
+                        'open',
+                        'in_progress',
+                        'progress_work',
+                        'waiting_approval',
+                        'waiting_approval_permanent'
+                    ])
+                    ->orWhere(function ($q) {
+                        $q->where('status_lct', 'waiting_approval_temporary')
+                          ->where('approved_temporary_by_ehs', false);
+                    })
+                    ->orWhere(function ($subSubQuery) {
+                        $subSubQuery->whereIn('status_lct', [
+                            'waiting_approval_taskbudget',
+                            'taskbudget_revision',
+                            'approved_taskbudget'
+                        ])
+                        ->where('approved_temporary_by_ehs', false);
+                    });
+                });
+            }
+             elseif ($roleName === 'pic') {
+                $query->whereIn('status_lct', ['in_progress','progress_work','revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision']);
                 $picId = Pic::where('user_id', $user->id)->value('id');
                 if ($picId) {
-                    // Apply filter for 'pic' role to check if they are assigned to this LCT
                     $query->where('pic_id', $picId);
                 }
             } elseif ($roleName === 'manajer') {
+                $query->whereIn('status_lct', ['waiting_approval_taskbudget']);
                 $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
                 if ($departemenId) {
-                    // Filter LCT based on the department managed by the manager
                     $query->where('departemen_id', $departemenId);
                 }
             }
+
 
             $notifikasiLCT = $query->get();
 

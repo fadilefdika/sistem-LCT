@@ -142,13 +142,13 @@ class LctReportController extends Controller
             $laporan->load('user', 'kategori');
             
             // Kirim email ke EHS
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new LaporanKetidaksesuaian($laporan));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
             
     
             // Log pengiriman laporan ke EHS
@@ -230,13 +230,13 @@ class LctReportController extends Controller
             $laporan->load('picUser');
 
             // Kirim email hanya jika picUser valid
-            try {
-                Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
-                Log::info('Email berhasil dikirim.');
-            } catch (\Exception $mailException) {
-                Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-                return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            }
+            // try {
+            //     Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
+            //     Log::info('Email berhasil dikirim.');
+            // } catch (\Exception $mailException) {
+            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
+            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
+            // }
 
             return redirect()->route('ehs.progress-perbaikan.index')->with('success', 'The report has been successfully submitted to the PIC.');
             
