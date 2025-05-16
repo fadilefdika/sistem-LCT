@@ -4,6 +4,34 @@
         <div class="mx-auto max-w-screen-2xl">
             <div class="container mx-auto">
 
+                 <!-- Top Section - Cards and Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <!-- Summary Cards -->
+                <div class="bg-blue-600 text-white p-4 rounded-lg shadow-lg">
+                    <h3 class="font-medium text-white/80">Total Findings</h3>
+                    <p class="text-3xl font-bold">1,248</p>
+                    <div class="text-sm mt-2">↑ 12% from last month</div>
+                </div>
+                
+                <div class="bg-green-600 text-white p-4 rounded-lg shadow-lg">
+                    <h3 class="font-medium text-white/80">Resolved</h3>
+                    <p class="text-3xl font-bold">892</p>
+                    <div class="text-sm mt-2">↑ 8% from last month</div>
+                </div>
+                
+                <div class="bg-amber-500 text-white p-4 rounded-lg shadow-lg">
+                    <h3 class="font-medium text-white/80">Overdue</h3>
+                    <p class="text-3xl font-bold">156</p>
+                    <div class="text-sm mt-2">↓ 3% from last month</div>
+                </div>
+                
+                <div class="bg-red-600 text-white p-4 rounded-lg shadow-lg">
+                    <h3 class="font-medium text-white/80">High Risk</h3>
+                    <p class="text-3xl font-bold">42</p>
+                    <div class="text-sm mt-2">↑ 5% from last month</div>
+                </div>
+            </div>
+
                 @php
                     // Cek apakah pengguna adalah EHS atau bukan
                     if (Auth::guard('ehs')->check()) {
@@ -95,7 +123,6 @@
                 </div>
 
 
-
                 <!-- Tabel Reports Section (Overdue & Medium-High Risk) -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4 items-start">
                     
@@ -157,6 +184,29 @@
                     <!-- Grafik Pie: Open vs Closed (1/3 width) -->
                     <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-1 flex flex-col justify-between">
                         <h2 class="text-2xl font-semibold mb-1">Findings by Status</h2>
+                        <div class="flex gap-4 mb-4">
+                            <div class="flex space-x-4">
+                                <!-- Year Select -->
+                                <div class="relative w-40">
+                                    <select id="year-select-status" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">Select Year</option>
+                                        @foreach ($findings as $year)
+                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            
+                                <!-- Month Select -->
+                                <div class="relative w-48">
+                                    <select id="month-select-status" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                        <option value="">All Months</option>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>                           
+                        </div>
                         <canvas id="statusChart" class="self-center" style="max-width: 300px; max-height: 300px;"></canvas>
                     </div>
 
@@ -222,7 +272,36 @@
                         <canvas id="categoryChart" class="max-h-80"></canvas>
                     </div>
                 </div>
-                
+                <div class="grid grid-cols-1 mt-6">
+                <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-3 flex flex-col">
+                    <h2 class="text-2xl font-semibold mb-4">Findings by Department</h2>
+                    <div class="flex gap-4 mb-4">
+                        <div class="flex space-x-4">
+                            <!-- Year Select -->
+                            <div class="relative w-40">
+                                <select id="year-department" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                    <option value="">Select Year</option>
+                                    @foreach ($findings as $year)
+                                        <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        
+                            <!-- Month Select -->
+                            <div class="relative w-48">
+                                <select id="month-department" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                                    <option value="">All Months</option>
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>                           
+                    </div>
+                    <div style="height: 390px;">
+                        <canvas id="departmentChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -543,52 +622,166 @@
         @endif
 
     
-        const statusCounts = [
-            {{ $statusCounts['open'] }},
-            {{ $statusCounts['close'] }},
-            {{ $statusCounts['in_progress'] }}
-        ];
-    
-        new Chart(document.getElementById('statusChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Open', 'Closed', 'In Progress'],
-                datasets: [{
-                    data: statusCounts,
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',   // Open
-                        'rgba(75, 192, 75, 0.6)',    // Closed
-                        'rgba(255, 206, 86, 0.6)'    // In Progress
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(75, 192, 75, 1)',
-                        'rgba(255, 206, 86, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    datalabels: {
-                        formatter: (value, context) => {
-                            const sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const percentage = (value / sum * 100).toFixed(1) + '%';
-                            return percentage;
+        let statusChart;
+
+        function renderStatusChart(statusCounts) {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            if (statusChart) statusChart.destroy();
+
+            const dataValues = [
+                Number(statusCounts.open) || 0,
+                Number(statusCounts.closed) || 0,
+                Number(statusCounts.in_progress) || 0
+            ];
+
+            const total = dataValues.reduce((a, b) => a + b, 0);
+
+            statusChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Open', 'Closed', 'In Progress'],
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 75, 0.6)',
+                            'rgba(255, 206, 86, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 75, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        datalabels: {
+                            formatter: (value, context) => {
+                                return total ? (value / total * 100).toFixed(1) + '%' : '0%';
+                            },
+                            color: '#000',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+
+
+        function fetchStatusChartData(year, month) {
+            const url = userRole === 'ehs' ? '/ehs/dashboard/status-chart-data' : '/dashboard/status-chart-data';
+
+            $.ajax({
+                url: url,
+                data: { year, month },
+                success: function (res) {
+                    renderStatusChart(res.statusCounts);
+                },
+                error: function (xhr) {
+                    console.error('Error fetching status chart data:', xhr.responseText);
+                }
+            });
+        }
+
+
+        $('#year-select-status').change(function () {
+            const year = $(this).val();
+            $('#month-select-status').prop('disabled', !year).val('');
+            if (year) fetchStatusChartData(year);
+        });
+
+        $('#month-select-status').change(function () {
+            const year = $('#year-select-status').val();
+            const month = $(this).val();
+            if (year) fetchStatusChartData(year, month);
+        });
+
+        // Initial load (optional)
+        @if(count($findings))
+        fetchStatusChartData({{ $findings->max() }});
+        @endif
+
+        let departmentChart;
+
+        function renderDepartmentChart(data) {
+            const ctx = document.getElementById('departmentChart').getContext('2d');
+
+            if (departmentChart) departmentChart.destroy();
+
+            const labels = data.map(d => d.label);
+            const values = data.map(d => d.value);
+
+            departmentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Jumlah Temuan per Departemen',
+                        data: values,
+                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
                         },
-                        color: '#000',
-                        font: {
-                            weight: 'bold'
+                        x: {
+                            ticks: {
+                                autoSkip: false
+                            }
                         }
                     }
                 }
-            },
-            plugins: [ChartDataLabels]
+            });
+        }
+
+        function fetchDepartmentChartData(year, month) {
+            const url = userRole === 'ehs' ? '/ehs/dashboard/department-chart-data' : '/dashboard/department-chart-data';
+            
+            $.ajax({
+                url: url,
+                data: { year, month },
+                success: function (res) {
+                    renderDepartmentChart(res.data);
+                },
+                error: function (xhr) {
+                    console.error('Error fetching department chart data:', xhr.responseText);
+                }
+            });
+        }
+
+        $('#year-department').change(function () {
+            const year = $(this).val();
+            $('#month-department').prop('disabled', !year).val('');
+            if (year) fetchDepartmentChartData(year);
         });
+
+        $('#month-department').change(function () {
+            const year = $('#year-department').val();
+            const month = $(this).val();
+            if (year) fetchDepartmentChartData(year, month);
+        });
+
+
+        @if(count($findings))
+            fetchDepartmentChartData({{ $findings->max() }});
+        @endif
 
     </script>
     

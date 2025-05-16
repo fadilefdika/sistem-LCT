@@ -56,6 +56,8 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
     Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
     Route::get('/dashboard/area-chart-data', [DashboardController::class, 'getAreaChartData']);
     Route::get('/dashboard/category-chart-data', [DashboardController::class, 'getCategoryChartData']);
+    Route::get('/dashboard/status-chart-data', [DashboardController::class, 'getStatusChartData']);
+    Route::get('/dashboard/department-chart-data', [DashboardController::class, 'getDepartmentChartData']);
 
     // Form Laporan LCT
     Route::get('/report-form', [UserController::class, 'index'])->name('report-form');  
@@ -90,7 +92,9 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
     Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData']);
     Route::get('/dashboard/area-chart-data', [DashboardController::class, 'getAreaChartData']);
     Route::get('/dashboard/category-chart-data', [DashboardController::class, 'getCategoryChartData']);
-    
+    Route::get('/dashboard/status-chart-data', [DashboardController::class, 'getStatusChartData']);
+    Route::get('/dashboard/department-chart-data', [DashboardController::class, 'getDepartmentChartData']);
+
 
     // Form Laporan LCT
     Route::get('/report-form', [UserController::class, 'index'])->name('ehs.report-form');  

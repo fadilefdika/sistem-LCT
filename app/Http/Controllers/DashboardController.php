@@ -242,60 +242,138 @@ class DashboardController extends Controller
 
         return response()->json(['areaStatusCounts' => $areaStatusCounts]);
     }
-public function getCategoryChartData(Request $request)
-{
-    $year = $request->input('year');
-    $month = $request->input('month');
+    public function getCategoryChartData(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
 
-    // Ambil semua kategori
-    $allCategory = DB::table('lct_kategori')->pluck('nama_kategori');
+        // Ambil semua kategori
+        $allCategory = DB::table('lct_kategori')->pluck('nama_kategori');
 
-    // Query laporan
-    $query = DB::table('lct_laporan')
-        ->join('lct_kategori', 'lct_laporan.kategori_id', '=', 'lct_kategori.id') // Pastikan join dengan kategori
-        ->select(
-            'lct_kategori.nama_kategori as kategori',
-            DB::raw("SUM(CASE WHEN lct_laporan.status_lct = 'closed' THEN 1 ELSE 0 END) AS closed_count"),
-            DB::raw("SUM(CASE WHEN lct_laporan.status_lct != 'closed' THEN 1 ELSE 0 END) AS non_closed_count")
-        )
-        ->whereYear('lct_laporan.created_at', $year);
+        // Query laporan
+        $query = DB::table('lct_laporan')
+            ->join('lct_kategori', 'lct_laporan.kategori_id', '=', 'lct_kategori.id') // Pastikan join dengan kategori
+            ->select(
+                'lct_kategori.nama_kategori as kategori',
+                DB::raw("SUM(CASE WHEN lct_laporan.status_lct = 'closed' THEN 1 ELSE 0 END) AS closed_count"),
+                DB::raw("SUM(CASE WHEN lct_laporan.status_lct != 'closed' THEN 1 ELSE 0 END) AS non_closed_count")
+            )
+            ->whereYear('lct_laporan.created_at', $year);
 
-    if ($month) {
-        $query->whereMonth('lct_laporan.created_at', $month);
+        if ($month) {
+            $query->whereMonth('lct_laporan.created_at', $month);
+        }
+
+        $reportData = $query->groupBy('lct_kategori.nama_kategori')
+            ->get()
+            ->keyBy('kategori');
+
+        // Map data laporan dengan kategori yang ada
+        $categoryStatusCounts = $allCategory->mapWithKeys(function ($kategori) use ($reportData) {
+            if ($reportData->has($kategori)) {
+                return [$kategori => [
+                    'closed_count' => $reportData[$kategori]->closed_count,
+                    'non_closed_count' => $reportData[$kategori]->non_closed_count
+                ]];
+            } else {
+                return [$kategori => [
+                    'closed_count' => 0,
+                    'non_closed_count' => 0
+                ]];
+            }
+        });
+
+        // Siapkan categoryAliases untuk digunakan di chart
+        $categoryAliases = $allCategory->mapWithKeys(function ($kategori) {
+            return [$kategori => $kategori === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' ? '5S' : $kategori];
+        });
+        
+
+        return response()->json([
+            'categoryStatusCounts' => $categoryStatusCounts,
+            'categoryAliases' => $categoryAliases // Kirimkan categoryAliases ke frontend
+        ]);
     }
 
-    $reportData = $query->groupBy('lct_kategori.nama_kategori')
-        ->get()
-        ->keyBy('kategori');
+    public function getStatusChartData(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
 
-    // Map data laporan dengan kategori yang ada
-    $categoryStatusCounts = $allCategory->mapWithKeys(function ($kategori) use ($reportData) {
-        if ($reportData->has($kategori)) {
-            return [$kategori => [
-                'closed_count' => $reportData[$kategori]->closed_count,
-                'non_closed_count' => $reportData[$kategori]->non_closed_count
-            ]];
-        } else {
-            return [$kategori => [
-                'closed_count' => 0,
-                'non_closed_count' => 0
-            ]];
+        $query = DB::table('lct_laporan');
+
+        if ($year) {
+            $query->whereYear('created_at', $year);
         }
-    });
 
-    // Siapkan categoryAliases untuk digunakan di chart
-    $categoryAliases = $allCategory->mapWithKeys(function ($kategori) {
-        return [$kategori => $kategori === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' ? '5S' : $kategori];
-    });
+        if ($month) {
+            $query->whereMonth('created_at', $month);
+        }
+
+        $counts = $query
+            ->select(
+                DB::raw("SUM(CASE WHEN status_lct = 'open' THEN 1 ELSE 0 END) as [open]"),
+                DB::raw("SUM(CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END) as [closed]"), // <-- disini 'closed'
+                DB::raw("SUM(CASE WHEN status_lct = 'in_progress' THEN 1 ELSE 0 END) as [in_progress]")
+            )
+            ->first();
+
+
+        // Cek jika null
+        if (!$counts) {
+            $counts = (object)[
+                'open' => 0,
+                'closed' => 0,
+                'in_progress' => 0
+            ];
+        }
+
+        return response()->json([
+            'statusCounts' => [
+                'open' => $counts->open ?? 0,
+                'closed' => $counts->closed ?? 0,  // ini sesuai alias
+                'in_progress' => $counts->in_progress ?? 0
+            ]
+        ]);
+    }
+
+    public function getDepartmentChartData(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
+    
+        // Ambil semua departemen
+        $departemenList = DB::table('lct_departement')->pluck('nama_departemen', 'id');
+    
+        // Query temuan per departemen
+        $query = DB::table('lct_laporan')
+            ->select('departemen_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('departemen_id');
+    
+        if ($year) {
+            $query->whereYear('created_at', $year);
+        }
+    
+        if ($month) {
+            $query->whereMonth('created_at', $month);
+        }
+    
+        $laporanData = $query->get()->keyBy('departemen_id');
+    
+        // Bangun data lengkap berdasarkan semua departemen
+        $chartData = $departemenList->map(function ($nama, $id) use ($laporanData) {
+            return [
+                'label' => $nama,
+                'value' => $laporanData[$id]->total ?? 0
+            ];
+        })->values(); // reset index agar array numerik
+    
+        return response()->json([
+            'data' => $chartData
+        ]);
+    }
     
 
-
-
-    return response()->json([
-        'categoryStatusCounts' => $categoryStatusCounts,
-        'categoryAliases' => $categoryAliases // Kirimkan categoryAliases ke frontend
-    ]);
-}
 
 
     

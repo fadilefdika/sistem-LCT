@@ -176,7 +176,7 @@
                                 <svg class="shrink-0 fill-current @if(Request::is('progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
                                 </svg>                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Activity Progress</span>
+                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
                             </div>
                         </a>
                     </li>
@@ -189,7 +189,7 @@
                                 <svg class="shrink-0 fill-current @if(Request::is('ehs/progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
                                 </svg>                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('ehs/progress-perbaikan')|| Request::is('ehs/progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Activity Progress</span>
+                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('ehs/progress-perbaikan')|| Request::is('ehs/progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
                             </div>
                         </a>
                     </li>
