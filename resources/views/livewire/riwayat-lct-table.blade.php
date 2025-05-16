@@ -70,7 +70,7 @@
                     <th class="py-3 px-4">No</th>
                     <th class="py-3 px-4">Non-Conformity Findings</th>
                     <th class="py-3 px-4">Date of Finding</th>
-                    <th class="py-3 px-4">SVP Name</th>
+                    <th class="py-3 px-4">PIC</th>
                     <th class="py-3 px-4">Hazard Level</th>
                     <th class="py-3 px-4">Final Status</th>
                     <th class="px-4 py-3">Completion Date</th>

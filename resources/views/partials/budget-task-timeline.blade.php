@@ -37,7 +37,7 @@
                             <tr>
                                 <th class="border px-3 py-2 text-center">No</th>
                                 <th class="border px-3 py-2 text-left">Task Name</th>
-                                <th class="border px-3 py-2 text-left">SVP Name</th>
+                                <th class="border px-3 py-2 text-left">PIC</th>
                                 <th class="border px-3 py-2 text-left">Due Date</th>
                                 <th class="border px-3 py-2 text-center">Action</th>
                             </tr>

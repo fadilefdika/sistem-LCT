@@ -4,7 +4,7 @@
             <tr class="text-left text-xs font-medium text-gray-600">
                 <th class="px-3 py-2">No</th>
                 <th class="px-3 py-2">Non-Conformity Findings</th>
-                <th class="px-3 py-2">SVP Name</th>
+                <th class="px-3 py-2">PIC</th>
                 <th class="px-3 py-2">Hazard Level</th>
                 <th class="px-3 py-2">Progress Status</th>
                 <th class="px-3 py-2">Tracking Status</th>

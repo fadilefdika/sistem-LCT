@@ -3,7 +3,7 @@
         <thead class="bg-gray-50">
             <tr class="text-left text-sm font-semibold text-gray-600">
                 <th class="px-4 py-3">No</th>
-                <th class="px-4 py-3">SVP Name</th> 
+                <th class="px-4 py-3">PIC</th> 
                 <th class="px-4 py-3">Hazard Level</th> 
                 <th class="px-4 py-3">Total Amount</th> 
                 <th class="px-4 py-3">Submission Date</th> 

@@ -107,7 +107,7 @@
                                         <p x-show="errorDepartemen" class="text-red-500 text-xs mt-1">Please Select a Department.</p>
                                     
                                         <!-- Dropdown PIC -->
-                                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">SVP Name <span class="text-red-500">*</span></label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">PIC <span class="text-red-500">*</span></label>
                                         <div class="relative">
                                             <select 
                                                 x-model="selectedPic"

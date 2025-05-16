@@ -71,7 +71,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left">No</th>
                                 <th class="px-4 py-3 text-left">Task Name</th>
-                                <th class="px-4 py-3 text-left">SVP Name</th>
+                                <th class="px-4 py-3 text-left">PIC</th>
                                 <th class="px-4 py-3 text-left">Due Date</th>
                                 <th class="px-4 py-3 text-left">Attachment</th>
                             </tr>
