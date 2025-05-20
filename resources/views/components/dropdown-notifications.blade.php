@@ -104,8 +104,8 @@
                             $url = '';
                             if ($roleName === 'ehs') {
                                 $url = $notif->status_lct === 'open'
-                                    ? route('ehs.laporan-lct.show', $notif->id_laporan_lct)
-                                    : route('ehs.progress-perbaikan.show', $notif->id_laporan_lct);
+                                    ? route('ehs.reporting.show.new', $notif->id_laporan_lct)
+                                    : route('ehs.reporting.show', $notif->id_laporan_lct);
                             } elseif ($roleName === 'pic') {
                                 $url = route('admin.manajemen-lct.show', $notif->id_laporan_lct);
                             } elseif ($roleName === 'manajer') {

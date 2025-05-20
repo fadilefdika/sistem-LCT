@@ -38,20 +38,20 @@ class AppServiceProvider extends ServiceProvider
                 $roleName = optional($user->roleLct->first())->name;
             }
 
-            // Cek jika rute adalah admin.laporan-lct.show dan memiliki parameter id
-            if ($route && $route->getName() === 'admin.laporan-lct.show') {
+            // Cek jika rute adalah admin.reporting.show.new dan memiliki parameter id
+            if ($route && $route->getName() === 'admin.reporting.show.new') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
-            }else if ($route && $route->getName() === 'ehs.laporan-lct.show') {
+            }else if ($route && $route->getName() === 'ehs.reporting.show.new') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
             }else if ($route && $route->getName() === 'admin.manajemen-lct.show') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
-            }else if ($route && $route->getName() === 'admin.progress-perbaikan.show') {
+            }else if ($route && $route->getName() === 'admin.reporting.show') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
-            }else if ($route && $route->getName() === 'ehs.progress-perbaikan.show') {
+            }else if ($route && $route->getName() === 'ehs.reporting.show') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
             }else if ($route && $route->getName() === 'admin.riwayat-lct.show') {

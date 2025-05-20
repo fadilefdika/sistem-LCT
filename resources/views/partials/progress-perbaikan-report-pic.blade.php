@@ -332,7 +332,7 @@
                             @else
                                 <div class="flex space-x-4">
                                     <!-- Approve Button -->
-                                    <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                    <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <button type="submit" 
                                             class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -351,7 +351,7 @@
                             
                                 <!-- Alasan Penolakan -->
                                 <div x-show="revision" class="mt-4">
-                                    <form @submit="revision = false" action="{{ route('ehs.progress-perbaikan.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                    <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
                                         @csrf
                                         <label class="block text-gray-700 font-semibold">Revision Reason:</label>
                                         <textarea x-model="reason" name="alasan_reject" rows="3"
@@ -374,7 +374,7 @@
                                 @if($laporan->status_lct === "approved" && $laporan->tingkat_bahaya === 'Low')
                                     <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
                                         <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
-                                        <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                                        <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
                                             @csrf 
                                             <button type="submit" @click="closed = true"
                                                     class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
@@ -392,8 +392,8 @@
 
                         <a href="{{ route(
                             $roleName === 'ehs' 
-                                ? 'ehs.progress-perbaikan.history' 
-                                : 'admin.progress-perbaikan.history', 
+                                ? 'ehs.reporting.history' 
+                                : 'admin.reporting.history', 
                             $laporan->id_laporan_lct
                         ) }}" class="inline-block">
                             <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">

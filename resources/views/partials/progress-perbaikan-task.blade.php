@@ -67,7 +67,7 @@
                     <div class="mt-6 flex justify-end gap-4">
                         <!-- Tombol Approve -->
                         @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
-                            <form action="{{ route('ehs.progress-perbaikan.approve', $laporan->id_laporan_lct) }}" method="POST">
+                            <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf
                                 <button type="submit"
                                         class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
@@ -78,7 +78,7 @@
             
                         <!-- Tombol Close -->
                         @if($laporan->status_lct === 'approved_permanent')
-                            <form action="{{ route('ehs.progress-perbaikan.close', $laporan->id_laporan_lct) }}" method="POST">
+                            <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf 
                                 <button type="submit"
                                         class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">

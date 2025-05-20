@@ -43,7 +43,7 @@ class ProgressPerbaikanTable extends Component
         }
 
         // === Status progress dan closed ===
-        $progressStatuses = [
+        $progressStatuses = ['open',
             'in_progress', 'progress_work', 'waiting_approval', 'approved', 'revision',
             'waiting_approval_temporary', 'approved_temporary', 'temporary_revision',
             'approved_taskbudget', 'waiting_approval_taskbudget', 'taskbudget_revision',

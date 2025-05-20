@@ -85,7 +85,17 @@ class DashboardController extends Controller
 
         $laporanNeedApprovalQuery = LaporanLct::whereIn('status_lct', [
             'waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent',
-        ])->where('status_lct', '!=', 'closed');
+        ])->where('status_lct', '!=', 'closed')
+          ->orderByRaw("
+              CASE 
+                  WHEN tingkat_bahaya = 'High' THEN 1
+                  WHEN tingkat_bahaya = 'Medium' THEN 2
+                  WHEN tingkat_bahaya = 'Low' THEN 3
+                  ELSE 4
+              END ASC
+          ");
+        
+        
 
         $laporanNeedReviseQuery = LaporanLct::whereIn('status_lct', [
             'revision', 'taskbudget_revision', 'permanent_revision',
@@ -96,28 +106,65 @@ class DashboardController extends Controller
         $laporanInProgressQuery = LaporanLct::where('status_lct', 'in_progress');
 
         $now = Carbon::now()->toDateString();
-        $laporanOverdueQuery = LaporanLct::where('due_date', '<', $now)
+
+        // Query dasar overdue
+        $baseQuery = LaporanLct::where('due_date', '<', $now)
             ->where('status_lct', '!=', 'closed')
             ->where(function ($query) {
                 $query->whereNull('date_completion')
                     ->orWhereColumn('date_completion', '>', 'due_date');
             });
 
+        // Ambil dulu yang tingkat_bahaya medium & high
+        $priorityLaporans = (clone $baseQuery)
+            ->whereIn('tingkat_bahaya', ['high', 'medium'])
+            ->orderByRaw("
+                CASE 
+                    WHEN tingkat_bahaya = 'high' THEN 1
+                    WHEN tingkat_bahaya = 'medium' THEN 2
+                    ELSE 3
+                END
+            ")
+            ->orderBy('due_date', 'asc') // overdue paling lama dulu
+            ->take(5)
+            ->get();
+
+
+        // Hitung sisa kuota yang masih kosong dari 5
+        $remaining = 5 - $priorityLaporans->count();
+
+        if ($remaining > 0) {
+            // Ambil low yang belum ada di list sebelumnya
+            $excludeIds = $priorityLaporans->pluck('id')->toArray();
+
+            $lowLaporans = (clone $baseQuery)
+                ->where('tingkat_bahaya', 'low')
+                ->whereNotIn('id', $excludeIds)
+                ->orderBy('due_date', 'asc')
+                ->take($remaining)
+                ->get();
+
+            // Gabungkan kedua koleksi hasil
+            $laporanOverdue = $priorityLaporans->concat($lowLaporans);
+        } else {
+            $laporanOverdue = $priorityLaporans;
+        }
+
         // Role-based filter
         if ($roleName === 'pic') {
             $picId = Pic::where('user_id', $user->id)->value('id');
             if ($picId) {
-                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdue, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
                     $query->where('pic_id', $picId);
                 }
             } else {
-                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdue, $laporanInProgressQuery, $laporanNeedReviseQuery] as $query) {
                     $query->whereRaw('1 = 0');
                 }
             }
         } elseif ($roleName === 'user') {
             $laporanMediumHighQuery->where('user_id', $user->id);
-            $laporanOverdueQuery->where('user_id', $user->id);
+            $laporanOverdue->where('user_id', $user->id);
             $laporanNeedApprovalQuery->where('user_id', $user->id);
 
             // Tambahan: Semua laporan milik user
@@ -127,11 +174,11 @@ class DashboardController extends Controller
         } elseif ($roleName === 'manajer') {
             $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
             if ($departemenId) {
-                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdue, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
                     $query->where('departemen_id', $departemenId);
                 }
             } else {
-                foreach ([$laporanMediumHighQuery, $laporanOverdueQuery, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
+                foreach ([$laporanMediumHighQuery, $laporanOverdue, $laporanNeedApprovalBudgetQuery, $laporanNeedReviseQuery] as $query) {
                     $query->whereRaw('1 = 0');
                 }
             }
@@ -145,7 +192,7 @@ class DashboardController extends Controller
             'areaStatusCounts' => $areaStatusCounts,
             'statusCounts' => $statusCounts,
             'laporanMediumHigh' => $laporanMediumHighQuery->take(5)->get(),
-            'laporanOverdue' => $laporanOverdueQuery->take(5)->get(),
+            'laporanOverdue' => $laporanOverdue,
             'laporanNew' => $laporanNewQuery->take(5)->get(),
             'laporanNeedApproval' => $laporanNeedApprovalQuery->take(5)->get(),
             'laporanNeedRevise' => $laporanNeedReviseQuery->take(5)->get(),

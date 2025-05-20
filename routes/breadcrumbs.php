@@ -26,7 +26,7 @@ Breadcrumbs::for('laporan-lct', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('laporan-lct');
-    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.laporan-lct.show', $laporan));
+    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.reporting.show.new', $laporan));
 });
 
 // laporan lct
@@ -37,7 +37,7 @@ Breadcrumbs::for('ehs laporan-lct', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('ehs laporan-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('laporan-lct');
-    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('ehs.laporan-lct.show', $laporan));
+    $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('ehs.reporting.show.new', $laporan));
 });
 
 // activity approval
@@ -67,25 +67,25 @@ Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trai
 // progress perbaikan
 Breadcrumbs::for('progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Progress', route('admin.progress-perbaikan.index'));
+    $trail->push('Reporting', route('admin.reporting.index'));
 });
 
 // progress perbaikan detail 
 Breadcrumbs::for('progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Activity Progress #{$laporan->id_laporan_lct}", route('admin.progress-perbaikan.show', $laporan));
+    $trail->push("Reporting #{$laporan->id_laporan_lct}", route('admin.reporting.show', $laporan));
 });
 
 // progress perbaikan
 Breadcrumbs::for('ehs progress-perbaikan', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Progress', route('ehs.progress-perbaikan.index'));
+    $trail->push('Reporting', route('ehs.reporting.index'));
 });
 
 // progress perbaikan detail 
 Breadcrumbs::for('ehs progress-perbaikan.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('progress-perbaikan');
-    $trail->push("Activity Progress #{$laporan->id_laporan_lct}", route('ehs.progress-perbaikan.show', $laporan));
+    $trail->push("Reporting #{$laporan->id_laporan_lct}", route('ehs.reporting.show', $laporan));
 });
 
 

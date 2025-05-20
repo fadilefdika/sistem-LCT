@@ -89,7 +89,7 @@
                             $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
                         @endphp
 
-                            <a href="{{ route($roleName === 'ehs' ? 'ehs.laporan-lct.show' : 'admin.laporan-lct.show', $laporan->id_laporan_lct) }}"
+                            <a href="{{ route($roleName === 'ehs' ? 'ehs.reporting.show.new' : 'admin.reporting.show.new', $laporan->id_laporan_lct) }}"
                                 class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor">

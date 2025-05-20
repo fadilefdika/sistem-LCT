@@ -3,11 +3,8 @@
         <thead class="bg-gray-50">
             <tr class="text-left font-semibold text-gray-600">
                 <th scope="col" class="px-3 py-2 w-8 text-center">No</th>
-                <th scope="col" class="px-3 py-2 w-24">Date</th>
+                <th scope="col" class="px-3 py-2 w-24">Date Finding</th>
                 <th scope="col" class="px-3 py-2 w-28">Area</th>
-                <th scope="col" class="px-3 py-2 w-28">Reporter</th>
-                <th scope="col" class="px-3 py-2 w-40">Findings</th>
-                <th scope="col" class="px-3 py-2 w-16 text-center">Photo</th>
                 <th scope="col" class="px-3 py-2 w-28">Category</th>
                 <th scope="col" class="px-3 py-2 w-24 text-center">Actions</th>
             </tr>                
@@ -29,35 +26,7 @@
                 <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
                     {{ $laporan->area->nama_area ?? '-' }}
                 </td>
-        
-                <!-- Nama User -->
-                <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
-                    {{ $laporan->user->fullname }}
-                </td>
-        
-                <!-- Temuan Ketidaksesuaian -->
-                <td class="px-3 py-2 text-gray-800 max-w-xs break-words truncate cursor-pointer relative group">
-                    <span class="temuan-clamp" title="{{ $laporan->temuan_ketidaksesuaian }}">
-                        {{ $laporan->temuan_ketidaksesuaian }}
-                    </span>
-                </td>
-
-                <!-- Bukti Temuan -->
-                <td class="px-3 py-2 text-center w-16">
-                    @if (!empty($laporan->bukti_temuan))
-                        @php
-                            $gambar = json_decode($laporan->bukti_temuan, true)[0] ?? null;
-                        @endphp
-                        @if ($gambar)
-                            <img src="{{ asset('storage/' . $gambar) }}" class="w-10 h-10 object-cover rounded shadow">
-                        @else
-                            <span class="text-gray-500 italic">-</span>
-                        @endif
-                    @else
-                        <span class="text-gray-500 italic">-</span>
-                    @endif
-                </td>
-        
+                    
                 <!-- Kategori -->
                 <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
                     {{ $laporan->kategori ? $laporan->kategori->nama_kategori : '-' }}
@@ -72,7 +41,7 @@
                             $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
                         @endphp
 
-                        <a href="{{ route($roleName === 'ehs' ? 'ehs.laporan-lct.show' : 'admin.laporan-lct.show', $laporan->id_laporan_lct) }}"
+                        <a href="{{ route($roleName === 'ehs' ? 'ehs.reporting.show.new' : 'admin.reporting.show.new', $laporan->id_laporan_lct) }}"
                             class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">

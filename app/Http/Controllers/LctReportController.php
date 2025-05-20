@@ -238,7 +238,7 @@ class LctReportController extends Controller
             //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
             // }
 
-            return redirect()->route('ehs.progress-perbaikan.index')->with('success', 'The report has been successfully submitted to the PIC.');
+            return redirect()->route('ehs.reporting.index')->with('success', 'The report has been successfully submitted to the PIC.');
             
         } catch (\Exception $e) {
             DB::rollBack();

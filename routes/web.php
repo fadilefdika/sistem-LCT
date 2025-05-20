@@ -64,9 +64,10 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
     Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('laporan-lct.store');
 
     // Progress Perbaikan
-    Route::prefix('progress-perbaikan')->name('admin.progress-perbaikan.')->group(function () {
+    Route::prefix('reporting')->name('admin.reporting.')->group(function () {
         Route::get('/', [ProgressPerbaikanController::class, 'index'])->name('index');
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
+        Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
     });
 
@@ -101,15 +102,16 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
     Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('ehs.laporan-lct.store');
 
     // Progress Perbaikan
-    Route::prefix('progress-perbaikan')->name('ehs.progress-perbaikan.')->group(function () {
+    Route::prefix('reporting')->name('ehs.reporting.')->group(function () {
         Route::get('/', [ProgressPerbaikanController::class, 'index'])->name('index');
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
+        Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
     });
 
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('ehs.laporan-lct.assignToPic');
 
-    Route::prefix('progress-perbaikan/{id_laporan_lct}')->name('ehs.progress-perbaikan.')->group(function () {
+    Route::prefix('reporting/{id_laporan_lct}')->name('ehs.reporting.')->group(function () {
         Route::post('/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('approve');
         Route::post('/reject', [ProgressPerbaikanController::class, 'rejectLaporan'])->name('reject');
         Route::post('/close', [ProgressPerbaikanController::class, 'closeLaporan'])->name('close');
@@ -118,7 +120,6 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
     // Laporan LCT
     Route::prefix('laporan-lct')->name('ehs.laporan-lct.')->group(function () {
         Route::get('/', [LctReportController::class, 'index'])->name('index');
-        Route::get('/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show');
         Route::post('/{id_laporan_lct}/close', [LctReportController::class, 'closed'])->name('closed');
     });
 

@@ -104,8 +104,34 @@
                         </a>
                     </li>
                     @endrole
+                    <!-- Progress Perbaikan -->
+                    @hasanyrole(['manajer','user'])
+                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('reporting') || Request::is('reporting/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
+                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('reporting') || Request::is('reporting/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.reporting.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 fill-current @if(Request::is('reporting')|| Request::is('reporting/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                    <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
+                                </svg>                                
+                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('reporting')|| Request::is('reporting/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
+                            </div>
+                        </a>
+                    </li>
+                    @endrole
 
-                    <!-- Laporan LCT untuk EHS -->
+                    @hasrole('ehs')
+                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('ehs/reporting') || Request::is('ehs/reporting/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
+                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('ehs/reporting') || Request::is('ehs/reporting/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('ehs.reporting.index') }}">
+                            <div class="flex items-center">
+                                <svg class="shrink-0 fill-current @if(Request::is('ehs/reporting')|| Request::is('reporting/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                    <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
+                                </svg>                                
+                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('ehs/reporting')|| Request::is('ehs/reporting/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
+                            </div>
+                        </a>
+                    </li>
+                    @endrole
+
+                    {{-- <!-- Laporan LCT untuk EHS -->
                     @role('ehs')
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('ehs/laporan-lct') || Request::is('ehs/laporan-lct/*')) from-[#048cfb]/[0.12] to-[#048cfb]/[0.04] @endif">
                         <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('ehs/laporan-lct') || Request::is('ehs/laporan-lct/*')) hover:text-gray-900 @endif" href="{{ route('ehs.laporan-lct.index') }}">
@@ -135,7 +161,7 @@
                             </div>
                         </a>
                     </li>
-                    @endrole
+                    @endrole --}}
 
 
                     <!-- Manajemen LCT -->
@@ -167,33 +193,6 @@
                     </li>
                     @endrole
 
-
-                    <!-- Progress Perbaikan -->
-                    @hasanyrole(['manajer','user'])
-                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
-                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('progress-perbaikan') || Request::is('progress-perbaikan/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.progress-perbaikan.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                    <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
-                                </svg>                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
-                            </div>
-                        </a>
-                    </li>
-                    @endrole
-
-                    @hasrole('ehs')
-                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('ehs/progress-perbaikan') || Request::is('ehs/progress-perbaikan/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
-                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('ehs/progress-perbaikan') || Request::is('ehs/progress-perbaikan/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('ehs.progress-perbaikan.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('ehs/progress-perbaikan')|| Request::is('progress-perbaikan/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                    <path d="M22.7 19.3l-3.3-3.3c1.2-2.4.8-5.4-1.2-7.4-2.2-2.2-5.5-2.5-8-1l3 3c.4.4.4 1 0 1.4l-3.2 3.2c-.4.4-1 .4-1.4 0l-3-3c-1.5 2.5-1.2 5.8 1 8 2 2 5 2.4 7.4 1l3.3 3.3c.4.4 1 .4 1.4 0l3.1-3.1c.4-.4.4-1 0-1.4z"/>
-                                </svg>                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('ehs/progress-perbaikan')|| Request::is('ehs/progress-perbaikan/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
-                            </div>
-                        </a>
-                    </li>
-                    @endrole
 
                     <!-- Master Data -->
                     @hasrole('manajer')
@@ -363,27 +362,26 @@
             </div>
         </div>
 
-        <div class="mt-7 w-full">
-            @php
-                if (Auth::guard('ehs')->check()) {
-                    // Jika pengguna adalah EHS
-                    $user = Auth::guard('ehs')->user();
-                    $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
-                    $reportRoute = route('ehs.report-form');
-                } else {
-                    // Jika pengguna adalah User biasa
+        @php
+            $isEhs = Auth::guard('ehs')->check();
+        @endphp
+        
+        @if (!$isEhs)
+            <div class="mt-7 w-full">
+                @php
                     $user = Auth::user();
                     $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
                     $reportRoute = route('report-form');
-                }
-            @endphp
+                @endphp
         
-            <a href="{{ $reportRoute }}"
-               class="block w-full px-4 py-2 text-center text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300"
-               aria-label="Go to Report Form LCT">
-                Report Form LCT
-            </a>
-        </div>                      
+                <a href="{{ $reportRoute }}"
+                class="block w-full px-4 py-2 text-center text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300"
+                aria-label="Go to Report Form LCT">
+                    Report Form LCT
+                </a>
+            </div>
+        @endif
+                        
     </div>
 </div>
 

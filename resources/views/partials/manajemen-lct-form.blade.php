@@ -140,11 +140,11 @@
         </div>
         @php
             if ($roleName === 'ehs') {
-                $routeName = 'ehs.progress-perbaikan.history';
+                $routeName = 'ehs.reporting.history';
             } elseif ($roleName === 'pic') {
                 $routeName = 'admin.manajemen-lct.history';
             } else {
-                $routeName = 'admin.progress-perbaikan.history';
+                $routeName = 'admin.reporting.history';
             }
         @endphp
         

@@ -58,8 +58,8 @@
                             @if (in_array($roleName, ['ehs', 'manajer', 'user']))
                                 <a href="{{ route(
                                     $roleName === 'ehs' 
-                                        ? 'ehs.progress-perbaikan.show' 
-                                        : 'admin.progress-perbaikan.show', 
+                                        ? 'ehs.reporting.show' 
+                                        : 'admin.reporting.show', 
                                     $laporan->id_laporan_lct
                                 ) }}" 
                                 class="text-blue-600 hover:text-blue-800 text-xs font-medium">

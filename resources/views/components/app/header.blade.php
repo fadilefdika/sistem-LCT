@@ -33,23 +33,23 @@
                         {{ Breadcrumbs::render('ehs dashboard') }}
                     @elseif (Route::currentRouteName() === 'admin.laporan-lct.index')
                         {{ Breadcrumbs::render('laporan-lct') }}
-                    @elseif (Route::currentRouteName() === 'admin.laporan-lct.show')
+                    @elseif (Route::currentRouteName() === 'admin.reporting.show.new')
                         {{ Breadcrumbs::render('laporan-lct.show', $laporan) }}
                     @elseif (Route::currentRouteName() === 'ehs.laporan-lct.index')
                         {{ Breadcrumbs::render('ehs laporan-lct') }}
-                    {{-- @elseif (Route::currentRouteName() === 'ehs.laporan-lct.show')
+                    {{-- @elseif (Route::currentRouteName() === 'ehs.reporting.show.new')
                         {{ Breadcrumbs::render('ehs laporan-lct.show', $laporan) }} --}}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.index')
                         {{ Breadcrumbs::render('manajemen-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.show')
                         {{ Breadcrumbs::render('manajemen-lct.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.index')
+                    @elseif(Route::currentRouteName() === 'admin.reporting.index')
                         {{ Breadcrumbs::render('progress-perbaikan') }}
-                    @elseif(Route::currentRouteName() === 'admin.progress-perbaikan.show')
+                    @elseif(Route::currentRouteName() === 'admin.reporting.show')
                         {{ Breadcrumbs::render('progress-perbaikan.show', $laporan) }}
-                    @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.index')
+                    @elseif(Route::currentRouteName() === 'ehs.reporting.index')
                         {{ Breadcrumbs::render('ehs progress-perbaikan') }}
-                    @elseif(Route::currentRouteName() === 'ehs.progress-perbaikan.show')
+                    @elseif(Route::currentRouteName() === 'ehs.reporting.show')
                         {{ Breadcrumbs::render('ehs progress-perbaikan.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.budget-approval.index')
                         {{ Breadcrumbs::render('budget-approval') }}

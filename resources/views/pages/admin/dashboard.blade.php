@@ -68,7 +68,7 @@
                         <!-- New Finding -->
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
                             <h2 class="text-xl font-semibold mb-2">New Finding</h2>
-                            <div class="overflow-auto h-[435px]"> <!-- Height diseragamkan -->
+                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel-new', [
                                     'laporans' => $laporanNew
                                 ])
@@ -78,8 +78,8 @@
                         <!-- Report Awaiting Approval -->
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
                             <h2 class="text-xl font-semibold mb-2">Report Awaiting Approval</h2>
-                            <div class="overflow-auto h-[435px]"> <!-- Height diseragamkan -->
-                                @include('partials.dashboard-tabel', [
+                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
+                                @include('partials.dashboard-tabel-approval-ehs', [
                                     'laporans' => $laporanNeedApproval
                                 ])
                             </div>
@@ -100,7 +100,7 @@
 
                     @if($isUser)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Activity Progress</h2>
+                            <h2 class="text-xl font-semibold mb-2">Reporting</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanUser

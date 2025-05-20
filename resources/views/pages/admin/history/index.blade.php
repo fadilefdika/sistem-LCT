@@ -12,11 +12,11 @@
                         $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
                   
                     if ($roleName === 'ehs') {
-                        $routeName = 'ehs.progress-perbaikan.show';
+                        $routeName = 'ehs.reporting.show';
                     } elseif ($roleName === 'pic') {
                         $routeName = 'admin.manajemen-lct.show';
                     } else {
-                        $routeName = 'admin.progress-perbaikan.show';
+                        $routeName = 'admin.reporting.show';
                     }
                 @endphp
             
