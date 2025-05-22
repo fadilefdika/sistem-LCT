@@ -1,9 +1,9 @@
 @php
-    $bahayaColors = [
-        'High' => 'bg-red-600',
-        'Medium' => 'bg-yellow-500',
-        'Low' => 'bg-green-600'
-    ];
+    $bahayaTextColors = [
+    'High' => 'text-red-600',
+    'Medium' => 'text-yellow-600',
+    'Low' => 'text-green-600'
+];
 @endphp
 
 <div class="bg-white border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-200">
@@ -34,44 +34,39 @@
             };
         @endphp
 
-        <div class="grid grid-cols-[40px_1fr_1fr_80px] gap-x-4 items-center p-4 hover:bg-gray-50 transition cursor-pointer rounded-md">
-            <!-- No -->
-            <div class="text-xs font-semibold text-gray-700 text-center">
-                {{ $loop->iteration }}
-            </div>
+    <a href="{{ $link }}" class="grid grid-cols-[40px_1fr_1fr] gap-x-4 items-center p-4 hover:bg-gray-50 transition cursor-pointer rounded-md">
+        <!-- No -->
+        <div class="text-xs font-semibold text-gray-700 text-center">
+            {{ $loop->iteration }}
+        </div>
 
-            <!-- Data Column 1 -->
-            <div class="text-sm text-gray-700 space-y-1">
-                <div>
-                    <span class="font-semibold">Due:</span> {{ $dueDate }}
-                </div>
-                <div>
-                    <span class="inline-block px-2 py-0.5 rounded-full text-white text-xs font-semibold {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
-                        {{ $laporan->tingkat_bahaya }}
-                    </span>
-                </div>
+        <!-- Data Column 1 -->
+        <div class="text-gray-700 space-y-1">
+            <div class="text-[11px]">
+                <span class="font-semibold">Due Date:</span> {{ $dueDate }}
             </div>
+            <div>
+                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold {{ $bahayaTextColors[$laporan->tingkat_bahaya] ?? 'text-gray-500' }}">
+                    {{ $laporan->tingkat_bahaya }}
+                </span>
+            </div>            
+        </div>
 
-            <!-- Data Column 2 -->
-            <div class="text-sm text-gray-700 space-y-1 truncate">
-                <div>
-                    <span class="font-semibold">PIC:</span> <span class="truncate">{{ $formattedName }}</span>
-                </div>
-                <div>
-                    <span class="font-semibold">Type:</span> {{ $approvalType }}
-                </div>
+        <!-- Data Column 2 -->
+        <div class="text-gray-700 space-y-1 truncate">
+            <div class="text-xs">
+                <span class="font-semibold">PIC:</span> <span class="truncate">{{ $formattedName }}</span>
             </div>
-
-            <!-- Action -->
-            <div class="text-blue-600 hover:text-blue-800 font-medium text-xs text-right">
-                <a href="{{ $link }}">View →</a>
+            <div class="text-xs">
+                <span class="font-semibold">Type:</span> {{ $approvalType }}
             </div>
         </div>
+    </a>
 
     @empty
         <div class="text-center py-16 text-gray-500">
             <i class="fa-solid fa-face-smile text-3xl mb-4"></i>
-            <p class="text-sm font-medium">No data found non-conformities.</p>
+            <p class="text-xs font-medium">No data found non-conformities.</p>
         </div>
     @endforelse
 </div>

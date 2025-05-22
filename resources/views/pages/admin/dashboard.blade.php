@@ -67,7 +67,7 @@
                     @if($isEhs)
                         <!-- New Finding -->
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">New Finding</h2>
+                            <h2 class="text-base font-semibold mb-2">New Finding</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel-new', [
                                     'laporans' => $laporanNew
@@ -77,7 +77,7 @@
 
                         <!-- Report Awaiting Approval -->
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Report Awaiting Approval</h2>
+                            <h2 class="text-base font-semibold mb-2">Report Awaiting Approval</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel-approval-ehs', [
                                     'laporans' => $laporanNeedApproval
@@ -89,7 +89,7 @@
                     {{-- Manager --}}
                     @if($isManajer)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Report Awaiting Approval</h2>
+                            <h2 class="text-base font-semibold mb-2">Report Awaiting Approval</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel-approval-taskbudget', [
                                     'laporans' => $laporanNeedApprovalBudget
@@ -100,7 +100,7 @@
 
                     @if($isUser)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Reporting</h2>
+                            <h2 class="text-base font-semibold mb-2">Reporting</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanUser
@@ -111,7 +111,7 @@
 
                     @if($isPic)
                         <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-xl font-semibold mb-2">Unread Reports</h2>
+                            <h2 class="text-base font-semibold mb-2">Unread Reports</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanInProgress
@@ -128,7 +128,7 @@
                     
                     <!-- Overdue Reports Table -->
                     <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                        <h2 class="text-xl font-semibold mb-2">Overdue Reports</h2>
+                        <h2 class="text-base font-semibold mb-2">Overdue Reports</h2>
                         <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
                             @include('partials.dashboard-tabel', [
                                 'laporans' => $laporanOverdue
@@ -138,7 +138,7 @@
                     
                     <!-- Medium & High Risk Reports Table -->
                     <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                        <h2 class="text-xl font-semibold mb-2">Medium & High Risk Reports</h2>
+                        <h2 class="text-base font-semibold mb-2">Medium & High Risk Reports</h2>
                         <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
                             @include('partials.dashboard-tabel-medium-high',[
                                 'laporans' => $laporanMediumHigh
@@ -148,160 +148,91 @@
 
                 </div>
 
-                <!-- Main Grid Layout -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-4">
-                    
-                    <!-- Grafik Garis: LCT Per Bulan (2/3 width) -->
-                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-2 flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-1">Findings</h2>
-                        <div class="flex gap-4 mb-4">
-                            <div class="flex space-x-4">
-                                <!-- Year Select -->
-                                <div class="relative w-40">
-                                    <select id="year-select" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">Select Year</option>
-                                        @foreach ($findings as $year)
-                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            
-                                <!-- Month Select -->
-                                <div class="relative w-48">
-                                    <select id="month-select" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">All Months</option>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>                           
-                        </div>
-                        
-                        <canvas id="monthlyChart" class="flex-grow"></canvas>
-                    </div>
+                <!-- Grid Utama untuk Chart Atas -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3">
 
-                    <!-- Grafik Pie: Open vs Closed (1/3 width) -->
-                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-1 flex flex-col justify-between">
-                        <h2 class="text-2xl font-semibold mb-1">Findings by Status</h2>
-                        <div class="flex gap-4 mb-4">
-                            <div class="flex space-x-4">
-                                <!-- Year Select -->
-                                <div class="relative w-40">
-                                    <select id="year-select-status" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">Select Year</option>
-                                        @foreach ($findings as $year)
-                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            
-                                <!-- Month Select -->
-                                <div class="relative w-48">
-                                    <select id="month-select-status" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">All Months</option>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>                           
-                        </div>
-                        <canvas id="statusChart" class="self-center" style="max-width: 300px; max-height: 300px;"></canvas>
-                    </div>
-
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-6">
-                    <!-- Grafik Batang Horizontal: Berdasarkan Area -->
-                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-3 flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-4">Findings by Area</h2>
-                        <div class="flex gap-4 mb-4">
-                            <div class="flex space-x-4">
-                                <!-- Year Select -->
-                                <div class="relative w-40">
-                                    <select id="year-select-area" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">Select Year</option>
-                                        @foreach ($findings as $year)
-                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            
-                                <!-- Month Select -->
-                                <div class="relative w-48">
-                                    <select id="month-select-area" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">All Months</option>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>                           
-                        </div>
-                        <div style="height: 390px;">
-                            <canvas id="areaChart"></canvas>
-                        </div>
-                    </div>
-                
-                    <!-- Grafik Batang Vertikal: Berdasarkan Kategori -->
-                    <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-2 flex flex-col">
-                        <h2 class="text-2xl font-semibold mb-4">Findings by Category</h2>
-                        <div class="flex gap-4 mb-4">
-                            <div class="flex space-x-4">
-                                <!-- Year Select -->
-                                <div class="relative w-40">
-                                    <select id="year-select-category" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">Select Year</option>
-                                        @foreach ($findings as $year)
-                                            <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            
-                                <!-- Month Select -->
-                                <div class="relative w-48">
-                                    <select id="month-select-category" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                        <option value="">All Months</option>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            </div>                           
-                        </div>
-                        <canvas id="categoryChart" class="max-h-80"></canvas>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 mt-6">
-                <div class="p-6 bg-white rounded-lg shadow-md lg:col-span-3 flex flex-col">
-                    <h2 class="text-2xl font-semibold mb-4">Findings by Department</h2>
-                    <div class="flex gap-4 mb-4">
-                        <div class="flex space-x-4">
-                            <!-- Year Select -->
-                            <div class="relative w-40">
-                                <select id="year-department" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                    <option value="">Select Year</option>
-                                    @foreach ($findings as $year)
-                                        <option value="{{ $year }}" {{ $year == now()->year ? 'selected' : '' }}>{{ $year }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        
-                            <!-- Month Select -->
-                            <div class="relative w-48">
-                                <select id="month-department" class="w-full px-4 py-2 pr-8 rounded border border-gray-300 bg-white text-gray-700 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
-                                    <option value="">All Months</option>
+                    <!-- Chart Garis: Findings per Bulan -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
+                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings Per Month</h2>
+                            <div class="absolute top-4 right-4 w-28">
+                                <select id="month-select" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
                                     @for ($m = 1; $m <= 12; $m++)
                                         <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
                                     @endfor
                                 </select>
                             </div>
-                        </div>                           
+                        <div class="h-[200px]">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
                     </div>
-                    <div style="height: 390px;">
-                        <canvas id="departmentChart"></canvas>
+
+                    <!-- Chart Pie: Status Closed/Non-Closed -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 relative">
+                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Status</h2>
+                        <div class="absolute top-4 right-4 w-28">
+                            <select id="month-select-status" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="flex justify-center items-center h-[200px]">
+                            <canvas id="statusChart"></canvas>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Grid untuk Area dan Kategori -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
+
+                    <!-- Chart Horizontal: Area -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-3 relative">
+                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Area</h2>
+                        <div class="absolute top-4 right-4 w-28">
+                            <select id="month-select-area" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="h-[300px]">
+                            <canvas id="areaChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart Vertikal: Kategori -->
+                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
+                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Category</h2>
+                        <div class="absolute top-4 right-4 w-28">
+                            <select id="month-select-category" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="h-[300px]">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Department -->
+                <div class="grid grid-cols-1 mt-4">
+                    <div class="bg-white rounded-2xl shadow-md p-6 relative">
+                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
+                        <div class="absolute top-6 right-6 w-40">
+                            <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                @for ($m = 1; $m <= 12; $m++)
+                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="h-[300px]">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -315,8 +246,11 @@
     const userRole = @json($roleName);
     
     let monthlyChart;
-    
 
+    const currentYearFinding = new Date().getFullYear();
+    const currentMonthFinding = (new Date().getMonth() + 1).toString().padStart(2, '0');
+
+    
     function renderChart(labels, data, isMonthly = true) {
         const ctx = document.getElementById('monthlyChart').getContext('2d');
 
@@ -331,8 +265,8 @@
                 datasets: [{
                     label: 'Number of Findings',
                     data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(0, 105, 170, 0.2)', // warna biru muda transparan
+                    borderColor: '#0069AA', // warna biru utama
                     borderWidth: 2,
                     fill: true
                 }]
@@ -343,16 +277,16 @@
                     x: {
                         title: {
                             display: true,
-                            text: isMonthly ? 'Months' : 'Dates' // Gunakan flag, bukan length
+                            text: isMonthly ? 'Months' : 'Dates'
                         },
                         ticks: {
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
                                 if (isMonthly) {
-                                    return label; // langsung tampilkan nama bulan
+                                    return label;
                                 } else {
                                     const date = new Date(label);
-                                    return date.getDate().toString().padStart(2, '0'); // hanya tanggal
+                                    return date.getDate().toString().padStart(2, '0');
                                 }
                             }
                         }
@@ -373,6 +307,7 @@
     }
 
 
+
     function fetchChartData(year, month = '') {
         const url = userRole === 'ehs' ? '/ehs/dashboard/chart-data' : '/dashboard/chart-data';
 
@@ -389,237 +324,243 @@
         });
     }
 
-    // Event dropdown
-    $('#year-select').change(function () {
-        const year = $(this).val();
-        $('#month-select').prop('disabled', !year).val('');
-        if (year) {
-            fetchChartData(year);
-        }
-    });
-
     $('#month-select').change(function () {
-        const year = $('#year-select').val();
         const month = $(this).val();
-        if (year) {
-            fetchChartData(year, month); // bulan kosong => all month
-        }
+        const year = new Date().getFullYear(); // ambil tahun saat ini
+        fetchChartData(year, month);
     });
 
-    // Initial load (optional)
-    @if(count($findings))
-        fetchChartData({{ $findings->max() }});
-    @endif
-    
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        const currentMonth = (now.getMonth() + 1).toString(); // 1–12
 
-        let areaChart;
-        // Fungsi untuk menggambar chart area
-        function renderAreaChart(data) {
-            const ctx = document.getElementById('areaChart').getContext('2d');
+        // Set dropdown bulan ke bulan saat ini
+        document.getElementById('month-select').value = currentMonth;
 
-            // Hancurkan chart lama jika ada
-            if (areaChart) {
-                areaChart.destroy();
-            }
+        // Panggil fetchChartData dengan bulan dan tahun saat ini
+        const year = now.getFullYear();
+        fetchChartData(year, currentMonth);
+    });
 
-            const areaLabels = Object.keys(data);
-            const closedData = areaLabels.map(label => data[label].closed_count);
-            const nonClosedData = areaLabels.map(label => data[label].non_closed_count);
+    let areaChart;
 
-            areaChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: areaLabels,
-                    datasets: [
-                        {
-                            label: 'Closed',
-                            data: closedData,
-                            backgroundColor: 'rgba(75, 192, 75, 0.6)',
-                            borderColor: 'rgba(75, 192, 75, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Non-Closed',
-                            data: nonClosedData,
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y',
-                    maintainAspectRatio: false, 
-                    responsive: true,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Findings'
-                            },
-                            ticks: {
-                                stepSize: 1,
-                                precision: 0,
-                                callback: function (value) {
-                                    return Number.isInteger(value) ? value : '';
-                                }
+    function renderAreaChart(data) {
+        const ctx = document.getElementById('areaChart').getContext('2d');
+
+        if (areaChart) areaChart.destroy();
+
+        const areaLabels = Object.keys(data);
+        const closedData = areaLabels.map(label => data[label].closed_count);
+        const nonClosedData = areaLabels.map(label => data[label].non_closed_count);
+
+        areaChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: areaLabels,
+                datasets: [
+                    {
+                        label: 'Closed',
+                        data: closedData,
+                        backgroundColor: 'rgba(0, 105, 170, 0.2)',
+                        borderColor: 'rgba(0, 105, 170, 0.4)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Non-Closed',
+                        data: nonClosedData,
+                        backgroundColor: '#0069AA',
+                        borderColor: '#0069AA',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                // indexAxis: 'y', // ❌ HAPUS untuk bar vertikal
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 45,   // Putar label agar muat
+                            minRotation: 30,   // Minimum rotasi
+                            font: {
+                                size: 9       // Kecilkan ukuran font jika terlalu banyak
                             }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Area'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Findings'
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0,
+                            callback: function (value) {
+                                return Number.isInteger(value) ? value : '';
+                            }
+                            
                         }
                     }
                 }
-            });
-        }
-
-
-        // Fungsi untuk mengambil data berdasarkan tahun dan bulan
-        function fetchAreaChartData(year, month) {
-            const url = userRole === 'ehs' ? '/ehs/dashboard/area-chart-data' : '/dashboard/area-chart-data';
-            
-            $.ajax({
-                url: url,
-                data: { year, month },
-                success: function (res) {
-                    renderAreaChart(res.areaStatusCounts);
-                },
-                error: function (xhr) {
-                    console.error('Error fetching area chart data:', xhr.responseText);
-                }
-            });
-        }
-
-        // Event listener untuk dropdown tahun
-        $('#year-select-area').change(function () {
-            const year = $(this).val();
-            $('#month-select-area').prop('disabled', !year).val('');
-            if (year) {
-                fetchAreaChartData(year);
             }
         });
 
-        // Event listener untuk dropdown bulan
-        $('#month-select-area').change(function () {
-            const year = $('#year-select-area').val();
-            const month = $(this).val();
-            if (year) {
-                fetchAreaChartData(year, month); // Filter berdasarkan tahun dan bulan
+    }
+
+    function fetchAreaChartData(year, month) {
+        const url = userRole === 'ehs' ? '/ehs/dashboard/area-chart-data' : '/dashboard/area-chart-data';
+
+        console.log('Fetching area chart for:', year, month);
+
+        $.ajax({
+            url: url,
+            data: { year, month },
+            success: function (res) {
+                console.log('Area chart data:', res);
+                renderAreaChart(res.areaStatusCounts);
+            },
+            error: function (xhr) {
+                console.error('Error fetching area chart data:', xhr.responseText);
             }
         });
+    }
 
-            // Initial load (optional)
-        @if(count($findings))
-            fetchAreaChartData({{ $findings->max() }});
-        @endif
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        const year = now.getFullYear(); // Tahun sekarang otomatis
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
 
-    
-        let categoryChart; // Simpan chart agar bisa di-destroy
+        const monthSelect = document.getElementById('month-select-area');
+        if (monthSelect) {
+            monthSelect.value = currentMonth;
 
-
-        function renderCategoryChart(categoryStatusCounts, categoryAliases) {
-            const ctx = document.getElementById('categoryChart').getContext('2d');
-
-            if (categoryChart) categoryChart.destroy();
-
-            const categoryLabels = Object.values(categoryAliases);
-
-            const closedData = categoryLabels.map(label => {
-                const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
-                return categoryStatusCounts[originalLabel]?.closed_count || 0;
+            monthSelect.addEventListener('change', function () {
+                const selectedMonth = this.value;
+                fetchAreaChartData(year, selectedMonth);
             });
+        }
 
-            const nonClosedData = categoryLabels.map(label => {
-                const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
-                return categoryStatusCounts[originalLabel]?.non_closed_count || 0;
-            });
+        // Initial fetch dengan bulan dan tahun sekarang
+        fetchAreaChartData(year, currentMonth);
+    });
 
-            categoryChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categoryLabels,
-                    datasets: [
-                        {
-                            label: 'Closed',
-                            data: closedData,
-                            backgroundColor: 'rgba(75, 192, 75, 0.6)',
-                            borderColor: 'rgba(75, 192, 75, 1)',
-                            borderWidth: 1,
-                            barThickness: 40,
+
+    let categoryChart;
+
+    function renderCategoryChart(categoryStatusCounts, categoryAliases) {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+
+        if (categoryChart) categoryChart.destroy();
+
+        const categoryLabels = Object.values(categoryAliases);
+
+        const closedData = categoryLabels.map(label => {
+            const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
+            return categoryStatusCounts[originalLabel]?.closed_count || 0;
+        });
+
+        const nonClosedData = categoryLabels.map(label => {
+            const originalLabel = Object.keys(categoryAliases).find(key => categoryAliases[key] === label);
+            return categoryStatusCounts[originalLabel]?.non_closed_count || 0;
+        });
+
+        categoryChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categoryLabels,
+                datasets: [
+                    {
+                        label: 'Non-Closed',
+                        data: nonClosedData,
+                        backgroundColor: '#0069AA',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Closed',
+                        data: closedData,
+                        backgroundColor: 'rgba(0, 105, 170, 0.2)',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // ✅ Inilah bagian penting agar jadi horizontal
+                scales: {
+                    x: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0
                         },
-                        {
-                            label: 'Non-Closed',
-                            data: nonClosedData,
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1,
-                            barThickness: 40,
+                        title: {
+                            display: true,
+                            text: 'Jumlah Findings'
                         }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    aspectRatio: 0.1,
-                    scales: {
-                        x: {
-                            stacked: true,
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 45,
-                                minRotation: 0
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            autoSkip: false,
+                            font: {
+                                size: 10
                             }
                         },
-                        y: {
-                            beginAtZero: true,
-                            stacked: true,
-                            ticks: {
-                                stepSize: 1,
-                                precision: 0
-                            }
+                        title: {
+                            display: true,
+                            text: 'Kategori'
                         }
                     }
                 }
-            });
-        }
-
-        function fetchCategoryChartData(year, month) {
-            const url = userRole === 'ehs' ? '/ehs/dashboard/category-chart-data' : '/dashboard/category-chart-data';
-            
-            $.ajax({
-                url: url,
-                data: { year, month },
-                success: function (res) {
-                    // Gunakan renderCategoryChart untuk memperbarui grafik kategori
-                    renderCategoryChart(res.categoryStatusCounts, res.categoryAliases);
-                },
-                error: function (xhr) {
-                    console.error('Error fetching category chart data:', xhr.responseText);
-                }
-            });
-        }
-
-
-        // Event listener untuk dropdown tahun
-        $('#year-select-category').change(function () {
-            const year = $(this).val();
-            $('#month-select-category').prop('disabled', !year).val('');
-            if (year) {
-                fetchCategoryChartData(year);
             }
         });
 
-        // Event listener untuk dropdown bulan
-        $('#month-select-category').change(function () {
-            const year = $('#year-select-category').val();
-            const month = $(this).val();
-            if (year) {
-                fetchCategoryChartData(year, month); // Filter berdasarkan tahun dan bulan
+
+    }
+
+    function fetchCategoryChartData(year, month) {
+        const url = userRole === 'ehs' ? '/ehs/dashboard/category-chart-data' : '/dashboard/category-chart-data';
+
+        $.ajax({
+            url: url,
+            data: { year, month },
+            success: function (res) {
+                renderCategoryChart(res.categoryStatusCounts, res.categoryAliases);
+            },
+            error: function (xhr) {
+                console.error('Error fetching category chart data:', xhr.responseText);
             }
         });
-        
-        // Initial load (optional)
-        @if(count($findings))
-            fetchCategoryChartData({{ $findings->max() }});
-        @endif
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        const year = now.getFullYear();
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+
+        const monthSelect = document.getElementById('month-select-category');
+        if (monthSelect) {
+            monthSelect.value = currentMonth;
+
+            monthSelect.addEventListener('change', function () {
+                const selectedMonth = this.value;
+                fetchCategoryChartData(year, selectedMonth);
+            });
+        }
+
+        // Initial fetch dengan bulan dan tahun sekarang
+        fetchCategoryChartData(year, currentMonth);
+    });
+
 
     
         let statusChart;
@@ -632,7 +573,8 @@
             const dataValues = [
                 Number(statusCounts.open) || 0,
                 Number(statusCounts.closed) || 0,
-                Number(statusCounts.in_progress) || 0
+                Number(statusCounts.in_progress) || 0,
+                Number(statusCounts.overdue) || 0
             ];
 
             const total = dataValues.reduce((a, b) => a + b, 0);
@@ -640,20 +582,16 @@
             statusChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['Open', 'Closed', 'In Progress'],
+                    labels: ['Open', 'Closed', 'In Progress', 'Overdue'],
                     datasets: [{
                         data: dataValues,
                         backgroundColor: [
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(75, 192, 75, 0.6)',
-                            'rgba(255, 206, 86, 0.6)'
+                            '#FFC107',   // Open - kuning lebih tegas
+                            '#4CAF50',   // Closed - hijau tegas
+                            '#2196F3',   // In Progress - biru tegas
+                            '#0069AA'    // Overdue - biru utama solid
                         ],
-                        borderColor: [
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(75, 192, 75, 1)',
-                            'rgba(255, 206, 86, 1)'
-                        ],
-                        borderWidth: 1
+                        borderWidth: 0 // tidak ada border
                     }]
                 },
                 options: {
@@ -674,7 +612,6 @@
         }
 
 
-
         function fetchStatusChartData(year, month) {
             const url = userRole === 'ehs' ? '/ehs/dashboard/status-chart-data' : '/dashboard/status-chart-data';
 
@@ -690,23 +627,26 @@
             });
         }
 
-
-        $('#year-select-status').change(function () {
-            const year = $(this).val();
-            $('#month-select-status').prop('disabled', !year).val('');
-            if (year) fetchStatusChartData(year);
-        });
-
         $('#month-select-status').change(function () {
-            const year = $('#year-select-status').val();
+            const now = new Date();
+            const year = now.getFullYear(); // Tahun sekarang otomatis
             const month = $(this).val();
-            if (year) fetchStatusChartData(year, month);
+            fetchStatusChartData(year, month);
         });
 
-        // Initial load (optional)
-        @if(count($findings))
-        fetchStatusChartData({{ $findings->max() }});
-        @endif
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const now = new Date();
+            const year = now.getFullYear();
+            const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+
+            const monthSelect = document.getElementById('month-select-status');
+            if (monthSelect) {
+                monthSelect.value = currentMonth;
+            }
+
+            fetchStatusChartData(year, currentMonth);
+        });
 
         let departmentChart;
 
@@ -725,10 +665,10 @@
                     datasets: [{
                         label: 'Jumlah Temuan per Departemen',
                         data: values,
-                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1,
-                        barThickness: 40
+                        backgroundColor: '#0069AA', // warna biru utama transparan
+                        // borderColor: '#0069AA', // warna biru utama solid
+                        // borderWidth: 2,
+                        borderRadius: 3
                     }]
                 },
                 options: {
@@ -743,7 +683,10 @@
                         },
                         x: {
                             ticks: {
-                                autoSkip: false
+                                autoSkip: false,
+                                font: {
+                                    size: 10 // ukuran font label agar tidak bertumpuk
+                                }
                             }
                         }
                     }
@@ -751,9 +694,11 @@
             });
         }
 
-        function fetchDepartmentChartData(year, month) {
+
+        function fetchDepartmentChartData(month) {
+            const year = new Date().getFullYear(); // selalu gunakan tahun sekarang
             const url = userRole === 'ehs' ? '/ehs/dashboard/department-chart-data' : '/dashboard/department-chart-data';
-            
+
             $.ajax({
                 url: url,
                 data: { year, month },
@@ -766,22 +711,23 @@
             });
         }
 
-        $('#year-department').change(function () {
-            const year = $(this).val();
-            $('#month-department').prop('disabled', !year).val('');
-            if (year) fetchDepartmentChartData(year);
+        document.addEventListener('DOMContentLoaded', function () {
+            const now = new Date();
+            const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+
+            const monthSelect = document.getElementById('month-department');
+            if (monthSelect) {
+                monthSelect.value = currentMonth;
+
+                monthSelect.addEventListener('change', function () {
+                    fetchDepartmentChartData(this.value);
+                });
+
+                // Load awal
+                fetchDepartmentChartData(currentMonth);
+            }
         });
 
-        $('#month-department').change(function () {
-            const year = $('#year-department').val();
-            const month = $(this).val();
-            if (year) fetchDepartmentChartData(year, month);
-        });
-
-
-        @if(count($findings))
-            fetchDepartmentChartData({{ $findings->max() }});
-        @endif
 
     </script>
     

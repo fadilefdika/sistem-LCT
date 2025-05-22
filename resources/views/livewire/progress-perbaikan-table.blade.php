@@ -1,13 +1,11 @@
-<div>
-
-
-<section class="p-2 flex flex-col">
-    <div class="flex flex-row justify-between items-center align-center gap-4 p-4 border rounded-xl shadow-sm bg-white mb-4">
+<div class="max-w-full">
+<section class="flex flex-col">
+    <div class="flex flex-row justify-between items-center align-center gap-4 p-4 border rounded-xl shadow-xs bg-white mb-4">
         <!-- Filter Popover -->
         <div x-data="{ open: false }" class="relative z-10">
             <!-- Tombol Filter -->
             <button @click="open = !open"
-                class="inline-flex items-center gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                class="inline-flex items-center gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow text-xs hover:bg-gray-800 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
                 </svg>
@@ -126,19 +124,7 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-3">
-            <!-- PPT Button with PowerPoint styling -->
-            <div class="export-option ppt-option">
-                <span class="block text-xs font-semibold text-orange-600 mb-1">Presentation Format</span>
-                <button wire:click="exportToPPT"
-                        class="flex cursor-pointer items-center px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-md transition duration-200 shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-                    </svg>
-                    Download PPT Report
-                </button>
-            </div>
-            
+        <div class="flex flex-wrap gap-3"> 
             <!-- Excel Button with Excel styling -->
             <div class="export-option excel-option">
                 <span class="block text-xs font-semibold text-green-600 mb-1">Data Format</span>
@@ -171,46 +157,184 @@
     @endphp
 
     @if($roleName === 'ehs')
-        <div class="p-3">
-            <h2 class="text-2xl font-bold mb-4">Advanced Report</h2>
+        <div class="mb-3">
+            <h2 class="text-base font-bold mb-4">Advanced Report</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                <!-- Finding -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Total Findings</h3>
-                    <canvas id="findingChart"></canvas>
+            <div class="space-y-4">
+                <!-- Baris 1: Total Findings dan Findings by Status -->
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <!-- Total Findings -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] xl:w-2/3 w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-semibold">Total Findings</h3>
+                            <div class="flex gap-2">
+                                <select id="findingYear" class="text-sm border-gray-300 rounded-md">
+                                    @for ($year = now()->year; $year >= 2020; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                                <select id="findingMonth" class="text-sm border-gray-300 rounded-md">
+                                    <option value="">All Months</option>
+                                    @foreach ([
+                                        1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                        6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                        11 => 'Nov', 12 => 'Dec'
+                                    ] as $num => $month)
+                                        <option value="{{ $num }}">{{ $month }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="h-[200px]">
+                            <canvas id="findingChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Findings by Status -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] xl:w-1/3 w-full">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-semibold">Findings by Status</h3>
+                            <div class="flex gap-2">
+                                <select id="statusYear" class="text-sm border-gray-300 rounded-md">
+                                    @for ($year = now()->year; $year >= 2020; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
+                                <select id="statusMonth" class="text-sm border-gray-300 rounded-md">
+                                    <option value="">All Months</option>
+                                    @foreach ([1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                            6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                            11 => 'Nov', 12 => 'Dec'] as $num => $month)
+                                        <option value="{{ $num }}">{{ $month }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="h-[200px]">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
                 </div>
-
-                <!-- Finding by Status -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Findings by Status</h3>
-                    <canvas id="statusChart"></canvas>
+            
+                <!-- Baris 2: Findings by Category dan Area -->
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <!-- Findings by Category -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] xl:w-1/3 w-full">
+                        <h3 class="text-sm font-semibold mb-2">Findings by Category</h3>
+                    
+                        <!-- Filter Year & Month -->
+                        <div class="flex gap-2 mb-3">
+                            <select id="categoryYear" class="text-sm border-gray-300 rounded-md">
+                                @for ($year = now()->year; $year >= 2020; $year--)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
+                            </select>
+                    
+                            <select id="categoryMonth" class="text-sm border-gray-300 rounded-md">
+                                <option value="">All Months</option>
+                                @foreach ([
+                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                    11 => 'Nov', 12 => 'Dec'
+                                ] as $num => $month)
+                                    <option value="{{ $num }}">{{ $month }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    
+                        <div class="h-[200px]">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    
+            
+                    <!-- Findings by Area -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
+                        <h3 class="text-sm font-semibold mb-2">Findings by Area</h3>
+                    
+                        <!-- Filter Year & Month -->
+                        <div class="flex gap-2 mb-3">
+                            <select id="areaYear" class="text-sm border-gray-300 rounded-md">
+                                @for ($year = now()->year; $year >= 2020; $year--)
+                                    <option value="{{ $year }}">{{ $year }}</option>
+                                @endfor
+                            </select>
+                    
+                            <select id="areaMonth" class="text-sm border-gray-300 rounded-md">
+                                <option value="">All Months</option>
+                                @foreach ([
+                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                    11 => 'Nov', 12 => 'Dec'
+                                ] as $num => $month)
+                                    <option value="{{ $num }}">{{ $month }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    
+                        <div class="h-[200px]"><!-- beri min-width agar scroll muncul jika area banyak -->
+                            <canvas id="areaChart"></canvas>
+                        </div>
+                    </div>                    
                 </div>
+            
+                <!-- Baris 3: Department dan Overdue -->
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <!-- Department -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
+                        <h3 class="text-sm font-semibold mb-2">Findings by Department</h3>
+                        <div class="flex gap-2 mb-3">
+                            <select id="departmentYear" class="text-sm border-gray-300 rounded-md">
+                            @for ($year = now()->year; $year >= 2020; $year--)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                            @endfor
+                            </select>
+                            <select id="departmentMonth" class="text-sm border-gray-300 rounded-md">
+                            <option value="">All Months</option>
+                            @foreach ([
+                                1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                11 => 'Nov', 12 => 'Dec'
+                            ] as $num => $month)
+                                <option value="{{ $num }}">{{ $month }}</option>
+                            @endforeach
+                            </select>
+                        </div>
+                        <div class="h-[200px]">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
 
-                <!-- Findings by Area -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Findings by Area</h3>
-                    <canvas id="areaChart"></canvas>
-                </div>
-
-                <!-- Findings by Category -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Findings by Category</h3>
-                    <canvas id="categoryChart"></canvas>
-                </div>
-
-                <!-- Findings by Department -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Findings by Department</h3>
-                    <canvas id="departmentChart"></canvas>
-                </div>
-
-                <!-- Overdue -->
-                <div class="bg-white p-4 rounded-xl shadow">
-                    <h3 class="text-lg font-semibold mb-2">Overdue Findings</h3>
-                    <canvas id="overdueChart"></canvas>
+                    <!-- Overdue -->
+                    <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
+                        <h3 class="text-sm font-semibold mb-2">Overdue Findings</h3>
+                        <div class="flex gap-2 mb-3">
+                            <select id="overdueYear" class="text-sm border-gray-300 rounded-md">
+                              @for ($year = now()->year; $year >= 2020; $year--)
+                                <option value="{{ $year }}">{{ $year }}</option>
+                              @endfor
+                            </select>
+                            <select id="overdueMonth" class="text-sm border-gray-300 rounded-md">
+                              <option value="">All Months</option>
+                              @foreach ([
+                                1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
+                                6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
+                                11 => 'Nov', 12 => 'Dec'
+                              ] as $num => $month)
+                                <option value="{{ $num }}">{{ $month }}</option>
+                              @endforeach
+                            </select>
+                          </div>
+                        <div class="h-[200px]">
+                            <canvas id="overdueChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
+            
+            
         </div>
     @endif
 </section>
@@ -716,88 +840,369 @@
 </div>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
     <script>
-        // Dummy Data
         const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
 
-        // Finding
-        new Chart(document.getElementById('findingChart'), {
+        let findingChart;
+        function renderFindingChart(labels, data) {
+            const ctx = document.getElementById('findingChart').getContext('2d');
+            if (findingChart) findingChart.destroy();
+
+            findingChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Findings',
+                        data: data,
+                        borderColor: '#0069AA',
+                        backgroundColor: 'rgba(0, 105, 170, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#0069AA'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Total Findings' }, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+
+        function loadFindingData(year, month) {
+            const dummyLabels = month ? Array.from({ length: 28 }, (_, i) => `${i + 1}`) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dummyData = dummyLabels.map(() => Math.floor(Math.random() * 10) + 1);
+            renderFindingChart(dummyLabels, dummyData);
+        }
+
+        const yearSelect = document.getElementById('findingYear');
+        const monthSelect = document.getElementById('findingMonth');
+        yearSelect.addEventListener('change', () => loadFindingData(yearSelect.value, monthSelect.value));
+        monthSelect.addEventListener('change', () => loadFindingData(yearSelect.value, monthSelect.value));
+        loadFindingData(yearSelect.value, monthSelect.value);
+
+    </script>
+
+    <script>
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+
+        const statusChart = new Chart(ctxStatus, {
             type: 'doughnut',
             data: {
-                labels: ['Closed', 'Open'],
+                labels: ['Open', 'Closed', 'In Progress', 'Overdue'],
                 datasets: [{
-                    data: [100, 300],
-                    backgroundColor: [colors[0], colors[1]],
+                    data: [50, 120, 40, 30],
+                    backgroundColor: ['#F59E0B', '#10B981', '#3B82F6', '#EF4444'],
                 }]
-            }
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    datalabels: {
+                        color: '#fff',          // Warna putih
+                        font: {
+                            weight: 'bold',
+                            size: 9            // Ukuran font yang cukup besar agar terlihat
+                        },
+                        formatter: (value, ctx) => {
+                            let data = ctx.chart.data.datasets[0].data;
+                            let total = data.reduce((a, b) => a + b, 0);
+                            if (total === 0) return '0%';
+                            let percentage = (value / total * 100).toFixed(1);
+                            return percentage + '%';
+                        },
+                        // Tempatkan label di tengah slice (default sudah oke)
+                        anchor: 'center',
+                        align: 'center',
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
         });
 
-        // Status
-        new Chart(document.getElementById('statusChart'), {
+        function generateDummyStatusData(year, month) {
+            // Untuk variasi nilai per kombinasi filter
+            const seed = parseInt(year + (month || '0'));
+            const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+            // Bisa juga pakai seedable random lib untuk hasil konsisten
+            const open = random(10, 50);
+            const closed = random(20, 70);
+            const inProgress = random(5, 40);
+            const overdue = random(0, 25);
+
+            return [open, closed, inProgress, overdue];
+        }
+
+        function updateStatusChartWithDummy() {
+            const year = document.getElementById('statusYear').value;
+            const month = document.getElementById('statusMonth').value;
+
+            const dummyData = generateDummyStatusData(year, month);
+            statusChart.data.datasets[0].data = dummyData;
+            statusChart.update();
+        }
+
+        // Jalankan saat pertama kali
+        updateStatusChartWithDummy();
+
+        // Listener untuk filter dropdown
+        document.getElementById('statusYear').addEventListener('change', updateStatusChartWithDummy);
+        document.getElementById('statusMonth').addEventListener('change', updateStatusChartWithDummy);
+    </script>
+
+    <script>  const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+        const categoryLabels = ['Unsafe Act', '5S', 'Unsafe Condition', 'Nearmiss'];
+        const categoryColors = ['#F87171', '#60A5FA', '#34D399', '#FBBF24']; // contoh warna per kategori
+
+        // Inisialisasi chart dengan data kosong dulu
+        const categoryChart = new Chart(ctxCategory, {
             type: 'bar',
             data: {
-                labels: ['Open', 'In Progress', 'Resolved', 'Closed'],
+                labels: categoryLabels,
                 datasets: [{
                     label: 'Findings',
-                    data: [120, 90, 60, 130],
-                    backgroundColor: colors,
+                    data: [0, 0, 0, 0], // awalnya kosong
+                    backgroundColor: categoryColors,
                 }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } }
             }
         });
 
-        // Area
-        new Chart(document.getElementById('areaChart'), {
-            type: 'pie',
-            data: {
-                labels: ['Area A', 'Area B', 'Area C'],
-                datasets: [{
-                    data: [80, 150, 70],
-                    backgroundColor: colors,
-                }]
-            }
-        });
+        // Fungsi buat generate dummy data acak untuk kategori
+        function generateDummyCategoryData(year, month) {
+            // Misal: data berbeda jika bulan dipilih, atau default jika tidak
+            // Disini cuma random saja sebagai contoh
+            return categoryLabels.map(() => Math.floor(Math.random() * 100) + 1);
+        }
 
-        // Category
-        new Chart(document.getElementById('categoryChart'), {
+        // Fungsi update chart berdasarkan filter
+        function updateCategoryChart() {
+            const year = document.getElementById('categoryYear').value;
+            const month = document.getElementById('categoryMonth').value;
+
+            // Generate dummy data sesuai year & month
+            const dummyData = generateDummyCategoryData(year, month);
+
+            categoryChart.data.datasets[0].data = dummyData;
+            categoryChart.update();
+        }
+
+        // Event listener untuk filter
+        document.getElementById('categoryYear').addEventListener('change', updateCategoryChart);
+        document.getElementById('categoryMonth').addEventListener('change', updateCategoryChart);
+
+        // Initial render
+        updateCategoryChart();
+    </script>
+
+    <script>
+        const ctxArea = document.getElementById('areaChart').getContext('2d');
+
+        // Generate label area sesuai jumlah
+        function generateAreaLabels(count = 20) {
+            return Array.from({ length: count }, (_, i) => `Area ${i + 1}`);
+        }
+
+        // Generate data dummy
+        function generateDummyAreaData(count = 20) {
+            return Array.from({ length: count }, () => Math.floor(Math.random() * 100));
+        }
+
+        const initialCount = 20;
+        const areaLabels = generateAreaLabels(initialCount);
+        const areaData = generateDummyAreaData(initialCount);
+
+        const areaChart = new Chart(ctxArea, {
             type: 'bar',
             data: {
-                labels: ['Safety', 'Quality', 'Compliance'],
+                labels: areaLabels,
                 datasets: [{
-                    label: 'Findings',
-                    data: [50, 120, 100],
-                    backgroundColor: colors,
+                    label: 'Findings by Area',
+                    data: areaData,
+                    backgroundColor: '#0069AA',
+                    borderRadius: 6
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: { size: 9 },
+                            maxRotation: 45,
+                            minRotation: 45,
+                            autoSkip: false
+                        },
+                        maxBarThickness: 5,   // maksimal ketebalan bar (px)
+                        barPercentage: 0.15,    // coba perkecil lagi jadi 15% dari slot
+                        categoryPercentage: 0.4 // perkecil ruang kategori untuk jarak antar bar
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
             }
         });
 
-        // Department
-        new Chart(document.getElementById('departmentChart'), {
+        // Update chart data berdasarkan filter
+        function updateAreaChart() {
+            const year = document.getElementById('areaYear').value;
+            const month = document.getElementById('areaMonth').value;
+
+            // Contoh: jika month dipilih area 15, jika tidak area 20
+            const count = month ? 15 : 20;
+
+            const newLabels = generateAreaLabels(count);
+            const newData = generateDummyAreaData(count);
+
+            areaChart.data.labels = newLabels;
+            areaChart.data.datasets[0].data = newData;
+            areaChart.update();
+        }
+
+        // Event listener
+        document.getElementById('areaYear').addEventListener('change', updateAreaChart);
+        document.getElementById('areaMonth').addEventListener('change', updateAreaChart);
+
+        // Render awal
+        updateAreaChart();
+    </script>
+
+    <script>
+        const ctx = document.getElementById('departmentChart').getContext('2d');
+
+        // Fungsi generate dummy data berdasarkan year dan month
+        function generateDummyData(year, month) {
+            // Dummy labels dept
+            const labels = Array.from({ length: 12 }, (_, i) => `Dept ${i + 1}`);
+
+            // Data random, bisa ditambah logika jika mau beda berdasarkan filter
+            const data = labels.map(() => Math.floor(Math.random() * 80) + 1);
+
+            return { labels, data };
+        }
+
+        // Render chart awal
+        let currentYear = document.getElementById('departmentYear').value;
+        let currentMonth = document.getElementById('departmentMonth').value;
+
+        let { labels, data } = generateDummyData(currentYear, currentMonth);
+
+        let departmentChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['HR', 'Finance', 'Production', 'Logistics'],
-                datasets: [{
-                    label: 'Findings',
-                    data: [30, 60, 90, 40],
-                    backgroundColor: colors,
-                }]
+            labels: labels,
+            datasets: [{
+                label: 'Findings',
+                data: data,
+                backgroundColor: '#0069AA',
+            }]
+            },
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
             }
         });
 
-        // Overdue
-        new Chart(document.getElementById('overdueChart'), {
+        // Update chart saat filter berubah
+        document.getElementById('departmentYear').addEventListener('change', function() {
+            currentYear = this.value;
+            updateChart();
+        });
+
+        document.getElementById('departmentMonth').addEventListener('change', function() {
+            currentMonth = this.value;
+            updateChart();
+        });
+
+        function updateChart() {
+            const newData = generateDummyData(currentYear, currentMonth);
+            departmentChart.data.labels = newData.labels;
+            departmentChart.data.datasets[0].data = newData.data;
+            departmentChart.update();
+        }
+    </script>
+
+    <script>
+        const ctxOverdue = document.getElementById('overdueChart').getContext('2d');
+
+        // Dummy data generator untuk 4 minggu
+        function generateOverdueData(year, month) {
+            const labelsOverdue = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+            const dataOverdue = labelsOverdue.map(() => Math.floor(Math.random() * 16));
+            return { labelsOverdue, dataOverdue };
+        }
+
+        let currentYearOverdue = document.getElementById('overdueYear').value;
+        let currentMonthOverdue = document.getElementById('overdueMonth').value;
+
+        let { labelsOverdue, dataOverdue } = generateOverdueData(currentYearOverdue, currentMonthOverdue);
+
+        let overdueChart = new Chart(ctxOverdue, {
             type: 'line',
             data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                labels: labelsOverdue,
                 datasets: [{
                     label: 'Overdue Count',
-                    data: [5, 8, 4, 9],
-                    borderColor: colors[3],
+                    data: dataOverdue,
+                    borderColor: '#EF4444',
                     backgroundColor: 'rgba(239,68,68,0.1)',
                     fill: true,
                     tension: 0.3,
                 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
             }
         });
+
+        // Event listener untuk update chart jika filter berubah
+        document.getElementById('overdueYear').addEventListener('change', function () {
+            currentYearOverdue = this.value;
+            updateChart();
+        });
+
+        document.getElementById('overdueMonth').addEventListener('change', function () {
+            currentMonthOverdue = this.value;
+            updateChart();
+        });
+
+        function updateChart() {
+            const newData = generateOverdueData(currentYearOverdue, currentMonthOverdue);
+            overdueChart.data.labels = newData.labelsOverdue;
+            overdueChart.data.datasets[0].data = newData.dataOverdue;
+            overdueChart.update();
+        }
+
     </script>
+    
 </div>

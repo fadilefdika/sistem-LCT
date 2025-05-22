@@ -1,8 +1,8 @@
 @php
-    $bahayaColors = [
-        'High' => 'bg-red-500',
-        'Medium' => 'bg-yellow-500',
-        'Low' => 'bg-green-500'
+    $bahayaTextColors = [
+        'High' => 'text-red-600',
+        'Medium' => 'text-yellow-600',
+        'Low' => 'text-green-600'
     ];
 @endphp
 
@@ -31,41 +31,37 @@
                     : 'admin.manajemen-lct.show', 
                 $laporan->id_laporan_lct
             );
+            
         @endphp
 
-        <div class="flex items-center p-4 border-b border-gray-200 transition last:border-b-0">
+        <a href="{{ $link }}" class="flex items-center p-4 border-b border-gray-200 last:border-b-0 transition hover:bg-gray-50">
             <!-- No -->
-            <div class="w-8 text-center font-semibold text-gray-700">
+            <div class="w-8 text-center font-semibold text-gray-700 text-xs">
                 {{ $loop->iteration }}
             </div>
 
             <!-- Due Date -->
-            <div class="w-40 text-sm text-gray-700 px-4">
-                <div class="text-gray-400 text-xs">Due Date</div>
-                <div class="font-medium text-xs">{{ $dueDate }}</div>
+            <div class="w-40 px-4 text-sm text-gray-700">
+                <div class="text-xs text-gray-400">Due Date</div>
+                <div class="text-xs font-medium">{{ $dueDate }}</div>
             </div>
 
             <!-- Hazard Level -->
             <div class="w-32 px-4">
-                <div class="text-gray-400 text-xs mb-1">Hazard Level</div>
-                <span class="inline-block px-2 py-[3px] text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
+                <div class="text-[11px] font-medium text-gray-500 mb-1 tracking-wide uppercase">Hazard Level</div>
+                <span class="inline-block px-2 py-[2px] rounded-full text-xs font-semibold {{ $bahayaTextColors[$laporan->tingkat_bahaya] ?? 'text-gray-500' }}">
                     {{ $laporan->tingkat_bahaya }}
                 </span>
-            </div>
+            </div>            
 
             <!-- PIC -->
             <div class="flex-1 px-4">
-                <div class="text-gray-400 text-xs">PIC</div>
-                <div class="text-gray-800 font-medium truncate max-w-full text-xs">{{ $formattedName }}</div>
+                <div class="text-xs text-gray-400">PIC</div>
+                <div class="text-xs font-medium text-gray-800 truncate max-w-full">
+                    {{ $formattedName }}
+                </div>
             </div>
-
-            <!-- Action -->
-            <div class="w-28 text-right">
-                <a href="{{ $link }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View Details →
-                </a>
-            </div>
-        </div>
+        </a>
 
     @empty
         <div class="text-center py-16 text-gray-500">

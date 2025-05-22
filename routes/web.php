@@ -107,6 +107,15 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
+        // routes/web.php
+        Route::get('/chart/findings', [ProgressPerbaikanController::class, 'chartFindings']);
+        Route::get('/chart/status', [ProgressPerbaikanController::class, 'chartStatus']);
+        Route::get('/chart/category', [ProgressPerbaikanController::class, 'chartCategory']);
+        Route::get('/chart/area', [ProgressPerbaikanController::class, 'chartArea']);
+        Route::get('/chart/department', [ProgressPerbaikanController::class, 'chartDepartment']);
+        // Route::get('/chart/overdue', [ProgressPerbaikanController::class, 'chartOverdue']);
+
+
     });
 
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('ehs.laporan-lct.assignToPic');

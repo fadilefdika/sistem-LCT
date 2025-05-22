@@ -2,38 +2,38 @@
     <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr class="text-left font-semibold text-gray-600">
-                <th scope="col" class="px-3 py-2 w-8 text-center">No</th>
-                <th scope="col" class="px-3 py-2 w-24">Date Finding</th>
-                <th scope="col" class="px-3 py-2 w-28">Area</th>
-                <th scope="col" class="px-3 py-2 w-28">Category</th>
-                <th scope="col" class="px-3 py-2 w-24 text-center">Actions</th>
+                <th scope="col" class="px-3 py-2 text-[11px] w-8 text-center">No</th>
+                <th scope="col" class="px-3 py-2 text-[11px] w-24">Date Finding</th>
+                <th scope="col" class="px-3 py-2 text-[11px] w-28">Area</th>
+                <th scope="col" class="px-3 py-2 text-[11px] w-28">Category</th>
+                <th scope="col" class="px-3 py-2 text-[11px] w-24 text-center">Actions</th>
             </tr>                
         </thead>                
         <tbody class="divide-y divide-gray-200 bg-white">
             @forelse($laporans as $index => $laporan)
             <tr class="hover:bg-gray-100 transition duration-200 ease-in-out">
                 <!-- Nomor Urut -->
-                <td class="px-3 py-2 text-center font-semibold text-gray-800 w-8">
+                <td class="px-3 py-2 text-[11px] text-center font-semibold text-gray-800 w-8">
                     {{ $index + 1 }}
                 </td>
 
                 <!-- Tanggal Temuan -->
-                <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
+                <td class="px-3 py-2 text-[11px] text-gray-800 whitespace-nowrap">
                     {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('d M Y') }}
                 </td>
         
                 <!-- Area -->
-                <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
+                <td class="px-3 py-2 text-[11px] text-gray-800 whitespace-nowrap">
                     {{ $laporan->area->nama_area ?? '-' }}
                 </td>
                     
                 <!-- Kategori -->
-                <td class="px-3 py-2 text-gray-800 whitespace-nowrap">
+                <td class="px-3 py-2 text-[11px] text-gray-800 whitespace-nowrap">
                     {{ $laporan->kategori ? $laporan->kategori->nama_kategori : '-' }}
                 </td>
         
                 <!-- Aksi -->
-                <td class="px-3 py-2 text-center w-24">
+                <td class="px-3 py-2 text-[11px] text-center w-24">
                     <div class="flex flex-col space-y-1 items-center">
                         <!-- Tombol Detail -->
                         @php

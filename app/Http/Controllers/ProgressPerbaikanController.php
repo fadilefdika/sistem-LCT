@@ -12,16 +12,194 @@ use App\Mail\ApprovalNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\AreaLct;
+use App\Models\Kategori;
+use App\Models\LctDepartement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use PhpOffice\PhpPresentation\Shape\Chart\Type\Area;
 
 class ProgressPerbaikanController extends Controller
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.admin.progress-perbaikan.index');
+        // Ambil user dan role sesuai guard
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;
+        } else {
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;
+        }
+
+        // Data dropdown filter
+        $departments = \App\Models\LctDepartement::pluck('nama_departemen', 'id');
+        $areas = \App\Models\AreaLct::whereNull('deleted_at')->pluck('nama_area', 'id');
+
+        $statusGroups = [
+            'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
+            'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
+            'Closed' => ['closed'],
+            'Overdue' => ['overdue'],
+        ];
+
+        $now = Carbon::now();
+
+        // Ambil semua laporan yang belum pernah dicatat overdue
+        $laporanList = LaporanLct::whereNull('first_overdue_date')
+            ->where('status_lct', '!=', 'closed')
+            ->get();
+
+        foreach ($laporanList as $laporan) {
+            $overdue = false;
+
+            if ($laporan->tingkat_bahaya === 'Low') {
+                if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
+                    $overdue = true;
+                }
+            } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                if (
+                    is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
+                ) {
+                    // Safety net jika due_date_temp tidak digunakan
+                    $overdue = true;
+                } elseif (
+                    !is_null($laporan->due_date_temp) &&
+                    is_null($laporan->due_date_perm) &&
+                    Carbon::parse($laporan->due_date_temp)->lt($now)
+                ) {
+                    $overdue = true;
+                } elseif (
+                    !is_null($laporan->due_date_perm) &&
+                    is_null($laporan->date_completion) &&
+                    Carbon::parse($laporan->due_date_perm)->lt($now)
+                ) {
+                    $overdue = true;
+                }
+            }
+
+            if ($overdue) {
+                $laporan->first_overdue_date = $now;
+                $laporan->save();
+            }
+        }
+        // Query utama untuk data laporan
+        $query = LaporanLct::query()
+            ->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+
+        // Filter berdasarkan role
+        if ($role === 'user') {
+            $query->where('user_id', $user->id);
+        } elseif ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+            $query->where('departemen_id', $departemenId);
+        } elseif (!in_array($role, ['ehs'])) {
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+            $query->where('pic_id', $picId);
+        }
+
+        // Filter tambahan dari request
+        if ($request->filled('riskLevel')) {
+            $query->where('tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
+
+            $query->where(function ($q) use ($statuses, $today) {
+                $q->whereIn('status_lct', $statuses);
+
+                if (in_array('overdue', $statuses)) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('tingkat_bahaya', 'Low')
+                                ->whereDate('due_date', '<', $today)
+                                ->whereNull('date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_temp', '<', $today)
+                                ->whereNull('date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_perm', '<', $today)
+                                ->whereNull('date_completion');
+                        });
+                    });
+                }
+            });
+        }
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+        }
+
+        if ($request->filled('departemenId')) {
+            $query->where('departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);  // koreksi dari where('id', $request->areaId) ke area_id
+        }
+
+        // Hanya yang status bukan open
+        $laporans = $query->where('status_lct', '!=', 'open')
+            ->orderBy('order_type')
+            ->orderByDesc('updated_at')
+            ->paginate(10);
+
+        // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
+
+        // Query base untuk statistik, sama filter seperti query utama tapi tanpa paginate dan filter open
+        $baseQuery = LaporanLct::query();
+
+        // Filter role sama seperti di atas
+        if ($role === 'user') {
+            $baseQuery->where('user_id', $user->id);
+        } elseif ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+            $baseQuery->where('departemen_id', $departemenId);
+        } elseif (!in_array($role, ['ehs'])) {
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+            $baseQuery->where('pic_id', $picId);
+        }
+
+        // Filter tanggal dan lainnya
+        if ($request->filled('riskLevel')) {
+            $baseQuery->where('tingkat_bahaya', $request->riskLevel);
+        }
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $baseQuery->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+        }
+        if ($request->filled('departemenId')) {
+            $baseQuery->where('departemen_id', $request->departemenId);
+        }
+        if ($request->filled('areaId')) {
+            $baseQuery->where('area_id', $request->areaId);
+        }
+
+        $availableYears = LaporanLct::selectRaw('YEAR(tanggal_temuan) as year')
+        ->distinct()
+        ->orderByDesc('year')
+        ->pluck('year');
+    
+    
+
+            return view('pages.admin.progress-perbaikan.index', [
+                'laporans' => $laporans,
+                'statusGroups' => $statusGroups,
+                'areas' => $areas,
+                'departments' => $departments,
+                'availableYears' => $availableYears,
+            ]);
+            
     }
+
 
     public function show($id_laporan_lct)
     {
@@ -320,6 +498,308 @@ class ProgressPerbaikanController extends Controller
 
         return view('pages.admin.history.index', compact('history','id_laporan_lct'));
     }
+    
+
+    public function chartFindings(Request $request)
+    {
+        $year = $request->input('year');
+        $month = $request->input('month');
+    
+        $baseQuery = LaporanLct::query();
+    
+        if (!$year || !is_numeric($year)) {
+            return response()->json(['labels' => [], 'data' => []]);
+        }
+    
+        if ($month) {
+            $result = (clone $baseQuery)
+                ->selectRaw('DAY(tanggal_temuan) as hari, COUNT(*) as total')
+                ->whereYear('tanggal_temuan', $year)
+                ->whereMonth('tanggal_temuan', $month)
+                ->groupBy(DB::raw('DAY(tanggal_temuan)'))
+                ->pluck('total', 'hari')
+                ->toArray();
+    
+            $allDays = range(1, 31);
+            $totalTemuan = array_fill_keys($allDays, 0);
+            foreach ($result as $day => $count) {
+                $totalTemuan[$day] = (int) $count;
+            }
+    
+            return response()->json([
+                'labels' => $allDays,
+                'data' => array_values($totalTemuan),
+            ]);
+        } else {
+            $result = (clone $baseQuery)
+                ->selectRaw('MONTH(tanggal_temuan) as bulan, COUNT(*) as total')
+                ->whereYear('tanggal_temuan', $year)
+                ->groupBy(DB::raw('MONTH(tanggal_temuan)'))
+                ->pluck('total', 'bulan')
+                ->toArray();
+    
+            $allMonths = range(1, 12);
+            $totalTemuan = array_fill_keys($allMonths, 0);
+            foreach ($result as $bulan => $count) {
+                $totalTemuan[$bulan] = (int) $count;
+            }
+    
+            return response()->json([
+                'labels' => $allMonths,
+                'data' => array_values($totalTemuan),
+            ]);
+        }
+    }
+
+    public function chartStatus(Request $request)
+    {
+        $year = $request->query('year');
+        $month = $request->query('month');
+
+        $query = LaporanLct::query();
+
+        if ($year) {
+            $query->whereYear('tanggal_temuan', $year);
+        }
+        if ($month) {
+            $query->whereMonth('tanggal_temuan', $month);
+        }
+
+        $records = $query->get();
+        $today = now();
+
+        $chartCounts = [
+            'Open' => 0,
+            'Closed' => 0,
+            'In Progress' => 0,
+            'Overdue' => 0,
+        ];
+
+        foreach ($records as $item) {
+            $status = $item->status_lct;
+            $bahaya = $item->tingkat_bahaya;
+            $completion = $item->date_completion;
+            $due = $item->due_date;
+            $dueTemp = $item->due_date_temp;
+            $duePerm = $item->due_date_perm;
+
+            // Logika Overdue
+            $isOverdue = false;
+
+            if ($bahaya === 'low' && is_null($completion) && $due && $today->gt($due)) {
+                $isOverdue = true;
+            } elseif (in_array($bahaya, ['medium', 'high'])) {
+                if (is_null($dueTemp) && $due && $today->gt($due)) {
+                    $isOverdue = true;
+                } elseif (!is_null($dueTemp) && is_null($duePerm) && $dueTemp && $today->gt($dueTemp)) {
+                    $isOverdue = true;
+                } elseif (!is_null($duePerm) && $today->gt($duePerm) && is_null($completion)) {
+                    $isOverdue = true;
+                }
+            }
+
+            if ($isOverdue) {
+                $chartCounts['Overdue']++;
+            } elseif ($status === 'open') {
+                $chartCounts['Open']++;
+            } elseif ($status === 'closed') {
+                $chartCounts['Closed']++;
+            } else {
+                $chartCounts['In Progress']++;
+            }
+        }
+
+        return response()->json([
+            'labels' => ['Open', 'Closed', 'In Progress', 'Overdue'],
+            'data' => [
+                $chartCounts['Open'],
+                $chartCounts['Closed'],
+                $chartCounts['In Progress'],
+                $chartCounts['Overdue'],
+            ],
+        ]);
+    }
+
+
+    public function chartCategory(Request $request)
+    {
+        $year = $request->query('year');
+        $month = $request->query('month');
+
+        $query = DB::table('lct_laporan as l')
+            ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
+            ->whereNull('k.deleted_at');
+
+        if ($year) {
+            $query->whereYear('l.tanggal_temuan', $year);
+        }
+
+        if ($month) {
+            $query->whereMonth('l.tanggal_temuan', $month);
+        }
+
+        $categoryCounts = $query
+            ->select('k.nama_kategori', DB::raw('COUNT(*) as total'))
+            ->groupBy('k.nama_kategori')
+            ->pluck('total', 'k.nama_kategori')
+            ->toArray();
+
+            $categories = Kategori::whereNull('deleted_at')
+            ->pluck('nama_kategori')
+            ->toArray();
+        
+        // Mapping manual nama panjang ke pendek (untuk chart)
+        $categoryDisplayNames = array_map(function ($name) {
+            return match ($name) {
+                '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' => '5S',
+                'Unsafe Condition' => 'Unsafe Condition',
+                'Unsafe Act' => 'Unsafe Act',
+                'Near miss' => 'Nearmiss',
+                default => $name,
+            };
+        }, $categories);
+        
+        $data = [];
+        foreach ($categories as $i => $category) {
+            $data[] = $categoryCounts[$category] ?? 0;
+        }
+
+        return response()->json([
+            'labels' => $categoryDisplayNames,
+            'data' => $data,
+        ]);
+    }
+
+    public function chartArea(Request $request)
+    {
+        $year = $request->query('year');
+        $month = $request->query('month');
+
+        // Ambil semua area aktif (tidak dihapus)
+        $areas = AreaLct::whereNull('deleted_at')
+            ->orderBy('nama_area')
+            ->pluck('nama_area', 'id');
+
+        $query = DB::table('lct_laporan')
+            ->select('area_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('area_id', $areas->keys()) // hanya area aktif
+            ->when($year, fn($q) => $q->whereYear('tanggal_temuan', $year))
+            ->when($month, fn($q) => $q->whereMonth('tanggal_temuan', $month))
+            ->groupBy('area_id')
+            ->pluck('total', 'area_id')
+            ->toArray();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($areas as $id => $nama) {
+            $labels[] = $nama;
+            $data[] = $query[$id] ?? 0;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data,
+        ]);
+    }
+
+    public function chartDepartment(Request $request)
+    {
+        $year = $request->query('year');
+        $month = $request->query('month');
+
+        // Ambil semua departemen aktif
+        $departments = LctDepartement::whereNull('deleted_at')
+            ->orderBy('nama_departemen')
+            ->pluck('nama_departemen', 'id');
+
+        // Query laporan_lct hitung temuan per departemen sesuai filter
+        $query = DB::table('lct_laporan')
+            ->select('departemen_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('departemen_id', $departments->keys())
+            ->when($year, fn($q) => $q->whereYear('tanggal_temuan', $year))
+            ->when($month, fn($q) => $q->whereMonth('tanggal_temuan', $month))
+            ->groupBy('departemen_id')
+            ->pluck('total', 'departemen_id')
+            ->toArray();
+
+        $labels = [];
+        $data = [];
+
+        foreach ($departments as $id => $name) {
+            $labels[] = $name;
+            $data[] = $query[$id] ?? 0;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data,
+        ]);
+    }
+
+    // public function chartOverdue(Request $request)
+    // {
+    //     $year = $request->query('year');
+    //     $month = $request->query('month');
+
+    //     $query = DB::table('lct_laporan')
+    //         ->whereNotNull('first_overdue_date');
+
+    //     if ($year) {
+    //         $query->whereYear('first_overdue_date', $year);
+    //     }
+
+    //     if ($month) {
+    //         // Filter per tanggal dalam bulan tsb
+    //         $query->whereMonth('first_overdue_date', $month);
+
+    //         $results = $query
+    //             ->select(DB::raw("DAY(first_overdue_date) as label"), DB::raw("COUNT(*) as total"))
+    //             ->groupBy(DB::raw("DAY(first_overdue_date)"))
+    //             ->orderBy(DB::raw("DAY(first_overdue_date)"))
+    //             ->pluck('total', 'label')
+    //             ->toArray();
+
+    //         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year ?? now()->year);
+    //         $labels = range(1, $daysInMonth);
+    //     } else {
+    //         // Filter per bulan dalam tahun
+    //         $results = $query
+    //             ->select(DB::raw("MONTH(first_overdue_date) as label"), DB::raw("COUNT(*) as total"))
+    //             ->groupBy(DB::raw("MONTH(first_overdue_date)"))
+    //             ->orderBy(DB::raw("MONTH(first_overdue_date)"))
+    //             ->pluck('total', 'label')
+    //             ->toArray();
+
+    //         $labels = [
+    //             1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
+    //             5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug',
+    //             9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'
+    //         ];
+    //     }
+
+    //     $chartLabels = [];
+    //     $chartData = [];
+
+    //     foreach ($labels as $key => $label) {
+    //         if ($month) {
+    //             // label adalah angka 1-31
+    //             $chartLabels[] = $label;
+    //             $chartData[] = $results[$label] ?? 0;
+    //         } else {
+    //             // label adalah nama bulan, key adalah angka 1-12
+    //             $chartLabels[] = $label;
+    //             $chartData[] = $results[$key] ?? 0;
+    //         }
+    //     }
+        
+
+    //     return response()->json([
+    //         'labelsOverdue' => $chartLabels,
+    //         'dataOverdue' => $chartData,
+    //     ]);
+    // }
+
     
 
 }
