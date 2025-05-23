@@ -27,7 +27,22 @@ function renderFindingChart(labels, data) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { title: { display: true, text: "Date" } },
+                x: {
+                    title: { display: true, text: "Date" },
+                    ticks: {
+                        callback: function (value, index, ticks) {
+                            const date = new Date(this.getLabelForValue(value));
+                            const day = date
+                                .getDate()
+                                .toString()
+                                .padStart(2, "0");
+                            const month = date.toLocaleString("default", {
+                                month: "short",
+                            });
+                            return `${day} ${month}`;
+                        },
+                    },
+                },
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: "Total Findings" },
@@ -38,26 +53,20 @@ function renderFindingChart(labels, data) {
     });
 }
 
-function loadFindingData(year, month) {
-    fetch(`/ehs/reporting/chart/findings?year=${year}&month=${month || ""}`)
+function loadFindingData() {
+    const queryString = window.location.search; // Ambil semua query dari URL
+
+    fetch(`/ehs/reporting/chart/findings${queryString}`)
         .then((res) => res.json())
         .then(({ labels, data }) => {
             renderFindingChart(labels, data);
         });
 }
 
-const yearSelect = document.getElementById("findingYear");
-const monthSelect = document.getElementById("findingMonth");
-
-yearSelect.addEventListener("change", () =>
-    loadFindingData(yearSelect.value, monthSelect.value)
-);
-monthSelect.addEventListener("change", () =>
-    loadFindingData(yearSelect.value, monthSelect.value)
-);
-
-// Load default on page load
-loadFindingData(yearSelect.value, monthSelect.value);
+// Panggil loadFindingData() saat halaman selesai dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    loadFindingData();
+});
 
 // statusChart
 let ctxStatus = document.getElementById("statusChart").getContext("2d");

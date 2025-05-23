@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
     // Progress Perbaikan
     Route::prefix('reporting')->name('admin.reporting.')->group(function () {
         Route::get('/', [ProgressPerbaikanController::class, 'index'])->name('index');
+        Route::get('/filter', [ProgressPerbaikanController::class, 'index'])->name('index.filter');
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
@@ -105,6 +106,7 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
     // Progress Perbaikan
     Route::prefix('reporting')->name('ehs.reporting.')->group(function () {
         Route::get('/', [ProgressPerbaikanController::class, 'index'])->name('index');
+        Route::get('/filter', [ProgressPerbaikanController::class, 'index'])->name('index.filter');
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');

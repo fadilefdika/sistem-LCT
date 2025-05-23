@@ -16,124 +16,116 @@
                   $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
               @endphp
 
-              <div class="flex justify-between items-center flex-wrap gap-3 mb-5">
-                  <!-- Filter Button + Popover -->
-                  <div x-data="{ open: false }" class="relative z-50">
-                      <button @click="open = !open"
-                          class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
-                          </svg>
-                          Filter
-                      </button>
+        <div x-data="{ showFilter: false }" class="mb-5">
 
-                    <div x-show="open" x-cloak @click.outside="open = false" x-transition
-                        class="absolute top-full mb-3 left-0 w-[80vw] max-w-4xl bg-white border border-gray-300 shadow-xl rounded-xl p-4 space-y-4 max-h-[70vh] overflow-y-auto">
-                        
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-sm font-semibold text-gray-800">Filter Options</h2>
-                            <button @click="open = false" class="text-gray-500 hover:text-gray-800 transition">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                    
-                        <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            
-                            <!-- Risk Level -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Hazard Level</label>
-                                <select name="riskLevel" class="w-full rounded-lg border-gray-200 text-sm p-2.5">
-                                    <option value="">All Hazard Levels</option>
-                                    <option value="Low" {{ request('riskLevel') == 'Low' ? 'selected' : '' }}>Low</option>
-                                    <option value="Medium" {{ request('riskLevel') == 'Medium' ? 'selected' : '' }}>Medium</option>
-                                    <option value="High" {{ request('riskLevel') == 'High' ? 'selected' : '' }}>High</option>
-                                </select>
-                            </div>
-                    
-                            <!-- Status LCT -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">LCT Status</label>
-                                <select name="statusLct" class="w-full rounded-lg border-gray-200 text-sm p-2.5">
-                                    <option value="">All Statuses</option>
-                                    @foreach ($statusGroups as $label => $statuses)
-                                        <option value="{{ implode(',', $statuses) }}"
-                                            {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                    
-                            <!-- From Date -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">From Date</label>
-                                <input type="date" name="tanggalAwal" value="{{ request('tanggalAwal') }}"
-                                    class="w-full rounded-lg border-gray-200 text-sm p-2.5" />
-                            </div>
-                    
-                            <!-- To Date -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">To Date</label>
-                                <input type="date" name="tanggalAkhir" value="{{ request('tanggalAkhir') }}"
-                                    class="w-full rounded-lg border-gray-200 text-sm p-2.5" />
-                            </div>
-                    
-                            <!-- Department -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Department</label>
-                                <select name="departemenId" class="w-full rounded-lg border-gray-200 text-sm p-2.5">
-                                    <option value="">All Departments</option>
-                                    @foreach ($departments as $id => $nama)
-                                        <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
-                                            {{ $nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                    
-                            <!-- Area -->
-                            <div>
-                                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Area</label>
-                                <select name="areaId" class="w-full rounded-lg border-gray-200 text-sm p-2.5">
-                                    <option value="">All Areas</option>
-                                    @foreach ($areas as $id => $nama)
-                                        <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
-                                            {{ $nama }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                    
-                            <!-- Action Buttons -->
-                            <div class="flex items-end gap-3 md:col-span-2 lg:col-span-4">
-                                <button type="submit"
-                                    class="px-4 py-2.5 text-sm font-medium rounded-lg bg-black text-white cursor-pointer focus:outline-none">
-                                    Filters
-                                </button>
-                                <a href="{{ route($routePrefix . '.reporting.index') }}"
-                                    class="px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none">
-                                    Reset
-                                </a>
-                            </div>
-                        </form>
+            <!-- Top Bar -->
+            <div class="flex justify-between items-center flex-wrap gap-3">
+            <!-- Filter Button -->
+            <div>
+                <button @click="showFilter = !showFilter"
+                class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                Filter
+                </button>
+            </div>
+        
+            <!-- Export Button -->
+            <div>
+                <a class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Export to Excel
+                </a>
+            </div>
+            </div>
+        
+            <!-- Filter Form Section (Hidden by default) -->
+            <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-3">
+                <h2 class="text-xs font-semibold text-gray-800 mb-2">Filter Options</h2>
+
+                <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+
+                    <!-- Date Range -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Date Range</label>
+                        <input type="text" class="w-full rounded-md border-gray-200 text-xs p-2" name="daterange" 
+                            id="kt_daterangepicker_4" placeholder="Select range" autocomplete="off" />
+                        <input type="hidden" name="tanggalAwal" id="tanggalAwal">
+                        <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
                     </div>
-                  
-                  </div>
 
-                  <!-- Export Button -->
-                  <div>
-                      <a 
-                          class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                          </svg>
-                          Export to Excel
-                      </a>
-                  </div>
-              </div>
+                    <!-- Hazard Level -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Hazard Level</label>
+                        <select name="riskLevel" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <option value="">All Levels</option>
+                            <option value="Low" {{ request('riskLevel') == 'Low' ? 'selected' : '' }}>Low</option>
+                            <option value="Medium" {{ request('riskLevel') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                            <option value="High" {{ request('riskLevel') == 'High' ? 'selected' : '' }}>High</option>
+                        </select>
+                    </div>
+
+                    <!-- Status LCT -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">LCT Status</label>
+                        <select name="statusLct" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <option value="">All Statuses</option>
+                            @foreach ($statusGroups as $label => $statuses)
+                            <option value="{{ implode(',', $statuses) }}"
+                            {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
+                            {{ $label }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Department -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Department</label>
+                        <select name="departemenId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <option value="">All Depts</option>
+                            @foreach ($departments as $id => $nama)
+                            <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
+                            {{ $nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Area -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Area</label>
+                        <select name="areaId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <option value="">All Areas</option>
+                            @foreach ($areas as $id => $nama)
+                            <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
+                            {{ $nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-5">
+                        <button type="submit"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md bg-black text-white cursor-pointer focus:outline-none">
+                            Apply
+                        </button>
+                        <a href="{{ route($routePrefix . '.reporting.index') }}"
+                            class="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none">
+                            Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        
+        </div>
+        
+
           </div>
       </div>
 
@@ -154,24 +146,6 @@
                     <div class="bg-white p-4 rounded-xl shadow h-[320px] xl:w-2/3 w-full">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-sm font-semibold">Total Findings</h3>
-                            <div class="flex gap-2">
-                                <select id="findingYear" class="text-sm border-gray-300 rounded-md">
-                                    @foreach ($availableYears as $year)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endforeach
-                                </select>
-                                
-                                <select id="findingMonth" class="text-sm border-gray-300 rounded-md">
-                                    <option value="">All Months</option>
-                                    @foreach ([
-                                        1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
-                                        6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
-                                        11 => 'Nov', 12 => 'Dec'
-                                    ] as $num => $month)
-                                        <option value="{{ $num }}">{{ $month }}</option>
-                                    @endforeach
-                                </select>                                
-                            </div>
                         </div>
                         <div class="h-[200px]">
                             <canvas id="findingChart"></canvas>
@@ -296,30 +270,6 @@
                         </div>
                     </div>
 
-                    {{-- <!-- Overdue -->
-                    <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
-                        <h3 class="text-sm font-semibold mb-2">Overdue Findings</h3>
-                        <div class="flex gap-2 mb-3">
-                            <select id="overdueYear" class="text-sm border-gray-300 rounded-md">
-                                @foreach ($availableYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            
-                            <select id="overdueMonth" class="text-sm border-gray-300 rounded-md">
-                                <option value="">All Months</option>
-                                @foreach ([
-                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
-                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
-                                    11 => 'Nov', 12 => 'Dec'
-                                ] as $num => $month)
-                                    <option value="{{ $num }}">{{ $month }}</option>
-                                @endforeach
-                          </div>
-                        <div class="h-[200px]">
-                            <canvas id="overdueChart"></canvas>
-                        </div>
-                    </div> --}}
                 </div>
             </div>
             
@@ -328,51 +278,11 @@
       @endif
 
     <div class="bg-white p-4 rounded-xl shadow">
-        <div x-data="{ openRow: null }">
-            <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-                <select id="perPageSelect" class="border border-gray-300 text-sm rounded p-1">
-                    <option value="10">10 baris</option>
-                    <option value="15">15 baris</option>
-                    <option value="25">25 baris</option>
-                    <option value="50">50 baris</option>
-                </select>
-                
-                <table class="w-full min-w-full divide-y divide-gray-300 shadow-sm border border-gray-200 rounded-lg">
-                    <thead class="bg-gray-100">
-                        <tr class="text-left text-xs font-semibold text-gray-600">
-                            <th class="px-4 py-3">No</th>
-                            <th class="px-4 py-3 whitespace-nowrap">Finding Date</th>
-                            <th class="px-4 py-3">Due Date</th>
-                            <th class="px-4 py-3">PIC</th>
-                            <th class="px-4 py-3">Hazard Level</th>
-                            <th class="px-4 py-3">Progress Status</th>
-                        </tr>                 
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
-                        @include('partials.tabel-reporting', ['laporans' => $laporans])
-                    </tbody>
-                </table>
-            </div>
+        <div id="report-container">
+            @include('partials.tabel-reporting-wrapper', ['laporans' => $laporans])
         </div>
-
-        <div class="flex items-center justify-between mt-6 px-2">
-            <!-- Left side: Showing info -->
-            <div class="text-sm text-gray-600">
-                Showing
-                <span class="font-semibold">{{ $laporans->firstItem() }}</span>
-                to
-                <span class="font-semibold">{{ $laporans->lastItem() }}</span>
-                of
-                <span class="font-semibold">{{ $laporans->total() }}</span>
-                results
-            </div>
-
-            <!-- Right side: Pagination -->
-            <div>
-                {{ $laporans->withQueryString()->links() }}
-            </div>
-        </div>
-        </div>
+    </div>
+    
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -411,8 +321,108 @@
         });
     </script>
 
+    <script>
+        $(document).ready(function() {
+            var start = moment().subtract(29, "days");
+            var end = moment();
 
+            function cb(start, end) {
+                $("#kt_daterangepicker_4").val(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
+                // Simpan juga ke hidden input dalam format Y-m-d untuk backend
+                $("#tanggalAwal").val(start.format("YYYY-MM-DD"));
+                $("#tanggalAkhir").val(end.format("YYYY-MM-DD"));
+            }
 
+            $("#kt_daterangepicker_4").daterangepicker({
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    "Today": [moment(), moment()],
+                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                    "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                    "This Month": [moment().startOf("month"), moment().endOf("month")],
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                }
+            }, cb);
+
+            cb(start, end);
+        });
+
+    </script>
+    
+    <script>
+        $(document).ready(function() {
+        
+            function fetchData(params = {}) {
+                $.ajax({
+                    url: "{{ route($routePrefix . '.reporting.index') }}",
+                    type: 'GET',
+                    data: params,
+                    success: function(res) {
+                        $('#report-container').html(res);
+                        // Scroll ke atas tabel agar user tau data baru sudah dimuat
+                        if (window.Alpine) {
+                            Alpine.initTree(document.querySelector('#report-container'));
+                        }
+                        $('html, body').animate({ scrollTop: $('#report-container').offset().top - 100 }, 300);
+                    },
+                    error: function() {
+                        alert('Gagal mengambil data.');
+                    }
+                });
+            }
+        
+            // Submit filter via AJAX
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+        
+                // Ambil semua input filter, termasuk tanggalAwal, tanggalAkhir, dropdown dll
+                let params = $(this).serializeArray().reduce((obj, item) => {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+        
+                // Tambahkan perPage saat filter dijalankan supaya konsisten
+                params.perPage = $('#perPageSelect').val() || 10;
+        
+                fetchData(params);
+            });
+        
+            // Handle pagination click (delegated event karena link dinamis)
+            $(document).on('click', '#pagination-links a', function(e) {
+                e.preventDefault();
+        
+                let url = new URL($(this).attr('href'), window.location.origin);
+                let params = Object.fromEntries(url.searchParams.entries());
+        
+                // Ambil filter dari form juga supaya tetap konsisten
+                let formParams = $('form').serializeArray().reduce((obj, item) => {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+        
+                // Gabungkan params
+                params = {...formParams, ...params};
+        
+                fetchData(params);
+            });
+        
+            // Ganti perPage lewat select dropdown
+            $(document).on('change', '#perPageSelect', function() {
+                let params = $('form').serializeArray().reduce((obj, item) => {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+        
+                params.perPage = $(this).val();
+        
+                fetchData(params);
+            });
+        
+        });
+        </script>
+        
     
 
 </x-app-layout>

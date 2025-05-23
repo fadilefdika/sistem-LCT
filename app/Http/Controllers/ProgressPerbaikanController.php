@@ -190,13 +190,18 @@ class ProgressPerbaikanController extends Controller
     
     
 
-            return view('pages.admin.progress-perbaikan.index', [
-                'laporans' => $laporans,
-                'statusGroups' => $statusGroups,
-                'areas' => $areas,
-                'departments' => $departments,
-                'availableYears' => $availableYears,
-            ]);
+        if ($request->ajax()) {
+            // Ini penting! Return partial yang hanya bagian isi
+            return view('partials.tabel-reporting-wrapper', compact('laporans'))->render();
+        }
+        
+        return view('pages.admin.progress-perbaikan.index', [
+            'laporans' => $laporans,
+            'statusGroups' => $statusGroups,
+            'areas' => $areas,
+            'departments' => $departments,
+            'availableYears' => $availableYears,
+        ]);
             
     }
 
@@ -502,53 +507,78 @@ class ProgressPerbaikanController extends Controller
 
     public function chartFindings(Request $request)
     {
-        $year = $request->input('year');
-        $month = $request->input('month');
-    
-        $baseQuery = LaporanLct::query();
-    
-        if (!$year || !is_numeric($year)) {
-            return response()->json(['labels' => [], 'data' => []]);
-        }
-    
-        if ($month) {
-            $result = (clone $baseQuery)
-                ->selectRaw('DAY(tanggal_temuan) as hari, COUNT(*) as total')
-                ->whereYear('tanggal_temuan', $year)
-                ->whereMonth('tanggal_temuan', $month)
-                ->groupBy(DB::raw('DAY(tanggal_temuan)'))
-                ->pluck('total', 'hari')
-                ->toArray();
-    
-            $allDays = range(1, 31);
-            $totalTemuan = array_fill_keys($allDays, 0);
-            foreach ($result as $day => $count) {
-                $totalTemuan[$day] = (int) $count;
-            }
-    
-            return response()->json([
-                'labels' => $allDays,
-                'data' => array_values($totalTemuan),
-            ]);
+        $query = LaporanLct::query();
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
         } else {
-            $result = (clone $baseQuery)
-                ->selectRaw('MONTH(tanggal_temuan) as bulan, COUNT(*) as total')
-                ->whereYear('tanggal_temuan', $year)
-                ->groupBy(DB::raw('MONTH(tanggal_temuan)'))
-                ->pluck('total', 'bulan')
-                ->toArray();
-    
-            $allMonths = range(1, 12);
-            $totalTemuan = array_fill_keys($allMonths, 0);
-            foreach ($result as $bulan => $count) {
-                $totalTemuan[$bulan] = (int) $count;
-            }
-    
-            return response()->json([
-                'labels' => $allMonths,
-                'data' => array_values($totalTemuan),
-            ]);
+            $startDate = now()->startOfMonth();
+            $endDate = now()->endOfMonth();
         }
+        
+        $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+        
+        
+    
+        if ($request->filled('riskLevel')) {
+            $query->where('tingkat_bahaya', $request->riskLevel);
+        }
+    
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
+
+            $query->where(function ($q) use ($statuses, $today) {
+                $q->whereIn('status_lct', $statuses);
+
+                if (in_array('overdue', $statuses)) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('tingkat_bahaya', 'Low')
+                                ->whereDate('due_date', '<', $today)
+                                ->whereNull('date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_temp', '<', $today)
+                                ->whereNull('date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_perm', '<', $today)
+                                ->whereNull('date_completion');
+                        });
+                    });
+                }
+            });
+        }
+    
+        if ($request->filled('departemenId')) {
+            $query->where('departemen_id', $request->departemenId);
+        }
+    
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);  // koreksi dari where('id', $request->areaId) ke area_id
+        }
+    
+        $results = $query->get();
+    
+        // Hitung data chart: jumlah temuan per tanggal, dll
+        $labels = [];
+        $data = [];
+    
+        $grouped = $results->groupBy(function ($item) {
+            return \Carbon\Carbon::parse($item->tanggal_temuan)->format('Y-m-d');
+        });
+        
+    
+        foreach ($grouped as $date => $items) {
+            $labels[] = $date;
+            $data[] = count($items);
+        }
+    
+        return response()->json(['labels' => $labels, 'data' => $data]);
     }
 
     public function chartStatus(Request $request)
