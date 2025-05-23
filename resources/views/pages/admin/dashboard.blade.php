@@ -157,91 +157,92 @@
 
                 </div>
 
-                <!-- Grid Utama untuk Chart Atas -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3">
+                @if(!$isUser)
+                    <!-- Grid Utama untuk Chart Atas -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3">
 
-                    <!-- Chart Garis: Findings per Bulan -->
-                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
-                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings Per Month</h2>
+                        <!-- Chart Garis: Findings per Bulan -->
+                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
+                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings Per Month</h2>
+                                <div class="absolute top-4 right-4 w-28">
+                                    <select id="month-select" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            <div class="h-[200px]">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart Pie: Status Closed/Non-Closed -->
+                        <div class="bg-white rounded-2xl shadow-md p-6 relative">
+                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Status</h2>
                             <div class="absolute top-4 right-4 w-28">
-                                <select id="month-select" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                <select id="month-select-status" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
                                     @for ($m = 1; $m <= 12; $m++)
-                                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
                                     @endfor
                                 </select>
                             </div>
-                        <div class="h-[200px]">
-                            <canvas id="monthlyChart"></canvas>
+                            <div class="flex justify-center items-center h-[200px]">
+                                <canvas id="statusChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Chart Pie: Status Closed/Non-Closed -->
-                    <div class="bg-white rounded-2xl shadow-md p-6 relative">
-                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Status</h2>
-                        <div class="absolute top-4 right-4 w-28">
-                            <select id="month-select-status" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                @endfor
-                            </select>
+                    <!-- Grid untuk Area dan Kategori -->
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
+
+                        <!-- Chart Horizontal: Area -->
+                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-3 relative">
+                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Area</h2>
+                            <div class="absolute top-4 right-4 w-28">
+                                <select id="month-select-area" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="h-[300px]">
+                                <canvas id="areaChart"></canvas>
+                            </div>
                         </div>
-                        <div class="flex justify-center items-center h-[200px]">
-                            <canvas id="statusChart"></canvas>
+
+                        <!-- Chart Vertikal: Kategori -->
+                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
+                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Category</h2>
+                            <div class="absolute top-4 right-4 w-28">
+                                <select id="month-select-category" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="h-[300px]">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Grid untuk Area dan Kategori -->
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
-
-                    <!-- Chart Horizontal: Area -->
-                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-3 relative">
-                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Area</h2>
-                        <div class="absolute top-4 right-4 w-28">
-                            <select id="month-select-area" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="h-[300px]">
-                            <canvas id="areaChart"></canvas>
+                    <!-- Chart Department -->
+                    <div class="grid grid-cols-1 mt-4">
+                        <div class="bg-white rounded-2xl shadow-md p-6 relative">
+                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
+                            <div class="absolute top-6 right-6 w-40">
+                                <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="h-[300px]">
+                                <canvas id="departmentChart"></canvas>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Chart Vertikal: Kategori -->
-                    <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
-                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Category</h2>
-                        <div class="absolute top-4 right-4 w-28">
-                            <select id="month-select-category" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="h-[300px]">
-                            <canvas id="categoryChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chart Department -->
-                <div class="grid grid-cols-1 mt-4">
-                    <div class="bg-white rounded-2xl shadow-md p-6 relative">
-                        <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
-                        <div class="absolute top-6 right-6 w-40">
-                            <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                @for ($m = 1; $m <= 12; $m++)
-                                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        <div class="h-[300px]">
-                            <canvas id="departmentChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
+                @endif
             </div>
         </div>
     </div>

@@ -156,7 +156,7 @@ class DashboardController extends Controller
             }
         } elseif ($roleName === 'user') {
             $laporanMediumHighQuery->where('user_id', $user->id);
-            $laporanOverdue->where('user_id', $user->id);
+            $laporanOverdue = $laporanOverdue->where('user_id', $user->id)->values();
             $laporanNeedApprovalQuery->where('user_id', $user->id);
 
             // Tambahan: Semua laporan milik user

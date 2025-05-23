@@ -90,6 +90,17 @@ class AuthController extends Controller
             ])->withInput();
         }
 
+        if ($user->roleLct->isEmpty()) {
+            // Jika kosong, assign role default: role_id = 1 (employee)
+            $defaultRoleId = 1;
+        
+            // Buat relasi baru di tabel pivot
+            $user->roleLct()->attach($defaultRoleId);
+        
+            // Refresh relasi supaya ada datanya sekarang
+            $user->load('roleLct');
+        }
+        
         $actualRoleId = $user->roleLct->first()->id ?? null;
 
         if ($actualRoleId != $expectedRoleId) {
