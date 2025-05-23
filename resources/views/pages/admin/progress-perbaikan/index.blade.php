@@ -31,7 +31,7 @@
                 </button>
             </div>
         
-            <!-- Export Button -->
+            {{-- <!-- Export Button -->
             <div>
                 <a class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -39,7 +39,7 @@
                 </svg>
                 Export to Excel
                 </a>
-            </div>
+            </div> --}}
             </div>
         
             <!-- Filter Form Section (Hidden by default) -->
@@ -53,10 +53,11 @@
                     <div>
                         <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Date Range</label>
                         <input type="text" class="w-full rounded-md border-gray-200 text-xs p-2" name="daterange" 
-                            id="kt_daterangepicker_4" placeholder="Select range" autocomplete="off" />
+                            id="kt_daterangepicker_4" placeholder="All Time" autocomplete="off" />
                         <input type="hidden" name="tanggalAwal" id="tanggalAwal">
                         <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
                     </div>
+                    
 
                     <!-- Hazard Level -->
                     <div>
@@ -288,6 +289,55 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
+  <script>
+    function confirmClose(id) {
+        Swal.fire({
+            title: 'Are you sure you want to close this report?',
+            text: "The report will be marked as closed.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#16a34a',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, close it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Ambil action dan token dari form
+                const form = document.getElementById(`form-close-${id}`);
+                const action = form.getAttribute('action');
+                const csrf = form.querySelector('input[name="_token"]').value;
+
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed");
+                    return res.json(); // opsional, tergantung response controller kamu
+                })
+                .then(data => {
+                    Swal.fire({
+                        title: 'Closed!',
+                        text: 'The report has been successfully closed.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload(); // Refresh halaman setelah modal sukses ditutup
+                    });
+                })
+                .catch(err => {
+                    Swal.fire('Error', 'Failed to close the report.', 'error');
+                });
+            }
+        });
+    }
+
+</script>
+
+
     <script src="{{ asset('js/charts.js') }}"></script>
 
     @php
@@ -323,19 +373,22 @@
 
     <script>
         $(document).ready(function() {
-            var start = moment().subtract(29, "days");
-            var end = moment();
+            // Default tidak ada range (All Time)
+            function clearRange() {
+                $("#kt_daterangepicker_4").val("All Time");
+                $("#tanggalAwal").val('');
+                $("#tanggalAkhir").val('');
+            }
 
             function cb(start, end) {
                 $("#kt_daterangepicker_4").val(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
-                // Simpan juga ke hidden input dalam format Y-m-d untuk backend
                 $("#tanggalAwal").val(start.format("YYYY-MM-DD"));
                 $("#tanggalAkhir").val(end.format("YYYY-MM-DD"));
             }
 
             $("#kt_daterangepicker_4").daterangepicker({
-                startDate: start,
-                endDate: end,
+                autoUpdateInput: false,
+                opens: 'left',
                 ranges: {
                     "Today": [moment(), moment()],
                     "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
@@ -344,11 +397,21 @@
                     "This Month": [moment().startOf("month"), moment().endOf("month")],
                     "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
                 }
-            }, cb);
+            });
 
-            cb(start, end);
+            // Set default ke All Time (kosong)
+            clearRange();
+
+            // Ketika user pilih range, update input dan hidden
+            $("#kt_daterangepicker_4").on('apply.daterangepicker', function(ev, picker) {
+                cb(picker.startDate, picker.endDate);
+            });
+
+            // Kalau user cancel, set ke All Time
+            $("#kt_daterangepicker_4").on('cancel.daterangepicker', function(ev, picker) {
+                clearRange();
+            });
         });
-
     </script>
     
     <script>

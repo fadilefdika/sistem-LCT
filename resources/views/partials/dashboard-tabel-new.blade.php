@@ -66,7 +66,7 @@
                         @if ($userRole == 'ehs')
                         <!-- Tombol Closed (dengan SweetAlert2) -->
                             <form id="form-close-{{ $laporan->id_laporan_lct }}"
-                                action="{{ route('admin.laporan-lct.closed', $laporan->id_laporan_lct) }}"
+                                action="{{ route('ehs.laporan-lct.closed', $laporan->id_laporan_lct) }}"
                                 method="POST" class="inline-block">
                             @csrf
                             <button type="button"

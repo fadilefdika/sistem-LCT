@@ -338,15 +338,44 @@
                                                     </div>
                                             
                                                     <!-- Action Button -->
-                                                    <div class="flex justify-end pt-2">
+                                                    <div class="flex justify-end pt-2 space-x-4">
                                                         <a href="{{ route($routeName, $laporan->id_laporan_lct) }}"
-                                                            class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                                                            Details
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-150 ease-in-out">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                                             </svg>
+                                                            Details
                                                         </a>
+
+                                                        @php
+                                                            // Cek apakah pengguna adalah EHS atau bukan
+                                                            if (Auth::guard('ehs')->check()) {
+                                                                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
+                                                                $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                                                            } else {
+                                                                // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
+                                                                $userRole = optional(auth()->user()->roleLct->first())->name;
+                                                            }
+                                                        @endphp
+                                                        @if ($userRole == 'ehs' && $laporan->status_lct == 'open')
+                                                            <form id="form-close-{{ $laporan->id_laporan_lct }}"
+                                                                action="{{ route('ehs.laporan-lct.closed', $laporan->id_laporan_lct) }}"
+                                                                method="POST" class="inline-block">
+                                                                @csrf
+                                                                <button type="button"
+                                                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-green-600 text-white text-xs font-semibold shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-150 ease-in-out"
+                                                                        onclick="confirmClose('{{ $laporan->id_laporan_lct }}')">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                            d="M6 18L18 6M6 6l12 12"/>
+                                                                    </svg>
+                                                                    Closed
+                                                                </button>
+                                                            </form>
+                                                        @endif                                                    
                                                     </div>
+
                                                 </div>
                                             </div>
                                         

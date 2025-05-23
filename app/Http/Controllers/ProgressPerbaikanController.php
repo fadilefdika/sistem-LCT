@@ -38,6 +38,7 @@ class ProgressPerbaikanController extends Controller
         $areas = \App\Models\AreaLct::whereNull('deleted_at')->pluck('nama_area', 'id');
 
         $statusGroups = [
+            'Open' => ['open'],
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
             'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
@@ -148,10 +149,11 @@ class ProgressPerbaikanController extends Controller
         }
 
         // Hanya yang status bukan open
-        $laporans = $query->where('status_lct', '!=', 'open')
+        $laporans = $query
             ->orderBy('order_type')
             ->orderByDesc('updated_at')
             ->paginate(10);
+
 
         // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
 

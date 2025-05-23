@@ -122,11 +122,25 @@
                 if (this.value === 'ehs') {
                     npkInput.type = 'text';
                     npkInput.placeholder = 'Enter your username here...';
+                    // Hide Form Laporan tab
+                    document.getElementById('tab-form').style.display = 'none';
+
+                    // Pastikan redirect_to default ke dashboard kalau sebelumnya form aktif
+                    setRedirectTo('dashboard');
                 } else {
                     npkInput.type = 'number';
                     npkInput.placeholder = 'Enter your NPK here...';
+
+                    // Show Form Laporan tab
+                    document.getElementById('tab-form').style.display = 'inline-block';
                 }
             });
+            
+            // Jika saat load halaman role sudah "ehs", langsung sembunyikan tab form
+            if (roleSelect.value === 'ehs') {
+                document.getElementById('tab-form').style.display = 'none';
+                setRedirectTo('dashboard');
+            }
 
             // Default tab
             setRedirectTo('dashboard');
