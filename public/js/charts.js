@@ -132,16 +132,6 @@ updateStatusChart();
 
 const ctxCategory = document.getElementById("categoryChart").getContext("2d");
 
-// Warna default, akan diulang jika kategori lebih dari jumlah warna
-const baseColors = [
-    "#F87171",
-    "#60A5FA",
-    "#34D399",
-    "#FBBF24",
-    "#A78BFA",
-    "#F472B6",
-];
-
 const categoryChart = new Chart(ctxCategory, {
     type: "bar",
     data: {
@@ -150,7 +140,7 @@ const categoryChart = new Chart(ctxCategory, {
             {
                 label: "Findings",
                 data: [],
-                backgroundColor: [],
+                backgroundColor: [], // akan diisi dengan warna #0069AA
             },
         ],
     },
@@ -176,9 +166,9 @@ function updateCategoryChart() {
             categoryChart.data.labels = labels;
             categoryChart.data.datasets[0].data = data;
 
-            // Generate warna otomatis sesuai jumlah kategori
+            // Set semua warna batang menjadi #0069AA
             categoryChart.data.datasets[0].backgroundColor = labels.map(
-                (_, index) => baseColors[index % baseColors.length]
+                () => "#0069AA"
             );
 
             categoryChart.update();
@@ -209,7 +199,6 @@ const areaChart = new Chart(ctxArea, {
                 label: "Findings by Area",
                 data: [],
                 backgroundColor: "#0069AA",
-                borderRadius: 6,
             },
         ],
     },

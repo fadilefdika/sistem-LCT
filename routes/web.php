@@ -69,6 +69,7 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
+        Route::get('/paginated', [ProgressPerbaikanController::class, 'getPaginatedData'])->name('paginated');
     });
 
     
@@ -107,6 +108,8 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
+        Route::get('/paginated', [ProgressPerbaikanController::class, 'getPaginatedData'])->name('paginated');
+
         // routes/web.php
         Route::get('/chart/findings', [ProgressPerbaikanController::class, 'chartFindings']);
         Route::get('/chart/status', [ProgressPerbaikanController::class, 'chartStatus']);

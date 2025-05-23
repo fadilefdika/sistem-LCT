@@ -49,7 +49,7 @@
     </div>
 
     <!-- Modal Tambah/Edit Area -->
-    <div id="areaModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
+    <div id="areaModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-56 hidden">
         <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
             <h2 class="text-lg font-medium text-gray-800 mb-3">
                 <span id="modalTitle">Add Area</span>
@@ -75,6 +75,16 @@
 </div>
 
 <!-- SCRIPT -->
+
+<script>
+    @php
+         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+         $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+     @endphp
+
+         // Kirim role ke JS
+      const userRole = "{{ $roleName }}";
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function openModal(editMode = false, area = null) {
@@ -106,7 +116,17 @@
             e.preventDefault();
             let formData = new FormData(this);
             let areaId = document.getElementById("areaId").value;
-            let url = areaId ? `/master-data/area-data/${areaId}` : "/master-data/area-data";
+            let baseUrl;
+
+            if (userRole === 'ehs') {
+                baseUrl = '/ehs/master-data/area-data';
+            } else if (userRole === 'manajer') {
+                baseUrl = '/admin/master-data/area-data';
+            } else {
+                baseUrl = '/master-data/area-data';
+            }
+
+            let url = areaId ? `${baseUrl}/${areaId}` : baseUrl;
 
             if (areaId) {
                 formData.append('_method', 'PUT'); // Untuk Laravel PUT
@@ -161,7 +181,17 @@
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    let response = await fetch(`/master-data/area-data/${id}`, {
+                    let baseUrl;
+
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/area-data';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/area-data';
+                    } else {
+                        baseUrl = '/master-data/area-data';
+                    }
+
+                    let response = await fetch(`${baseUrl}/${id}`, {
                         method: "DELETE",
                         headers: {
                             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content

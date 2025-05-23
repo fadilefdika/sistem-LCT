@@ -9,26 +9,35 @@
                 <!-- Summary Cards -->
                 <div class="bg-blue-600 text-white p-4 rounded-lg shadow-lg">
                     <h3 class="font-medium text-white/80">Total Findings</h3>
-                    <p class="text-3xl font-bold">1,248</p>
-                    <div class="text-sm mt-2">↑ 12% from last month</div>
+                    <p class="text-3xl font-bold">{{$totalFindings}}</p>
+                    <div class="text-sm mt-2 {{ $totalFindingsChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
+                        {{ $totalFindingsChange >= 0 ? '↑' : '↓' }} {{ abs($totalFindingsChange) }}% from last month
+                    </div>
+                    
                 </div>
                 
                 <div class="bg-green-600 text-white p-4 rounded-lg shadow-lg">
                     <h3 class="font-medium text-white/80">Resolved</h3>
-                    <p class="text-3xl font-bold">892</p>
-                    <div class="text-sm mt-2">↑ 8% from last month</div>
+                    <p class="text-3xl font-bold">{{$resolved}}</p>
+                    <div class="text-sm mt-2 {{ $resolvedChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
+                        {{ $resolvedChange >= 0 ? '↑' : '↓' }} {{ abs($resolvedChange) }}% from last month
+                    </div>
                 </div>
                 
                 <div class="bg-amber-500 text-white p-4 rounded-lg shadow-lg">
                     <h3 class="font-medium text-white/80">Overdue</h3>
-                    <p class="text-3xl font-bold">156</p>
-                    <div class="text-sm mt-2">↓ 3% from last month</div>
+                    <p class="text-3xl font-bold">{{$overdue}}</p>
+                    <div class="text-sm mt-2 {{ $overdueChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
+                        {{ $overdueChange >= 0 ? '↑' : '↓' }} {{ abs($overdueChange) }}% from last month
+                    </div>
                 </div>
                 
                 <div class="bg-red-600 text-white p-4 rounded-lg shadow-lg">
                     <h3 class="font-medium text-white/80">High Risk</h3>
-                    <p class="text-3xl font-bold">42</p>
-                    <div class="text-sm mt-2">↑ 5% from last month</div>
+                    <p class="text-3xl font-bold">{{$highRisk}}</p>
+                    <div class="text-sm mt-2 {{ $highRiskChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
+                        {{ $highRiskChange >= 0 ? '↑' : '↓' }} {{ abs($highRiskChange) }}% from last month
+                    </div>
                 </div>
             </div>
 
@@ -417,13 +426,10 @@
     function fetchAreaChartData(year, month) {
         const url = userRole === 'ehs' ? '/ehs/dashboard/area-chart-data' : '/dashboard/area-chart-data';
 
-        console.log('Fetching area chart for:', year, month);
-
         $.ajax({
             url: url,
             data: { year, month },
             success: function (res) {
-                console.log('Area chart data:', res);
                 renderAreaChart(res.areaStatusCounts);
             },
             error: function (xhr) {

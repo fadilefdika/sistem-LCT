@@ -140,6 +140,16 @@
 </div>
 
 <script>
+    @php
+         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+         $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+     @endphp
+
+         // Kirim role ke JS
+      const userRole = "{{ $roleName }}";
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         function openModal(editMode = false, pic = null) {
             const modal = document.getElementById("picModal");
@@ -186,7 +196,17 @@
                     userList.classList.remove("hidden");
                     loadingSpinnerUser.classList.remove("hidden");
 
-                    let responseUsers = await fetch(`/master-data/role-data/search-users?q=${query}`, { signal });
+                    let baseUrl;
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/role-data/search-users';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/role-data/search-users';
+                    } else {
+                        baseUrl = '/master-data/role-data/search-users';
+                    }
+
+                    let responseUsers = await fetch(`${baseUrl}?q=${query}`, { signal });
+
                     let dataUsers = await responseUsers.json();
 
                     loadingSpinnerUser.classList.add("hidden");
@@ -241,7 +261,17 @@
                     departmentList.classList.remove("hidden");
                     loadingSpinnerDept.classList.remove("hidden");
 
-                    let response = await fetch(`/master-data/role-data/search-department?q=${query}`, { signal });
+                    let baseUrl;
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/role-data/search-department';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/role-data/search-department';
+                    } else {
+                        baseUrl = '/master-data/role-data/search-department';
+                    }
+
+                    let response = await fetch(`${baseUrl}?q=${query}`, { signal });
+
                     let dataDepartments = await response.json();
 
                     loadingSpinnerDept.classList.add("hidden");
@@ -282,7 +312,16 @@
             e.preventDefault();
             let formData = new FormData(this);
             let picId = document.getElementById("picId").value;
-            let url = picId ? `/master-data/role-data/${picId}` : "/master-data/role-data";
+            let baseUrl;
+            if (userRole === 'ehs') {
+                baseUrl = '/ehs/master-data/role-data';
+            } else if (userRole === 'manajer') {
+                baseUrl = '/admin/master-data/role-data';
+            } else {
+                baseUrl = '/master-data/role-data';
+            }
+
+            let url = picId ? `${baseUrl}/${picId}` : baseUrl;
             let method = picId ? "PUT" : "POST";
 
             console.log("Data sebelum dikirim:");
@@ -360,11 +399,21 @@
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    let response = await fetch(`/master-data/role-data/${id}`, {
-                        method: "DELETE",
-                        headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content }
-                    });
+                    let baseUrl;
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/role-data';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/role-data';
+                    } else {
+                        baseUrl = '/master-data/role-data';
+                    }
 
+                    let response = await fetch(`${baseUrl}/${id}`, {
+                        method: "DELETE",
+                        headers: { 
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content 
+                        }
+                    });
                     if (response.ok) {
                         Swal.fire({
                             title: "Deleted!",

@@ -29,14 +29,6 @@ class DashboardController extends Controller
         }
         
 
-        $monthNames = [
-            1 => "January", 2 => "February", 3 => "March", 4 => "April",
-            5 => "May", 6 => "June", 7 => "July", 8 => "August",
-            9 => "September", 10 => "October", 11 => "November", 12 => "December"
-        ];
-
-        $currentYear = now()->year;
-
         $findings = LaporanLct::selectRaw('YEAR(created_at) as year')
                     ->distinct()
                     ->pluck('year');
@@ -184,6 +176,88 @@ class DashboardController extends Controller
             }
         }
 
+        // Ambil tanggal awal dan akhir bulan ini
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
+        $filteredQuery = LaporanLct::whereBetween('created_at', [$startOfMonth, $endOfMonth]);
+
+        $filteredLastMonthQuery = LaporanLct::whereBetween('created_at', [
+            Carbon::now()->subMonth()->startOfMonth(),
+            Carbon::now()->subMonth()->endOfMonth(),
+        ]);
+
+        // Terapkan filter sesuai role
+        if ($roleName === 'pic') {
+            $picId = Pic::where('user_id', $user->id)->value('id');
+            if ($picId) {
+                $filteredQuery->where('pic_id', $picId);
+                $filteredLastMonthQuery->where('pic_id', $picId);
+            } else {
+                $filteredQuery->whereRaw('1 = 0');
+                $filteredLastMonthQuery->whereRaw('1 = 0');
+            }
+        } elseif ($roleName === 'user') {
+            $filteredQuery->where('user_id', $user->id);
+            $filteredLastMonthQuery->where('user_id', $user->id);
+        } elseif ($roleName === 'manajer') {
+            $departemenId = LctDepartement::where('user_id', $user->id)->value('id');
+            if ($departemenId) {
+                $filteredQuery->where('departemen_id', $departemenId);
+                $filteredLastMonthQuery->where('departemen_id', $departemenId);
+            } else {
+                $filteredQuery->whereRaw('1 = 0');
+                $filteredLastMonthQuery->whereRaw('1 = 0');
+            }
+        }
+
+        // Bulan ini
+        $totalFindings = (clone $filteredQuery)->count();
+        $resolved = (clone $filteredQuery)->where('status_lct', 'closed')->count();
+        $overdue = (clone $filteredQuery)->where('status_lct', '!=', 'closed')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('tingkat_bahaya', 'Low')
+                    ->whereNull('date_completion')
+                    ->whereDate('due_date', '<', now());
+                })->orWhere(function ($q) {
+                    $q->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                    ->whereNull('date_completion')
+                    ->whereDate('due_date', '<', now());
+                });
+            })->count();
+        $highRisk = (clone $filteredQuery)->where('tingkat_bahaya', 'High')->count();
+
+        // Bulan lalu
+        $lastMonthTotalFindings = (clone $filteredLastMonthQuery)->count();
+        $lastMonthResolved = (clone $filteredLastMonthQuery)->where('status_lct', 'closed')->count();
+        $lastMonthOverdue = (clone $filteredLastMonthQuery)->where('status_lct', '!=', 'closed')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('tingkat_bahaya', 'Low')
+                    ->whereNull('date_completion')
+                    ->whereDate('due_date', '<', now());
+                })->orWhere(function ($q) {
+                    $q->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                    ->whereNull('date_completion')
+                    ->whereDate('due_date', '<', now());
+                });
+            })->count();
+        $lastMonthHighRisk = (clone $filteredLastMonthQuery)->where('tingkat_bahaya', 'High')->count();
+
+        // Fungsi bantu hitung persentase perubahan
+        function calculateChangePercentage($current, $previous)
+        {
+            if ($previous == 0) return $current == 0 ? 0 : 100;
+            return round((($current - $previous) / $previous) * 100);
+        }
+
+        $totalFindingsChange = calculateChangePercentage($totalFindings, $lastMonthTotalFindings);
+        $resolvedChange = calculateChangePercentage($resolved, $lastMonthResolved);
+        $overdueChange = calculateChangePercentage($overdue, $lastMonthOverdue);
+        $highRiskChange = calculateChangePercentage($highRisk, $lastMonthHighRisk);
+
+
         return view('pages.admin.dashboard', [
             'layout' => 'layouts.admin',
             'findings' => $findings,
@@ -200,6 +274,15 @@ class DashboardController extends Controller
             'laporanInProgress' => $laporanInProgressQuery->take(5)->get(),
             'laporanUser' => $laporanUserQuery?->latest()->take(5)->get() ?? collect(), 
             'roleName' => $roleName,
+            'totalFindings' => $totalFindings,
+            'resolved' => $resolved,
+            'overdue' => $overdue,
+            'highRisk' => $highRisk,
+            'totalFindingsChange' => $totalFindingsChange,
+            'resolvedChange' => $resolvedChange,
+            'overdueChange' => $overdueChange,
+            'highRiskChange' => $highRiskChange,
+
         ]);
     }
 

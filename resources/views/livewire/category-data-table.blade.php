@@ -57,7 +57,7 @@
     </div>
 
     <!-- Modal Tambah/Edit Category -->
-    <div id="categoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
+    <div id="categoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-57 hidden">
         <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
             <h2 class="text-lg font-medium text-gray-800 mb-3">
                 <span id="modalTitle">Add Category</span>
@@ -84,6 +84,15 @@
     </div>
 </div>
 
+<script>
+    @php
+         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+         $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+     @endphp
+
+         // Kirim role ke JS
+      const userRole = "{{ $roleName }}";
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -153,7 +162,16 @@
                     reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/master-data/category-data/${btn.dataset.id}`, {
+                        let baseUrl;
+                        if (userRole === 'ehs') {
+                            baseUrl = '/ehs/master-data/category-data';
+                        } else if (userRole === 'manajer') {
+                            baseUrl = '/admin/master-data/category-data';
+                        } else {
+                            baseUrl = '/master-data/category-data';
+                        }
+
+                        fetch(`${baseUrl}/${btn.dataset.id}`, {
                             method: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -187,7 +205,16 @@
             const id = categoryIdInput.value;
             const nama = namaInput.value;
 
-            const url = id ? `/master-data/category-data/${id}` : `/master-data/category-data`;
+            let baseUrl;
+            if (userRole === 'ehs') {
+                baseUrl = '/ehs/master-data/category-data';
+            } else if (userRole === 'manajer') {
+                baseUrl = '/admin/master-data/category-data';
+            } else {
+                baseUrl = '/master-data/category-data';
+            }
+
+            const url = id ? `${baseUrl}/${id}` : baseUrl;
             const method = id ? 'PUT' : 'POST';
 
             fetch(url, {

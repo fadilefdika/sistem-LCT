@@ -104,7 +104,15 @@
 
 </div>
 
+<script>
+    @php
+         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+         $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+     @endphp
 
+         // Kirim role ke JS
+      const userRole = "{{ $roleName }}";
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -143,8 +151,17 @@
                     userList.innerHTML = "";
                     userList.classList.remove("hidden");
                     loadingSpinner.classList.remove("hidden");
-    
-                    let response = await fetch(`/master-data/department-data/search-users?q=${query}`);
+
+                    let baseUrl;
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/department-data';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/department-data';
+                    } else {
+                        baseUrl = '/master-data/department-data';
+                    }
+
+                    let response = await fetch(`${baseUrl}/search-users?q=${query}`);
                     let data = await response.json();
     
                     userList.innerHTML = "";
@@ -183,7 +200,16 @@
             e.preventDefault();
             let formData = new FormData(this);
             let departmentId = document.getElementById("departmentId").value;
-            let url = departmentId ? `/master-data/department-data/${departmentId}` : "/master-data/department-data";
+            let baseUrl;
+            if (userRole === 'ehs') {
+                baseUrl = '/ehs/master-data/department-data';
+            } else if (userRole === 'manajer') {
+                baseUrl = '/admin/master-data/department-data';
+            } else {
+                baseUrl = '/master-data/department-data';
+            }
+
+            let url = departmentId ? `${baseUrl}/${departmentId}` : baseUrl;
             let method = departmentId ? "PUT" : "POST";
     
             try {
@@ -250,11 +276,21 @@
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    let response = await fetch(`/master-data/department-data/${id}`, {
-                        method: "DELETE",
-                        headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content }
-                    });
+                    let baseUrl;
+                    if (userRole === 'ehs') {
+                        baseUrl = '/ehs/master-data/department-data';
+                    } else if (userRole === 'manajer') {
+                        baseUrl = '/admin/master-data/department-data';
+                    } else {
+                        baseUrl = '/master-data/department-data';
+                    }
 
+                    let response = await fetch(`${baseUrl}/${id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
                     if (response.ok) {
                         Swal.fire({
                             title: "Deleted!",

@@ -800,6 +800,16 @@ class ProgressPerbaikanController extends Controller
     //     ]);
     // }
 
-    
+    public function getPaginatedData(Request $request)
+    {
+        $perPage = $request->input('perPage', 10);
+
+        $laporans = LaporanLct::latest()->paginate($perPage);
+
+        return response()->json([
+            'data' => view('partials.tabel-reporting', compact('laporans'))->render(),
+        ]);
+    }
+
 
 }
