@@ -18,10 +18,9 @@
 
                 <!-- Deskripsi -->
                 <div>
-                    <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Report Your Nonconformity Findings</h4>
+                    <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Laporkan Temuan Ketidaksesuaian Anda</h4>
                     <p class="text-gray-600 text-sm sm:text-base">
-                        Non-conformity findings or LCT (Non-Conformity Finding Report) are essential to ensure that all operational aspects continue to run in accordance with established safety standards and procedures.
-                    </p>
+                    Temuan ketidaksesuaian atau LCT (Laporan Temuan Ketidaksesuaian) sangat penting untuk memastikan bahwa semua aspek operasional terus berjalan sesuai dengan standar dan prosedur keselamatan yang ditetapkan.</p>
                 </div>
             </div>
 
@@ -64,7 +63,7 @@
                         <!-- Nama -->
                         <div>
                             <label for="nama" class="block text-sm font-medium text-gray-700">
-                                Name <span class="text-red-500">*</span>
+                                Nama <span class="text-red-500">*</span>
                             </label>
                             <input 
                                 type="text" 
@@ -81,19 +80,20 @@
                     
                     <div class="grid grid-cols-1 gap-6 mt-4">
                         <!-- Tanggal Temuan -->
-                        <div>
-                            <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">
-                                Date of Finding <span class="text-red-500">*</span>
-                            </label>
-                            <input 
-                                type="date" 
-                                id="tanggal_temuan" 
-                                name="tanggal_temuan" 
-                                class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
-                                required
-                            >
-                            <p class="text-xs text-gray-500 mt-1">Enter the date the LCT was found. Input a maximum of 3 days after the finding.</p> <!-- Deskripsi kecil -->
-                        </div>
+                            <div>
+                                <label for="tanggal_temuan" class="block text-sm font-medium text-gray-700">
+                                    Tanggal Temuan <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="tanggal_temuan" 
+                                    name="tanggal_temuan" 
+                                    class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
+                                    required
+                                    value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" >
+                        
+                                <p class="text-xs text-gray-500 mt-1">Masukkan tanggal ditemukannya LCT. Masukkan maksimal 3 hari setelah ditemukannya LCT.</p> <!-- Deskripsi kecil -->
+                            </div>
 
                         <!-- Area -->
                         <div x-data="{ open: false, selected: '', error: false }">
@@ -105,7 +105,7 @@
                             <div class="relative mt-2">
                                 <div class="flex justify-between items-center px-4 py-2 border border-black rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
                                     @click="open = !open" :class="{ 'border-red-500': error }">
-                                    <span x-text="selected || 'Select Area'" class="text-gray-700"></span>
+                                    <span x-text="selected || 'Pilih Area'" class="text-gray-700"></span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M6 9l6 6 6-6"></path>
@@ -133,10 +133,10 @@
                             <!-- Input Tersembunyi untuk Validasi -->
                             <input type="text" name="area" x-model="selected" required class="absolute opacity-0 w-0 h-0">
 
-                            <p class="text-xs text-gray-500 mt-1">Select the area where the LCT was found.</p> <!-- Deskripsi -->
+                            <p class="text-xs text-gray-500 mt-1">Pilih area dimana LCT ditemukan.</p> <!-- Deskripsi -->
 
                             <!-- Pesan error manual -->
-                            <p x-show="error" class="text-red-500 text-xs mt-1">Please select an area.</p>
+                            <p x-show="error" class="text-red-500 text-xs mt-1">Silakan pilih area.</p>
 
                             <!-- Validasi saat submit -->
                             <script>
@@ -158,7 +158,7 @@
                         <!-- Detail Area -->
                         <div class="order-1 flex flex-col relative" x-data="{ open: false }">
                             <label for="detail_area" class="block text-sm font-medium text-gray-700">
-                                Area Details <span class="text-red-500">*</span>
+                                Detail Area <span class="text-red-500">*</span>
                                 <button type="button" @click.prevent="open = !open" class="text-gray-500 hover:text-gray-700 focus:outline-none">
                                     <img src="{{ asset('images/question-mark-circle-svgrepo-com.svg') }}" alt="question-mark" class="w-4 h-4">
                                 </button>
@@ -169,7 +169,7 @@
                                 class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" 
                                 required>
 
-                            <p class="text-xs text-gray-500 mt-1">Please enter the location or area details of the LCT finding. For example: click the question mark icon.</p>    
+                            <p class="text-xs text-gray-500 mt-1">Harap masukkan detail lokasi atau area temuan LCT. Misalnya: klik ikon tanda tanya.</p>    
 
                             <!-- Dropdown untuk contoh -->
                             <div
@@ -186,16 +186,16 @@
                                 x-cloak
                             >
                                 <div class="p-2">
-                                    <p class="font-semibold mt-2">Example Input:</p>
+                                    <p class="font-semibold mt-2">Contoh Masukan:</p>
                                     <p class="text-sm text-gray-600">Mis: FA Line 2 - Cluster Assy</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Upload Photo -->
+                        <!-- Unggah Foto -->
                         <div class="order-2">
                             <label class="block text-sm font-medium text-gray-700">
-                            Upload Photo <span class="text-red-500">*</span>
+                            Unggah Foto <span class="text-red-500">*</span>
                             </label>
                             
                             <div class="flex flex-col items-center justify-center w-full mt-2 space-y-4">
@@ -206,7 +206,7 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
-                                        Select from Gallery
+                                    Pilih dari Galeri
                                     </button>
                                     
                                     <!-- Camera Button - Now opens native camera app -->
@@ -215,7 +215,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
-                                        Take Photo
+                                    Ambil Foto
                                     </button>
                                 </div>
                             
@@ -231,8 +231,7 @@
                             </div>
                             
                             <p class="text-xs text-gray-500 mt-1">
-                                Upload up to 5 photos related to the LCT finding. Make sure each image file is no larger than 1MB and in PNG, JPG, or GIF format
-                            </p>
+                            Unggah hingga 5 foto yang terkait dengan temuan LCT. Pastikan setiap file gambar tidak lebih besar dari 1MB dan berformat PNG atau JPG </p>
                         </div>
                         <!-- Modal untuk memperbesar gambar -->
                         <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex justify-center items-center z-50">
@@ -246,10 +245,10 @@
                     
                     
                     <div class="flex flex-col gap-6 mt-4">
-                        <!-- Finding Category -->
+                        <!-- Kategori Temuan -->
                         <div x-data="{ open: false, selected: '', error: false }">
                             <label for="area" class="block text-sm font-medium text-gray-700">
-                                Finding Category <span class="text-red-500">*</span>
+                                Kategori Temuan <span class="text-red-500">*</span>
                             </label>
 
                             <!-- Dropdown Input with Icon and Text -->
@@ -284,10 +283,10 @@
                             <!-- Input Tersembunyi untuk Validasi -->
                             <input type="text" name="kategori_temuan" x-model="selected" required class="absolute opacity-0 w-0 h-0">
 
-                            <p class="text-xs text-gray-500 mt-1">Select the category that matches your LCT finding. For example, is it related to unsafe conditions, unsafe actions, or other issues?.</p> <!-- Deskripsi -->
+                            <p class="text-xs text-gray-500 mt-1">Pilih kategori yang sesuai dengan temuan LCT Anda. Misalnya, apakah terkait dengan kondisi yang tidak aman, tindakan yang tidak aman, atau masalah lainnya?.</p> <!-- Deskripsi -->
 
                             <!-- Pesan error manual -->
-                            <p x-show="error" class="text-red-500 text-xs mt-1">Please select a category.</p>
+                            <p x-show="error" class="text-red-500 text-xs mt-1">Silakan pilih kategori.</p>
 
                             <!-- Validasi saat submit -->
                             <script>
@@ -304,10 +303,10 @@
                         </div>
 
                     
-                        <!-- Non-Conformity Finding -->
+                        <!-- Temuan Ketidaksesuaian -->
                         <div class="w-full">
                             <label for="temuan_ketidaksesuaian" class="block text-sm font-medium text-gray-700">
-                                Non-Conformity Finding <span class="text-red-500">*</span>
+                                Temuan Ketidaksesuaian <span class="text-red-500">*</span>
                             </label>
                             <textarea 
                                 id="temuan_ketidaksesuaian" 
@@ -318,20 +317,20 @@
                             ></textarea>
                             
                             <!-- Deskripsi kecil -->
-                            <p class="text-xs text-gray-500 mt-1">Describe the non-conformity finding identified in the LCT area. Provide detailed information to ensure prompt follow-up.</p>
+                            <p class="text-xs text-gray-500 mt-1">Jelaskan temuan ketidaksesuaian yang diidentifikasi di area LCT. Berikan informasi terperinci untuk memastikan tindak lanjut yang cepat.</p>
                         </div>
                     </div>
                     
 
                     <!-- Rekomendasi Safety -->
-                    <div class="mb-4 mt-3">
-                        <label for="rekomendasi_safety" class="block text-sm font-medium text-gray-700">Safety Recommendation <span class="text-red-500">*</span></label>
+                    <div class="mb-4">
+                        <label for="rekomendasi_safety" class="block text-sm font-medium text-gray-700">Rekomendasi Safety <span class="text-red-500">*</span></label>
                         <textarea id="rekomendasi_safety" name="rekomendasi_safety" rows="4" class="mt-2 w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500" required></textarea>
-                        <p class="text-xs text-gray-500">Enter recommendations to correct the unsafe condition or act. Provide suggestions that can help improve safety in the area.</p>
+                        <p class="text-xs text-gray-500">Masukkan rekomendasi untuk memperbaiki kondisi atau tindakan yang tidak aman. Berikan saran yang dapat membantu meningkatkan keselamatan di area tersebut.</p>
                     </div>
 
                     <!-- Tombol Kirim -->
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md focus:ring-2 focus:ring-blue-500 mt-2 cursor-pointer">Submit Report</button>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md focus:ring-2 focus:ring-blue-500 mt-2 cursor-pointer">Kirim Laporan</button>
                 </form>
             </div>
 
@@ -351,7 +350,7 @@
     </script>
 @endif
 
-{{-- Non-Conformity Image --}}
+{{-- Finding Item Image --}}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const maxFiles = 5;
@@ -524,11 +523,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-
 <script>
      document.getElementById('tanggal_temuan').addEventListener('click', function() {
         this.showPicker();
     });
 </script>
-
+<script>
+    // Autofill with today's date
+    document.getElementById('tanggal_temuan').value = new Date().toISOString().split('T')[0];
+</script>
 @endsection

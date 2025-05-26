@@ -505,11 +505,16 @@
                         $bukti_temuan = collect($buktiArray)->map(fn($path) => asset('storage/' . $path));
 
                         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
-                        $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
-                            
-                        $routeName = $laporan->status_lct === 'open'
-                                ? ($roleName === 'ehs' ? 'ehs.reporting.show.new' : 'admin.reporting.show')
-                                : ($roleName === 'ehs' ? 'ehs.reporting.show' : 'admin.reporting.show');
+                        $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');        
+                                        if ($roleName === 'ehs') {
+                                        $routeName = $laporan->status_lct === 'open'
+                                                ? 'ehs.reporting.show.new'
+                                                : 'ehs.reporting.show';
+                                        } elseif ($roleName === 'pic') {
+                                            $routeName = 'admin.manajemen-lct.show';
+                                        } else {
+                                            $routeName = 'admin.reporting.show';
+                                        }
 
                     @endphp
     
@@ -754,13 +759,22 @@
                                                                     <p class="text-xs text-gray-800">{{ \Carbon\Carbon::parse($tp['tanggal'])->format('d M Y') ?? '-' }}</p>
                                                                 </div>
                                                                 <div>
-                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Temporary Due Date</p>
-                                                                    <p class="text-xs text-gray-800">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') ?? '-' }}</p>
+                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+                                                                        {{ strtolower($laporan->tingkat_bahaya) === 'low' ? 'Due Date' : 'Temporary Due Date' }}
+                                                                    </p>
+                                                                    <p class="text-xs text-gray-800">
+                                                                        {{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}
+                                                                    </p>
                                                                 </div>
-                                                                <div>
-                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Permanent Due Date</p>
-                                                                    <p class="text-xs text-gray-800">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') ?? '-' }}</p>
-                                                                </div>
+                                                                @if(strtolower($laporan->tingkat_bahaya) !== 'low')
+                                                                    <div>
+                                                                        <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Permanent Due Date</p>
+                                                                        <p class="text-xs text-gray-800">
+                                                                            {{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}
+                                                                        </p>
+                                                                    </div>
+                                                                @endif
+
                                                                 <div>
                                                                     <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">PIC</p>
                                                                     <p class="text-xs text-gray-800">{{ $laporan->picUser->fullname ?? '-' }}</p>
@@ -787,7 +801,7 @@
                                                         <div class="flex justify-end">
                                                             <a href="{{ route($routeName, $laporan->id_laporan_lct) }}"
                                                                 class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                                                                View Full Details
+                                                                Details
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                                                 </svg>

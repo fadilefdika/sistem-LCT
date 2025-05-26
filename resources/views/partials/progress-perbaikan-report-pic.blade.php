@@ -390,16 +390,33 @@
                             </div>
                         @endif
 
-                        <a href="{{ route(
-                            $roleName === 'ehs' 
-                                ? 'ehs.reporting.history' 
-                                : 'admin.reporting.history', 
-                            $laporan->id_laporan_lct
-                        ) }}" class="inline-block">
-                            <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
-                                <i class="fas fa-history mr-2"></i>History
-                            </button>
-                        </a>
+                           <!-- Tombol History -->
+                        </div>
+                            @php
+                                if ($roleName === 'ehs') {
+                                    $routeName = 'ehs.reporting.history';
+                                } elseif ($roleName === 'pic') {
+                                    $routeName = 'admin.manajemen-lct.history';
+                                } else {
+                                    $routeName = 'admin.reporting.history';
+                                }
+                            @endphp
+                        
+                            <!-- History Card -->
+                            <div class="bg-white rounded-lg shadow-md p-4 mt-4 border border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h2 class="text-lg font-semibold text-gray-800">Corrective Action History</h2>
+                                        <p class="text-sm text-gray-500">View the detailed progress and corrective actions taken for this case.</p>
+                                    </div>
+                                    <a href="{{ route($routeName, $laporan->id_laporan_lct) }}">
+                                        <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 cursor-pointer">
+                                            <i class="fas fa-history mr-2"></i>View History
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         
                         
 

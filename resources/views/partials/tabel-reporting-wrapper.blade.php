@@ -1,4 +1,10 @@
-<div x-data="{ openRow: null }">
+<div x-data="{ openRow: null }" class="p-1">
+      <!-- Judul di luar border -->
+    <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-gray-800">
+        Findings Report
+        </h2>
+    </div>
     <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
         {{-- <select id="perPageSelect" class="border border-gray-300 text-sm rounded p-1">
             <option value="10" @if(request('perPage') == 10) selected @endif>10 baris</option>

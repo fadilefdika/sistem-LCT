@@ -6,7 +6,7 @@
                     @if(Request::is('report-form'))
                         <a href="{{ route('admin.dashboard') }}" 
                         class="px-4 py-2 text-white bg-blue-400 rounded-md shadow-md hover:bg-blue-500 transition duration-300">
-                            Go To Dashboard
+                            Masuk ke Dashboard
                         </a>
                     @else
                         <button
@@ -88,10 +88,14 @@
             <!-- Header: Right side -->
             <div class="flex items-center space-x-3">
 
-                <!-- Notifications button -->
-                <x-dropdown-notifications align="right" :roleName="$roleName" :notifikasiLCT="$notifikasiLCT" />
-            
+                <!-- Tombol Notifikasi -->
+                @if (!request()->is('report-form'))
+                    @if($roleName !== 'user')
+                        <x-dropdown-notifications align="right" :roleName="$roleName" :notifikasiLCT="$notifikasiLCT" />
+                    @endif
+                @endif
 
+            
                 <!-- Divider -->
                 <hr class="w-px h-6 bg-gray-200 dark:bg-gray-700/60 border-none" />
 

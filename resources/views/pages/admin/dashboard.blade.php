@@ -145,9 +145,9 @@
                         </div>
                     </div>
                     
-                    <!-- Medium & High Risk Reports Table -->
+                    <!-- Medium & High Hazard Reports Table -->
                     <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                        <h2 class="text-base font-semibold mb-2">Medium & High Risk Reports</h2>
+                        <h2 class="text-base font-semibold mb-2">Medium & High Hazard Reports</h2>
                         <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
                             @include('partials.dashboard-tabel-medium-high',[
                                 'laporans' => $laporanMediumHigh
