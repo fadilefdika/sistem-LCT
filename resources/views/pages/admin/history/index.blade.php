@@ -4,8 +4,7 @@
             <!-- Header Section -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Riwayat Perbaikan</h1>
-                    <p class="text-gray-600">Log aktivitas dari semua peran dalam proses LCT</p>
+                    <h1 class="text-2xl font-bold text-gray-900">LCT Process Activity Log</h1>
                 </div>
                 @php
                         $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
@@ -24,7 +23,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                 </svg>
-                Kembali
+                Back
             </a>
 
             </div>
@@ -36,11 +35,11 @@
                         <thead class="bg-gray-100 text-gray-600 uppercase text-xs font-semibold tracking-wider">
                             <tr>
                                 <th class="px-6 py-3 text-left">No</th>
-                                <th class="px-6 py-3 text-left">Tanggal</th>
+                                <th class="px-6 py-3 text-left">Date</th>
                                 <th class="px-6 py-3 text-left">User</th>
                                 <th class="px-6 py-3 text-left">Role</th>
                                 <th class="px-6 py-3 text-left">Status</th>
-                                <th class="px-6 py-3 text-left">Alasan Reject</th>
+                                <th class="px-6 py-3 text-left">Rejection Reason</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -53,7 +52,7 @@
                                     </td>                                    
                                     <td class="px-6 py-4 text-gray-700">{{ $item->user->fullname ?? '-' }}</td>
                                     <td class="px-6 py-4 text-gray-700">
-                                        {{ $item->status_lct === 'open' ? 'finder' : ($item->role ?? '-') }}
+                                        {{ $item->status_lct === 'open' ? 'Finder' : ($item->role ?? '-') }}
                                     </td>                                    
                                     <td class="px-6 py-4">
                                         @php

@@ -701,114 +701,140 @@
 
 
                                             @if(is_array($tindakanPerbaikan) && count($tindakanPerbaikan))
-                                                @foreach($tindakanPerbaikan as $index => $tp)
-                                                    <div class="space-y-4">
-                                                        {{-- <p class="text-sm font-semibold text-gray-700">Revision {{ $index + 1 }}</p> --}}
+                                                <div x-data="{
+                                                    slides: @js($tindakanPerbaikan),
+                                                    current: 0,
+                                                    prev() {
+                                                        this.current = (this.current - 1 + this.slides.length) % this.slides.length;
+                                                    },
+                                                    next() {
+                                                        this.current = (this.current + 1) % this.slides.length;
+                                                    }
+                                                    }" class="relative overflow-hidden">
 
-                                                        <div class="flex flex-col lg:flex-row gap-6">
-                                                            <!-- Image Slider -->
-                                                            <div class="lg:w-1/3 w-full" x-data="{
-                                                                images: @js($tp['bukti']),
-                                                                current: 0,
-                                                                interval: null,
-                                                                startSlider() {
-                                                                    if (this.images.length > 1) {
-                                                                        this.interval = setInterval(() => this.next(), 3000);
-                                                                    }
-                                                                },
-                                                                stopSlider() {
-                                                                    clearInterval(this.interval);
-                                                                },
-                                                                next() {
-                                                                    this.current = (this.current + 1) % this.images.length;
-                                                                },
-                                                                prev() {
-                                                                    this.current = (this.current - 1 + this.images.length) % this.images.length;
-                                                                }
-                                                                }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
-                                                                <div class="relative aspect-video rounded-md overflow-hidden border border-gray-200">
-                                                                    <template x-for="(img, idx) in images" :key="idx">
-                                                                        <img :src="img" alt="Evidence"
-                                                                            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-                                                                            :class="{ 'opacity-100': idx === current, 'opacity-0': idx !== current }">
-                                                                    </template>
+                                                    <!-- Wrapper untuk semua slide -->
+                                                    <div class="flex transition-transform duration-500 ease-in-out"
+                                                        :style="`transform: translateX(-${current * 100}%)`">
 
-                                                                    <template x-if="images.length > 1">
-                                                                        <button @click="prev"
-                                                                            class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-2 py-1 rounded-r-md">
-                                                                            ‹
-                                                                        </button>
-                                                                    </template>
-                                                                    <template x-if="images.length > 1">
-                                                                        <button @click="next"
-                                                                            class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-2 py-1 rounded-l-md">
-                                                                            ›
-                                                                        </button>
-                                                                    </template>
-                                                                </div>
+                                                        <template x-for="(tp, index) in slides" :key="index">
+                                                            <div class="min-w-full p-4 space-y-4 border rounded-md shadow-md">
+                                                                {{-- Konten sama seperti sebelumnya --}}
+                                                                <div class="flex flex-col lg:flex-row gap-6">
+                                                                    <!-- Image Slider -->
+                                                                    <div class="lg:w-1/3 w-full" x-data="{
+                                                                        images: tp.bukti,
+                                                                        currentImg: 0,
+                                                                        interval: null,
+                                                                        startSlider() {
+                                                                            if (this.images.length > 1) {
+                                                                                this.interval = setInterval(() => this.next(), 3000);
+                                                                            }
+                                                                        },
+                                                                        stopSlider() {
+                                                                            clearInterval(this.interval);
+                                                                        },
+                                                                        next() {
+                                                                            this.currentImg = (this.currentImg + 1) % this.images.length;
+                                                                        },
+                                                                        prev() {
+                                                                            this.currentImg = (this.currentImg - 1 + this.images.length) % this.images.length;
+                                                                        }
+                                                                    }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
+                                                                    <p class="text-center text-[10px] text-gray-500 mb-2" x-text="index === 0 ? '' : `Revision #${index}`"></p>
 
-                                                                <p class="text-center text-[10px] text-gray-500 mt-2">
-                                                                    <span x-text="'This correction contains ' + images.length + ' image' + (images.length > 1 ? 's' : '') + '.'"></span>
-                                                                </p>
-                                                            </div>
+                                                                        <div class="relative aspect-video rounded-md overflow-hidden border border-gray-200 mb-2">
+                                                                            <template x-for="(img, idx) in images" :key="idx">
+                                                                                <img :src="img" alt="Evidence"
+                                                                                    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+                                                                                    :class="{ 'opacity-100': idx === currentImg, 'opacity-0': idx !== currentImg }">
+                                                                            </template>
 
-                                                            <!-- Detail Tindakan -->
-                                                            <div class="lg:w-2/3 w-full grid grid-cols-2 gap-4 text-sm">
-                                                                <div>
-                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Completion Date</p>
-                                                                    <p class="text-xs text-gray-800">{{ \Carbon\Carbon::parse($tp['tanggal'])->format('d M Y') ?? '-' }}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">
-                                                                        {{ strtolower($laporan->tingkat_bahaya) === 'low' ? 'Due Date' : 'Temporary Due Date' }}
-                                                                    </p>
-                                                                    <p class="text-xs text-gray-800">
-                                                                        {{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}
-                                                                    </p>
-                                                                </div>
-                                                                @if(strtolower($laporan->tingkat_bahaya) !== 'low')
-                                                                    <div>
-                                                                        <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Permanent Due Date</p>
-                                                                        <p class="text-xs text-gray-800">
-                                                                            {{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}
-                                                                        </p>
+                                                                            <template x-if="images.length > 1">
+                                                                                <button @click="prev"
+                                                                                    class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-2 py-1 rounded-r-md">
+                                                                                    ‹
+                                                                                </button>
+                                                                            </template>
+                                                                            <template x-if="images.length > 1">
+                                                                                <button @click="next"
+                                                                                    class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-800 px-2 py-1 rounded-l-md">
+                                                                                    ›
+                                                                                </button>
+                                                                            </template>
+                                                                        </div>
+
+                                                                        <p class="text-center text-[10px] text-gray-500 mt-2" x-text="'This correction contains ' + images.length + ' image' + (images.length > 1 ? 's' : '') + '.'"></p>
                                                                     </div>
-                                                                @endif
 
-                                                                <div>
-                                                                    <p class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">PIC</p>
-                                                                    <p class="text-xs text-gray-800">{{ $laporan->picUser->fullname ?? '-' }}</p>
+                                                                    <!-- Detail Tindakan -->
+                                                                    <div class="lg:w-2/3 w-full grid grid-cols-2 gap-6 text-sm bg-white p-4 rounded-md shadow-sm">
+                                                                        <div class="border-b border-gray-200 pb-2">
+                                                                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Completion Date</p>
+                                                                            <p class="text-sm text-gray-900" x-text="new Date(tp.tanggal).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) ?? '-'"></p>
+                                                                        </div>
+                                                                        
+                                                                        <div class="border-b border-gray-200 pb-2">
+                                                                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
+                                                                                {{ strtolower($laporan->tingkat_bahaya) === 'low' ? 'Due Date' : 'Temporary Due Date' }}
+                                                                            </p>
+                                                                            <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
+                                                                        </div>
+                                                                        
+                                                                        @if(strtolower($laporan->tingkat_bahaya) !== 'low')
+                                                                        <div class="border-b border-gray-200 pb-2">
+                                                                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Permanent Due Date</p>
+                                                                        <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
+                                                                        </div>
+                                                                        @endif
+                                                                    
+                                                                        <div class="border-b border-gray-200 pb-2">
+                                                                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">PIC</p>
+                                                                        <p class="text-sm text-gray-900">{{ $laporan->picUser->fullname ?? '-' }}</p>
+                                                                        </div>
+                                                                    </div>                                                                              
+                                                                </div>
+
+                                                                <!-- Safety Recommendation -->
+                                                                <div class="bg-blue-50/50 p-4 rounded-md border border-blue-100">
+                                                                    <div class="flex items-start space-x-2">
+                                                                        <div class="mt-0.5">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h4 class="text-xs font-medium text-blue-800 mb-1">Corrective Action</h4>
+                                                                            <p class="text-xs text-gray-700 whitespace-pre-line leading-relaxed" x-text="tp.tindakan"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Action Button -->
+                                                                <div class="flex justify-end">
+                                                                    <a href="{{ route($routeName, $laporan->id_laporan_lct) }}"
+                                                                        class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                                                                        Details
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                                        </svg>
+                                                                    </a>
                                                                 </div>
                                                             </div>
-                                                        </div>
-
-                                                        <!-- Safety Recommendation -->
-                                                        <div class="bg-blue-50/50 p-4 rounded-md border border-blue-100">
-                                                            <div class="flex items-start space-x-2">
-                                                                <div class="mt-0.5">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
-                                                                    </svg>
-                                                                </div>
-                                                                <div>
-                                                                    <h4 class="text-xs font-medium text-blue-800 mb-1">Corrective Action</h4>
-                                                                    <p class="text-xs text-gray-700 whitespace-pre-line leading-relaxed">{{ $tp['tindakan'] }}</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Action Button -->
-                                                        <div class="flex justify-end">
-                                                            <a href="{{ route($routeName, $laporan->id_laporan_lct) }}"
-                                                                class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                                                                Details
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                                </svg>
-                                                            </a>
-                                                        </div>
+                                                        </template>
                                                     </div>
-                                                @endforeach
+
+                                                    <!-- Navigation: tampilkan hanya jika slide > 1 -->
+                                                    @if(count($tindakanPerbaikan) > 1)
+                                                        <div class="flex justify-between mt-4">
+                                                            <button @click="prev()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                                ‹ Prev
+                                                            </button>
+                                                            <button @click="next()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                                Next ›
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             @else
                                                 <p class="text-sm text-gray-500 italic">No corrective action provided.</p>
                                             @endif

@@ -20,7 +20,7 @@
             <button @click="activeTab = 'user'" 
                     :class="activeTab === 'user' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
                     class="px-4 py-2 focus:outline-none cursor-pointer">
-                User
+                Finder
             </button>
         
             <button @click="activeTab = 'pic'" 
