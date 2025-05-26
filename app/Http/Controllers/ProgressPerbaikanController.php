@@ -148,11 +148,13 @@ class ProgressPerbaikanController extends Controller
             $query->where('area_id', $request->areaId);  // koreksi dari where('id', $request->areaId) ke area_id
         }
 
-        // Hanya yang status bukan open
+        $perPage = $request->input('perPage', 10);
+
         $laporans = $query
             ->orderBy('order_type')
             ->orderByDesc('updated_at')
-            ->paginate(10);
+            ->paginate($perPage)
+            ->withQueryString();
 
 
         // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
