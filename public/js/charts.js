@@ -146,7 +146,7 @@ const categoryChart = new Chart(ctxCategory, {
             {
                 label: "Findings",
                 data: [],
-                backgroundColor: [], // akan diisi dengan warna #0069AA
+                backgroundColor: [], // akan diisi nanti
             },
         ],
     },
@@ -162,37 +162,31 @@ const categoryChart = new Chart(ctxCategory, {
     },
 });
 
-function updateCategoryChart() {
-    const year = document.getElementById("categoryYear").value;
-    const month = document.getElementById("categoryMonth").value;
-
-    fetch(`/ehs/reporting/chart/category?year=${year}&month=${month || ""}`)
-        .then((res) => res.json())
-        .then(({ labels, data }) => {
-            categoryChart.data.labels = labels;
-            categoryChart.data.datasets[0].data = data;
-
-            // Set semua warna batang menjadi #0069AA
-            categoryChart.data.datasets[0].backgroundColor = labels.map(
-                () => "#0069AA"
-            );
-
-            categoryChart.update();
-        })
-        .catch((err) => {
-            console.error("Failed to fetch category chart data:", err);
-        });
+function loadCategoryChart(params = {}) {
+    $.ajax({
+        url: "/ehs/reporting/chart/category",
+        type: "GET",
+        data: params,
+        success: function ({ labels, data }) {
+            renderCategoryChart(labels, data);
+        },
+        error: function () {
+            alert("Gagal memuat data chart kategori.");
+        },
+    });
 }
 
-// Event listener untuk filter
-const yearSelectCategory = document.getElementById("categoryYear");
-const monthSelectCategory = document.getElementById("categoryMonth");
-
-yearSelectCategory.addEventListener("change", updateCategoryChart);
-monthSelectCategory.addEventListener("change", updateCategoryChart);
+function renderCategoryChart(labels, data) {
+    categoryChart.data.labels = labels;
+    categoryChart.data.datasets[0].data = data;
+    categoryChart.data.datasets[0].backgroundColor = data.map(() => "#0069AA");
+    categoryChart.update();
+}
 
 // Initial render
-updateCategoryChart();
+document.addEventListener("DOMContentLoaded", () => {
+    loadCategoryChart();
+});
 
 const ctxArea = document.getElementById("areaChart").getContext("2d");
 

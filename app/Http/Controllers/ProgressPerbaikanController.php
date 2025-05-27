@@ -551,32 +551,45 @@ class ProgressPerbaikanController extends Controller
 
     public function chartCategory(Request $request)
     {
-        $year = $request->query('year');
-        $month = $request->query('month');
-
+        
         $query = DB::table('lct_laporan as l')
-            ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
-            ->whereNull('k.deleted_at');
-
-        if ($year) {
-            $query->whereYear('l.tanggal_temuan', $year);
+        ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
+        ->whereNull('k.deleted_at');
+    
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $query->whereIn('l.status_lct', $statuses);
         }
-
-        if ($month) {
-            $query->whereMonth('l.tanggal_temuan', $month);
+        
+        if ($request->filled('riskLevel')) {
+            $query->where('l.tingkat_bahaya', $request->riskLevel);
         }
-
+        
+        if ($request->filled('departemenId')) {
+            $query->where('l.departemen_id', $request->departemenId);
+        }
+        
+        if ($request->filled('areaId')) {
+            $query->where('l.area_id', $request->areaId);
+        }
+        
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('l.created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
+        }
+    
         $categoryCounts = $query
             ->select('k.nama_kategori', DB::raw('COUNT(*) as total'))
             ->groupBy('k.nama_kategori')
             ->pluck('total', 'k.nama_kategori')
             ->toArray();
 
-            $categories = Kategori::whereNull('deleted_at')
+        $categories = Kategori::whereNull('deleted_at')
             ->pluck('nama_kategori')
             ->toArray();
-        
-        // Mapping manual nama panjang ke pendek (untuk chart)
+
         $categoryDisplayNames = array_map(function ($name) {
             return match ($name) {
                 '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' => '5S',
@@ -586,11 +599,12 @@ class ProgressPerbaikanController extends Controller
                 default => $name,
             };
         }, $categories);
-        
+
         $data = [];
-        foreach ($categories as $i => $category) {
+        foreach ($categories as $category) {
             $data[] = $categoryCounts[$category] ?? 0;
         }
+
 
         return response()->json([
             'labels' => $categoryDisplayNames,

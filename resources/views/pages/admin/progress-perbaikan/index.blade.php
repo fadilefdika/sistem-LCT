@@ -171,27 +171,6 @@
                     <!-- Findings by Category -->
                     <div class="bg-white p-4 rounded-xl shadow h-[320px] xl:w-1/3 w-full">
                         <h3 class="text-sm font-semibold mb-2">Findings by Category</h3>
-                    
-                        <!-- Filter Year & Month -->
-                        <div class="flex gap-2 mb-3">
-                            <select id="categoryYear" class="text-sm border-gray-300 rounded-md">
-                                @foreach ($availableYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            
-                            <select id="categoryMonth" class="text-sm border-gray-300 rounded-md">
-                                <option value="">All Months</option>
-                                @foreach ([
-                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
-                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
-                                    11 => 'Nov', 12 => 'Dec'
-                                ] as $num => $month)
-                                    <option value="{{ $num }}">{{ $month }}</option>
-                                @endforeach
-                            </select> 
-                        </div>
-                    
                         <div class="h-[200px]">
                             <canvas id="categoryChart"></canvas>
                         </div>
@@ -434,6 +413,7 @@
                 fetchData(params);         // update tabel
                 loadFindingData(params);   // update chart
                 loadStatusChart(params);
+                loadCategoryChart(params);
             });
                     
             // Handle pagination click (delegated event karena link dinamis)
