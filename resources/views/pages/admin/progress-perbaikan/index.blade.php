@@ -180,26 +180,6 @@
                     <!-- Findings by Area -->
                     <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
                         <h3 class="text-sm font-semibold mb-2">Findings by Area</h3>
-                    
-                        <!-- Filter Year & Month -->
-                        <div class="flex gap-2 mb-3">
-                            <select id="areaYear" class="text-sm border-gray-300 rounded-md">
-                                @foreach ($availableYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            
-                            <select id="areaMonth" class="text-sm border-gray-300 rounded-md">
-                                <option value="">All Months</option>
-                                @foreach ([
-                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
-                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
-                                    11 => 'Nov', 12 => 'Dec'
-                                ] as $num => $month)
-                                    <option value="{{ $num }}">{{ $month }}</option>
-                                @endforeach
-                            </select> 
-                        </div>
                         <div class="h-[200px]"><!-- beri min-width agar scroll muncul jika area banyak -->
                             <canvas id="areaChart"></canvas>
                         </div>
@@ -211,24 +191,6 @@
                     <!-- Department -->
                     <div class="bg-white p-4 rounded-xl shadow h-[320px] overflow-x-auto xl:w-2/3 w-full">
                         <h3 class="text-sm font-semibold mb-2">Findings by Department</h3>
-                        <div class="flex gap-2 mb-3">
-                            <select id="departmentYear" class="text-sm border-gray-300 rounded-md">
-                                @foreach ($availableYears as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
-                                @endforeach
-                            </select>
-                            
-                            <select id="departmentMonth" class="text-sm border-gray-300 rounded-md">
-                                <option value="">All Months</option>
-                                @foreach ([
-                                    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May',
-                                    6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct',
-                                    11 => 'Nov', 12 => 'Dec'
-                                ] as $num => $month)
-                                    <option value="{{ $num }}">{{ $month }}</option>
-                                @endforeach
-                            </select> 
-                        </div>
                         <div class="h-[200px]">
                             <canvas id="departmentChart"></canvas>
                         </div>
@@ -414,6 +376,8 @@
                 loadFindingData(params);   // update chart
                 loadStatusChart(params);
                 loadCategoryChart(params);
+                loadAreaChart(params);
+                loadDepartmentChart(params);
             });
                     
             // Handle pagination click (delegated event karena link dinamis)

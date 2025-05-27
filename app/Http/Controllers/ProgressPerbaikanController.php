@@ -614,29 +614,53 @@ class ProgressPerbaikanController extends Controller
 
     public function chartArea(Request $request)
     {
-        $year = $request->query('year');
-        $month = $request->query('month');
-
         // Ambil semua area aktif (tidak dihapus)
         $areas = AreaLct::whereNull('deleted_at')
             ->orderBy('nama_area')
             ->pluck('nama_area', 'id');
 
-        $query = DB::table('lct_laporan')
-            ->select('area_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('area_id', $areas->keys()) // hanya area aktif
-            ->when($year, fn($q) => $q->whereYear('tanggal_temuan', $year))
-            ->when($month, fn($q) => $q->whereMonth('tanggal_temuan', $month))
-            ->groupBy('area_id')
-            ->pluck('total', 'area_id')
+        // Mulai query laporan
+        $query = DB::table('lct_laporan as l')
+            ->select('l.area_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('l.area_id', $areas->keys()); // hanya area aktif
+
+        // Terapkan filter jika tersedia
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $query->whereIn('l.status_lct', $statuses);
+        }
+
+        if ($request->filled('riskLevel')) {
+            $query->where('l.tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('departemenId')) {
+            $query->where('l.departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('areaId')) {
+            $query->where('l.area_id', $request->areaId);
+        }
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('l.created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
+        }
+
+        // Group dan ambil hasil
+        $counts = $query->groupBy('l.area_id')
+            ->pluck('total', 'l.area_id')
             ->toArray();
 
+        // Susun hasil sesuai urutan area
         $labels = [];
         $data = [];
 
         foreach ($areas as $id => $nama) {
             $labels[] = $nama;
-            $data[] = $query[$id] ?? 0;
+            $data[] = $counts[$id] ?? 0;
         }
 
         return response()->json([
@@ -647,37 +671,56 @@ class ProgressPerbaikanController extends Controller
 
     public function chartDepartment(Request $request)
     {
-        $year = $request->query('year');
-        $month = $request->query('month');
-
         // Ambil semua departemen aktif
         $departments = LctDepartement::whereNull('deleted_at')
             ->orderBy('nama_departemen')
             ->pluck('nama_departemen', 'id');
-
-        // Query laporan_lct hitung temuan per departemen sesuai filter
-        $query = DB::table('lct_laporan')
-            ->select('departemen_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('departemen_id', $departments->keys())
-            ->when($year, fn($q) => $q->whereYear('tanggal_temuan', $year))
-            ->when($month, fn($q) => $q->whereMonth('tanggal_temuan', $month))
-            ->groupBy('departemen_id')
-            ->pluck('total', 'departemen_id')
+    
+        // Base query laporan_lct
+        $query = DB::table('lct_laporan as l')
+            ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('l.departemen_id', $departments->keys());
+    
+        // Filter opsional
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $query->whereIn('l.status_lct', $statuses);
+        }
+    
+        if ($request->filled('riskLevel')) {
+            $query->where('l.tingkat_bahaya', $request->riskLevel);
+        }
+    
+        if ($request->filled('areaId')) {
+            $query->where('l.area_id', $request->areaId);
+        }
+    
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('l.created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
+        }
+    
+        $result = $query->groupBy('l.departemen_id')
+            ->pluck('total', 'l.departemen_id')
             ->toArray();
-
+    
+        // Menyusun data berdasarkan urutan nama departemen
         $labels = [];
         $data = [];
-
+    
         foreach ($departments as $id => $name) {
             $labels[] = $name;
-            $data[] = $query[$id] ?? 0;
+            $data[] = $result[$id] ?? 0;
         }
-
+    
         return response()->json([
             'labels' => $labels,
             'data' => $data,
         ]);
     }
+    
 
     private function buildLaporanQuery(Request $request, $user, $role)
     {

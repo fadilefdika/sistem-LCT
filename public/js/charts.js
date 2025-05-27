@@ -226,29 +226,29 @@ const areaChart = new Chart(ctxArea, {
     },
 });
 
-function updateAreaChart() {
-    const year = document.getElementById("areaYear").value;
-    const month = document.getElementById("areaMonth").value;
-
-    fetch(`/ehs/reporting/chart/area?year=${year}&month=${month || ""}`)
-        .then((res) => res.json())
-        .then(({ labels, data }) => {
-            areaChart.data.labels = labels;
-            areaChart.data.datasets[0].data = data;
-            areaChart.update();
-        })
-        .catch((err) => {
-            console.error("Failed to fetch area chart data:", err);
-        });
+function loadAreaChart(params = {}) {
+    $.ajax({
+        url: "/ehs/reporting/chart/area",
+        type: "GET",
+        data: params,
+        success: function ({ labels, data }) {
+            renderAreaChart(labels, data);
+        },
+        error: function () {
+            alert("Gagal memuat data chart area.");
+        },
+    });
 }
 
-document.getElementById("areaYear").addEventListener("change", updateAreaChart);
-document
-    .getElementById("areaMonth")
-    .addEventListener("change", updateAreaChart);
+function renderAreaChart(labels, data) {
+    areaChart.data.labels = labels;
+    areaChart.data.datasets[0].data = data;
+    areaChart.update();
+}
 
-// Initial render
-updateAreaChart();
+document.addEventListener("DOMContentLoaded", () => {
+    loadAreaChart();
+});
 
 const ctx = document.getElementById("departmentChart").getContext("2d");
 
@@ -268,35 +268,46 @@ let departmentChart = new Chart(ctx, {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 },
+            },
+            x: {
+                ticks: {
+                    autoSkip: false,
+                    font: { size: 9 },
+                },
+            },
+        },
     },
 });
 
-function updateChart() {
-    const year = document.getElementById("departmentYear").value;
-    const month = document.getElementById("departmentMonth").value;
-
-    fetch(`/ehs/reporting/chart/department?year=${year}&month=${month || ""}`)
-        .then((res) => res.json())
-        .then(({ labels, data }) => {
-            departmentChart.data.labels = labels;
-            departmentChart.data.datasets[0].data = data;
-            departmentChart.update();
-        })
-        .catch((err) => {
-            console.error("Failed to fetch department chart data:", err);
-        });
+// Jika kamu ingin mengirim filter, pastikan `params` didefinisikan
+function loadDepartmentChart(params = {}) {
+    $.ajax({
+        url: "/ehs/reporting/chart/department",
+        type: "GET",
+        data: params,
+        success: function ({ labels, data }) {
+            renderDepartmentChart(labels, data);
+        },
+        error: function () {
+            alert("Gagal memuat data chart departemen.");
+        },
+    });
 }
 
-document
-    .getElementById("departmentYear")
-    .addEventListener("change", updateChart);
-document
-    .getElementById("departmentMonth")
-    .addEventListener("change", updateChart);
+function renderDepartmentChart(labels, data) {
+    departmentChart.data.labels = labels;
+    departmentChart.data.datasets[0].data = data;
+    departmentChart.update();
+}
 
-// Render awal
-updateChart();
+// Render awal saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    loadDepartmentChart();
+});
 
 // const ctxOverdue = document.getElementById("overdueChart").getContext("2d");
 
