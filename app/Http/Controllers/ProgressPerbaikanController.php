@@ -85,68 +85,9 @@ class ProgressPerbaikanController extends Controller
                 $laporan->save();
             }
         }
-        // Query utama untuk data laporan
-        $query = LaporanLct::query()
-            ->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+        $query = $this->buildLaporanQuery($request, $user, $role);
+        $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
 
-        // Filter berdasarkan role
-        if ($role === 'user') {
-            $query->where('user_id', $user->id);
-        } elseif ($role === 'manajer') {
-            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
-            $query->where('departemen_id', $departemenId);
-        } elseif (!in_array($role, ['ehs'])) {
-            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
-            $query->where('pic_id', $picId);
-        }
-
-        // Filter tambahan dari request
-        if ($request->filled('riskLevel')) {
-            $query->where('tingkat_bahaya', $request->riskLevel);
-        }
-
-        if ($request->filled('statusLct')) {
-            $statuses = explode(',', $request->statusLct);
-            $today = now();
-
-            $query->where(function ($q) use ($statuses, $today) {
-                $q->whereIn('status_lct', $statuses);
-
-                if (in_array('overdue', $statuses)) {
-                    $q->orWhere(function ($sub) use ($today) {
-                        $sub->where(function ($low) use ($today) {
-                            $low->where('tingkat_bahaya', 'Low')
-                                ->whereDate('due_date', '<', $today)
-                                ->whereNull('date_completion');
-                        })
-                        ->orWhere(function ($mediumHighTemp) use ($today) {
-                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_temp', '<', $today)
-                                ->whereNull('date_completion_temp');
-                        })
-                        ->orWhere(function ($mediumHighPerm) use ($today) {
-                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_perm', '<', $today)
-                                ->whereNull('date_completion');
-                        });
-                    });
-                }
-            });
-        }
-
-        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
-            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
-        }
-
-        if ($request->filled('departemenId')) {
-            $query->where('departemen_id', $request->departemenId);
-        }
-
-        if ($request->filled('areaId')) {
-            $query->where('area_id', $request->areaId);  // koreksi dari where('id', $request->areaId) ke area_id
-        }
 
         $perPage = $request->input('perPage', 10);
 
@@ -160,32 +101,7 @@ class ProgressPerbaikanController extends Controller
         // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
 
         // Query base untuk statistik, sama filter seperti query utama tapi tanpa paginate dan filter open
-        $baseQuery = LaporanLct::query();
-
-        // Filter role sama seperti di atas
-        if ($role === 'user') {
-            $baseQuery->where('user_id', $user->id);
-        } elseif ($role === 'manajer') {
-            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
-            $baseQuery->where('departemen_id', $departemenId);
-        } elseif (!in_array($role, ['ehs'])) {
-            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
-            $baseQuery->where('pic_id', $picId);
-        }
-
-        // Filter tanggal dan lainnya
-        if ($request->filled('riskLevel')) {
-            $baseQuery->where('tingkat_bahaya', $request->riskLevel);
-        }
-        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $baseQuery->whereBetween('tanggal_temuan', [$startDate, $endDate]);
-        }
-        if ($request->filled('departemenId')) {
-            $baseQuery->where('departemen_id', $request->departemenId);
-        }
-        if ($request->filled('areaId')) {
-            $baseQuery->where('area_id', $request->areaId);
-        }
+        $baseQuery = $this->buildLaporanQuery($request, $user, $role);
 
         $availableYears = LaporanLct::selectRaw('YEAR(tanggal_temuan) as year')
         ->distinct()
@@ -511,79 +427,36 @@ class ProgressPerbaikanController extends Controller
 
     public function chartFindings(Request $request)
     {
-        $query = LaporanLct::query();
-
-        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+        // Ambil user dan role sesuai guard, sama seperti di index()
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;
         } else {
-            $startDate = now()->startOfMonth();
-            $endDate = now()->endOfMonth();
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;
         }
-        
-        $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
-        
-        
-    
-        if ($request->filled('riskLevel')) {
-            $query->where('tingkat_bahaya', $request->riskLevel);
-        }
-    
-        if ($request->filled('statusLct')) {
-            $statuses = explode(',', $request->statusLct);
-            $today = now();
 
-            $query->where(function ($q) use ($statuses, $today) {
-                $q->whereIn('status_lct', $statuses);
+        // Pakai fungsi buildLaporanQuery untuk mendapatkan data yang sudah difilter
+        $query = $this->buildLaporanQuery($request, $user, $role);
 
-                if (in_array('overdue', $statuses)) {
-                    $q->orWhere(function ($sub) use ($today) {
-                        $sub->where(function ($low) use ($today) {
-                            $low->where('tingkat_bahaya', 'Low')
-                                ->whereDate('due_date', '<', $today)
-                                ->whereNull('date_completion');
-                        })
-                        ->orWhere(function ($mediumHighTemp) use ($today) {
-                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_temp', '<', $today)
-                                ->whereNull('date_completion_temp');
-                        })
-                        ->orWhere(function ($mediumHighPerm) use ($today) {
-                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_perm', '<', $today)
-                                ->whereNull('date_completion');
-                        });
-                    });
-                }
-            });
-        }
-    
-        if ($request->filled('departemenId')) {
-            $query->where('departemen_id', $request->departemenId);
-        }
-    
-        if ($request->filled('areaId')) {
-            $query->where('area_id', $request->areaId);  // koreksi dari where('id', $request->areaId) ke area_id
-        }
-    
         $results = $query->get();
-    
-        // Hitung data chart: jumlah temuan per tanggal, dll
+
         $labels = [];
         $data = [];
-    
+
         $grouped = $results->groupBy(function ($item) {
             return \Carbon\Carbon::parse($item->tanggal_temuan)->format('Y-m-d');
         });
-        
-    
+
         foreach ($grouped as $date => $items) {
             $labels[] = $date;
             $data[] = count($items);
         }
-    
+
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
+
+    
 
     public function chartStatus(Request $request)
     {
@@ -771,68 +644,72 @@ class ProgressPerbaikanController extends Controller
         ]);
     }
 
-    // public function chartOverdue(Request $request)
-    // {
-    //     $year = $request->query('year');
-    //     $month = $request->query('month');
+    private function buildLaporanQuery(Request $request, $user, $role)
+    {
+        $query = LaporanLct::query();
 
-    //     $query = DB::table('lct_laporan')
-    //         ->whereNotNull('first_overdue_date');
+        // Filter berdasarkan role
+        if ($role === 'user') {
+            $query->where('user_id', $user->id);
+        } elseif ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+            $query->where('departemen_id', $departemenId);
+        } elseif (!in_array($role, ['ehs'])) {
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+            $query->where('pic_id', $picId);
+        }
 
-    //     if ($year) {
-    //         $query->whereYear('first_overdue_date', $year);
-    //     }
+        // Filter tambahan dari request
+        if ($request->filled('riskLevel')) {
+            $query->where('tingkat_bahaya', $request->riskLevel);
+        }
 
-    //     if ($month) {
-    //         // Filter per tanggal dalam bulan tsb
-    //         $query->whereMonth('first_overdue_date', $month);
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
 
-    //         $results = $query
-    //             ->select(DB::raw("DAY(first_overdue_date) as label"), DB::raw("COUNT(*) as total"))
-    //             ->groupBy(DB::raw("DAY(first_overdue_date)"))
-    //             ->orderBy(DB::raw("DAY(first_overdue_date)"))
-    //             ->pluck('total', 'label')
-    //             ->toArray();
+            $query->where(function ($q) use ($statuses, $today) {
+                $q->whereIn('status_lct', $statuses);
 
-    //         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year ?? now()->year);
-    //         $labels = range(1, $daysInMonth);
-    //     } else {
-    //         // Filter per bulan dalam tahun
-    //         $results = $query
-    //             ->select(DB::raw("MONTH(first_overdue_date) as label"), DB::raw("COUNT(*) as total"))
-    //             ->groupBy(DB::raw("MONTH(first_overdue_date)"))
-    //             ->orderBy(DB::raw("MONTH(first_overdue_date)"))
-    //             ->pluck('total', 'label')
-    //             ->toArray();
+                if (in_array('overdue', $statuses)) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('tingkat_bahaya', 'Low')
+                                ->whereDate('due_date', '<', $today)
+                                ->whereNull('date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_temp', '<', $today)
+                                ->whereNull('date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_perm', '<', $today)
+                                ->whereNull('date_completion');
+                        });
+                    });
+                }
+            });
+        }
 
-    //         $labels = [
-    //             1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
-    //             5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug',
-    //             9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'
-    //         ];
-    //     }
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+        }
 
-    //     $chartLabels = [];
-    //     $chartData = [];
+        if ($request->filled('departemenId')) {
+            $query->where('departemen_id', $request->departemenId);
+        }
 
-    //     foreach ($labels as $key => $label) {
-    //         if ($month) {
-    //             // label adalah angka 1-31
-    //             $chartLabels[] = $label;
-    //             $chartData[] = $results[$label] ?? 0;
-    //         } else {
-    //             // label adalah nama bulan, key adalah angka 1-12
-    //             $chartLabels[] = $label;
-    //             $chartData[] = $results[$key] ?? 0;
-    //         }
-    //     }
-        
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);
+        }
 
-    //     return response()->json([
-    //         'labelsOverdue' => $chartLabels,
-    //         'dataOverdue' => $chartData,
-    //     ]);
-    // }
+        return $query;
+    }
+
 
     public function getPaginatedData(Request $request)
     {

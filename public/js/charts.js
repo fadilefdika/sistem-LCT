@@ -53,10 +53,10 @@ function renderFindingChart(labels, data) {
     });
 }
 
-function loadFindingData() {
-    const queryString = window.location.search; // Ambil semua query dari URL
+function loadFindingData(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
 
-    fetch(`/ehs/reporting/chart/findings${queryString}`)
+    fetch(`/ehs/reporting/chart/findings?${queryString}`)
         .then((res) => res.json())
         .then(({ labels, data }) => {
             renderFindingChart(labels, data);

@@ -441,19 +441,18 @@
             // Submit filter via AJAX
             $('form').on('submit', function(e) {
                 e.preventDefault();
-        
-                // Ambil semua input filter, termasuk tanggalAwal, tanggalAkhir, dropdown dll
+
                 let params = $(this).serializeArray().reduce((obj, item) => {
                     obj[item.name] = item.value;
                     return obj;
                 }, {});
-        
-                // Tambahkan perPage saat filter dijalankan supaya konsisten
+
                 params.perPage = $('#perPageSelect').val() || 10;
-        
-                fetchData(params);
+
+                fetchData(params);         // update tabel
+                loadFindingData(params);   // update chart
             });
-        
+                    
             // Handle pagination click (delegated event karena link dinamis)
             $(document).on('click', '#pagination-links a', function(e) {
                 e.preventDefault();
