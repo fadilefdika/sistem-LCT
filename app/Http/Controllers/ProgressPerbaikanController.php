@@ -460,61 +460,81 @@ class ProgressPerbaikanController extends Controller
 
     public function chartStatus(Request $request)
     {
-        $year = $request->query('year');
-        $month = $request->query('month');
-
         $query = LaporanLct::query();
 
-        if ($year) {
-            $query->whereYear('tanggal_temuan', $year);
+        // Terapkan filter manual
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $query->whereIn('status_lct', $statuses);
         }
-        if ($month) {
-            $query->whereMonth('tanggal_temuan', $month);
+
+        if ($request->filled('riskLevel')) {
+            $query->where('tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('departemenId')) {
+            $query->where('departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);
+        }
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
         }
 
         $records = $query->get();
         $today = now();
 
+        // Logika status
         $chartCounts = [
             'Open' => 0,
             'Closed' => 0,
             'In Progress' => 0,
             'Overdue' => 0,
         ];
-
+        
         foreach ($records as $item) {
-            $status = $item->status_lct;
-            $bahaya = $item->tingkat_bahaya;
+            $status = strtolower($item->status_lct);
+            $bahaya = strtolower($item->tingkat_bahaya);
             $completion = $item->date_completion;
             $due = $item->due_date;
             $dueTemp = $item->due_date_temp;
             $duePerm = $item->due_date_perm;
-
-            // Logika Overdue
-            $isOverdue = false;
-
-            if ($bahaya === 'low' && is_null($completion) && $due && $today->gt($due)) {
-                $isOverdue = true;
-            } elseif (in_array($bahaya, ['medium', 'high'])) {
-                if (is_null($dueTemp) && $due && $today->gt($due)) {
-                    $isOverdue = true;
-                } elseif (!is_null($dueTemp) && is_null($duePerm) && $dueTemp && $today->gt($dueTemp)) {
-                    $isOverdue = true;
-                } elseif (!is_null($duePerm) && $today->gt($duePerm) && is_null($completion)) {
-                    $isOverdue = true;
-                }
-            }
-
-            if ($isOverdue) {
-                $chartCounts['Overdue']++;
-            } elseif ($status === 'open') {
+        
+            // Hitung status utama
+            if ($status === 'open') {
                 $chartCounts['Open']++;
             } elseif ($status === 'closed') {
                 $chartCounts['Closed']++;
             } else {
                 $chartCounts['In Progress']++;
             }
+        
+            // Hitung overdue secara terpisah
+            $isOverdue = false;
+        
+            if ($bahaya === 'low' && is_null($completion) && $due && $today->gt($due)) {
+                $isOverdue = true;
+            } elseif (in_array($bahaya, ['medium', 'high'])) {
+                if (is_null($dueTemp) && $due && $today->gt($due)) {
+                    $isOverdue = true;
+                } elseif (!is_null($dueTemp) && is_null($duePerm) && $today->gt($dueTemp)) {
+                    $isOverdue = true;
+                } elseif (!is_null($duePerm) && is_null($completion) && $today->gt($duePerm)) {
+                    $isOverdue = true;
+                }
+            }
+        
+            if ($isOverdue) {
+                $chartCounts['Overdue']++;
+            }
         }
+        
 
         return response()->json([
             'labels' => ['Open', 'Closed', 'In Progress', 'Overdue'],
@@ -526,6 +546,7 @@ class ProgressPerbaikanController extends Controller
             ],
         ]);
     }
+
 
 
     public function chartCategory(Request $request)

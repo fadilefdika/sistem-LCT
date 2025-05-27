@@ -68,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadFindingData();
 });
 
-// statusChart
 let ctxStatus = document.getElementById("statusChart").getContext("2d");
 
 let statusChart = new Chart(ctxStatus, {
@@ -77,7 +76,7 @@ let statusChart = new Chart(ctxStatus, {
         labels: ["Open", "Closed", "In Progress", "Overdue"],
         datasets: [
             {
-                data: [50, 120, 40, 30],
+                data: [0, 0, 0, 0], // Awalnya 0, nanti akan diupdate
                 backgroundColor: ["#F59E0B", "#10B981", "#3B82F6", "#EF4444"],
             },
         ],
@@ -110,34 +109,32 @@ let statusChart = new Chart(ctxStatus, {
     plugins: [ChartDataLabels],
 });
 
-function updateStatusChart() {
-    const year = document.getElementById("statusYear").value;
-    const month = document.getElementById("statusMonth").value;
-
-    fetch(`/ehs/reporting/chart/status?year=${year}&month=${month || ""}`)
-        .then((res) => res.json())
-        .then(({ labels, data }) => {
-            statusChart.data.labels = labels;
-            statusChart.data.datasets[0].data = data;
-            statusChart.update();
-        })
-        .catch((err) => {
-            console.error("Failed to fetch status chart data:", err);
-        });
+// Fungsi untuk mengupdate chart status tanpa re-inisialisasi
+function renderStatusChart(labels, data) {
+    statusChart.data.labels = labels;
+    statusChart.data.datasets[0].data = data;
+    statusChart.update();
 }
 
-const yearSelectStatus = document.getElementById("statusYear");
-const monthSelectStatus = document.getElementById("statusMonth");
+// Ambil data chart status dari server via AJAX
+function loadStatusChart(params = {}) {
+    $.ajax({
+        url: "/ehs/reporting/chart/status",
+        type: "GET",
+        data: params,
+        success: function ({ labels, data }) {
+            renderStatusChart(labels, data);
+        },
+        error: function () {
+            alert("Gagal memuat data status chart.");
+        },
+    });
+}
 
-yearSelectStatus.addEventListener("change", () =>
-    updateStatusChart(yearSelectStatus.value, monthSelectStatus.value)
-);
-monthSelectStatus.addEventListener("change", () =>
-    updateStatusChart(yearSelectStatus.value, monthSelectStatus.value)
-);
-
-// Load initial data
-updateStatusChart();
+// Saat halaman pertama kali dibuka
+document.addEventListener("DOMContentLoaded", () => {
+    loadStatusChart();
+});
 
 const ctxCategory = document.getElementById("categoryChart").getContext("2d");
 
