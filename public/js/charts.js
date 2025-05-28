@@ -163,11 +163,14 @@ const categoryChart = new Chart(ctxCategory, {
 });
 
 function loadCategoryChart(params = {}) {
+    console.log("Mengirim filter ke chart:", params);
+
     $.ajax({
         url: "/ehs/reporting/chart/category",
         type: "GET",
         data: params,
         success: function ({ labels, data }) {
+            console.log("Data diterima dari chart:", { labels, data });
             renderCategoryChart(labels, data);
         },
         error: function () {

@@ -6,9 +6,6 @@ use Carbon\Carbon;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
-use App\Mail\CloseNotification;
-use App\Mail\LaporanRevisiToPic;
-use App\Mail\ApprovalNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -16,8 +13,8 @@ use App\Models\AreaLct;
 use App\Models\Kategori;
 use App\Models\LctDepartement;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use PhpOffice\PhpPresentation\Shape\Chart\Type\Area;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LaporanLctExport;
 
 class ProgressPerbaikanController extends Controller
 {
@@ -34,8 +31,9 @@ class ProgressPerbaikanController extends Controller
         }
 
         // Data dropdown filter
-        $departments = \App\Models\LctDepartement::pluck('nama_departemen', 'id');
+        $departments = \App\Models\LctDepartement::whereNull('deleted_at')->pluck('nama_departemen', 'id');
         $areas = \App\Models\AreaLct::whereNull('deleted_at')->pluck('nama_area', 'id');
+        $categories = \App\Models\Kategori::whereNull('deleted_at')->pluck('nama_kategori', 'id');
 
         $statusGroups = [
             'Open' => ['open'],
@@ -88,6 +86,12 @@ class ProgressPerbaikanController extends Controller
         $query = $this->buildLaporanQuery($request, $user, $role);
         $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
 
+        // dd(
+        //     $query->toSql(),
+        //     $query->getBindings(),
+        //     $query->count()
+        // );
+        
 
         $perPage = $request->input('perPage', 10);
 
@@ -120,6 +124,7 @@ class ProgressPerbaikanController extends Controller
             'statusGroups' => $statusGroups,
             'areas' => $areas,
             'departments' => $departments,
+            'categories' => $categories,
             'availableYears' => $availableYears,
         ]);
             
@@ -165,8 +170,6 @@ class ProgressPerbaikanController extends Controller
             $laporan->save();
         }
         
-
-
         
         return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted'));
     }
@@ -476,6 +479,10 @@ class ProgressPerbaikanController extends Controller
             $query->where('departemen_id', $request->departemenId);
         }
 
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
+        }
+
         if ($request->filled('areaId')) {
             $query->where('area_id', $request->areaId);
         }
@@ -553,9 +560,10 @@ class ProgressPerbaikanController extends Controller
     {
         
         $query = DB::table('lct_laporan as l')
-        ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
-        ->whereNull('k.deleted_at');
-    
+            ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
+            ->whereNull('l.deleted_at')
+            ->whereNull('k.deleted_at');
+
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
             $query->whereIn('l.status_lct', $statuses);
@@ -567,6 +575,10 @@ class ProgressPerbaikanController extends Controller
         
         if ($request->filled('departemenId')) {
             $query->where('l.departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
         }
         
         if ($request->filled('areaId')) {
@@ -585,6 +597,7 @@ class ProgressPerbaikanController extends Controller
             ->groupBy('k.nama_kategori')
             ->pluck('total', 'k.nama_kategori')
             ->toArray();
+        
 
         $categories = Kategori::whereNull('deleted_at')
             ->pluck('nama_kategori')
@@ -621,8 +634,10 @@ class ProgressPerbaikanController extends Controller
 
         // Mulai query laporan
         $query = DB::table('lct_laporan as l')
+            ->whereNull('l.deleted_at')
             ->select('l.area_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('l.area_id', $areas->keys()); // hanya area aktif
+            ->whereIn('l.area_id', $areas->keys())
+            ->groupBy('l.area_id');
 
         // Terapkan filter jika tersedia
         if ($request->filled('statusLct')) {
@@ -636,6 +651,10 @@ class ProgressPerbaikanController extends Controller
 
         if ($request->filled('departemenId')) {
             $query->where('l.departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
         }
 
         if ($request->filled('areaId')) {
@@ -675,11 +694,14 @@ class ProgressPerbaikanController extends Controller
         $departments = LctDepartement::whereNull('deleted_at')
             ->orderBy('nama_departemen')
             ->pluck('nama_departemen', 'id');
-    
-        // Base query laporan_lct
+
+
         $query = DB::table('lct_laporan as l')
+            ->whereNull('l.deleted_at')
             ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('l.departemen_id', $departments->keys());
+            ->whereIn('l.departemen_id', $departments->keys())
+            ->groupBy('l.departemen_id');
+
     
         // Filter opsional
         if ($request->filled('statusLct')) {
@@ -689,6 +711,14 @@ class ProgressPerbaikanController extends Controller
     
         if ($request->filled('riskLevel')) {
             $query->where('l.tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('departemenId')) {
+            $query->where('l.departemen_id', $request->departemenId);
+        }
+
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
         }
     
         if ($request->filled('areaId')) {
@@ -781,6 +811,10 @@ class ProgressPerbaikanController extends Controller
             $query->where('departemen_id', $request->departemenId);
         }
 
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
+        }
+
         if ($request->filled('areaId')) {
             $query->where('area_id', $request->areaId);
         }
@@ -800,5 +834,23 @@ class ProgressPerbaikanController extends Controller
         ]);
     }
 
+
+    public function exportExcel(Request $request)
+    {
+        // Ambil user dan role sesuai guard
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;
+        } else {
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;
+        }
+
+        $query = $this->buildLaporanQuery($request, $user, $role);
+        $laporans = $query->get();
+
+
+        return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
+    }
 
 }

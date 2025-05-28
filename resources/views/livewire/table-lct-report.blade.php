@@ -21,7 +21,7 @@
             <thead class="bg-gray-50">
                 <tr class="text-left text-sm font-semibold text-gray-600">
                     <th scope="col" class="px-4 py-3 w-12 text-center">No</th>
-                    <th scope="col" class="px-4 py-3 w-40">Reporter Name</th>
+                    <th scope="col" class="px-4 py-3 w-40">Finder Name</th>
                     <th scope="col" class="px-4 py-3 w-60">Non-Conformity Findings</th>
                     <th scope="col" class="px-4 py-3 w-32">Date</th>
                     <th scope="col" class="px-4 py-3 w-36">Area</th>

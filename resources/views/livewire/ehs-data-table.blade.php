@@ -225,7 +225,7 @@
                 console.log("Error saving ehs:", error);
                 Swal.fire({
                     title: "Failed!",
-                    text: "Failed to save data. Check the console for details.",
+                    text: "Failed to save data.",
                     icon: "error",
                     confirmButtonText: "OK"
                 });

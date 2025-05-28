@@ -10,36 +10,47 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {
-    protected $start;
-    protected $end;
+    protected $laporans;
 
-    public function __construct($start, $end)
+    public function __construct($laporans)
     {
-        $this->start = $start;
-        $this->end = $end;
+        $this->laporans = $laporans;
     }
 
     public function collection()
     {
-        return LaporanLct::with(['kategori', 'area', 'picUser'])
-            ->whereBetween('tanggal_temuan', [$this->start, $this->end])
-            ->get();
+        return $this->laporans;
     }
 
     public function map($laporan): array
     {
-        $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))
-            ->map(fn($path) => '=HYPERLINK("' . asset('storage/' . $path) . '", "Lihat Gambar")')
-            ->implode(', ');
+        // Ambil gambar pertama dari bukti_temuan
+        $bukti_temuan_array = is_string($laporan->bukti_temuan)
+            ? json_decode($laporan->bukti_temuan, true)
+            : (is_array($laporan->bukti_temuan) ? $laporan->bukti_temuan : []);
 
-        $bukti_perbaikan = collect(json_decode($laporan->bukti_perbaikan, true))
-            ->map(fn($path) => '=HYPERLINK("' . asset('storage/' . $path) . '", "Lihat Gambar")')
-            ->implode(', ');
+        $bukti_temuan = '-';
+        if (!empty($bukti_temuan_array[0])) {
+            $url = asset('storage/' . $bukti_temuan_array[0]);
+            $bukti_temuan = '=HYPERLINK("' . asset('storage/' . $bukti_temuan_array[0]) . '", "Lihat Gambar")';
+        }
+
+        // Ambil gambar pertama dari bukti_perbaikan
+        $bukti_perbaikan_array = is_string($laporan->bukti_perbaikan)
+            ? json_decode($laporan->bukti_perbaikan, true)
+            : (is_array($laporan->bukti_perbaikan) ? $laporan->bukti_perbaikan : []);
+
+        $bukti_perbaikan = '-';
+        if (!empty($bukti_perbaikan_array[0])) {
+            $url = asset('storage/' . $bukti_perbaikan_array[0]);
+            $bukti_perbaikan = '=HYPERLINK("' . asset('storage/' . $bukti_perbaikan_array[0]) . '", "Lihat Gambar")';
+        }
 
         return [
             $laporan->tanggal_temuan,
             $laporan->temuan_ketidaksesuaian ?? '-',
-            $bukti_temuan ?: '-',
+            $bukti_temuan,
+            $laporan->tingkat_bahaya ?? '-',
             $laporan->kategori->nama_kategori ?? '-',
             $laporan->area->nama_area ?? '-',
             $laporan->detail_area ?? '-',
@@ -47,7 +58,7 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
             $laporan->picUser->fullname ?? '-',
             $laporan->due_date ?? '-',
             $laporan->date_completion ?? '-',
-            $bukti_perbaikan ?: '-',
+            $bukti_perbaikan,
         ];
     }
 
@@ -57,6 +68,7 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
             'Tanggal Temuan',
             'Temuan',
             'Foto Temuan',
+            'Tingkat Bahaya',
             'Jenis Temuan',
             'Lokasi Temuan',
             'Detail Lokasi',

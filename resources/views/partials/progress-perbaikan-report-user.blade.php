@@ -12,7 +12,7 @@
             <!-- Report from Reporter -->
             <div class="md:col-span-2 bg-white p-4 md:p-6 rounded-xl shadow-sm hover:shadow-md transition">
                 <h5 class="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2 tracking-wide">
-                    📝 Report from the Reporter
+                    📝 Report from the Finder
                 </h5>
                 <div class="w-full h-[1.5px] bg-gray-200 my-3"></div>
                 <p class="text-gray-500 text-xs md:text-sm">Non-Conformity Finding</p>
@@ -26,7 +26,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <p class="text-gray-500 text-xs flex items-center gap-1">
-                            <i class="fas fa-user text-blue-500"></i> Reporter Name
+                            <i class="fas fa-user text-blue-500"></i> Finder Name
                         </p>
                         <p class="text-gray-900 font-semibold text-sm mt-1 leading-tight">
                             {{ $laporan->user->fullname }}

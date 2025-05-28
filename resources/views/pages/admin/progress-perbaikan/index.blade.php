@@ -34,12 +34,14 @@
             <!-- Export Button -->
             @if($roleName === 'ehs')
                 <div>
-                    <a class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
-                    Export to Excel
-                    </a>
+                    <a href="{{ route('ehs.reporting.export') }}" id="export-link" 
+                        class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                             <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                         </svg>
+                         Export to Excel
+                     </a>
+                     
                 </div>
             @endif
             </div>
@@ -93,6 +95,19 @@
                             <option value="">All Depts</option>
                             @foreach ($departments as $id => $nama)
                             <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
+                            {{ $nama }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Category</label>
+                        <select name="categoryId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <option value="">All Category</option>
+                            @foreach ($categories as $id => $nama)
+                            <option value="{{ $id }}" {{ request('categoryId') == $id ? 'selected' : '' }}>
                             {{ $nama }}
                             </option>
                             @endforeach
@@ -354,13 +369,21 @@
                             Alpine.initTree(document.querySelector('#report-container'));
                         }
                         $('html, body').animate({ scrollTop: $('#report-container').offset().top - 100 }, 300);
+                        updateExportLink(params);
                     },
                     error: function() {
                         alert('Gagal mengambil data.');
                     }
                 });
             }
-        
+
+            // Fungsi untuk update href export Excel
+            function updateExportLink(filters) {
+                const queryString = new URLSearchParams(filters).toString();
+                const exportUrl = "{{ route('ehs.reporting.export') }}" + (queryString ? '?' + queryString : '');
+                $('#export-link').attr('href', exportUrl);
+            }
+                    
             // Submit filter via AJAX
             $('form').on('submit', function(e) {
                 e.preventDefault();
