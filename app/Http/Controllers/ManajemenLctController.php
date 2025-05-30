@@ -1,13 +1,19 @@
 <?php
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Pic;
 use App\Models\User;
+use App\Models\AreaLct;
+use App\Models\Kategori;
 use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
 use App\Models\BudgetApproval;
+use App\Models\LctDepartement;
+use App\Exports\LaporanLctExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use App\Mail\LaporanHasilPerbaikan;
 use Illuminate\Support\Facades\Log;
@@ -21,9 +27,85 @@ use Illuminate\Support\Facades\Validator;
 
 class ManajemenLctController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.admin.manajemen-lct.index');
+        $user = Auth::user();
+        $picId = Pic::where('user_id', $user->id)->value('id');
+        $areas = \App\Models\AreaLct::whereNull('deleted_at')->pluck('nama_area', 'id');
+        $categories = \App\Models\Kategori::whereNull('deleted_at')->pluck('nama_kategori', 'id');
+
+        $statusGroups = [
+            'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
+            'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
+            'Closed' => ['closed'],
+            'Overdue' => ['overdue'],
+        ];
+
+        $now = Carbon::now();
+
+        // Ambil semua laporan yang belum pernah dicatat overdue
+        $laporanList = LaporanLct::whereNull('first_overdue_date')
+            ->where('status_lct', '!=', 'closed')
+            ->get();
+
+        foreach ($laporanList as $laporan) {
+            $overdue = false;
+
+            if ($laporan->tingkat_bahaya === 'Low') {
+                if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
+                    $overdue = true;
+                }
+            } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                if (
+                    is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
+                ) {
+                    // Safety net jika due_date_temp tidak digunakan
+                    $overdue = true;
+                } elseif (
+                    !is_null($laporan->due_date_temp) &&
+                    is_null($laporan->due_date_perm) &&
+                    Carbon::parse($laporan->due_date_temp)->lt($now)
+                ) {
+                    $overdue = true;
+                } elseif (
+                    !is_null($laporan->due_date_perm) &&
+                    is_null($laporan->date_completion) &&
+                    Carbon::parse($laporan->due_date_perm)->lt($now)
+                ) {
+                    $overdue = true;
+                }
+            }
+
+            if ($overdue) {
+                $laporan->first_overdue_date = $now;
+                $laporan->save();
+            }
+        }
+        $query = $this->buildLaporanQuery($request, $user, 'pic');
+        $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+
+        $perPage = $request->input('perPage', 10);
+
+        $laporans = $query
+            ->orderBy('order_type')
+            ->orderByDesc('updated_at')
+            ->paginate($perPage)
+            ->withQueryString();
+
+       
+
+        if ($request->ajax()) {
+            // Ini penting! Return partial yang hanya bagian isi
+            return view('partials.tabel-manajemen-lct-wrapper', compact('laporans'))->render();
+        }
+
+        return view('pages.admin.manajemen-lct.index', [
+            'laporans' => $laporans, 
+            'statusGroups' => $statusGroups,
+            'areas'=>$areas,
+            'categories' => $categories,
+        
+        ]);
     }
 
     public function show($id_laporan_lct)
@@ -128,18 +210,28 @@ class ManajemenLctController extends Controller
             $roleName = optional($user->roleLct->first())->name;
         }
 
-        $request->validate([
-            'date_completion' => ['required', 'date'],
-            'bukti_perbaikan' => ['required', 'array', 'max:5'],
-            'bukti_perbaikan.*' => ['file', 'mimes:png,jpg,jpeg,gif', 'max:1024'],
-            'tindakan_perbaikan' => ['required', 'string', 'max:1000'],
-        ]);
+        Log::debug('Input request data:', $request->all());
+
+    // Validasi dengan try-catch untuk tangkap error validasi dan log pesan
+        try {
+            $validated = $request->validate([
+                'date_completion' => ['required', 'date'],
+                'bukti_perbaikan' => ['required', 'array', 'max:5'],
+                'bukti_perbaikan.*' => ['file', 'mimes:png,jpg,jpeg,gif,webp', 'max:1024'],
+                'tindakan_perbaikan' => ['required', 'string', 'max:1000'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log error validasi agar tahu apa yang gagal
+            Log::error('Validation failed:', $e->errors());
+
+            // Jika ingin langsung kirim balik pesan error ke response (opsional)
+            return back()->withErrors($e->errors())->withInput();
+        }
 
         try {
             DB::beginTransaction();
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
-
             $buktiPerbaikan = [];
             if ($request->hasFile('bukti_perbaikan')) {
                 foreach ($request->file('bukti_perbaikan') as $file) {
@@ -163,14 +255,12 @@ class ManajemenLctController extends Controller
             $statusLct = ($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') 
                 ? 'waiting_approval_temporary' 
                 : 'waiting_approval';
-
             $laporan->update([
                 'date_completion' => $request->date_completion,
                 'status_lct' => $statusLct,
                 'tindakan_perbaikan' => json_encode($existing), // JSON lengkap
                 'bukti_perbaikan' => null, // Optional: kosongkan karena sudah masuk dalam JSON
             ]);
-
             RejectLaporan::create([
                 'id_laporan_lct' => $laporan->id_laporan_lct,
                 'user_id' => $user->id,
@@ -348,5 +438,87 @@ class ManajemenLctController extends Controller
         return view('pages.admin.history.index', compact('history','id_laporan_lct'));
     }
     
-    
+    public function exportExcel(Request $request)
+    {
+        // Ambil user dan role sesuai guard
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $role = optional($user->roles->first())->name;
+        } else {
+            $user = Auth::user();
+            $role = optional($user->roleLct->first())->name;
+        }
+
+        $query = $this->buildLaporanQuery($request, $user, $role);
+        $laporans = $query->get();
+
+
+        return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
+    }
+
+    private function buildLaporanQuery(Request $request, $user, $role)
+    {
+        $query = LaporanLct::query();
+
+        // Filter berdasarkan role
+        if ($role === 'user') {
+            $query->where('user_id', $user->id);
+        } elseif ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+            $query->where('departemen_id', $departemenId);
+        } elseif (!in_array($role, ['ehs'])) {
+            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+            $query->where('pic_id', $picId);
+        }
+
+        // Filter tambahan dari request
+        if ($request->filled('riskLevel')) {
+            $query->where('tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
+
+            $query->where(function ($q) use ($statuses, $today) {
+                $q->whereIn('status_lct', $statuses);
+
+                if (in_array('overdue', $statuses)) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('tingkat_bahaya', 'Low')
+                                ->whereDate('due_date', '<', $today)
+                                ->whereNull('date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_temp', '<', $today)
+                                ->whereNull('date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_perm', '<', $today)
+                                ->whereNull('date_completion');
+                        });
+                    });
+                }
+            });
+        }
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+        }
+
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
+        }
+
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);
+        }
+
+        return $query;
+    }
 }

@@ -33,11 +33,11 @@
     @endif
 
     <!-- Content Area -->
-    <div class="flex flex-col md:grid md:grid-cols-2 flex-grow pb-1 min-h-0">
+    <div class="flex flex-col md:grid md:grid-cols-2 flex-grow pb-12 min-h-0">
         <!-- Card Laporan dari EHS -->
         <div 
             id="report-content"
-            class="relative max-w-full bg-[#F3F4F6] shadow-md p-3 overflow-y-auto flex-grow min-h-0
+            class="relative max-w-full bg-[#F3F4F6] p-3 overflow-y-auto flex-grow min-h-0
                 {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }}
                 [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full

@@ -826,10 +826,10 @@
                                                     <!-- Navigation: tampilkan hanya jika slide > 1 -->
                                                     @if(count($tindakanPerbaikan) > 1)
                                                         <div class="flex justify-between mt-4">
-                                                            <button @click="prev()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                            <button @click="prev()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">
                                                                 ‹ Prev
                                                             </button>
-                                                            <button @click="next()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                            <button @click="next()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">
                                                                 Next ›
                                                             </button>
                                                         </div>

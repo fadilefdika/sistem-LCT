@@ -54,7 +54,7 @@
                 <!-- Form -->
                 <div 
                     x-show="tab === 'form' || isDesktop"
-                    class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md p-3 pb-20 max-h-[calc(100vh)] overflow-y-auto
+                    class="relative max-w-full bg-[#F3F4F6] overflow-hidden shadow-md pt-3 px-3 pb-20 max-h-[calc(100vh)] overflow-y-auto
                         [&::-webkit-scrollbar]:w-1
                         [&::-webkit-scrollbar-track]:rounded-full
                         [&::-webkit-scrollbar-track]:bg-gray-100

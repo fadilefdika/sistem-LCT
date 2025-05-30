@@ -66,7 +66,6 @@
                                     @endif
                                 </td>
                             
-
                             
                                 @php
                                     $fullname = $laporan->picUser->fullname ?? '-';
@@ -281,14 +280,14 @@
                                                                 <!-- Panah Navigasi (hanya jika gambar > 1) -->
                                                                 <template x-if="images.length > 1">
                                                                     <button @click="prev"
-                                                                        class="absolute cursor-pointer left-0 top-1/2 -translate-y-1/2 bg-white/60 hover:bg-white text-gray-800 px-2 py-1 rounded-r-md">
+                                                                        class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/60 hover:bg-white text-gray-800 px-2 py-1 cursor-pointer rounded-r-md">
                                                                         ‹
                                                                     </button>
                                                                 </template>
                                                         
                                                                 <template x-if="images.length > 1">
                                                                     <button @click="next"
-                                                                        class="absolute cursor-pointer right-0 top-1/2 -translate-y-1/2 bg-white/60 hover:bg-white text-gray-800 px-2 py-1 rounded-l-md">
+                                                                        class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/60 hover:bg-white text-gray-800 px-2 py-1 cursor-pointer rounded-l-md">
                                                                         ›
                                                                     </button>
                                                                 </template>
@@ -523,10 +522,10 @@
 
                                                             @if(count($tindakanPerbaikan) > 1)
                                                                 <div class="flex justify-between mt-4">
-                                                                    <button @click="prev()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                                    <button @click="prev()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">
                                                                         ‹ Prev
                                                                     </button>
-                                                                    <button @click="next()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+                                                                    <button @click="next()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">
                                                                         Next ›
                                                                     </button>
                                                                 </div>

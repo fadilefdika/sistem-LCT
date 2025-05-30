@@ -123,7 +123,7 @@
                         <p class="text-xs text-gray-500 mt-1">
                             Upload up to 5 photos related to the LCT finding. Ensure that the image file size does not exceed 1MB and is in PNG, JPG, or GIF format.
                         </p>
-                        </div>
+                    </div>
                     
                 <!-- Submit button -->
                     <button 
@@ -177,23 +177,23 @@
 
 <!-- Script untuk menangani Kamera -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let maxFiles = 5;
         let uploadedFiles = [];
-
+    
         const dropzone = document.getElementById("dropzone-file");
         const openCameraBtn = document.getElementById("open-camera");
         const captureBtn = document.getElementById("capture-photo");
         const myCamera = document.getElementById("my_camera");
         const previewContainer = document.getElementById("preview-container");
-
-        // Pastikan dropzone tidak null sebelum digunakan
+    
         if (!dropzone) {
             console.error("Elemen dropzone-file tidak ditemukan.");
             return;
         }
-
+    
         // Inisialisasi Webcam.js
         Webcam.set({
             width: 200,
@@ -201,72 +201,82 @@
             image_format: 'jpeg',
             jpeg_quality: 90
         });
-
+    
         openCameraBtn.addEventListener("click", function () {
             if (uploadedFiles.length >= maxFiles) {
                 alert("Maksimal 5 foto yang bisa diunggah.");
                 return;
             }
-
             myCamera.style.display = "block";
             captureBtn.style.display = "block";
             Webcam.attach(myCamera);
         });
-
+    
         captureBtn.addEventListener("click", function () {
-            Webcam.snap(function (data_uri) {
+            Webcam.snap(async function (data_uri) {
                 // Konversi base64 menjadi file
-                fetch(data_uri)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        let file = new File([blob], `kamera-${Date.now()}.jpg`, { type: "image/jpeg" });
-
-                        // Tambahkan file ke daftar
-                        uploadedFiles.push(file);
-                        updateInputFiles();
-                        renderPreview();
-                    });
-
+                const res = await fetch(data_uri);
+                const blob = await res.blob();
+                let file = new File([blob], `kamera-${Date.now()}.jpg`, { type: "image/jpeg" });
+    
+                try {
+                    file = await compressImage(file);
+                } catch (err) {
+                    console.warn("Kompresi gagal, pakai file asli", err);
+                }
+    
+                uploadedFiles.push(file);
+                updateInputFiles();
+                renderPreview();
+    
                 // Sembunyikan kamera
                 Webcam.reset();
                 myCamera.style.display = "none";
                 captureBtn.style.display = "none";
             });
         });
-
-        // Saat memilih file dari galeri
-        dropzone.addEventListener("change", function (event) {
+    
+        dropzone.addEventListener("change", async function (event) {
             let files = Array.from(event.target.files);
+    
             if (uploadedFiles.length + files.length > maxFiles) {
                 alert("Maksimal 5 foto yang bisa diunggah.");
                 return;
             }
-
-            uploadedFiles = uploadedFiles.concat(files);
+    
+            // Kompresi semua file secara async
+            const compressedFiles = [];
+            for (const file of files) {
+                try {
+                    const compressed = await compressImage(file);
+                    compressedFiles.push(compressed);
+                } catch (err) {
+                    console.warn("Kompresi gagal, pakai file asli", err);
+                    compressedFiles.push(file);
+                }
+            }
+    
+            uploadedFiles = uploadedFiles.concat(compressedFiles);
             updateInputFiles();
             renderPreview();
         });
-
-        // Fungsi memperbarui input file agar dikirim ke backend
+    
         function updateInputFiles() {
             let dataTransfer = new DataTransfer();
             uploadedFiles.forEach(file => dataTransfer.items.add(file));
-
-            // Pastikan input file diperbarui
             dropzone.files = dataTransfer.files;
         }
-
-        // Render pratinjau gambar
+    
         function renderPreview() {
             previewContainer.innerHTML = "";
             uploadedFiles.forEach((file, index) => {
                 let wrapper = document.createElement("div");
                 wrapper.classList.add("relative", "w-24", "h-24", "rounded-lg", "overflow-hidden", "group");
-
+    
                 let img = document.createElement("img");
                 img.src = URL.createObjectURL(file);
                 img.classList.add("w-full", "h-full", "object-cover", "rounded-lg");
-
+    
                 let removeBtn = document.createElement("button");
                 removeBtn.innerHTML = "&times;";
                 removeBtn.classList.add(
@@ -280,13 +290,69 @@
                     updateInputFiles();
                     renderPreview();
                 });
-
+    
                 wrapper.appendChild(img);
                 wrapper.appendChild(removeBtn);
                 previewContainer.appendChild(wrapper);
             });
         }
-
-
+    
+        // Fungsi kompresi gambar seperti sebelumnya
+        async function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                if (file.type === 'image/webp' || !file.type.startsWith('image/')) {
+                    resolve(file);
+                    return;
+                }
+    
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+    
+                        const MAX_WIDTH = 1024;
+                        const MAX_HEIGHT = 1024;
+                        let width = img.width;
+                        let height = img.height;
+    
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+    
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+    
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+    
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                console.warn("Compression failed, using original file");
+                                resolve(file);
+                                return;
+                            }
+    
+                            const newFileName = file.name.replace(/\.[^/.]+$/, "") + '.webp';
+                            const compressedFile = new File([blob], newFileName, {
+                                type: "image/webp",
+                                lastModified: Date.now()
+                            });
+    
+                            resolve(compressedFile);
+                        }, "image/webp", 0.7);
+                    };
+                    img.onerror = () => resolve(file);
+                };
+                reader.onerror = () => resolve(file);
+                reader.readAsDataURL(file);
+            });
+        }
     });
-</script>
+    </script>

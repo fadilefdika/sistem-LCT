@@ -87,6 +87,9 @@ Route::middleware(['auth', 'verified', 'role:pic'])->prefix('manajemen-lct')->na
 
     Route::post('/{id_laporan_lct}/storeTask', [LctTaskController::class, 'store'])->name('storeTask');
     Route::post('/{id_task}/updateStatus', [LctTaskController::class, 'updateStatus'])->name('updateStatus');
+
+    
+    Route::get('/reporting/export', [ProgressPerbaikanController::class, 'exportExcel'])->name('export');
 });
 
 // =================== ROUTE UNTUK EHS ===================

@@ -162,34 +162,69 @@
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3">
 
                         <!-- Chart Garis: Findings per Bulan -->
-                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative">
+                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative w-full">
                             <h2 class="text-base font-semibold text-gray-800 mb-4">Findings Per Month</h2>
-                                <div class="absolute top-4 right-4 w-28">
-                                    <select id="month-select" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                            <div class="h-[200px]">
-                                <canvas id="monthlyChart"></canvas>
-                            </div>
-                        </div>
 
-                        <!-- Chart Pie: Status Closed/Non-Closed -->
-                        <div class="bg-white rounded-2xl shadow-md p-6 relative">
-                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Status</h2>
                             <div class="absolute top-4 right-4 w-28">
-                                <select id="month-select-status" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                <select id="month-select"
+                                    class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
                                     @for ($m = 1; $m <= 12; $m++)
-                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
                                     @endfor
                                 </select>
                             </div>
-                            <div class="flex justify-center items-center h-[200px]">
-                                <canvas id="statusChart"></canvas>
+
+                            <!-- Pastikan container penuh -->
+                            <div class="w-full h-[300px] relative">
+                                <canvas id="monthlyChart" class="!w-full !h-full"></canvas>
                             </div>
                         </div>
+
+
+                        <!-- Chart Pie: Status Closed/Non-Closed -->
+                        <div class="bg-white rounded-2xl shadow-md p-6 relative w-full">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="text-base font-semibold text-gray-800">Findings by Status</h2>
+                                <div class="w-32">
+                                    <select id="month-select-status"
+                                        class="w-full px-2 py-1 rounded-md border border-gray-300 bg-white text-xs focus:ring-2 focus:ring-blue-400">
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">
+                                                {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+                                <!-- Chart Area -->
+                                <div class="flex-1 flex justify-center items-center h-[250px]">
+                                    <canvas id="statusChart" class="!w-full !h-full max-w-[300px] max-h-[300px]"></canvas>
+                                </div>
+
+                                <!-- Legend Manual (Optional Enhancement) -->
+                                <div class="text-sm space-y-2 hidden lg:block">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full bg-[#FFC107]"></span>
+                                        <span>Open</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full bg-[#4CAF50]"></span>
+                                        <span>Closed</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full bg-[#2196F3]"></span>
+                                        <span>In Progress</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full bg-[#0069AA]"></span>
+                                        <span>Overdue</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <!-- Grid untuk Area dan Kategori -->
@@ -227,21 +262,23 @@
                     </div>
 
                     <!-- Chart Department -->
-                    <div class="grid grid-cols-1 mt-4">
-                        <div class="bg-white rounded-2xl shadow-md p-6 relative">
-                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
-                            <div class="absolute top-6 right-6 w-40">
-                                <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                    @for ($m = 1; $m <= 12; $m++)
-                                        <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div class="h-[300px]">
-                                <canvas id="departmentChart"></canvas>
+                    @if($isEhs)
+                        <div class="grid grid-cols-1 mt-4">
+                            <div class="bg-white rounded-2xl shadow-md p-6 relative">
+                                <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
+                                <div class="absolute top-6 right-6 w-40">
+                                    <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="h-[300px]">
+                                    <canvas id="departmentChart"></canvas>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 @endif
             </div>
         </div>
@@ -315,7 +352,6 @@
             }
         });
     }
-
 
 
     function fetchChartData(year, month = '') {
@@ -573,50 +609,77 @@
         let statusChart;
 
         function renderStatusChart(statusCounts) {
-            const ctx = document.getElementById('statusChart').getContext('2d');
+        const ctx = document.getElementById('statusChart').getContext('2d');
 
-            if (statusChart) statusChart.destroy();
+        if (statusChart) statusChart.destroy();
 
-            const dataValues = [
-                Number(statusCounts.open) || 0,
-                Number(statusCounts.closed) || 0,
-                Number(statusCounts.in_progress) || 0,
-                Number(statusCounts.overdue) || 0
-            ];
+        const dataValues = [
+            Number(statusCounts.open) || 0,
+            Number(statusCounts.closed) || 0,
+            Number(statusCounts.in_progress) || 0,
+            Number(statusCounts.overdue) || 0
+        ];
 
-            const total = dataValues.reduce((a, b) => a + b, 0);
+        const total = dataValues.reduce((a, b) => a + b, 0);
 
-            statusChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Open', 'Closed', 'In Progress', 'Overdue'],
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: [
-                            '#FFC107',   // Open - kuning lebih tegas
-                            '#4CAF50',   // Closed - hijau tegas
-                            '#2196F3',   // In Progress - biru tegas
-                            '#0069AA'    // Overdue - biru utama solid
-                        ],
-                        borderWidth: 0 // tidak ada border
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        datalabels: {
-                            formatter: (value, context) => {
-                                return total ? (value / total * 100).toFixed(1) + '%' : '0%';
-                            },
-                            color: '#000',
-                            font: { weight: 'bold' }
+        statusChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Open', 'Closed', 'In Progress', 'Overdue'],
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: [
+                        '#FFC107',   // Open
+                        '#4CAF50',   // Closed
+                        '#2196F3',   // In Progress
+                        '#0069AA'    // Overdue
+                    ],
+                    borderWidth: 4,
+                    borderColor: '#fff',
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            boxWidth: 12,
+                            font: {
+                                size: 12,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    datalabels: {
+                        formatter: (value, context) => {
+                            return total ? (value / total * 100).toFixed(1) + '%' : '0%';
+                        },
+                        color: '#000',
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value} (${((value / total) * 100).toFixed(1)}%)`;
+                            }
                         }
                     }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
 
 
         function fetchStatusChartData(year, month) {

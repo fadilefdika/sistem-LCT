@@ -15,7 +15,8 @@
                 'In Progress' => ['in_progress', 'progress_work', 'work_permanent'],
                 'Waiting Approval' => ['waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent', 'waiting_approval_taskbudget'],
                 'Approved' => ['approved', 'approved_temporary', 'approved_permanent', 'approved_taskbudget'],
-                'Revision' => ['revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision']
+                'Revision' => ['revision', 'temporary_revision', 'permanent_revision', 'taskbudget_revision'],
+                'Closed' => ['closed']
             ];
 
             $statusText = 'Unknown';
@@ -41,6 +42,10 @@
                         case 'Revision':
                             $statusColor = 'red';
                             $statusIcon = 'fas fa-times-circle text-red-500';
+                            break;
+                        case 'Closed':
+                            $statusColor = 'green';
+                            $statusIcon = 'ffas fa-check-circle text-green-500';
                             break;
                     }
                     break;
@@ -251,7 +256,7 @@
         @if ($rejected->isNotEmpty())
             @foreach ($rejected as $reject)
                 <div class="bg-red-50 p-3 rounded-lg mb-2">
-                    <p class="text-red-700 text-sm"><strong>Alasan:</strong> {{ $reject->alasan_reject }}</p>
+                    <p class="text-red-700 text-sm"><strong>Reason:</strong> {{ $reject->alasan_reject }}</p>
                     <p class="text-gray-500 text-xs">{{ $reject->created_at->format('d M Y') }}</p>
                 </div>
             @endforeach
@@ -383,7 +388,7 @@
     </div>
 
     <!-- Modal Preview -->
-    <div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/50 bg-opacity-75 flex items-center justify-center z-60 transition-opacity duration-300">
         <div class="relative bg-white p-1 rounded-lg shadow-lg">
             <!-- Tombol Close -->
             <button id="closeModalBtn"
