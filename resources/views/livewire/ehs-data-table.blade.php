@@ -59,7 +59,7 @@
 
 
 <!-- MODAL EHS -->
-<div id="ehsModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
+<div id="ehsModal" class="fixed inset-0 flex items-center justify-center bg-black/40 bg-opacity-50 px-4 z-60 hidden">
     <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
         <h2 class="text-lg font-medium text-gray-800 mb-3">
             <span id="modalTitle">Tambah EHS</span>

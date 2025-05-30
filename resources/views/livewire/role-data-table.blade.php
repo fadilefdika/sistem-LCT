@@ -1,7 +1,7 @@
 <div class="overflow-x-auto bg-white p-6 shadow-md rounded-xl flex flex-col gap-6">
     <!-- Add PIC Button -->
     <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-700">Manage PIC</h2>
+        <h2 class="text-xl font-semibold text-gray-700">PIC List</h2>
         <button id="openModal" class="bg-blue-600 text-white py-2 px-4 text-xs rounded-lg shadow-sm hover:bg-blue-700 transition-all cursor-pointer">
             + Add PIC
         </button>
@@ -67,75 +67,75 @@
             
         </div>
         <!-- Pagination -->
-        <div class="mt-4 flex justify-between items-center border-t px-5 py-3 text-gray-600 text-sm">
+        <div class="flex justify-between items-center border-t px-5 py-3 text-gray-600 text-sm">
             <span>Showing {{ $pics->firstItem() }} to {{ $pics->lastItem() }} of {{ $pics->total() }} entries</span>
             <div>{{ $pics->links('pagination::tailwind') }}</div>
         </div>
 
     </div>
     <!-- Modal Tambah/Edit PIC -->
-<div id="picModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-50 hidden">
-    <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
-        <h2 class="text-lg font-medium text-gray-800 mb-3">
-            <span id="modalTitle">Add PIC</span>
-        </h2>
+    <div id="picModal" class="fixed inset-0 flex items-center justify-center bg-black/40 bg-opacity-50 px-4 z-60 hidden">
+        <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
+            <h2 class="text-lg font-medium text-gray-800 mb-3">
+                <span id="modalTitle">Add PIC</span>
+            </h2>
 
-        <form id="picForm">
-            @csrf
-            <input type="hidden" id="picId" name="pic_id">
+            <form id="picForm">
+                @csrf
+                <input type="hidden" id="picId" name="pic_id">
 
-            <!-- Search PIC -->
-            <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700">Pic</label>
+                <!-- Search PIC -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">PIC</label>
 
-                <div class="relative">
-                    <input type="text" id="searchUser" class="w-full pr-10 border border-gray-300 rounded-md p-2 mt-1 text-sm focus:ring focus:ring-blue-200" placeholder="Search PIC...">
+                    <div class="relative">
+                        <input type="text" id="searchUser" class="w-full pr-10 border border-gray-300 rounded-md p-2 mt-1 text-sm focus:ring focus:ring-blue-200" placeholder="Search PIC...">
 
-                    <!-- Loading Spinner -->
-                    <div id="loadingSpinnerUser" class="absolute inset-y-0 right-3 flex items-center hidden">
-                        <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"></path>
-                        </svg>
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinnerUser" class="absolute inset-y-0 right-3 flex items-center hidden">
+                            <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"></path>
+                            </svg>
+                        </div>
+
+                        <!-- Dropdown User List -->
+                        <ul id="userList" class="absolute left-0 w-full border border-gray-300 rounded-md mt-1 bg-white shadow-lg hidden z-50 max-h-48 overflow-auto"></ul>
                     </div>
 
-                    <!-- Dropdown User List -->
-                    <ul id="userList" class="absolute left-0 w-full border border-gray-300 rounded-md mt-1 bg-white shadow-lg hidden z-50 max-h-48 overflow-auto"></ul>
+                    <input type="hidden" id="selectedUserId" name="user_id">
                 </div>
 
-                <input type="hidden" id="selectedUserId" name="user_id">
-            </div>
+                <!-- Search Department -->
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700">Department</label>
 
-            <!-- Search Department -->
-            <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700">Department</label>
+                    <div class="relative">
+                        <input type="text" id="searchDepartment" class="w-full pr-10 border border-gray-300 rounded-md p-2 mt-1 text-sm focus:ring focus:ring-blue-200" placeholder="Search Department...">
 
-                <div class="relative">
-                    <input type="text" id="searchDepartment" class="w-full pr-10 border border-gray-300 rounded-md p-2 mt-1 text-sm focus:ring focus:ring-blue-200" placeholder="Search Department...">
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinnerDept" class="absolute inset-y-0 right-3 flex items-center hidden">
+                            <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"></path>
+                            </svg>
+                        </div>
 
-                    <!-- Loading Spinner -->
-                    <div id="loadingSpinnerDept" class="absolute inset-y-0 right-3 flex items-center hidden">
-                        <svg class="animate-spin h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"></path>
-                        </svg>
+                        <!-- Dropdown Department List -->
+                        <ul id="departmentList" class="absolute left-0 w-full border border-gray-300 rounded-md mt-1 bg-white shadow-lg hidden z-50 max-h-48 overflow-auto"></ul>
                     </div>
 
-                    <!-- Dropdown Department List -->
-                    <ul id="departmentList" class="absolute left-0 w-full border border-gray-300 rounded-md mt-1 bg-white shadow-lg hidden z-50 max-h-48 overflow-auto"></ul>
+                    <input type="hidden" id="selectedDepartmentId" name="department_id">
                 </div>
 
-                <input type="hidden" id="selectedDepartmentId" name="department_id">
-            </div>
-
-            <!-- Buttons -->
-            <div class="mt-4 flex justify-end space-x-2">
-                <button type="button" id="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-md text-sm hover:bg-gray-500 cursor-pointer">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-500 cursor-pointer">Save</button>
-            </div>
-        </form>
+                <!-- Buttons -->
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button type="button" id="closeModal" class="px-4 py-2 bg-gray-400 text-white rounded-md text-sm hover:bg-gray-500 cursor-pointer">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-500 cursor-pointer">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
 </div>
 

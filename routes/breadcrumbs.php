@@ -115,7 +115,7 @@ Breadcrumbs::for('riwayat-lct.show', function (BreadcrumbTrail $trail, $laporan)
 // laporan master data
 Breadcrumbs::for('master-data.role-data', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Role Data', route('admin.master-data.role-data.index'));
+    $trail->push('PIC Data', route('admin.master-data.role-data.index'));
 });
 
 // laporan master data
@@ -138,7 +138,7 @@ Breadcrumbs::for('master-data.area-data', function (BreadcrumbTrail $trail) {
 // laporan master data
 Breadcrumbs::for('ehs.master-data.role-data', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Role Data', route('ehs.master-data.role-data.index'));
+    $trail->push('PIC Data', route('ehs.master-data.role-data.index'));
 });
 
 // laporan master data

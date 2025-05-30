@@ -13,8 +13,8 @@
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                 <tr>
                     <th class="px-4 py-3">No</th>
-                    <th class="px-4 py-3">Nama Kategori</th>
-                    <th class="px-4 py-3">Aksi</th>
+                    <th class="px-4 py-3">Category Name</th>
+                    <th class="px-4 py-3">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Modal Tambah/Edit Category -->
-    <div id="categoryModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4 z-57 hidden">
+    <div id="categoryModal" class="fixed inset-0 flex items-center justify-center bg-black/40 bg-opacity-50 px-4 z-60 hidden">
         <div class="bg-white p-5 rounded-lg shadow-md w-full max-w-md">
             <h2 class="text-lg font-medium text-gray-800 mb-3">
                 <span id="modalTitle">Add Category</span>
@@ -68,7 +68,7 @@
                 @csrf
                 <input type="hidden" id="categoryId" name="category_id">
 
-                <!-- Nama Kategori -->
+                <!-- Category Name -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Category Name</label>
                     <input type="text" id="namaCategory" name="nama_kategori" class="w-full border border-gray-300 rounded-md p-2 mt-1 text-sm focus:ring focus:ring-blue-200" placeholder="Enter Category Name...">
