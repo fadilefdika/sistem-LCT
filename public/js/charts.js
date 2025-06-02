@@ -31,15 +31,34 @@ function renderFindingChart(labels, data) {
                     title: { display: true, text: "Date" },
                     ticks: {
                         callback: function (value, index, ticks) {
-                            const date = new Date(this.getLabelForValue(value));
-                            const day = date
-                                .getDate()
-                                .toString()
-                                .padStart(2, "0");
-                            const month = date.toLocaleString("default", {
-                                month: "short",
-                            });
-                            return `${day} ${month}`;
+                            const label = this.getLabelForValue(value);
+
+                            // Jika format YYYY-MM-DD (panjang 10)
+                            if (label.length === 10) {
+                                const date = new Date(label);
+                                const day = date
+                                    .getDate()
+                                    .toString()
+                                    .padStart(2, "0");
+                                const month = date.toLocaleString("default", {
+                                    month: "short",
+                                });
+                                return `${day} ${month}`;
+                            }
+
+                            // Jika format YYYY-MM (panjang 7)
+                            if (label.length === 7) {
+                                const [year, month] = label.split("-");
+                                const monthName = new Date(
+                                    `${label}-01`
+                                ).toLocaleString("default", {
+                                    month: "short",
+                                });
+                                return `${monthName} ${year}`;
+                            }
+
+                            // Jika format hanya tahun (YYYY)
+                            return label;
                         },
                     },
                 },
@@ -76,7 +95,7 @@ let statusChart = new Chart(ctxStatus, {
         labels: ["Open", "Closed", "In Progress", "Overdue"],
         datasets: [
             {
-                data: [0, 0, 0, 0], // Awalnya 0, nanti akan diupdate
+                data: [0, 0, 0, 0],
                 backgroundColor: ["#F59E0B", "#10B981", "#3B82F6", "#EF4444"],
             },
         ],

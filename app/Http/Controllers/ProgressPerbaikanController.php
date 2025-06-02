@@ -220,29 +220,33 @@ class ProgressPerbaikanController extends Controller
                         $laporan->status_lct = 'approved_temporary';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
+                        $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'waiting_approval_taskbudget') {
                         Log::info('Status sekarang: waiting_approval_taskbudget');
                         $laporan->status_lct = 'waiting_approval_taskbudget';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
+                        $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'taskbudget_revision') {
                         Log::info('Status sekarang: taskbudget_revision');
                         $laporan->status_lct = 'taskbudget_revision';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
-        
+                        $laporan->date_completion_temp = Carbon::now();
+
                     } elseif ($laporan->status_lct == 'approved_taskbudget') {
                         Log::info('Status sekarang: approved_taskbudget');
                         $laporan->status_lct = 'approved_taskbudget';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
-        
+                        $laporan->date_completion_temp = Carbon::now();
                     } elseif ($laporan->status_lct == 'waiting_approval_permanent') {
                         Log::info('Status sekarang: waiting_approval_permanent - akan disetujui permanen');
                         $laporan->status_lct = 'approved_permanent';
                         $laporan->date_completion = Carbon::now();
+                        $laporan->date_completion_temp = Carbon::now();
                         $statusLog = 'approved_permanent';
         
                     } else {
@@ -430,7 +434,7 @@ class ProgressPerbaikanController extends Controller
 
     public function chartFindings(Request $request)
     {
-        // Ambil user dan role sesuai guard, sama seperti di index()
+        // Ambil user dan role
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
             $role = optional($user->roles->first())->name;
@@ -439,110 +443,154 @@ class ProgressPerbaikanController extends Controller
             $role = optional($user->roleLct->first())->name;
         }
 
-        // Pakai fungsi buildLaporanQuery untuk mendapatkan data yang sudah difilter
+        // Ambil query terfilter
         $query = $this->buildLaporanQuery($request, $user, $role);
 
         $results = $query->get();
 
+        // Tentukan format groupBy
+        $groupBy = $request->input('groupBy', 'daily');
+        $format = 'Y-m-d'; // default
+
+        switch ($groupBy) {
+            case 'monthly':
+                $format = 'Y-m';
+                break;
+            case 'yearly':
+                $format = 'Y';
+                break;
+            case 'weekly':
+                $format = 'o-\WW'; // ISO week format (e.g., 2024-W23)
+                break;
+        }
+
+        // Group & hitung jumlah
+        $grouped = $results->groupBy(function ($item) use ($format) {
+            return \Carbon\Carbon::parse($item->tanggal_temuan)->format($format);
+        });
+
         $labels = [];
         $data = [];
 
-        $grouped = $results->groupBy(function ($item) {
-            return \Carbon\Carbon::parse($item->tanggal_temuan)->format('Y-m-d');
-        });
-
-        foreach ($grouped as $date => $items) {
-            $labels[] = $date;
+        foreach ($grouped as $label => $items) {
+            $labels[] = $label;
             $data[] = count($items);
         }
 
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
 
-    
 
+    
     public function chartStatus(Request $request)
     {
         $query = LaporanLct::query();
-
-        // Terapkan filter manual
+    
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
-            $query->whereIn('status_lct', $statuses);
+            $today = now();
+    
+            $query->where(function ($q) use ($statuses, $today) {
+                // Filter status yang bukan 'overdue'
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+    
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('status_lct', $statusFilters);
+                }
+    
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    // Filter overdue berdasarkan kondisi tanggal & completion
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('tingkat_bahaya', 'Low')
+                                ->whereDate('due_date', '<', $today)
+                                ->whereNull('date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_temp', '<', $today)
+                                ->whereNull('date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('due_date_perm', '<', $today)
+                                ->whereNull('date_completion');
+                        });
+                    });
+                }
+            });
         }
-
+    
+        // Filter lainnya tetap sama
         if ($request->filled('riskLevel')) {
             $query->where('tingkat_bahaya', $request->riskLevel);
         }
-
+    
         if ($request->filled('departemenId')) {
             $query->where('departemen_id', $request->departemenId);
         }
-
+    
         if ($request->filled('categoryId')) {
             $query->where('kategori_id', $request->categoryId);
         }
-
+    
         if ($request->filled('areaId')) {
             $query->where('area_id', $request->areaId);
         }
-
+    
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $query->whereBetween('created_at', [
                 $request->tanggalAwal . ' 00:00:00',
                 $request->tanggalAkhir . ' 23:59:59',
             ]);
         }
-
+    
         $records = $query->get();
         $today = now();
-
-        // Logika status
+    
+        // Hitung chart seperti yang kamu sudah buat, dengan logika overdue di foreach
         $chartCounts = [
             'Open' => 0,
             'Closed' => 0,
             'In Progress' => 0,
             'Overdue' => 0,
         ];
-        
+    
         foreach ($records as $item) {
             $status = strtolower($item->status_lct);
             $bahaya = strtolower($item->tingkat_bahaya);
             $completion = $item->date_completion;
+            $completionTemp = $item->date_completion_temp;
             $due = $item->due_date;
             $dueTemp = $item->due_date_temp;
             $duePerm = $item->due_date_perm;
-        
-            // Hitung status utama
-            if ($status === 'open') {
-                $chartCounts['Open']++;
-            } elseif ($status === 'closed') {
-                $chartCounts['Closed']++;
-            } else {
-                $chartCounts['In Progress']++;
-            }
-        
-            // Hitung overdue secara terpisah
+    
             $isOverdue = false;
-        
             if ($bahaya === 'low' && is_null($completion) && $due && $today->gt($due)) {
                 $isOverdue = true;
             } elseif (in_array($bahaya, ['medium', 'high'])) {
                 if (is_null($dueTemp) && $due && $today->gt($due)) {
                     $isOverdue = true;
-                } elseif (!is_null($dueTemp) && is_null($duePerm) && $today->gt($dueTemp)) {
+                } elseif (!is_null($dueTemp) && is_null($duePerm) && $today->gt($dueTemp) && is_null($completionTemp)) {
                     $isOverdue = true;
                 } elseif (!is_null($duePerm) && is_null($completion) && $today->gt($duePerm)) {
                     $isOverdue = true;
                 }
             }
-        
+    
             if ($isOverdue) {
                 $chartCounts['Overdue']++;
+            } else {
+                if ($status === 'open') {
+                    $chartCounts['Open']++;
+                } elseif ($status === 'closed') {
+                    $chartCounts['Closed']++;
+                } else {
+                    $chartCounts['In Progress']++;
+                }
             }
         }
-        
-
+    
         return response()->json([
             'labels' => ['Open', 'Closed', 'In Progress', 'Overdue'],
             'data' => [
@@ -553,12 +601,11 @@ class ProgressPerbaikanController extends Controller
             ],
         ]);
     }
-
+    
 
 
     public function chartCategory(Request $request)
     {
-        
         $query = DB::table('lct_laporan as l')
             ->join('lct_kategori as k', 'l.kategori_id', '=', 'k.id')
             ->whereNull('l.deleted_at')
@@ -566,38 +613,65 @@ class ProgressPerbaikanController extends Controller
 
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
-            $query->whereIn('l.status_lct', $statuses);
+            $today = now();
+
+            $query->where(function ($q) use ($statuses, $today) {
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('l.status_lct', $statusFilters);
+                }
+
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('l.tingkat_bahaya', 'Low')
+                                ->whereDate('l.due_date', '<', $today)
+                                ->whereNull('l.date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_temp', '<', $today)
+                                ->whereNull('l.date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_perm', '<', $today)
+                                ->whereNull('l.date_completion');
+                        });
+                    });
+                }
+            });
         }
-        
+
         if ($request->filled('riskLevel')) {
             $query->where('l.tingkat_bahaya', $request->riskLevel);
         }
-        
+
         if ($request->filled('departemenId')) {
             $query->where('l.departemen_id', $request->departemenId);
         }
 
         if ($request->filled('categoryId')) {
-            $query->where('kategori_id', $request->categoryId);
+            $query->where('l.kategori_id', $request->categoryId);
         }
-        
+
         if ($request->filled('areaId')) {
             $query->where('l.area_id', $request->areaId);
         }
-        
+
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $query->whereBetween('l.created_at', [
                 $request->tanggalAwal . ' 00:00:00',
                 $request->tanggalAkhir . ' 23:59:59',
             ]);
         }
-    
+
         $categoryCounts = $query
             ->select('k.nama_kategori', DB::raw('COUNT(*) as total'))
             ->groupBy('k.nama_kategori')
             ->pluck('total', 'k.nama_kategori')
             ->toArray();
-        
 
         $categories = Kategori::whereNull('deleted_at')
             ->pluck('nama_kategori')
@@ -618,12 +692,12 @@ class ProgressPerbaikanController extends Controller
             $data[] = $categoryCounts[$category] ?? 0;
         }
 
-
         return response()->json([
             'labels' => $categoryDisplayNames,
             'data' => $data,
         ]);
     }
+
 
     public function chartArea(Request $request)
     {
@@ -636,13 +710,40 @@ class ProgressPerbaikanController extends Controller
         $query = DB::table('lct_laporan as l')
             ->whereNull('l.deleted_at')
             ->select('l.area_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('l.area_id', $areas->keys())
-            ->groupBy('l.area_id');
+            ->whereIn('l.area_id', $areas->keys());
 
-        // Terapkan filter jika tersedia
+        // Terapkan filter statusLct dengan overdue support
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
-            $query->whereIn('l.status_lct', $statuses);
+            $today = now();
+
+            $query->where(function ($q) use ($statuses, $today) {
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('l.status_lct', $statusFilters);
+                }
+
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('l.tingkat_bahaya', 'Low')
+                                ->whereDate('l.due_date', '<', $today)
+                                ->whereNull('l.date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_temp', '<', $today)
+                                ->whereNull('l.date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_perm', '<', $today)
+                                ->whereNull('l.date_completion');
+                        });
+                    });
+                }
+            });
         }
 
         if ($request->filled('riskLevel')) {
@@ -654,7 +755,7 @@ class ProgressPerbaikanController extends Controller
         }
 
         if ($request->filled('categoryId')) {
-            $query->where('kategori_id', $request->categoryId);
+            $query->where('l.kategori_id', $request->categoryId);
         }
 
         if ($request->filled('areaId')) {
@@ -688,68 +789,96 @@ class ProgressPerbaikanController extends Controller
         ]);
     }
 
+
     public function chartDepartment(Request $request)
-    {
-        // Ambil semua departemen aktif
-        $departments = LctDepartement::whereNull('deleted_at')
-            ->orderBy('nama_departemen')
-            ->pluck('nama_departemen', 'id');
+{
+    // Ambil semua departemen aktif
+    $departments = LctDepartement::whereNull('deleted_at')
+        ->orderBy('nama_departemen')
+        ->pluck('nama_departemen', 'id');
 
+    $query = DB::table('lct_laporan as l')
+        ->whereNull('l.deleted_at')
+        ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
+        ->whereIn('l.departemen_id', $departments->keys());
 
-        $query = DB::table('lct_laporan as l')
-            ->whereNull('l.deleted_at')
-            ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
-            ->whereIn('l.departemen_id', $departments->keys())
-            ->groupBy('l.departemen_id');
+    // Terapkan filter statusLct dengan overdue
+    if ($request->filled('statusLct')) {
+        $statuses = explode(',', $request->statusLct);
+        $today = now();
 
-    
-        // Filter opsional
-        if ($request->filled('statusLct')) {
-            $statuses = explode(',', $request->statusLct);
-            $query->whereIn('l.status_lct', $statuses);
-        }
-    
-        if ($request->filled('riskLevel')) {
-            $query->where('l.tingkat_bahaya', $request->riskLevel);
-        }
+        $query->where(function ($q) use ($statuses, $today) {
+            $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
 
-        if ($request->filled('departemenId')) {
-            $query->where('l.departemen_id', $request->departemenId);
-        }
+            if (count($statusFilters) > 0) {
+                $q->whereIn('l.status_lct', $statusFilters);
+            }
 
-        if ($request->filled('categoryId')) {
-            $query->where('kategori_id', $request->categoryId);
-        }
-    
-        if ($request->filled('areaId')) {
-            $query->where('l.area_id', $request->areaId);
-        }
-    
-        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $query->whereBetween('l.created_at', [
-                $request->tanggalAwal . ' 00:00:00',
-                $request->tanggalAkhir . ' 23:59:59',
-            ]);
-        }
-    
-        $result = $query->groupBy('l.departemen_id')
-            ->pluck('total', 'l.departemen_id')
-            ->toArray();
-    
-        // Menyusun data berdasarkan urutan nama departemen
-        $labels = [];
-        $data = [];
-    
-        foreach ($departments as $id => $name) {
-            $labels[] = $name;
-            $data[] = $result[$id] ?? 0;
-        }
-    
-        return response()->json([
-            'labels' => $labels,
-            'data' => $data,
+            if (in_array('overdue', array_map('strtolower', $statuses))) {
+                $q->orWhere(function ($sub) use ($today) {
+                    $sub->where(function ($low) use ($today) {
+                        $low->where('l.tingkat_bahaya', 'Low')
+                            ->whereDate('l.due_date', '<', $today)
+                            ->whereNull('l.date_completion');
+                    })
+                    ->orWhere(function ($mediumHighTemp) use ($today) {
+                        $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                            ->whereDate('l.due_date_temp', '<', $today)
+                            ->whereNull('l.date_completion_temp');
+                    })
+                    ->orWhere(function ($mediumHighPerm) use ($today) {
+                        $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                            ->whereDate('l.due_date_perm', '<', $today)
+                            ->whereNull('l.date_completion');
+                    });
+                });
+            }
+        });
+    }
+
+    if ($request->filled('riskLevel')) {
+        $query->where('l.tingkat_bahaya', $request->riskLevel);
+    }
+
+    if ($request->filled('departemenId')) {
+        $query->where('l.departemen_id', $request->departemenId);
+    }
+
+    if ($request->filled('categoryId')) {
+        $query->where('l.kategori_id', $request->categoryId);
+    }
+
+    if ($request->filled('areaId')) {
+        $query->where('l.area_id', $request->areaId);
+    }
+
+    if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+        $query->whereBetween('l.created_at', [
+            $request->tanggalAwal . ' 00:00:00',
+            $request->tanggalAkhir . ' 23:59:59',
         ]);
     }
+
+    // Group dan ambil hasil
+    $result = $query->groupBy('l.departemen_id')
+        ->pluck('total', 'l.departemen_id')
+        ->toArray();
+
+    // Susun hasil berdasarkan urutan nama departemen
+    $labels = [];
+    $data = [];
+
+    foreach ($departments as $id => $name) {
+        $labels[] = $name;
+        $data[] = $result[$id] ?? 0;
+    }
+
+    return response()->json([
+        'labels' => $labels,
+        'data' => $data,
+    ]);
+}
+
     
 
     private function buildLaporanQuery(Request $request, $user, $role)
@@ -767,7 +896,6 @@ class ProgressPerbaikanController extends Controller
             $query->where('pic_id', $picId);
         }
 
-        // Filter tambahan dari request
         if ($request->filled('riskLevel')) {
             $query->where('tingkat_bahaya', $request->riskLevel);
         }
@@ -775,32 +903,24 @@ class ProgressPerbaikanController extends Controller
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
             $today = now();
-
+        
             $query->where(function ($q) use ($statuses, $today) {
-                $q->whereIn('status_lct', $statuses);
-
-                if (in_array('overdue', $statuses)) {
-                    $q->orWhere(function ($sub) use ($today) {
-                        $sub->where(function ($low) use ($today) {
-                            $low->where('tingkat_bahaya', 'Low')
-                                ->whereDate('due_date', '<', $today)
-                                ->whereNull('date_completion');
-                        })
-                        ->orWhere(function ($mediumHighTemp) use ($today) {
-                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_temp', '<', $today)
-                                ->whereNull('date_completion_temp');
-                        })
-                        ->orWhere(function ($mediumHighPerm) use ($today) {
-                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
-                                ->whereDate('due_date_perm', '<', $today)
-                                ->whereNull('date_completion');
-                        });
-                    });
+                // Filter out 'overdue' from the normal status filter
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+        
+                // If there are other statuses, filter by them
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('status_lct', $statusFilters);
+                }
+        
+                // If 'overdue' is requested, filter by first_overdue_date (non-null means overdue)
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    $q->orWhereNotNull('first_overdue_date');
                 }
             });
-        }
-
+        }        
+        
+        
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
             $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
@@ -817,6 +937,20 @@ class ProgressPerbaikanController extends Controller
 
         if ($request->filled('areaId')) {
             $query->where('area_id', $request->areaId);
+        }
+        $groupByFormat = null;
+        if ($request->filled('groupBy')) {
+            switch ($request->groupBy) {
+                case 'daily':
+                    $groupByFormat = '%Y-%m-%d';
+                    break;
+                case 'monthly':
+                    $groupByFormat = '%Y-%m';
+                    break;
+                case 'yearly':
+                    $groupByFormat = '%Y';
+                    break;
+            }
         }
 
         return $query;

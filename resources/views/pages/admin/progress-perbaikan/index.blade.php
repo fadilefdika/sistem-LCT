@@ -47,26 +47,37 @@
                 </div>
             
                 <!-- Filter Form Section (Hidden by default) -->
-                <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-3">
-                    <h2 class="text-xs font-semibold text-gray-800 mb-2">Filter Options</h2>
+                <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-4">
+
+                    <h2 class="text-sm font-semibold text-gray-800">Filter Options</h2>
 
                     <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 
                         <!-- Date Range -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Date Range</label>
-                            <input type="text" class="w-full rounded-md border-gray-200 text-xs p-2" name="daterange" 
-                                id="kt_daterangepicker_4" placeholder="All Time" autocomplete="off" />
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Date Range</label>
+                            <input type="text" name="daterange" id="kt_daterangepicker_4"
+                                class="w-full rounded-md border-gray-300 text-xs p-2"
+                                placeholder="All Time" autocomplete="off">
                             <input type="hidden" name="tanggalAwal" id="tanggalAwal">
                             <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
                         </div>
-                        
+
+                        <!-- Group By -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Display Data</label>
+                            <select name="groupBy" id="groupBy" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                <option value="daily">By Date</option>
+                                <option value="weekly">By Week</option>
+                                <option value="monthly">By Month</option>
+                            </select>
+                        </div>                        
 
                         <!-- Hazard Level -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Hazard Level</label>
-                            <select name="riskLevel" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Hazard Level</label>
+                            <select name="riskLevel" class="w-full rounded-md border-gray-300 text-xs p-2">
                                 <option value="">All Levels</option>
                                 <option value="Low" {{ request('riskLevel') == 'Low' ? 'selected' : '' }}>Low</option>
                                 <option value="Medium" {{ request('riskLevel') == 'Medium' ? 'selected' : '' }}>Medium</option>
@@ -74,78 +85,75 @@
                             </select>
                         </div>
 
-                        <!-- Status LCT -->
+                        <!-- LCT Status -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">LCT Status</label>
-                            <select name="statusLct" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">LCT Status</label>
+                            <select name="statusLct" class="w-full rounded-md border-gray-300 text-xs p-2">
                                 <option value="">All Statuses</option>
                                 @foreach ($statusGroups as $label => $statuses)
-                                <option value="{{ implode(',', $statuses) }}"
-                                {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
-                                {{ $label }}
-                                </option>
+                                    <option value="{{ implode(',', $statuses) }}"
+                                        {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <!-- Department -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Department</label>
-                            <select name="departemenId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Department</label>
+                            <select name="departemenId" class="w-full rounded-md border-gray-300 text-xs p-2">
                                 <option value="">All Depts</option>
                                 @foreach ($departments as $id => $nama)
-                                <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
-                                {{ $nama }}
-                                </option>
+                                    <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
+                                        {{ $nama }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <!-- Category -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Category</label>
-                            <select name="categoryId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                            <select name="categoryId" class="w-full rounded-md border-gray-300 text-xs p-2">
                                 <option value="">All Category</option>
                                 @foreach ($categories as $id => $nama)
-                                <option value="{{ $id }}" {{ request('categoryId') == $id ? 'selected' : '' }}>
-                                {{ $nama }}
-                                </option>
+                                    <option value="{{ $id }}" {{ request('categoryId') == $id ? 'selected' : '' }}>
+                                        {{ $nama }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <!-- Area -->
                         <div>
-                            <label class="block text-xs text-gray-500 uppercase tracking-wider mb-1">Area</label>
-                            <select name="areaId" class="w-full rounded-md border-gray-200 text-xs p-2">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Area</label>
+                            <select name="areaId" class="w-full rounded-md border-gray-300 text-xs p-2">
                                 <option value="">All Areas</option>
                                 @foreach ($areas as $id => $nama)
-                                <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
-                                {{ $nama }}
-                                </option>
+                                    <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
+                                        {{ $nama }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-5">
+                        <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-4 xl:col-span-5">
                             <button type="submit"
-                                class="px-3 py-1.5 text-xs font-medium rounded-md bg-black text-white cursor-pointer focus:outline-none">
+                                class="px-4 py-2 text-xs font-medium rounded-md bg-black text-white hover:bg-gray-900 focus:outline-none">
                                 Apply
                             </button>
                             <a href="{{ route($routePrefix . '.reporting.index') }}"
-                                class="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 focus:outline-none">
+                                class="px-4 py-2 text-xs font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none">
                                 Reset
                             </a>
                         </div>
                     </form>
                 </div>
-            
             </div>
-        
-
-          </div>
-      </div>
+        </div>
+    </div>
 
 
       @php
@@ -312,8 +320,7 @@
     </script>
 
     <script>
-        $(document).ready(function() {
-            // Default tidak ada range (All Time)
+        $(document).ready(function () {
             function clearRange() {
                 $("#kt_daterangepicker_4").val("All Time");
                 $("#tanggalAwal").val('');
@@ -335,24 +342,29 @@
                     "Last 7 Days": [moment().subtract(6, "days"), moment()],
                     "Last 30 Days": [moment().subtract(29, "days"), moment()],
                     "This Month": [moment().startOf("month"), moment().endOf("month")],
-                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")],
+                    "Last 6 Months": [moment().subtract(6, "months").startOf("day"), moment()],
+                    "Last 1 Year": [moment().subtract(1, "year").startOf("day"), moment()],
+                    "Last 5 Years": [moment().subtract(5, "years").startOf("day"), moment()]
+                },
+                locale: {
+                    cancelLabel: 'Clear',
+                    applyLabel: 'Apply'
                 }
             });
 
-            // Set default ke All Time (kosong)
             clearRange();
 
-            // Ketika user pilih range, update input dan hidden
-            $("#kt_daterangepicker_4").on('apply.daterangepicker', function(ev, picker) {
+            $("#kt_daterangepicker_4").on('apply.daterangepicker', function (ev, picker) {
                 cb(picker.startDate, picker.endDate);
             });
 
-            // Kalau user cancel, set ke All Time
-            $("#kt_daterangepicker_4").on('cancel.daterangepicker', function(ev, picker) {
+            $("#kt_daterangepicker_4").on('cancel.daterangepicker', function (ev, picker) {
                 clearRange();
             });
         });
     </script>
+
     
     <script>
         $(document).ready(function() {
@@ -395,12 +407,18 @@
 
                 params.perPage = $('#perPageSelect').val() || 10;
 
-                fetchData(params);         // update tabel
-                loadFindingData(params);   // update chart
-                loadStatusChart(params);
-                loadCategoryChart(params);
-                loadAreaChart(params);
-                loadDepartmentChart(params);
+                 // Kirim ke semua chart & tabel (tanpa groupBy)
+                let globalParams = { ...params };
+                delete globalParams.groupBy;
+
+                fetchData(globalParams);
+                loadStatusChart(globalParams);
+                loadCategoryChart(globalParams);
+                loadAreaChart(globalParams);
+                loadDepartmentChart(globalParams);
+
+                // Khusus chart Finding, kirim full (termasuk groupBy)
+                loadFindingData(params);
             });
                     
             // Handle pagination click (delegated event karena link dinamis)
