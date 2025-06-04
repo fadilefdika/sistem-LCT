@@ -71,14 +71,14 @@
                 @else
                 @php
                     if (Auth::guard('ehs')->check()) {
-                    // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
-                    $user = Auth::guard('ehs')->user();
-                    $roleName = optional($user->roles->first())->name;
-                } else {
-                    // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
-                    $user = Auth::user();
-                    $roleName = optional($user->roleLct->first())->name;
-                }
+                        $user = Auth::guard('ehs')->user();
+                        $roleName = 'ehs';
+                    } else {
+                        $user = Auth::guard('web')->user();
+                        // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                    }
+
                 
                     if ($roleName === 'ehs') {
                         $routeName = 'ehs.reporting.history';

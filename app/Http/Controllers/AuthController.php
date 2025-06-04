@@ -20,7 +20,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $rules = [
-            'role' => 'required|in:ehs,manajer,pic,employee',
+            'role' => 'required|in:ehs,manajer,pic,user',
             'password' => 'required|string',
             'npk_or_username' => ['required'],
         ];
@@ -43,7 +43,7 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // === Login untuk EHS ===
+        // Login untuk EHS
         if ($request->role === 'ehs') {
             $username = $request->npk_or_username;
             $user = EhsUser::where('username', $username)->first();
@@ -63,8 +63,8 @@ class AuthController extends Controller
 
             Auth::guard('ehs')->login($user);
             $request->session()->regenerate();
-
-            // Redirect berdasarkan pilihan tab
+            session(['active_role' => 'ehs']);
+            
             if ($redirectTo === 'dashboard') {
                 return redirect()->route('ehs.dashboard');
             } elseif ($redirectTo === 'form') {
@@ -74,13 +74,14 @@ class AuthController extends Controller
             return redirect()->route('ehs.dashboard');
         }
 
-        // === Login untuk role selain EHS (web guard) ===
+        // Login untuk selain EHS
         $npk = $request->npk_or_username;
         $roleMapping = [
-            'employee' => 1,
+            'user' => 1,
             'pic' => 2,
             'manajer' => 4,
         ];
+        
         $expectedRoleId = $roleMapping[$request->role] ?? null;
         $user = User::with('roleLct')->where('npk', $npk)->first();
 
@@ -91,19 +92,14 @@ class AuthController extends Controller
         }
 
         if ($user->roleLct->isEmpty()) {
-            // Jika kosong, assign role default: role_id = 1 (employee)
             $defaultRoleId = 1;
-        
-            // Buat relasi baru di tabel pivot
             $user->roleLct()->attach($defaultRoleId);
-        
-            // Refresh relasi supaya ada datanya sekarang
             $user->load('roleLct');
         }
-        
-        $actualRoleId = $user->roleLct->first()->id ?? null;
 
-        if ($actualRoleId != $expectedRoleId) {
+        $hasRole = $user->roleLct->contains('id', $expectedRoleId);
+
+        if (!$hasRole) {
             return back()->withErrors([
                 'npk_or_username' => 'Permission denied.',
             ])->withInput();
@@ -112,8 +108,9 @@ class AuthController extends Controller
         if (Hash::check($request->password, $user->password_hash)) {
             Auth::guard('web')->login($user, $request->filled('remember'));
             $request->session()->regenerate();
+            
+            session(['active_role' => $request->role]);
 
-            // Redirect berdasarkan pilihan tab
             if ($redirectTo === 'dashboard') {
                 return redirect()->route('admin.dashboard');
             } elseif ($redirectTo === 'form') {
@@ -127,6 +124,7 @@ class AuthController extends Controller
             'npk_or_username' => 'Login failed. Please check your NPK and password.',
         ])->withInput();
     }
+
 
 
     public function logout(Request $request)

@@ -29,9 +29,13 @@
                     
                 <!-- Kategori -->
                 <td class="px-3 py-2 text-[11px] text-gray-800 whitespace-nowrap">
-                    {{ $laporan->kategori ? $laporan->kategori->nama_kategori : '-' }}
+                    {{
+                        \Illuminate\Support\Str::startsWith($laporan->kategori?->nama_kategori, '5S')
+                            ? '5S'
+                            : ($laporan->kategori?->nama_kategori ?? '-')
+                    }}
                 </td>
-        
+                
                 <!-- Aksi -->
                 <td class="px-3 py-2 text-[11px] text-center w-24">
                     <div class="flex flex-col space-y-1 items-center">
@@ -43,11 +47,6 @@
 
                         <a href="{{ route($roleName === 'ehs' ? 'ehs.reporting.show.new' : 'admin.reporting.show.new', $laporan->id_laporan_lct) }}"
                             class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
                             Detail
                         </a>
 
@@ -55,11 +54,12 @@
                         @php
                             // Cek apakah pengguna adalah EHS atau bukan
                             if (Auth::guard('ehs')->check()) {
-                                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
-                                $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                                $user = Auth::guard('ehs')->user();
+                                $userRole = 'ehs';
                             } else {
-                                // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
-                                $userRole = optional(auth()->user()->roleLct->first())->name;
+                                $user = Auth::guard('web')->user();
+                                // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                                $userRole = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
                             }
                         @endphp
 
@@ -72,11 +72,6 @@
                             <button type="button"
                                     class="text-green-700 hover:text-green-900 hover:underline flex items-center gap-1"
                                     onclick="confirmClose('{{ $laporan->id_laporan_lct }}')">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
                                 Closed
                             </button>
                             </form>

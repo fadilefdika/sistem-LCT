@@ -6,13 +6,14 @@
       <div class="overflow-visible">
           <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
               @php
-                  if (Auth::guard('ehs')->check()) {
-                      $user = Auth::guard('ehs')->user();
-                      $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
-                  } else {
-                      $user = Auth::user();
-                      $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
-                  }
+                     if (Auth::guard('ehs')->check()) {
+                        $user = Auth::guard('ehs')->user();
+                        $roleName = 'ehs';
+                    } else {
+                        $user = Auth::guard('web')->user();
+                        // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                    }
                   $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
               @endphp
 

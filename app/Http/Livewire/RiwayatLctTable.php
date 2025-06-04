@@ -30,14 +30,14 @@ class RiwayatLctTable extends Component
     public function render()
     {
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS
-            $user = EhsUser::with('roles')->find(Auth::guard('ehs')->id());
-            $role = optional($user->roles->first())->name;  // Ambil role dari relasi 'roles' di model EhsUser
+            $user = Auth::guard('ehs')->user();
+            $role = 'ehs';
         } else {
-            // Jika pengguna adalah User biasa (guard 'web')
-            $user = User::with('roleLct')->find(Auth::id());
-            $role = optional($user->roleLct->first())->name;  // Ambil role dari relasi 'roleLct' di model User
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
 
 
         $query = LaporanLct::where('status_lct', 'closed');

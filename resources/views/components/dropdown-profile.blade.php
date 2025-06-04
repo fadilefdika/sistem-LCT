@@ -37,28 +37,25 @@
             <div class="font-medium text-gray-800 dark:text-gray-100">
                 {{ $user->fullname ?? 'Admin Ehs' }}
             </div>            
+            @php
+                $activeRole = session('active_role');
+                
+                $roleMapping = [
+                    'manajer' => 'Manager',
+                    'pic' => 'PIC',
+                    'user' => 'Employee',
+                    'employee' => 'Employee',
+                    'ehs' => 'EHS',
+                ];
+
+                $displayRole = $roleMapping[strtolower($activeRole)] ?? 'Tidak Ada Role';
+            @endphp
+
             <div class="text-xs text-gray-500 dark:text-gray-400 italic uppercase mt-2">
-                @php
-                    if (Auth::guard('ehs')->check()) {
-                        $user = Auth::guard('ehs')->user();
-                        $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
-                    } else {
-                        $user = Auth::user();
-                        $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
-                    }
-            
-                    // Mapping Bahasa Indonesia ke Bahasa Inggris
-                    $roleMapping = [
-                        'manajer' => 'Manager',
-                        'pic' => 'PIC',
-                        'user' => 'Employee',
-                        'ehs' => 'EHS',
-                    ];
-            
-                    $displayRole = $roleMapping[strtolower($roleName)] ?? $roleName;
-                @endphp
                 {{ $displayRole }}
             </div>
+
+
                 
             </div>
         <ul>

@@ -32,11 +32,13 @@ class AppServiceProvider extends ServiceProvider
 
             if (Auth::guard('ehs')->check()) {
                 $user = Auth::guard('ehs')->user();
-                $roleName = optional($user->roles->first())->name;
+                $roleName = 'ehs';
             } else {
-                $user = Auth::user();
-                $roleName = optional($user->roleLct->first())->name;
+                $user = Auth::guard('web')->user();
+                // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
             }
+            
 
             // Cek jika rute adalah admin.reporting.show.new dan memiliki parameter id
             if ($route && $route->getName() === 'admin.reporting.show.new') {

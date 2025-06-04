@@ -25,10 +25,10 @@ class DashboardController extends Controller
             $roleName = 'ehs';
         } else {
             $user = Auth::guard('web')->user();
-            $roleName = optional($user->roleLct->first())->name ?? 'guest';
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
         
-
         $findings = LaporanLct::selectRaw('YEAR(created_at) as year')
                     ->distinct()
                     ->pluck('year');

@@ -78,7 +78,7 @@
                     <option value="ehs">EHS</option>
                     <option value="manajer">Manager</option>
                     <option value="pic">PIC</option>
-                    <option value="employee">Employee</option>
+                    <option value="user">Employee</option>
                 </select>
             </div>
 

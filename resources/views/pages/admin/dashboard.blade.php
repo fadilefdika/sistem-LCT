@@ -41,33 +41,31 @@
                 </div>
             </div>
 
-                @php
-                    // Cek apakah pengguna adalah EHS atau bukan
-                    if (Auth::guard('ehs')->check()) {
-                        // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
-                        $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
-                    } else {
-                        // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
-                        $userRole = optional(auth()->user()->roleLct->first())->name;
-                    }
-                @endphp
-
-
-                @php
-                    $isEhs = $userRole === 'ehs';
-                    $isUser = $userRole === 'user';
-                    $isPic = $userRole === 'pic';
-                    $isManajer = $userRole === 'manajer';
-
-                    // Hitung jumlah tabel
-                    $tableCount = 0;
-                    if ($isEhs) $tableCount += 2;
-                    if ($isManajer) $tableCount += 1;
-                    if ($isUser) $tableCount += 1;
-                    if ($isPic) $tableCount += 1;
-
-                    $gridColsClass = $tableCount > 1 ? 'lg:grid-cols-2' : 'lg:grid-cols-1';
-                @endphp
+            @php
+                // Ambil role aktif dari session, fallback ke relasi jika tidak ada
+                if (Auth::guard('ehs')->check()) {
+                    $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                } else {
+                    $userRole = session('active_role') ?? optional(auth()->user()->roleLct->first())->name;
+                }
+            
+                $userRole = strtolower($userRole);
+            
+                $isEhs = $userRole === 'ehs';
+                $isUser = $userRole === 'user' || $userRole === 'employee';
+                $isPic = $userRole === 'pic';
+                $isManajer = $userRole === 'manajer';
+            
+                // Hitung jumlah tabel
+                $tableCount = 0;
+                if ($isEhs) $tableCount += 2;
+                if ($isManajer) $tableCount += 1;
+                if ($isUser) $tableCount += 1;
+                if ($isPic) $tableCount += 1;
+            
+                $gridColsClass = $tableCount > 1 ? 'lg:grid-cols-2' : 'lg:grid-cols-1';
+            @endphp
+        
 
                 <!-- Tabel Reports Section -->
                 <div class="grid grid-cols-1 {{ $gridColsClass }} gap-3 items-start">
@@ -299,9 +297,12 @@
 
     
     function renderChart(labels, data, isMonthly = true) {
-        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        const canvas = document.getElementById('monthlyChart');
+        if (!canvas) return; // Stop diam-diam jika elemen tidak ada
 
-        if (monthlyChart) {
+        const ctx = canvas.getContext('2d');
+
+        if (typeof monthlyChart !== 'undefined' && monthlyChart) {
             monthlyChart.destroy();
         }
 
@@ -312,8 +313,8 @@
                 datasets: [{
                     label: 'Number of Findings',
                     data: data,
-                    backgroundColor: 'rgba(0, 105, 170, 0.2)', // warna biru muda transparan
-                    borderColor: '#0069AA', // warna biru utama
+                    backgroundColor: 'rgba(0, 105, 170, 0.2)',
+                    borderColor: '#0069AA',
                     borderWidth: 2,
                     fill: true
                 }]
@@ -353,7 +354,6 @@
         });
     }
 
-
     function fetchChartData(year, month = '') {
         const url = userRole === 'ehs' ? '/ehs/dashboard/chart-data' : '/dashboard/chart-data';
 
@@ -391,9 +391,14 @@
     let areaChart;
 
     function renderAreaChart(data) {
-        const ctx = document.getElementById('areaChart').getContext('2d');
+        const canvas = document.getElementById('areaChart');
+        if (!canvas) return; // Diam saja jika tidak ada elemen
 
-        if (areaChart) areaChart.destroy();
+        const ctx = canvas.getContext('2d');
+
+        if (typeof areaChart !== 'undefined' && areaChart) {
+            areaChart.destroy();
+        }
 
         const areaLabels = Object.keys(data);
         const closedData = areaLabels.map(label => data[label].closed_count);
@@ -421,17 +426,16 @@
                 ]
             },
             options: {
-                // indexAxis: 'y', // ❌ HAPUS untuk bar vertikal
                 maintainAspectRatio: false,
                 responsive: true,
                 scales: {
                     x: {
                         ticks: {
                             autoSkip: false,
-                            maxRotation: 45,   // Putar label agar muat
-                            minRotation: 30,   // Minimum rotasi
+                            maxRotation: 45,
+                            minRotation: 30,
                             font: {
-                                size: 9       // Kecilkan ukuran font jika terlalu banyak
+                                size: 9
                             }
                         },
                         title: {
@@ -451,14 +455,13 @@
                             callback: function (value) {
                                 return Number.isInteger(value) ? value : '';
                             }
-                            
                         }
                     }
                 }
             }
         });
-
     }
+
 
     function fetchAreaChartData(year, month) {
         const url = userRole === 'ehs' ? '/ehs/dashboard/area-chart-data' : '/dashboard/area-chart-data';
@@ -498,9 +501,14 @@
     let categoryChart;
 
     function renderCategoryChart(categoryStatusCounts, categoryAliases) {
-        const ctx = document.getElementById('categoryChart').getContext('2d');
+        const canvas = document.getElementById('categoryChart');
+        if (!canvas) return; // Stop diam-diam jika elemen tidak ada
 
-        if (categoryChart) categoryChart.destroy();
+        const ctx = canvas.getContext('2d');
+
+        if (typeof categoryChart !== 'undefined' && categoryChart){ 
+            categoryChart.destroy();
+        }
 
         const categoryLabels = Object.values(categoryAliases);
 
@@ -606,12 +614,17 @@
 
 
     
-        let statusChart;
+    let statusChart;
 
-        function renderStatusChart(statusCounts) {
-        const ctx = document.getElementById('statusChart').getContext('2d');
+    function renderStatusChart(statusCounts) {
+        const canvas = document.getElementById('statusChart');
+        if (!canvas) return;
 
-        if (statusChart) statusChart.destroy();
+        const ctx = canvas.getContext('2d');
+
+        if (typeof statusChart !== 'undefined' && statusChart){ 
+            statusChart.destroy();
+        }
 
         const dataValues = [
             Number(statusCounts.open) || 0,
@@ -721,9 +734,14 @@
         let departmentChart;
 
         function renderDepartmentChart(data) {
-            const ctx = document.getElementById('departmentChart').getContext('2d');
+            const canvas = document.getElementById('departmentChart');
+            if (!canvas) return;
 
-            if (departmentChart) departmentChart.destroy();
+            const ctx = canvas.getContext('2d');
+
+            if (typeof departmentChart !== 'undefined' && departmentChart){ 
+                departmentChart.destroy();
+            }
 
             const labels = data.map(d => d.label);
             const values = data.map(d => d.value);

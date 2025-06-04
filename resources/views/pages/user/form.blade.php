@@ -28,14 +28,13 @@
             <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 w-full">
                 @php
                     if (Auth::guard('ehs')->check()) {
-                        // Jika pengguna adalah EHS
                         $user = Auth::guard('ehs')->user();
-                        $roleName = optional($user->roles->first())->name ?? 'Tidak Ada Role';
+                        $roleName = 'ehs';
                         $formAction = route('ehs.laporan-lct.store');
                     } else {
-                        // Jika pengguna adalah User biasa
-                        $user = Auth::user();
-                        $roleName = optional($user->roleLct->first())->name ?? 'Tidak Ada Role';
+                        $user = Auth::guard('web')->user();
+                        // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
                         $formAction = route('laporan-lct.store');
                     }
                 @endphp

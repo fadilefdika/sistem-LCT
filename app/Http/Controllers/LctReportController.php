@@ -39,14 +39,14 @@ class LctReportController extends Controller
     {
         // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
             $user = Auth::guard('ehs')->user();
-            $roleName = optional($user->roles->first())->name;
+            $roleName = 'ehs';
         } else {
-            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
         
         $laporan = LaporanLct::with('user','kategori','area')->where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
         $kategori = Kategori::all();
@@ -86,15 +86,15 @@ class LctReportController extends Controller
             DB::beginTransaction(); // Mulai transaksi
     
            // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
-            if (Auth::guard('ehs')->check()) {
-                // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
-                $user = Auth::guard('ehs')->user();
-                $roleName = optional($user->roles->first())->name;
-            } else {
-                // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
-                $user = Auth::user();
-                $roleName = optional($user->roleLct->first())->name;
-            }
+           if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+        
 
             // Buat ID unik untuk laporan
             $idLCT = LaporanLct::generateLCTId();
@@ -178,11 +178,13 @@ class LctReportController extends Controller
     {
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
-            $roleName = optional($user->roles->first())->name;
+            $roleName = 'ehs';
         } else {
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
 
         $validator = Validator::make($request->all(), [
             'temuan_ketidaksesuaian' => 'required|string|max:255',

@@ -112,14 +112,14 @@ class ManajemenLctController extends Controller
     {
         // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
             $user = Auth::guard('ehs')->user();
-            $roleName = optional($user->roles->first())->name;
+            $roleName = 'ehs';
         } else {
-            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
         
         // Ambil laporan dengan relasi terkait
         $laporan = LaporanLct::with([
@@ -204,14 +204,13 @@ class ManajemenLctController extends Controller
     {
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
-            $roleName = optional($user->roles->first())->name;
+            $roleName = 'ehs';
         } else {
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
-
-        Log::debug('Input request data:', $request->all());
-
+        
     // Validasi dengan try-catch untuk tangkap error validasi dan log pesan
         try {
             $validated = $request->validate([
@@ -295,14 +294,14 @@ class ManajemenLctController extends Controller
     {
         // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
             $user = Auth::guard('ehs')->user();
-            $roleName = optional($user->roles->first())->name;
+            $roleName = 'ehs';
         } else {
-            // Jika pengguna adalah User biasa, ambil role dari relasi 'roleLct' pada model User
-            $user = Auth::user();
-            $roleName = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
         
         $data = $request->all();
         $uploadedFiles = $request->file('attachments') ?? [];
@@ -443,11 +442,13 @@ class ManajemenLctController extends Controller
         // Ambil user dan role sesuai guard
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
-            $role = optional($user->roles->first())->name;
+            $role = 'ehs';
         } else {
-            $user = Auth::user();
-            $role = optional($user->roleLct->first())->name;
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
 
         $query = $this->buildLaporanQuery($request, $user, $role);
         $laporans = $query->get();

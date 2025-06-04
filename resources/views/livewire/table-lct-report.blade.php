@@ -100,14 +100,15 @@
                             </a>
 
                             @php
-                                // Cek apakah pengguna adalah EHS atau bukan
                                 if (Auth::guard('ehs')->check()) {
-                                    // Jika pengguna adalah EHS, ambil role dari relasi 'roles' di model EhsUser
-                                    $userRole = optional(Auth::guard('ehs')->user()->roles->first())->name;
+                                    $user = Auth::guard('ehs')->user();
+                                    $userRole = 'ehs';
                                 } else {
-                                    // Jika pengguna bukan EHS, ambil role dari model User dengan roleLct
-                                    $userRole = optional(auth()->user()->roleLct->first())->name;
+                                    $user = Auth::guard('web')->user();
+                                    // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                                    $userRole = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
                                 }
+
                             @endphp
 
                             @if ($userRole == 'ehs')

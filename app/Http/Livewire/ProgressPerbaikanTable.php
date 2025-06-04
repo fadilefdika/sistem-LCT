@@ -33,14 +33,14 @@ class ProgressPerbaikanTable extends Component
     private function filterData()
     {
         if (Auth::guard('ehs')->check()) {
-            // Jika pengguna adalah EHS
             $user = Auth::guard('ehs')->user();
-            $role = optional($user->roles->first())->name;  // Ambil role dari model EhsUser
+            $role = 'ehs';
         } else {
-            // Jika pengguna adalah User biasa (guard 'web')
-            $user = Auth::user();
-            $role = optional($user->roleLct->first())->name;  // Ambil role dari model User
+            $user = Auth::guard('web')->user();
+            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+            $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
+        
 
         // === Status progress dan closed ===
         $progressStatuses = ['open',
