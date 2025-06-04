@@ -65,7 +65,7 @@
                                             :name="'tasks['+index+'][picId]'">
                                             <option value="">Pilih PIC</option>
                                             @foreach($picList as $pic)
-                                                <option value="{{ $pic['id'] }}" x-bind:selected="task.picId == {{ $pic['id'] }}">
+                                                <option value="{{ $pic['pic_id'] }}" x-bind:selected="task.picId == {{ $pic['pic_id'] }}">
                                                     {{ $pic['fullname'] }}
                                                 </option>
                                             @endforeach
@@ -83,7 +83,7 @@
                             </template>
                         </tbody>
                     </table>
-                </div> <!-- End of overflow-x-auto -->
+                </div> 
                 
                 <div class="mt-4 p-4 bg-gray-100 rounded-lg" 
                     x-data="{
@@ -248,9 +248,10 @@
                                     <td class="px-4 py-2 text-gray-900 break-words max-w-[200px]">{{ $task['taskName'] }}</td>
                                     <td class="px-4 py-2 text-gray-600">
                                         @php
-                                            $pic = $picList->firstWhere('id', $task['picId']);
+                                            $pic = $picList->firstWhere('pic_id', $task['picId']);
                                         @endphp
                                         {{ $pic ? $pic['fullname'] : 'No PIC Assigned' }}
+                                        
                                     </td>
                                     <td class="px-4 py-2 text-gray-600">
                                         {{ \Carbon\Carbon::parse($task['dueDate'])->format('F j, Y') }}

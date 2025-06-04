@@ -125,14 +125,28 @@
                     </div>
                     
                 <!-- Submit button -->
-                    <button 
-                        type="submit" 
-                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 mt-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 
-                        @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) opacity-50 cursor-not-allowed @else cursor-pointer @endif" 
-                        @if(in_array($laporan->status_lct, ['waiting_approval', 'approved','approved_temporary', 'waiting_approval_taskbudget'])) disabled @endif
-                        >
-                        Submit Report
-                    </button>
+                @php
+                    $disabledStatuses = [
+                        'waiting_approval',
+                        'waiting_approval_temporary',
+                        'approved',
+                        'approved_temporary',
+                        'waiting_approval_taskbudget',
+                    ];
+                    $isDisabled = in_array($laporan->status_lct, $disabledStatuses);
+                @endphp
+                
+                <button 
+                    type="submit"
+                    class="w-full mt-4 px-6 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 ease-in-out
+                        {{ $isDisabled ? 'bg-gray-400 cursor-not-allowed opacity-60' : 'bg-blue-700 hover:bg-blue-800 hover:scale-[1.02] active:scale-[0.98] focus:ring-4 focus:ring-blue-300' }}
+                        dark:{{ $isDisabled ? 'bg-gray-600 dark:opacity-60' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-800' }}
+                    "
+                    {{ $isDisabled ? 'disabled' : '' }}
+                >
+                    🚀 Submit Report
+                </button>
+            
 
                 </div>
             </form>

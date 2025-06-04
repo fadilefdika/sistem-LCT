@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\TaskBudgetApprovalRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\AssignToEhsRequest;
+use App\Models\LctDepartemenPic;
 use Illuminate\Support\Facades\Validator;
 
 class ManajemenLctController extends Controller
@@ -173,15 +174,20 @@ class ManajemenLctController extends Controller
         // Menambahkan baris kosong untuk task baru
         $tasks[] = ['id' => '', 'taskName' => '', 'namePic' => '', 'dueDate' => '', 'attachment' => '', 'status' => ''];
     
-        // Ambil daftar PIC terkait dengan laporan
-        $picList = Pic::with('user:id,fullname')
+        $picIds = LctDepartemenPic::whereNull('deleted_at')->pluck('pic_id')->toArray();
+
+        // Ambil semua PIC beserta user-nya
+        $picList = PIC::whereIn('id', $picIds)
+            ->with('user:id,fullname') // load user, ambil field yang diperlukan
             ->get()
             ->map(function ($pic) {
                 return [
-                    'id' => $pic->id,
+                    'pic_id' => $pic->id,
+                    'user_id' => $pic->user->id ?? null,
                     'fullname' => $pic->user->fullname ?? 'Unknown'
                 ];
             });
+
     
         // Mengambil bukti temuan dan perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
