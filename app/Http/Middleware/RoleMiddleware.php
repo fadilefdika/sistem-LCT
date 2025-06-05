@@ -35,14 +35,14 @@ class RoleMiddleware
         $activeRole = session('active_role');
     
         // Debug print
-        \Log::info('Middleware Debug', [
-            'user' => $user->username,
-            'guard' => $guard,
-            'activeRole' => $activeRole,
-            'rolesInRoute' => $roles,
-            'allowedRoles' => $allowedRoles,
-            'userRoles' => $user->roleLct->pluck('name')->toArray(),
-        ]);
+        // \Log::info('Middleware Debug', [
+        //     'user' => $user->username,
+        //     'guard' => $guard,
+        //     'activeRole' => $activeRole,
+        //     'rolesInRoute' => $roles,
+        //     'allowedRoles' => $allowedRoles,
+        //     'userRoles' => $user->roleLct->pluck('name')->toArray(),
+        // ]);
     
         if (!$activeRole || !in_array($activeRole, $roles)) {
             return redirect('/unauthorized')->with('error', 'Anda tidak memiliki izin untuk mengakses halaman ini. (active role tidak sesuai)');

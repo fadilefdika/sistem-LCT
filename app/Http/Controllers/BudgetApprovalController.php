@@ -24,7 +24,6 @@ class BudgetApprovalController extends Controller
 
     public function show($id_laporan_lct)
     {
-        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
             // Jika pengguna adalah EHS, ambil role dari relasi 'roles' pada model EhsUser
             $user = Auth::guard('ehs')->user();
@@ -34,7 +33,6 @@ class BudgetApprovalController extends Controller
             $user = Auth::user();
             $roleName = optional($user->roleLct->first())->name;
         }
-
         $taskBudget = LaporanLct::with([
             'tasks' => function ($query) {
                 $query->orderBy('due_date', 'asc');
@@ -45,13 +43,20 @@ class BudgetApprovalController extends Controller
         ->where('id_laporan_lct', $id_laporan_lct)
         ->whereIn('status_lct', ['waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision'])
         ->first();
-
-        // Pastikan data ditemukan
+    
         if (!$taskBudget) {
-            abort(404, 'Laporan tidak ditemukan.');
+            // Redirect atau tampilkan error jika laporan tidak ditemukan
+            return redirect()->back()->with('error', 'Data Laporan LCT tidak ditemukan atau status tidak sesuai.');
         }
+    
+        // Pastikan bukti_temuan dan bukti_perbaikan tidak null sebelum didecode
+        $bukti_temuan = collect(json_decode($taskBudget->bukti_temuan ?? '[]', true))
+            ->map(fn ($path) => asset('storage/' . $path));
+    
+        $bukti_perbaikan = collect(json_decode($taskBudget->bukti_perbaikan ?? '[]', true))
+            ->map(fn ($path) => asset('storage/' . $path));
 
-        // Jika role manager dan belum pernah melihat sebelumnya
+            // Jika role manager dan belum pernah melihat sebelumnya
         if ($roleName === 'manager' && !$taskBudget->first_viewed_by_manager_at) {
             $taskBudget->update(['first_viewed_by_manager_at' => now()]);
 
@@ -64,8 +69,8 @@ class BudgetApprovalController extends Controller
                 'tipe_reject' => null,
             ]);
         }
-
-        return view('pages.admin.budget-approval.show', compact('taskBudget'));
+    
+        return view('pages.admin.budget-approval.show', compact('taskBudget', 'bukti_temuan', 'bukti_perbaikan'));
     }
 
 

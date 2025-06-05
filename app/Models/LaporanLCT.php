@@ -30,6 +30,8 @@ class LaporanLct extends Model
         'tingkat_bahaya',  
         'rekomendasi',  
         'due_date',  
+        'due_date_temp',  
+        'due_date_perm',  
         'date_completion', 
         'date_closed', 
         'status_lct',  

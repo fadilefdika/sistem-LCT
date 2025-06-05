@@ -1,36 +1,36 @@
-<div class="overflow-x-auto rounded-lg border border-gray-200">
-    <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr class="text-left text-sm font-semibold text-gray-600">
-                <th class="px-4 py-3">No</th>
-                <th class="px-4 py-3">PIC</th> 
-                <th class="px-4 py-3">Hazard Level</th> 
-                <th class="px-4 py-3">Total Amount</th> 
-                <th class="px-4 py-3">Submission Date</th> 
-                <th class="px-4 py-3">Budget Status</th> 
-                <th class="px-4 py-3 text-center">Actions</th> 
-            </tr>                
-        </thead>            
-        <tbody class="divide-y divide-gray-100 bg-white">
+<div class="overflow-x-auto rounded-lg border border-gray-300 shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200 text-xs">
+        <thead class="bg-gray-100 text-gray-700 uppercase tracking-wide">
+            <tr>
+                <th class="px-4 py-2 text-left">No</th>
+                <th class="px-4 py-2 text-left">PIC</th>
+                <th class="px-4 py-2 text-left">Hazard Level</th>
+                <th class="px-4 py-2 text-left">Total Amount</th>
+                <th class="px-4 py-2 text-left">Submission Date</th>
+                <th class="px-4 py-2 text-left">Budget Status</th>
+                <th class="px-4 py-2 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-100">
             @forelse($laporans as $index => $budget)
-                <tr class="hover:bg-gray-100 transition duration-200 ease-in-out border-b bg-white">
-                    <td class="px-4 py-4 text-sm text-gray-800">{{ $index + 1 }}</td>
-                    <td class="px-4 py-4 text-sm text-gray-800">{{ $budget->picUser->fullname ?? '-' }}</td>
-                    <td class="px-4 py-4 text-sm text-gray-800">{{$budget->tingkat_bahaya}}</td>
-                    <td class="px-4 py-4 text-gray-900 font-medium">
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-4 py-2 text-gray-800">{{ $index + 1 }}</td>
+                    <td class="px-4 py-2 text-gray-800">{{ $budget->picUser->fullname ?? '-' }}</td>
+                    <td class="px-4 py-2 text-gray-800">{{ $budget->tingkat_bahaya }}</td>
+                    <td class="px-4 py-2 text-gray-900 font-semibold">
                         Rp {{ number_format($budget->estimated_budget, 0, ',', '.') }}
                     </td>
-                    <td>
+                    <td class="px-4 py-2 text-gray-800">
                         @if($budget->tasks->isNotEmpty())
-                            {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('F j, Y') }}
+                            {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('M d, Y') }}
                         @else
                             -
                         @endif
-                    </td>                      
+                    </td>
                     @php
                         $statusMapping = [
                             'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
-                            'taskbudget_revision' => 'The Task and Budget Require Revision by PIC.',
+                            'taskbudget_revision' => 'Task & Budget Revision Needed',
                             'approved_taskbudget' => 'Budget Approved',
                             'work_permanent' => 'Budget Approved',
                             'waiting_approval_permanent' => 'Budget Approved',
@@ -39,7 +39,6 @@
                         ];
 
                         $statusLabel = $statusMapping[$budget->status_lct] ?? ucfirst(str_replace('_', ' ', $budget->status_lct));
-
                         $bgClass = match ($budget->status_lct) {
                             'waiting_approval_taskbudget' => 'bg-red-100 text-red-700',
                             'taskbudget_revision' => 'bg-yellow-100 text-yellow-800',
@@ -47,17 +46,14 @@
                             default => 'bg-gray-100 text-gray-800',
                         };
                     @endphp
-
-                    <td class="px-4 py-4 text-sm">
-                        <p class="truncate block max-w-xs font-medium px-2 py-1 rounded {{ $bgClass }}">
+                    <td class="px-4 py-2">
+                        <span class="inline-block px-2 py-1 rounded text-[11px] font-medium {{ $bgClass }}">
                             {{ $statusLabel }}
-                        </p>
+                        </span>
                     </td>
-
-
-                    <td class="px-4 py-4 text-center">
-                        <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}" 
-                            class="text-blue-500 hover:text-blue-700 font-medium hover:underline ">
+                    <td class="px-4 py-2 text-center">
+                        <a href="{{ route('admin.budget-approval.show', $budget->id_laporan_lct) }}"
+                           class="text-blue-600 hover:underline font-medium">
                             Detail
                         </a>
                     </td>
@@ -65,16 +61,16 @@
             @empty
                 <tr>
                     <td colspan="7" class="text-center py-6 text-gray-500">
-                        <div class="flex flex-col items-center">
-                            <svg class="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
+                        <div class="flex flex-col items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
                             </svg>
-                            <p class="text-sm">No budget request data available.</p>
+                            <p class="text-xs">No budget request data available.</p>
                         </div>
                     </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
-    
 </div>

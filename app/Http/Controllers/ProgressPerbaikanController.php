@@ -215,37 +215,31 @@ class ProgressPerbaikanController extends Controller
         
                 case 'Medium':
                 case 'High':
-                    Log::info('Tingkat bahaya: Medium/High - pengecekan status saat ini');
         
                     if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
-                        Log::info('Status sekarang: waiting_approval_temporary / temporary_revision');
                         $laporan->status_lct = 'approved_temporary';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
                         $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'waiting_approval_taskbudget') {
-                        Log::info('Status sekarang: waiting_approval_taskbudget');
                         $laporan->status_lct = 'waiting_approval_taskbudget';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
                         $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'taskbudget_revision') {
-                        Log::info('Status sekarang: taskbudget_revision');
                         $laporan->status_lct = 'taskbudget_revision';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
                         $laporan->date_completion_temp = Carbon::now();
 
                     } elseif ($laporan->status_lct == 'approved_taskbudget') {
-                        Log::info('Status sekarang: approved_taskbudget');
                         $laporan->status_lct = 'approved_taskbudget';
                         $statusLog = 'approved_temporary';
                         $laporan->approved_temporary_by_ehs = true;
                         $laporan->date_completion_temp = Carbon::now();
                     } elseif ($laporan->status_lct == 'waiting_approval_permanent') {
-                        Log::info('Status sekarang: waiting_approval_permanent - akan disetujui permanen');
                         $laporan->status_lct = 'approved_permanent';
                         $laporan->date_completion = Carbon::now();
                         $laporan->date_completion_temp = Carbon::now();
@@ -266,9 +260,7 @@ class ProgressPerbaikanController extends Controller
                     return redirect()->back()->with('error', 'Tingkat bahaya tidak valid.');
             }
         
-            Log::info('Sebelum simpan status laporan', ['status_baru' => $laporan->status_lct]);
             $laporan->save();
-            Log::info('Setelah simpan status laporan', ['status_baru_aktual' => $laporan->fresh()->status_lct]);
         
             // Simpan ke tabel log (RejectLaporan) sebagai histori status
             RejectLaporan::create([
@@ -279,15 +271,12 @@ class ProgressPerbaikanController extends Controller
                 'alasan_reject' => null,
                 'tipe_reject' => null,
             ]);
-            Log::info('Log status tersimpan di tabel reject_laporan', ['status_log' => $statusLog]);
         
             DB::commit();
-            Log::info('Proses approval selesai dan transaksi dikomit.');
         
             return redirect()->back()->with('approve', 'The repair report has been successfully approved.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error approving EHS report: ' . $e->getMessage());
             return redirect()->back()->with('error', 'An error occurred while approving the report.');
         }
     }
@@ -295,91 +284,82 @@ class ProgressPerbaikanController extends Controller
 
     public function rejectLaporan(Request $request, $id_laporan_lct)
     {
-        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
             $roleName = 'ehs';
         } else {
             $user = Auth::guard('web')->user();
-            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
             $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
-        
 
-        // Validasi input untuk alasan reject
         $request->validate([
             'alasan_reject' => 'required|string|max:255',
         ]);
 
-        DB::beginTransaction(); // Mulai transaksi database
+        DB::beginTransaction();
         try {
-            // Cari laporan berdasarkan ID
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
             if (!$laporan) {
                 return response()->json(['error' => 'Laporan tidak ditemukan'], 404);
             }
 
-            // Tentukan status reject berdasarkan tingkat bahaya
-            switch ($laporan->tingkat_bahaya) {
-                case 'Low':
-                    $laporan->status_lct = 'revision';
-                    break;
+            $statusLama = $laporan->status_lct;
+            $tipeReject = 'lct_perbaikan_unknown';
 
-                case 'Medium':
-                case 'High':
-                    if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
-                        $laporan->status_lct = 'temporary_revision';
-                    } elseif (in_array($laporan->status_lct, ['waiting_approval_permanent', 'permanent_revision'])) {
-                        $laporan->status_lct = 'permanent_revision';
-                    }
-                    break;
+            if ($laporan->tingkat_bahaya === 'Low') {
+                $laporan->status_lct = 'revision';
+                $tipeReject = 'lct_perbaikan_low';
+            } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                // Mapping status lama ke status baru & tipe reject
+                $statusMap = [
+                    'waiting_approval_temporary' => ['temporary_revision', 'lct_perbaikan_temporary'],
+                    'temporary_revision'         => ['temporary_revision', 'lct_perbaikan_temporary'],
+                    'waiting_approval_taskbudget'=> ['waiting_approval_taskbudget', 'lct_perbaikan_temporary'],
+                    'taskbudget_revision'        => ['taskbudget_revision', 'lct_perbaikan_temporary'],
+                    'approved_taskbudget'        => ['approved_taskbudget', 'lct_perbaikan_temporary'],
+                    'work_permanent'             => ['work_permanent', 'lct_perbaikan_temporary'],
+                    'revision_permanent'         => ['revision_permanent', 'lct_perbaikan_temporary'],
+                    'waiting_approval_permanent' => ['approved_permanent', 'lct_perbaikan_permanent'],
+                ];
 
-                default:
-                    return response()->json(['error' => 'Tingkat bahaya tidak valid'], 400);
+                if (!array_key_exists($statusLama, $statusMap)) {
+                    return response()->json(['error' => 'Status tidak valid untuk ditolak.'], 400);
+                }
+
+                [$newStatus, $tipeReject] = $statusMap[$statusLama];
+                $laporan->status_lct = $newStatus;
+            } else {
+                return response()->json(['error' => 'Tingkat bahaya tidak valid'], 400);
             }
 
             $laporan->save();
 
-            // Tentukan tipe reject berdasarkan status_lct SEKARANG
-            $tipeReject = match ($laporan->status_lct) {
-                'revision' => 'lct_perbaikan_low',
-                'temporary_revision' => 'lct_perbaikan_temporary',
-                default => 'lct_perbaikan_unknown',
-            };
-
-            // Simpan alasan ke tabel lct_laporan_reject (log reject)
             RejectLaporan::create([
                 'id_laporan_lct' => $id_laporan_lct,
                 'user_id' => $user->id,
                 'role' => $roleName,
                 'status_lct' => $laporan->status_lct,
                 'alasan_reject' => $request->alasan_reject,
-                'tipe_reject' => $tipeReject, // Menambahkan tipe reject sesuai status
+                'tipe_reject' => $tipeReject,
             ]);
 
-            // Ambil alasan revisi terbaru berdasarkan tipe reject
             $alasanRevisi = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
                 ->where('tipe_reject', $tipeReject)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Kirim email ke PIC atau user terkait
-            // try {
-            //     Mail::to('efdika1102@gmail.com')->send(new LaporanRevisiToPic($laporan,$alasanRevisi));
-            //     Log::info('Email berhasil dikirim.');
-            // } catch (\Exception $mailException) {
-            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            // }
-
-            DB::commit(); // Commit transaksi
-
+            DB::commit();
             return redirect()->back()->with('reject', 'The revision report has been successfully sent to the PIC.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback jika ada error
-            return response()->json(['error' => 'Terjadi kesalahan saat menolak laporan.', 'message' => $e->getMessage()], 500);
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Terjadi kesalahan saat menolak laporan.',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
+
+
 
     public function closeLaporan($id_laporan_lct)
     {

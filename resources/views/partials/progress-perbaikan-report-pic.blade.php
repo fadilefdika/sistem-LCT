@@ -121,7 +121,7 @@
                                     {{ in_array($laporan->status_lct, ['approved', 'closed']) ? 'text-green-500' : 
                                     ($dueDate && $diffInDays < 0 ? 'text-red-500' : 
                                     ($dueDate && $diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
-                                    @if ($laporan->status_lct == 'approved'))
+                                    @if ($laporan->status_lct == 'approved')
                                         ✅ Completed
                                     @elseif ($dueDate && $diffInDays < 0)
                                         ⚠️ Overdue
@@ -318,58 +318,104 @@
 
                     <div x-data="{ revision: false, reason: '', closed: false }">
                         @if($laporan->status_lct !== 'closed')   
+
                             @if($notAllowed)
-                            <!-- Notifikasi Role Tidak Diizinkan -->
-                            <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                                <p class="text-gray-700 font-semibold">⚠️ You cannot take action on this report.</p>
-                            </div>
-                        @elseif(in_array($laporan->status_lct, ['in_progress', 'progress_work']))
-                            <!-- Notifikasi PIC Belum Selesai -->
-                            <div class="mt-3 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-                                <p class="text-yellow-800 font-semibold">⚠️ PIC belum menyelesaikan progres perbaikan. Anda tidak dapat memberikan keputusan sekarang.</p>
-                            </div>
-                            @else
-                                <div class="flex space-x-4">
-                                    <!-- Approve Button -->
-                                    <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" 
-                                            class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-emerald-700 cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                            @disabled(in_array($laporan->status_lct, ['approved', 'progress_work', 'revision', 'revision_temporary']))>
-                                            Approve
+                                <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
+                                    <p class="text-gray-700 font-semibold">⚠️ You cannot take action on this report.</p>
+                                </div>
+
+                            @elseif(in_array($laporan->tingkat_bahaya, ['Medium', 'High']))
+
+                                {{-- Case: Waiting approval temporary --}}
+                                @if(in_array($laporan->status_lct, ['in_progress', 'progress_work','temporary_revision']))
+                                    <div class="mt-3 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+                                        <p class="text-yellow-800 font-semibold">⚠️ Laporan masih menunggu penyelesaian perbaikan dari PIC.</p>
+                                    </div>
+
+                                {{-- Case: Temporary revision --}}
+                                @elseif($laporan->approved_temporary_by_ehs == false && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
+                                    <div class="flex space-x-4">
+                                        <!-- Approve Button -->
+                                        <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" 
+                                                class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-700">
+                                                Approve
+                                            </button>
+                                        </form>
+                                    
+                                        <!-- Revision Button -->
+                                        <button type="button" @click="revision = true"
+                                            class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md hover:bg-rose-700">
+                                            Revision
                                         </button>
-                                    </form>
+                                    </div>
+                                    
+                                    <!-- Alasan Penolakan -->
+                                    <div x-show="revision" class="mt-4">
+                                        <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                            @csrf
+                                            <label class="block text-gray-700 font-semibold">Revision Reason:</label>
+                                            <textarea x-model="reason" name="alasan_reject" rows="3"
+                                                class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                                    
+                                            <div class="flex mt-3 space-x-2">
+                                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                                    Send Revision
+                                                </button>
+                                                <button type="button" @click="revision = false"
+                                                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>                                
 
-                                    <!-- Reject Button -->
-                                    <button type="button" @click="revision = true"
-                                        class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md transition-all hover:bg-rose-700 cursor-pointer"
-                                        @disabled(in_array($laporan->status_lct, ['approved', 'progress_work']))>
-                                        Revision
-                                    </button>
-                                </div>
+                                {{-- Case: Approved dan sudah selesai --}}
+                                @elseif(in_array($laporan->status_lct, ['approved_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision', 'approved_taskbudget', 'work_permanent', 'approved_permanent','waiting_approval_permanent']) && $laporan->date_completion_temp !== null)
+                                    <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg">
+                                        <p class="text-green-800 font-semibold">✅ The report has been approved and completed by PIC.</p>
+                                    </div>
+                                @endif
                             
-                                <!-- Alasan Penolakan -->
-                                <div x-show="revision" class="mt-4">
-                                    <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
-                                        @csrf
-                                        <label class="block text-gray-700 font-semibold">Revision Reason:</label>
-                                        <textarea x-model="reason" name="alasan_reject" rows="3"
-                                            class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
-
-                                        <div class="flex mt-3 space-x-2">
-                                            <button type="submit"
-                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer">
-                                                Send Revision
-                                            </button>
-                                            <button type="button" @click="revision = false"
-                                                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <!-- Status Laporan -->
+                            @elseif($laporan->tingkat_bahaya === 'Low' && $laporan->status_lct === 'waiting_approval')
+                            <div class="flex space-x-4">
+                                <!-- Approve Button -->
+                                <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" 
+                                        class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-700">
+                                        Approve
+                                    </button>
+                                </form>
+                            
+                                <!-- Revision Button -->
+                                <button type="button" @click="revision = true"
+                                    class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md hover:bg-rose-700">
+                                    Revision
+                                </button>
+                            </div>
+                            
+                            <!-- Alasan Penolakan -->
+                            <div x-show="revision" class="mt-4">
+                                <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                    @csrf
+                                    <label class="block text-gray-700 font-semibold">Revision Reason:</label>
+                                    <textarea x-model="reason" name="alasan_reject" rows="3"
+                                        class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
+                            
+                                    <div class="flex mt-3 space-x-2">
+                                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                            Send Revision
+                                        </button>
+                                        <button type="button" @click="revision = false"
+                                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Status Laporan -->
                                 @if($laporan->status_lct === "approved" && $laporan->tingkat_bahaya === 'Low')
                                     <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
                                         <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
@@ -383,11 +429,13 @@
                                     </div>
                                 @endif
                             @endif
+
                         @else
                             <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
                                 <p class="text-gray-700 font-semibold">🔒 The report has been closed.</p>
                             </div>
                         @endif
+
 
                            <!-- Tombol History -->
                         </div>

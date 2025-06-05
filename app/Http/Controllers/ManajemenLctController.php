@@ -200,9 +200,10 @@ class ManajemenLctController extends Controller
             ];
         });
 
+        $revise = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)->where('status_lct', 'taskbudget_revision')->where('tipe_reject', 'budget_approval')->get();
     
         // Kembalikan tampilan dengan data yang sudah diproses
-        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'tindakan_perbaikan', 'picList'));
+        return view('pages.admin.manajemen-lct.show', compact('laporan', 'tasks', 'bukti_temuan', 'tindakan_perbaikan', 'picList', 'revise'));
     }
     
 
@@ -298,21 +299,22 @@ class ManajemenLctController extends Controller
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
-        // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
-        if (Auth::guard('ehs')->check()) {
-            $user = Auth::guard('ehs')->user();
-            $roleName = 'ehs';
-        } else {
-            $user = Auth::guard('web')->user();
-            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
-            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
-        }
-        
-        
+        // Preprocess: ubah format estimated budget
         $data = $request->all();
+        // dd($data);
+        Log::info('Raw estimatedBudget input:', ['value' => $request->estimatedBudget]);
+
+        $estimatedBudgetRaw = $request->estimatedBudget;
+        $estimatedBudgetClean = preg_replace('/[^0-9.]/', '', $estimatedBudgetRaw);
+        $data['estimatedBudget'] = (float) $estimatedBudgetClean;
+
+        Log::info('Parsed estimatedBudget:', ['value' => $data['estimatedBudget']]);
+
         $uploadedFiles = $request->file('attachments') ?? [];
-    
+
+        // Validasi input
         $validator = Validator::make($data, [
+            'permanentAction' => 'required|string|max:1000',
             'estimatedBudget' => 'required|numeric|min:0',
             'tasks' => 'nullable|array',
             'tasks.*.id' => 'nullable|integer|exists:lct_tasks,id',
@@ -320,121 +322,83 @@ class ManajemenLctController extends Controller
             'tasks.*.picId' => 'nullable|integer|exists:lct_pic,id',
             'tasks.*.dueDate' => 'nullable|date',
         ]);
-    
+
+
         if ($validator->fails()) {
-            Log::error('Validation Failed:', $validator->errors()->toArray());
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed!',
-                'errors' => $validator->errors()
-            ], 422);
+            Log::error('Validation Failed', $validator->errors()->toArray());
+            return back()->withErrors($validator)->withInput();
         }
-    
+
         DB::beginTransaction();
         try {
-            // Simpan semua file attachment
-            $attachmentPaths = [];
-            foreach ($uploadedFiles as $index => $uploadedFile) {
-                if ($uploadedFile instanceof \Illuminate\Http\UploadedFile) {
-                    // Mengambil nama asli file
-                    $originalFileName = $uploadedFile->getClientOriginalName();
-                    
-                    // Menyimpan file dengan nama yang sudah diubah, tetapi bisa menyimpan nama asli di database
-                    $fileName = "{$id_laporan_lct}_attachment_{$index}." . $uploadedFile->getClientOriginalExtension();
-                    $filePath = $uploadedFile->storeAs('public/task_attachments', $fileName);
-                    
-                    // Menyimpan nama asli file dalam array attachment
-                    $attachmentPaths[] = [
-                        'path' => $filePath,
-                        'original_name' => $originalFileName
-                    ];
-                }
-            }
-            
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
 
-            // Update laporan
-            $laporan->update([
-                'estimated_budget' => $data['estimatedBudget'],
-                'status_lct' => 'waiting_approval_taskbudget',
-                'attachments' => json_encode($attachmentPaths),
-            ]);
-            
-    
-            $existingTaskIds = [];
-    
-            if (!empty($data['tasks'])) {
-                foreach ($data['tasks'] as $index => $task) {
-                    if (empty($task['taskName']) || empty($task['picId']) || empty($task['dueDate'])) {
-                        continue;
-                    }
-    
-                    $taskData = [
-                        'id_laporan_lct' => $id_laporan_lct,
-                        'task_name' => $task['taskName'],
-                        'pic_id' => $task['picId'],
-                        'due_date' => $task['dueDate'],
-                        // Tidak ada lagi attachment_path di task
+            // Update permanent action & estimated budget
+            $laporan->action_permanent = $data['permanentAction'];
+            $laporan->estimated_budget = $data['estimatedBudget'];
+
+            // Process attachments
+            $existingAttachments = json_decode($laporan->attachments ?? '[]', true) ?? [];
+
+            // Cek total file jika ditambah file baru
+            $totalFiles = count($existingAttachments) + count($uploadedFiles);
+
+            if ($totalFiles > 5) {
+                // Batasi maksimal 5 file, bisa error atau hanya ambil sebagian file baru
+                return back()->with('error', 'Maximum 5 files allowed. Please remove some files before uploading new ones.')
+                            ->withInput();
+            }
+
+            // Proses simpan file baru
+            foreach ($uploadedFiles as $file) {
+                if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    $path = $file->store("lct/attachments/{$id_laporan_lct}", 'public');
+                    $existingAttachments[] = [
+                        'original_name' => $file->getClientOriginalName(),
+                        'path' => $path
                     ];
-    
-                    Log::info("Saving Task #{$index}:", $taskData);
-    
-                    if (!empty($task['id'])) {
-                        $taskModel = LctTasks::find($task['id']);
-                        if ($taskModel) {
-                            $taskModel->update($taskData);
-                            $existingTaskIds[] = $taskModel->id;
-                        }
-                    } else {
-                        $taskModel = LctTasks::create($taskData);
-                        $existingTaskIds[] = $taskModel->id;
-                    }
                 }
             }
-    
-            Log::info('Existing Task IDs:', $existingTaskIds);
-    
-            LctTasks::where('id_laporan_lct', $id_laporan_lct)
-                ->whereNotIn('id', $existingTaskIds)
-                ->delete();
+            $laporan->attachments = json_encode($existingAttachments);
+            $laporan->status_lct = 'waiting_approval_taskbudget';
+            $laporan->save();
 
-                
-            RejectLaporan::create([
-                'id_laporan_lct' => $laporan->id_laporan_lct,
-                'user_id' => $user->id,
-                'role' => $roleName,
-                'status_lct' => 'waiting_approval_taskbudget',  // Status pengiriman laporan
-                'alasan_reject' => null,  
-                'tipe_reject' => null,  
-            ]);
+            // Update or insert tasks
+            $submittedTasks = $data['tasks'] ?? [];
+            $submittedIds = [];
+            $existingTaskIds = LctTasks::where('id_laporan_lct', $id_laporan_lct)->pluck('id')->toArray();
 
-            // Ambil ulang semua task terbaru yang terhubung dengan laporan ini
-            $tasks = LctTasks::with('pic')
-                ->where('id_laporan_lct', $id_laporan_lct)
-                ->get();
+            foreach ($submittedTasks as $taskData) {
+                if (!empty($taskData['taskName'])) {
+                    $task = !empty($taskData['id']) ? LctTasks::find($taskData['id']) : new LctTasks();
+                    $task->id_laporan_lct = $id_laporan_lct;
+                    $task->task_name = $taskData['taskName'];
+                    $task->pic_id = $taskData['picId'] ?? null;
+                    $task->due_date = $taskData['dueDate'] ?? null;
+                    $task->save();
+                    $submittedIds[] = $task->id;
+                }
+            }
 
+            // Hapus task yang tidak dikirim ulang
+            $deletedTasks = array_diff($existingTaskIds, $submittedIds);
+            if (!empty($deletedTasks)) {
+                LctTasks::whereIn('id', $deletedTasks)->delete();
+                Log::info('Deleted Task IDs', $deletedTasks);
+            }
 
-            // try {
-            //     Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $tasks));
-            //     Log::info('Email berhasil dikirim.');
-            // } catch (\Exception $mailException) {
-            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            // }
-    
+            Log::info('Submitted Task IDs', $submittedIds);
             DB::commit();
-    
-            return redirect()->back()->with('success', 'Data saved successfully!');
+
+            return redirect()->back()->with('success', 'Task & Budget updated successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Exception caught during submitTaskBudget:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-    
-            return redirect()->back()->with('error', 'An error occurred while saving data.');
+            Log::error('Error in submitTaskBudget', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'An error occurred while saving the data.');
         }
     }
+
 
     public function history($id_laporan_lct)
     {

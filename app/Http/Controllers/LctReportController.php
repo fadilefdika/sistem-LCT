@@ -184,8 +184,7 @@ class LctReportController extends Controller
             // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
             $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
-        
-
+        // Validasi request
         $validator = Validator::make($request->all(), [
             'temuan_ketidaksesuaian' => 'required|string|max:255',
             'kategori_temuan' => 'required|string|max:255',
@@ -194,8 +193,10 @@ class LctReportController extends Controller
             'tingkat_bahaya' => 'required|in:Low,Medium,High',
             'rekomendasi' => 'required|string|max:255',
             'due_date' => 'required|date|after_or_equal:today',
+            'due_date_temp' => 'nullable|date|after_or_equal:today',
+            'due_date_perm' => 'nullable|date|after_or_equal:today',
         ]);
-
+        
         try {
             DB::beginTransaction();
 
@@ -204,7 +205,7 @@ class LctReportController extends Controller
                 abort(404, 'Report data not found');
             }
 
-            // Update data terlebih dahulu termasuk pic_id
+            
             $laporan->update([
                 'temuan_ketidaksesuaian' => $request->temuan_ketidaksesuaian,
                 'kategori_temuan' => $request->kategori_temuan,
@@ -213,25 +214,24 @@ class LctReportController extends Controller
                 'tingkat_bahaya' => $request->tingkat_bahaya,
                 'rekomendasi' => $request->rekomendasi,
                 'due_date' => $request->due_date,
+                'due_date_temp' => $request->due_date_temp,
+                'due_date_perm' => $request->due_date_perm,
                 'status_lct' => 'in_progress',
             ]);
-
-            // Buat reject log
+            
+            
             RejectLaporan::create([
                 'id_laporan_lct' => $laporan->id_laporan_lct,
                 'user_id' => $user->id,
-                'role' => $roleName,
-                'status_lct' => 'in_progress',
-                'alasan_reject' => null,
-                'tipe_reject' => null,
+                'role' => $roleName,  // Role user yang mengirimkan laporan
+                'status_lct' => 'in_progress',  // Status saat laporan baru dikirim
+                'alasan_reject' => null,  // Tidak ada alasan reject pada tahap ini
+                'tipe_reject' => null,  // Mengindikasikan ini adalah pengiriman ke EHS
             ]);
-
             DB::commit();
-
-            // Muat ulang laporan dengan relasi agar picUser terisi
+            
             $laporan->load('picUser');
-
-            // Kirim email hanya jika picUser valid
+            
             // try {
             //     Mail::to('efdika1102@gmail.com')->send(new LaporanDikirimKePic($laporan));
             //     Log::info('Email berhasil dikirim.');
@@ -239,16 +239,18 @@ class LctReportController extends Controller
             //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
             //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
             // }
-
             return redirect()->route('ehs.reporting.index')->with('success', 'The report has been successfully submitted to the PIC.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
             
+            return redirect()->back()->with('error', 'Report not found.', $e->getMessage());
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'An error occurred while submitting the report.');
+            Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while submitting the report.', $e->getMessage());
         }
     }
-
-
 
     public function closed(Request $request, $id_laporan_lct)
     {

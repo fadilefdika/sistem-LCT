@@ -44,8 +44,6 @@ class BudgetApprovalTable extends Component
         }
         
 
-
-
         $query = LaporanLct::with([
             'picUser',
             'tasks:id,id_laporan_lct,updated_at', // lebih ringkas
@@ -65,8 +63,22 @@ class BudgetApprovalTable extends Component
 
         // Ambil data dengan sorting dan pagination
         $taskBudget = $query
+            ->orderByRaw("
+                CASE 
+                    WHEN status_lct = 'waiting_approval_taskbudget' THEN 1
+                    WHEN status_lct = 'taskbudget_revision' THEN 2
+                    WHEN status_lct = 'work_permanent' THEN 3
+                    WHEN status_lct = 'approved_taskbudget' THEN 4
+                    WHEN status_lct = 'waiting_approval_permanent' THEN 5
+                    WHEN status_lct = 'permanent_revision' THEN 6
+                    WHEN status_lct = 'approved_permanent' THEN 7
+                    ELSE 99
+                END
+            ")
             ->orderBy($this->sortField ?? 'created_at', $this->sortDirection ?? 'desc')
             ->paginate($this->perPage ?? 10);
+
+
 
         return view('livewire.budget-approval-table', compact('taskBudget'));
     }

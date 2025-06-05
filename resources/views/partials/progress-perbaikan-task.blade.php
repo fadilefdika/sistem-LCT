@@ -1,87 +1,143 @@
-<div class="w-full bg-[#F3F4F6] max-h-[calc(100vh)] pb-32 overflow-y-auto 
-                    [&::-webkit-scrollbar]:w-1
-                    [&::-webkit-scrollbar-track]:rounded-full
-                    [&::-webkit-scrollbar-track]:bg-gray-100
-                    [&::-webkit-scrollbar-thumb]:rounded-full
-                    [&::-webkit-scrollbar-thumb]:bg-gray-300
-                    dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                    dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-<div class="mx-auto">
-    <h3 class="text-2xl font-bold text-gray-800 mb-4 mt-3 flex items-center">📌 Approved Tasks List</h3>
+<div class="w-full max-h-[calc(100vh)] pb-20 overflow-y-auto 
+                [&::-webkit-scrollbar]:w-2
+                [&::-webkit-scrollbar-track]:rounded-full
+                [&::-webkit-scrollbar-track]:bg-gray-100
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-thumb]:bg-gray-300
+                dark:[&::-webkit-scrollbar-track]:bg-slate-700
+                dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
+<div class="w-full px-4 sm:px-6 lg:px-8">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-6 pt-6">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-800 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Approved Tasks List
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">List of all approved tasks with current status</p>
+        </div>
+        @php
+            $status = $laporan->status_lct;
+            $statusMap = [
+                'approved_taskbudget' => ['label' => 'Approved (Task Budget)', 'color' => 'bg-emerald-100 text-emerald-800'],
+                'approved_permanent' => ['label' => 'Approved (Permanent)', 'color' => 'bg-emerald-100 text-emerald-800'],
+                'waiting_approval_taskbudget' => ['label' => 'Waiting Approval (Task Budget)', 'color' => 'bg-amber-100 text-amber-800'],
+                'waiting_approval_permanent' => ['label' => 'Waiting Approval (Permanent)', 'color' => 'bg-amber-100 text-amber-800'],
+                'work_permanent' => ['label' => 'In Progress (Permanent)', 'color' => 'bg-amber-100 text-amber-800'],
+                'taskbudget_revision' => ['label' => 'Revision (Task Budget)', 'color' => 'bg-rose-100 text-rose-800'],
+                'permanent_revision' => ['label' => 'Revision (Permanent)', 'color' => 'bg-rose-100 text-rose-800'],
+                'closed' => ['label' => 'Closed', 'color' => 'bg-gray-200 text-gray-800'],
+            ];
 
-    <div class="bg-white px-6 py-6 rounded-xl shadow-lg border border-gray-200">
+            $label = $statusMap[$status]['label'] ?? ucfirst(str_replace('_', ' ', $status));
+            $color = $statusMap[$status]['color'] ?? 'bg-gray-100 text-gray-800';
+        @endphp
+
+        <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $color }}">
+                {{ $label }}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         @if($laporan->tasks->isEmpty())
-            <div class="text-gray-500 italic text-center py-10">
-                No tasks have been created by SVP yet.
+            <div class="text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <h3 class="mt-2 text-lg font-medium text-gray-700">No tasks created yet</h3>
+                <p class="mt-1 text-sm text-gray-500 max-w-md mx-auto">The SVP has not created any tasks for this report.</p>
             </div>
         @else
-            <!-- Header -->
-            <div class="flex items-center font-semibold text-gray-900 border-b pb-3">
-                <div class="w-10 text-center">No</div>
-                <div class="flex-1 px-4">Task Name</div>
-                <div class="w-40 px-4">PIC</div>
-                <div class="w-32 px-4">Due Date</div>
-                <div class="w-32 px-4">Status</div>
-                <div class="w-40 px-4">Attachment</div>
+            <!-- Table Header -->
+            <div class="grid grid-cols-12 gap-4 bg-gray-50 px-6 py-4 border-b border-gray-100">
+                <div class="col-span-1 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">#</div>
+                <div class="col-span-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Task Name</div>
+                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">PIC</div>
+                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Due Date</div>
+                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Status</div>
+                <div class="col-span-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</div>
             </div>
-    
-            <!-- Data Rows -->
-            <div class="divide-y divide-gray-200">
+            
+            <!-- Table Rows -->
+            <div class="divide-y divide-gray-100">
                 @foreach($laporan->tasks as $index => $task)
-                    <div class="flex items-center py-4 hover:bg-gray-100 transition duration-200 rounded-lg">
-                        <div class="w-10 text-center font-medium text-gray-900">{{ $index + 1 }}</div>
-                        <div class="flex-1 px-4 font-medium text-gray-900">{{ $task->task_name }}</div>
-                        <div class="w-40 px-4 text-gray-800">{{ $task->pic->user->fullname }}</div>
-                        <div class="w-32 px-4 text-gray-800">{{ \Carbon\Carbon::parse($task->due_date)->format('F j, Y') }}</div>
-                        
-                        <!-- Status with better visibility -->
-                        <div class="w-32 px-4 text-center">
-                            <span class="px-3 py-1 text-sm rounded-full 
-                                        {{ $task->status == 'pending' ? 'bg-yellow-200 text-yellow-700' : '' }}
-                                        {{ $task->status == 'in_progress' ? 'bg-blue-200 text-blue-700' : '' }}
-                                        {{ $task->status == 'completed' ? 'bg-green-200 text-green-700' : '' }}">
-                                {{ ucfirst($task->status) }}
+                    <div class="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
+                        <div class="col-span-1 text-xs text-gray-500 text-center">{{ $index + 1 }}</div>
+                        <div class="col-span-4">
+                            <div class="font-medium text-xs text-gray-800">{{ $task->task_name }}</div>
+                        </div>
+                        <div class="col-span-2 flex items-center">
+                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
+                                {{ substr($task->pic->user->fullname, 0, 1) }}
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-xs font-medium text-gray-800">{{ $task->pic->user->fullname }}</div>
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-center">
+                            <div>
+                                @php
+                                    \Carbon\Carbon::setLocale('en');
+                                @endphp
+
+                                <div class="text-xs text-gray-800">
+                                    {{ \Carbon\Carbon::parse($task->due_date)->translatedFormat('M j, Y') }}
+                                </div>
+
+                                <div class="text-xs {{ $task->due_date < now() && $task->status != 'completed' ? 'text-rose-500' : 'text-gray-500' }}">
+                                    @if($task->due_date < now() && $task->status != 'completed')
+                                        Overdue
+                                    @else
+                                        {{ \Carbon\Carbon::parse($task->due_date)->diffForHumans() }}
+                                    @endif
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex items-center justify-center">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {{ $task->status == 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
+                                        {{ $task->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : '' }}
+                                        {{ $task->status == 'completed' ? 'bg-emerald-100 text-emerald-800' : '' }}">
+                                {{ str_replace('_', ' ', ucfirst($task->status)) }}
                             </span>
                         </div>
-    
-                        <div class="w-40 px-4 text-gray-600 italic">{{ $task->notes ?? '-' }}</div>
+                        <div class="col-span-1 text-xs text-gray-500 truncate" title="{{ $task->notes ?? 'No notes' }}">
+                            {{ $task->notes ?? '-' }}
+                        </div>
                     </div>
                 @endforeach
             </div>
 
-            @php
-                if (Auth::guard('ehs')->check()) {
-                    $user = Auth::guard('ehs')->user();
-                    $roleName = 'ehs';
-                } else {
-                    $user = Auth::guard('web')->user();
-                    // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
-                    $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
-                }
-            @endphp
-            
-            <!-- Tombol Approve & Close, hanya untuk EHS -->
+            <!-- Action Buttons -->
             @if(Auth::guard('ehs')->check())
                 @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
-                    <div class="mt-6 flex justify-end gap-4">
-                        <!-- Tombol Approve -->
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
                         @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
                             <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf
                                 <button type="submit"
-                                        class="px-4 py-2 text-white font-semibold rounded-lg bg-green-500 hover:bg-green-600 transition cursor-pointer">
-                                    ✅ Approve All
+                                        class="inline-flex items-center px-4 py-2 border cursor-pointer border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Approve All Tasks
                                 </button>
                             </form>
                         @endif
             
-                        <!-- Tombol Close -->
                         @if($laporan->status_lct === 'approved_permanent')
                             <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf 
                                 <button type="submit"
-                                        class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 transition cursor-pointer">
-                                    🔒 Close
+                                        class="inline-flex cursor-pointer items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                    Close Report
                                 </button>
                             </form>
                         @endif
@@ -90,25 +146,57 @@
             @endif
         @endif
     </div>
-    
 
-    <!-- Notifikasi Status di Bagian Bawah -->
+    <!-- Status Notification -->
     @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))
-        <div class="mt-6 bg-white px-6 py-4 rounded-xl shadow-lg border border-gray-200">
+        <div class="mt-6">
             @if($laporan->status_lct === 'approved_taskbudget')
-                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-                    <p class="font-bold">📝 Approval in Progress</p>
-                    <p>The tasks are still in the budget approval stage. Please review before final approval.</p>
+                <div class="rounded-md bg-amber-50 p-4 border-l-4 border-amber-400">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-amber-800">Approval in Progress</h3>
+                            <div class="mt-2 text-sm text-amber-700">
+                                <p>The tasks are still in the budget approval stage. Final approval pending review.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @elseif($laporan->status_lct === 'approved_permanent')
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
-                    <p class="font-bold">✅ Permanently Approved</p>
-                    <p>All tasks have been permanently approved. You may proceed with closure.</p>
+                <div class="rounded-md bg-emerald-50 p-4 border-l-4 border-emerald-400">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-emerald-800">Permanently Approved</h3>
+                            <div class="mt-2 text-sm text-emerald-700">
+                                <p>All tasks have been permanently approved. Ready for closure when appropriate.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @elseif($laporan->status_lct === 'closed')
-                <div class="bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4" role="alert">
-                    <p class="font-bold">🔒 Case Closed</p>
-                    <p>This case has been closed. No further actions are required.</p>
+                <div class="rounded-md bg-gray-50 p-4 border-l-4 border-gray-400">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-gray-800">Case Closed</h3>
+                            <div class="mt-2 text-sm text-gray-700">
+                                <p>This report has been officially closed. No further actions required.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
