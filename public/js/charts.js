@@ -84,7 +84,7 @@ function loadFindingData(params = {}) {
 
 // Panggil loadFindingData() saat halaman selesai dimuat
 document.addEventListener("DOMContentLoaded", () => {
-    loadFindingData();
+    loadFindingData({ groupBy: "date" });
 });
 
 let ctxStatus = document.getElementById("statusChart").getContext("2d");

@@ -433,20 +433,25 @@ class ProgressPerbaikanController extends Controller
         $results = $query->get();
 
         // Tentukan format groupBy
-        $groupBy = $request->input('groupBy', 'daily');
-        $format = 'Y-m-d'; // default
+        $groupBy = $request->input('groupBy', 'date');
+        $format = 'Y-m-d'; // default per tanggal
 
         switch ($groupBy) {
-            case 'monthly':
+            case 'month':
                 $format = 'Y-m';
                 break;
-            case 'yearly':
+            case 'year':
                 $format = 'Y';
                 break;
-            case 'weekly':
-                $format = 'o-\WW'; // ISO week format (e.g., 2024-W23)
+            case 'week':
+                $format = 'o-\WW'; // ISO week format
+                break;
+            case 'date':
+            default:
+                $format = 'Y-m-d';
                 break;
         }
+
 
         // Group & hitung jumlah
         $grouped = $results->groupBy(function ($item) use ($format) {
@@ -463,7 +468,6 @@ class ProgressPerbaikanController extends Controller
 
         return response()->json(['labels' => $labels, 'data' => $data]);
     }
-
 
     
     public function chartStatus(Request $request)
@@ -775,95 +779,159 @@ class ProgressPerbaikanController extends Controller
 
 
     public function chartDepartment(Request $request)
-{
-    // Ambil semua departemen aktif
-    $departments = LctDepartement::whereNull('deleted_at')
-        ->orderBy('nama_departemen')
-        ->pluck('nama_departemen', 'id');
+    {
+        $departments = LctDepartement::whereNull('deleted_at')
+            ->orderBy('nama_departemen')
+            ->pluck('nama_departemen', 'id');
 
-    $query = DB::table('lct_laporan as l')
-        ->whereNull('l.deleted_at')
-        ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
-        ->whereIn('l.departemen_id', $departments->keys());
+        $query = DB::table('lct_laporan as l')
+            ->whereNull('l.deleted_at')
+            ->select('l.departemen_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('l.departemen_id', $departments->keys());
 
-    // Terapkan filter statusLct dengan overdue
-    if ($request->filled('statusLct')) {
-        $statuses = explode(',', $request->statusLct);
-        $today = now();
+        // Terapkan filter statusLct dengan overdue
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
 
-        $query->where(function ($q) use ($statuses, $today) {
-            $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+            $query->where(function ($q) use ($statuses, $today) {
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
 
-            if (count($statusFilters) > 0) {
-                $q->whereIn('l.status_lct', $statusFilters);
-            }
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('l.status_lct', $statusFilters);
+                }
 
-            if (in_array('overdue', array_map('strtolower', $statuses))) {
-                $q->orWhere(function ($sub) use ($today) {
-                    $sub->where(function ($low) use ($today) {
-                        $low->where('l.tingkat_bahaya', 'Low')
-                            ->whereDate('l.due_date', '<', $today)
-                            ->whereNull('l.date_completion');
-                    })
-                    ->orWhere(function ($mediumHighTemp) use ($today) {
-                        $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
-                            ->whereDate('l.due_date_temp', '<', $today)
-                            ->whereNull('l.date_completion_temp');
-                    })
-                    ->orWhere(function ($mediumHighPerm) use ($today) {
-                        $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
-                            ->whereDate('l.due_date_perm', '<', $today)
-                            ->whereNull('l.date_completion');
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('l.tingkat_bahaya', 'Low')
+                                ->whereDate('l.due_date', '<', $today)
+                                ->whereNull('l.date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_temp', '<', $today)
+                                ->whereNull('l.date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_perm', '<', $today)
+                                ->whereNull('l.date_completion');
+                        });
                     });
-                });
-            }
-        });
-    }
+                }
+            });
+        }
 
-    if ($request->filled('riskLevel')) {
-        $query->where('l.tingkat_bahaya', $request->riskLevel);
-    }
+        if ($request->filled('riskLevel')) {
+            $query->where('l.tingkat_bahaya', $request->riskLevel);
+        }
 
-    if ($request->filled('departemenId')) {
-        $query->where('l.departemen_id', $request->departemenId);
-    }
+        if ($request->filled('departemenId')) {
+            $query->where('l.departemen_id', $request->departemenId);
+        }
 
-    if ($request->filled('categoryId')) {
-        $query->where('l.kategori_id', $request->categoryId);
-    }
+        if ($request->filled('categoryId')) {
+            $query->where('l.kategori_id', $request->categoryId);
+        }
 
-    if ($request->filled('areaId')) {
-        $query->where('l.area_id', $request->areaId);
-    }
+        if ($request->filled('areaId')) {
+            $query->where('l.area_id', $request->areaId);
+        }
 
-    if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-        $query->whereBetween('l.created_at', [
-            $request->tanggalAwal . ' 00:00:00',
-            $request->tanggalAkhir . ' 23:59:59',
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('l.created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
+        }
+
+        // Ambil hasil yang memiliki departemen_id
+        $result = $query->groupBy('l.departemen_id')
+            ->pluck('total', 'l.departemen_id')
+            ->toArray();
+
+        // Hitung jumlah laporan yang belum memiliki departemen_id (null)
+        $unassignedQuery = DB::table('lct_laporan as l')
+            ->whereNull('l.deleted_at')
+            ->whereNull('l.departemen_id');
+
+        // Terapkan filter yang sama ke $unassignedQuery
+        if ($request->filled('statusLct')) {
+            $statuses = explode(',', $request->statusLct);
+            $today = now();
+
+            $unassignedQuery->where(function ($q) use ($statuses, $today) {
+                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+
+                if (count($statusFilters) > 0) {
+                    $q->whereIn('l.status_lct', $statusFilters);
+                }
+
+                if (in_array('overdue', array_map('strtolower', $statuses))) {
+                    $q->orWhere(function ($sub) use ($today) {
+                        $sub->where(function ($low) use ($today) {
+                            $low->where('l.tingkat_bahaya', 'Low')
+                                ->whereDate('l.due_date', '<', $today)
+                                ->whereNull('l.date_completion');
+                        })
+                        ->orWhere(function ($mediumHighTemp) use ($today) {
+                            $mediumHighTemp->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_temp', '<', $today)
+                                ->whereNull('l.date_completion_temp');
+                        })
+                        ->orWhere(function ($mediumHighPerm) use ($today) {
+                            $mediumHighPerm->whereIn('l.tingkat_bahaya', ['Medium', 'High'])
+                                ->whereDate('l.due_date_perm', '<', $today)
+                                ->whereNull('l.date_completion');
+                        });
+                    });
+                }
+            });
+        }
+
+        if ($request->filled('riskLevel')) {
+            $unassignedQuery->where('l.tingkat_bahaya', $request->riskLevel);
+        }
+
+        if ($request->filled('categoryId')) {
+            $unassignedQuery->where('l.kategori_id', $request->categoryId);
+        }
+
+        if ($request->filled('areaId')) {
+            $unassignedQuery->where('l.area_id', $request->areaId);
+        }
+
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $unassignedQuery->whereBetween('l.created_at', [
+                $request->tanggalAwal . ' 00:00:00',
+                $request->tanggalAkhir . ' 23:59:59',
+            ]);
+        }
+
+        $unassignedCount = $unassignedQuery->count();
+
+        // Susun hasil berdasarkan urutan nama departemen
+        $labels = [];
+        $data = [];
+
+        foreach ($departments as $id => $name) {
+            $labels[] = $name;
+            $data[] = $result[$id] ?? 0;
+        }
+
+        // Tambahkan batang untuk Unassigned
+        if ($unassignedCount > 0) {
+            $labels[] = 'Unassigned';
+            $data[] = $unassignedCount;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data,
         ]);
     }
 
-    // Group dan ambil hasil
-    $result = $query->groupBy('l.departemen_id')
-        ->pluck('total', 'l.departemen_id')
-        ->toArray();
-
-    // Susun hasil berdasarkan urutan nama departemen
-    $labels = [];
-    $data = [];
-
-    foreach ($departments as $id => $name) {
-        $labels[] = $name;
-        $data[] = $result[$id] ?? 0;
-    }
-
-    return response()->json([
-        'labels' => $labels,
-        'data' => $data,
-    ]);
-}
-
-    
 
     private function buildLaporanQuery(Request $request, $user, $role)
     {
@@ -972,5 +1040,48 @@ class ProgressPerbaikanController extends Controller
 
         return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
     }
+
+    public function getRevisiData(Request $request)
+    {
+        $id = $request->id_laporan_lct;
+        $perPage = $request->input('per_page', 5);
+        $laporan = LaporanLct::with(['rejectLaporan'])->findOrFail($id);
+
+        $revisions = $laporan->rejectLaporan
+            ->filter(fn($item) => !empty($item->alasan_reject))
+            ->values();
+
+        $tindakan = $laporan->tindakan_perbaikan ?? [];
+        $combined = $revisions->map(function ($rev, $index) use ($tindakan) {
+            return [
+                'rev' => $rev,
+                'tindakan' => $tindakan[$index + 1] ?? null,
+            ];
+        })->reverse()->values();
+
+        $page = $request->input('page', 1);
+        $paginated = $combined->slice(($page - 1) * $perPage, $perPage)->values();
+        $totalPages = ceil($combined->count() / $perPage);
+
+        $result = $paginated->map(function ($item, $i) use ($page) {
+            $index = ($page - 1) * request('per_page', 5) + $i;
+
+            $html = view('partials.table-revise', [
+                'item' => $item,
+                'i' => $index
+            ])->render();
+
+            return [
+                'html' => $html
+            ];
+        });
+
+        return response()->json([
+            'data' => $result,
+            'total_pages' => $totalPages,
+        ]);
+    }
+
+
 
 }

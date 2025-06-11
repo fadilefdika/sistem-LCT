@@ -63,17 +63,7 @@
                                 placeholder="All Time" autocomplete="off">
                             <input type="hidden" name="tanggalAwal" id="tanggalAwal">
                             <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
-                        </div>
-
-                        <!-- Group By -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Display Data</label>
-                            <select name="groupBy" id="groupBy" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="daily">By Date</option>
-                                <option value="weekly">By Week</option>
-                                <option value="monthly">By Month</option>
-                            </select>
-                        </div>                        
+                        </div>                       
 
                         <!-- Hazard Level -->
                         <div>
@@ -339,20 +329,18 @@
                 opens: 'left',
                 ranges: {
                     "Today": [moment(), moment()],
-                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
                     "Last 7 Days": [moment().subtract(6, "days"), moment()],
-                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
                     "This Month": [moment().startOf("month"), moment().endOf("month")],
-                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")],
                     "Last 6 Months": [moment().subtract(6, "months").startOf("day"), moment()],
-                    "Last 1 Year": [moment().subtract(1, "year").startOf("day"), moment()],
-                    "Last 5 Years": [moment().subtract(5, "years").startOf("day"), moment()]
+                    "Last 1 Year": [moment().subtract(1, "years").startOf("day"), moment()],
+                    "Last 2 Years": [moment().subtract(2, "years").startOf("day"), moment()]
                 },
                 locale: {
                     cancelLabel: 'Clear',
                     applyLabel: 'Apply'
                 }
             });
+
 
             clearRange();
 
@@ -406,21 +394,29 @@
                     return obj;
                 }, {});
 
+                // Tambahkan perPage jika ada
                 params.perPage = $('#perPageSelect').val() || 10;
 
-                 // Kirim ke semua chart & tabel (tanpa groupBy)
-                let globalParams = { ...params };
-                delete globalParams.groupBy;
+                // Hitung durasi range tanggal untuk tentukan groupBy
+                const start = moment(params.tanggalAwal);
+                const end = moment(params.tanggalAkhir);
+                const monthsDiff = end.diff(start, 'months', true);
 
-                fetchData(globalParams);
-                loadStatusChart(globalParams);
-                loadCategoryChart(globalParams);
-                loadAreaChart(globalParams);
-                loadDepartmentChart(globalParams);
+                if (monthsDiff >= 6) {
+                    params.groupBy = 'month'; // jika lebih dari atau sama dengan 6 bulan
+                } else {
+                    params.groupBy = 'date'; // default
+                }
 
-                // Khusus chart Finding, kirim full (termasuk groupBy)
+                // Kirim ke semua chart & tabel
+                fetchData(params);
+                loadStatusChart(params);
+                loadCategoryChart(params);
+                loadAreaChart(params);
+                loadDepartmentChart(params);
                 loadFindingData(params);
             });
+
                     
             // Handle pagination click (delegated event karena link dinamis)
             $(document).on('click', '#pagination-links a', function(e) {

@@ -43,7 +43,7 @@
                     </div>
             
                     <div class="mb-4">
-                        <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">Team Department</label>
+                        <label for="nama_pic" class="block text-sm font-medium text-gray-700 mb-1">PIC</label>
                         <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" value="{{ $laporan->picUser->fullname ?? '' }}" required readonly>
                     </div>
             

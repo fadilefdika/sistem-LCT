@@ -12,7 +12,7 @@
             <!-- Report from Reporter -->
             <div class="md:col-span-2 bg-white p-4 md:p-6 rounded-xl shadow-sm hover:shadow-md transition">
                 <h5 class="text-base md:text-lg font-semibold text-gray-900 flex items-center gap-2 tracking-wide">
-                    📝 Report from the Finder
+                    📝 Report from Finder
                 </h5>
                 <div class="w-full h-[1.5px] bg-gray-200 my-3"></div>
                 <p class="text-gray-500 text-xs md:text-sm">Non-Conformity Finding</p>
@@ -21,52 +21,62 @@
                 </p>
             </div>
         
-            <!-- Informasi Pelapor -->
-            <div class="md:col-span-2 bg-white p-4 md:p-6 rounded-xl shadow-sm border-l-4 w-full border-blue-500 hover:shadow-md transition">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-gray-500 text-xs flex items-center gap-1">
-                            <i class="fas fa-user text-blue-500"></i> Finder Name
-                        </p>
-                        <p class="text-gray-900 font-semibold text-sm mt-1 leading-tight">
-                            {{ $laporan->user->fullname }}
-                        </p>
+            {{-- Informasi Pelapor --}}
+                <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition md:col-span-2 w-full">
+                    <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2 mb-6">
+                        <i class="fas fa-info-circle text-base"></i> Report Information
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12 mb-6">
+                        {{-- Finder Name --}}
+                        <div>
+                            <p class="text-gray-500 text-xs flex items-center gap-1 mb-1">
+                                <i class="fas fa-user text-blue-500"></i> Finder Name
+                            </p>
+                            <p class="text-gray-900 font-medium text-xs leading-snug">
+                                {{ $laporan->user->fullname }}
+                            </p>
+                        </div>
+
+                        {{-- Finding Date --}}
+                        <div>
+                            <p class="text-gray-500 text-xs flex items-center gap-1 mb-1">
+                                <i class="fas fa-calendar-alt text-green-500"></i> Finding Date
+                            </p>
+                            <p class="text-gray-900 font-medium text-xs leading-snug">
+                                {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('en')->translatedFormat('l, d F Y') }}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-gray-500 text-xs flex items-center gap-1">
-                            <i class="fas fa-calendar-alt text-green-500"></i> Finding Date
-                        </p>
-                        <p class="text-gray-900 font-semibold text-sm mt-1 leading-tight">
-                            {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->locale('en')->translatedFormat('l, d F Y') }}
-                        </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
+                        {{-- Finding Area --}}
+                        <div>
+                            <p class="text-gray-500 text-xs flex items-center gap-1 mb-1">
+                                <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
+                            </p>
+                            <p class="text-gray-900 font-medium text-xs leading-snug break-words">
+                                @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
+                                    {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
+                                @else
+                                    <span class="text-gray-400">No area details available</span>
+                                @endif
+                            </p>
+                        </div>
+
+                        {{-- Finding Category --}}
+                        <div>
+                            <p class="text-gray-500 text-xs flex items-center gap-1 mb-1">
+                                <i class="fa-solid fa-flag text-yellow-500"></i> Finding Category
+                            </p>
+                            <p class="text-gray-900 font-medium text-xs leading-snug">
+                                {{ $laporan->kategori->nama_kategori ?? '-' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        
-            <!-- Finding Area -->
-            <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border-l-4 border-red-500 hover:shadow-md transition md:col-span-2">
-                <p class="text-gray-500 text-xs flex items-center gap-1">
-                    <i class="fas fa-map-marker-alt text-red-500"></i> Finding Area
-                </p>
-                <p class="text-gray-900 font-semibold text-sm mt-1 whitespace-normal break-words overflow-hidden text-ellipsis max-h-[3rem]">
-                    @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
-                        {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
-                    @else
-                        <span class="text-gray-400">No area details available</span>
-                    @endif
-                </p>
-            </div>
-        
-            <!-- Finding Category -->
-            <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border-l-4 border-yellow-500 hover:shadow-md transition md:col-span-2">
-                <p class="text-gray-500 text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-flag text-yellow-500"></i> Finding Category
-                </p>
-                <p class="text-gray-900 font-semibold mt-2 text-sm md:text-base bg-yellow-100 p-2 rounded-lg hover:bg-yellow-200 transition">
-                    {{ $laporan->kategori->nama_kategori }}
-                </p>
-            </div>
-        
+
+
             <!-- Safety Recommendation -->
             <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border-l-4 border-green-400 hover:shadow-md transition md:col-span-2">
                 <p class="text-gray-500 text-xs flex items-center gap-1">

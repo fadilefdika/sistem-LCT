@@ -47,7 +47,7 @@
                         <div class="flex items-center justify-between">
                             <!-- Header -->
                             <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                📝 Report from the PIC
+                                📝 Report from PIC
                             </h5>
 
                             <!-- Badge Tingkat Bahaya -->
@@ -66,15 +66,72 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-5 rounded-xl shadow-md border-l-4 border-blue-500">
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-2 items-center">
-                            
-                            <!-- PIC Name -->
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {{-- 2. Due Date & Deadline Status --}}
+                            @php
+                                $dueDate = $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date) : null;
+                                $now = \Carbon\Carbon::now();
+                                $diffInHours = $dueDate ? $now->diffInHours($dueDate, false) : 0;
+                                $diffInDays = $dueDate ? floor($diffInHours / 24) : 0;
+                                $remainingHours = $dueDate ? $diffInHours % 24 : 0;
+                            @endphp
+                            <div>
+                                <div class="flex items-center gap-2 text-gray-500 text-xs font-semibold">
+                                    <i class="fas fa-hourglass-half text-blue-500"></i>
+                                    <span>Due Date</span>
+                                </div>
+                                <p class="text-gray-900 font-semibold text-sm mt-1">
+                                    {{ $dueDate ? $dueDate->translatedFormat('d F Y') : '-' }}
+                                </p>
+                                <p class="text-xs mt-1 font-semibold
+                                    {{ in_array($laporan->status_lct, ['approved', 'closed']) ? 'text-green-500' :
+                                        ($dueDate && $diffInDays < 0 ? 'text-red-500' :
+                                        ($dueDate && $diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
+                                    @if ($laporan->status_lct == 'approved')
+                                        ✅ Completed
+                                    @elseif ($dueDate && $diffInDays < 0)
+                                        ⚠️ Overdue
+                                    @elseif ($dueDate && $diffInDays === 0 && $remainingHours < 24)
+                                        ⏳ Deadline Approaching
+                                    @elseif ($dueDate)
+                                        ✅ Within Deadline
+                                    @else
+                                        -
+                                    @endif
+                                </p>
+                            </div>
+                    
+                            {{-- 3. Completion Date --}}
+                            <div>
+                                <div class="flex items-center gap-2 text-gray-500 text-xs font-semibold">
+                                    <i class="fas fa-calendar-check
+                                        {{ $laporan->date_completion == null ? 'text-red-500' : 'text-green-500' }}"></i>
+                                    <span>Completion Date</span>
+                                </div>
+                                @if($laporan->date_completion == null)
+                                    <p class="text-red-500 font-semibold text-sm mt-1">Not Completed Yet</p>
+                                @else
+                                    @php
+                                        $completionDate = \Carbon\Carbon::parse($laporan->date_completion);
+                                        $isLate = $dueDate && $completionDate->greaterThan($dueDate);
+                                    @endphp
+                                    <p class="text-gray-900 font-semibold text-sm mt-1">
+                                        {{ $completionDate->translatedFormat('d F Y') }}
+                                    </p>
+                                    @if($isLate)
+                                        <p class="text-xs text-red-500 font-medium mt-1">
+                                            ⚠️ Overdue by {{ $completionDate->diffInDays($dueDate) }} day(s)
+                                        </p>
+                                    @endif
+                                @endif
+                            </div>
+                    
+                            {{-- 1. PIC --}}
+                            <div>
+                                <div class="flex items-center gap-2 text-gray-500 text-xs font-semibold">
                                     <i class="fas fa-user text-blue-500"></i>
-                                    <p>PIC</p>
+                                    <span>PIC</span>
                                 </div>
                                 <p class="text-gray-900 font-semibold text-sm mt-1">
                                     @if($laporan->picUser && $laporan->picUser->fullname)
@@ -82,192 +139,139 @@
                                     @else
                                         <span class="text-gray-400">No PIC available</span>
                                     @endif
-                                </p>                                
+                                </p>
                             </div>
 
-                            <!-- Garis Pemisah (Hanya Muncul di Layar Lebar) -->
-                            <div class="hidden sm:flex justify-center">
-                                <div class="w-[2px] bg-gray-300 h-10 rounded-full"></div>
-                            </div>
-
-                             <!-- Card Informasi Pelapor -->
-                             @php
-                                $dueDate = $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date) : null; // Pastikan hanya parsing jika due_date tidak NULL
-                                $now = \Carbon\Carbon::now();
-                                $diffInHours = $dueDate ? $now->diffInHours($dueDate, false) : 0;
-                                $diffInDays = $dueDate ? floor($diffInHours / 24) : 0;
-                                $remainingHours = $dueDate ? $diffInHours % 24 : 0;
-                            
-                                $borderClass = 'border-green-500';
-                                if ($dueDate && $diffInDays < 0) {
-                                    $borderClass = 'border-red-500';
-                                } elseif ($dueDate && $diffInDays === 0 && $remainingHours < 24) {
-                                    $borderClass = 'border-yellow-500';
-                                }
-                            @endphp
-
-                            <!-- Due Date -->
-                            <div class="flex flex-col">
-                                <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
-                                    <i class="fas fa-hourglass-half text-blue-500"></i>
-                                    <p>Due Date</p>
+                            {{-- 4. Area Temuan --}}
+                            <div>
+                                <div class="flex items-center gap-2 text-gray-500 text-xs font-semibold">
+                                    <i class="fas fa-map-marker-alt text-red-500"></i>
+                                    <span>Finding Area</span>
                                 </div>
                                 <p class="text-gray-900 font-semibold text-sm mt-1">
-                                    <!-- Hanya tampilkan tanggal jika $dueDate ada -->
-                                    {{ $dueDate ? $dueDate->translatedFormat('d F Y') : '-' }}
-                                </p>                                
-                                <!-- Status -->
-                                <p class="text-xs mt-1 font-semibold 
-                                    {{ in_array($laporan->status_lct, ['approved', 'closed']) ? 'text-green-500' : 
-                                    ($dueDate && $diffInDays < 0 ? 'text-red-500' : 
-                                    ($dueDate && $diffInDays === 0 && $remainingHours < 24 ? 'text-yellow-500' : 'text-green-500')) }}">
-                                    @if ($laporan->status_lct == 'approved')
-                                        ✅ Completed
-                                    @elseif ($dueDate && $diffInDays < 0)
-                                        ⚠️ Overdue
-                                    @elseif ($dueDate && $diffInDays === 0 && $remainingHours < 24)
-                                        ⏳ Deadline Approaching
-                                    @elseif ($dueDate) <!-- Pastikan $dueDate ada -->
-                                        ✅ Within Deadline
+                                    @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
+                                        {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
                                     @else
-                                        <p></p> <!-- Jika tidak ada due_date, kosongkan -->
+                                        <span class="text-gray-400">No area details available</span>
                                     @endif
                                 </p>
-
                             </div>
-
                         </div>
                     </div>
-                
-                    <!-- Card Tanggal Selesai -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 
-                        {{ $laporan->date_completion == null ? 'border-red-500' : 'border-green-500' }}">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-2 text-gray-600 text-xs font-medium">
-                                <i class="fas fa-calendar-alt 
-                                    {{ $laporan->date_completion == null ? 'text-red-500' : 'text-green-500' }}"></i>
-                                <p>Completion Date</p>
-                            </div>
+                    
+                    @php
+                        $revisions = $laporan->rejectLaporan->filter(fn($item) => !empty($item->alasan_reject));
+                        $hasRevisions = $revisions->isNotEmpty();
+                    @endphp
 
-                            @if($laporan->date_completion == null)
-                                <!-- Jika belum selesai -->
-                                <p class="text-red-500 font-semibold text-sm mt-1">Not Completed Yet</p>
-                            @else
-                                @php
-                                    $dueDate = \Carbon\Carbon::parse($laporan->due_date); // Ambil due date
-                                    $completionDate = \Carbon\Carbon::parse($laporan->date_completion); // Ambil tanggal selesai
-                                    $isLate = $completionDate->greaterThan($dueDate); // Cek apakah terlambat
-                                @endphp
+                    @if ($laporan->status_lct === 'revision' || $laporan->tindakan_perbaikan)
 
-                                <!-- Jika sudah selesai -->
-                                <p class="text-gray-900 font-semibold text-sm mt-1">
-                                    {{ $completionDate->translatedFormat('d F Y') }}
-                                </p>
-
-                                @if($isLate)
-                                    <!-- Jika terlambat -->
-                                    <p class="text-xs text-red-500 font-medium mt-1">⚠️ Overdue {{ $completionDate->diffInDays($dueDate) }} hari</p>
-                                @endif
-                            @endif
-                        </div>
-                    </div>
-                
-                    <!-- Card Area Temuan -->
-                    <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
-                        <div class="flex items-center gap-1 text-gray-500 text-xs tracking-wide">
-                            <i class="fas fa-map-marker-alt text-red-500"></i>
-                            <p>Finding Area</p>
-                        </div>
-                        <p class="text-gray-900 font-semibold text-sm mt-1">
-                            @if($laporan->area && $laporan->area->nama_area && $laporan->detail_area)
-                                {{ $laporan->area->nama_area }} - {{ $laporan->detail_area }}
-                            @else
-                                <span class="text-gray-400">No area details available</span>
-                            @endif
-                        </p>                        
-                    </div>
-
-                    @if ($tindakan_perbaikan->isNotEmpty())
-                        <div x-data="{ open: false }" class="mb-4">
-                            <!-- Card utama untuk perbaikan terbaru dan sebelumnya -->
-                            <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-gray-500 relative">
-                                <div class="absolute top-2 right-3 text-xs text-gray-400">
-                                    {{ \Carbon\Carbon::parse($tindakan_perbaikan[0]['tanggal'])->format('d M Y') }}
-                                </div>   
-                                <!-- Tindakan Perbaikan Terbaru -->
-                                <div class="mb-4">
-                                    <p class="text-gray-500 text-xs mb-1">
-                                        <span class="text-gray-700 text-lg font-semibold">Corrective Action</span> (Latest):
-                                    </p>
-                                    <div class="flex items-center gap-1">
-                                        <p class="text-gray-600 text-sm font-semibold">Action:</p>
-                                        <p class="text-gray-900 text-sm font-semibold">{{ $tindakan_perbaikan[0]['tindakan'] }}</p>
-                                    </div>
+                        {{-- Corrective Action PERTAMA (selalu tampil) --}}
+                        @if (!empty($tindakan_perbaikan[0]))
+                            <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <i class="fa-solid fa-wrench text-green-600 text-lg"></i>
+                                    <p class="text-gray-700 text-xs font-semibold">Initial Corrective Action</p>
                                 </div>
 
-                                
-                                <!-- Gambar perbaikan terbaru -->
+                                <div class="mb-2">
+                                    <p class="text-xs font-medium text-gray-700 mb-1">Action:</p>
+                                    <p class="text-gray-900 font-medium text-sm">{{ $tindakan_perbaikan[0]['tindakan'] }}</p>
+                                </div>
+
                                 @if (!empty($tindakan_perbaikan[0]['bukti']))
-                                    <div class="mt-4">
-                                        <p class="text-gray-600 text-sm font-semibold mb-2">Corrective Action Images</p>
-                                        <div class="flex overflow-x-auto gap-2">
-                                            @foreach ($tindakan_perbaikan[0]['bukti'] as $gambar)
-                                                <img src="{{ $gambar }}" 
-                                                    class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                                                    alt="Bukti Perbaikan"
-                                                    onclick="openModal('{{ $gambar }}')">
-                                            @endforeach
-                                        </div>
+                                    <p class="text-xs font-medium text-gray-700 mb-1 mt-3">Images:</p>
+                                    <div class="flex overflow-x-auto gap-2">
+                                        @foreach ($tindakan_perbaikan[0]['bukti'] as $img)
+                                            <img src="{{ $img }}" class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition" onclick="openModal('{{ $img }}')" alt="Proof">
+                                        @endforeach
                                     </div>
                                 @endif
-
-                                <!-- Tombol dropdown untuk menampilkan perbaikan sebelumnya -->
-                                @if (count($tindakan_perbaikan) > 1)
-                                    <button @click="open = !open" class="mt-4 w-full flex justify-center items-center text-sm text-blue-500 hover:text-blue-700 transition">
-                                        <span x-text="open ? 'Hide Previous Actions' : 'Show Previous Actions'"></span>
-                                    </button>
-                                @endif
-
-                                <!-- Konten dropdown untuk perbaikan sebelumnya -->
-                                <div x-show="open" x-transition class="mt-4 bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-300">
-                                    @foreach ($tindakan_perbaikan->skip(1) as $index => $entry)
-                                        <div class="mb-4 relative">
-                                            <div class="absolute top-2 right-3 text-xs text-gray-400">
-                                                {{ \Carbon\Carbon::parse($entry['tanggal'])->format('d M Y') }}
-                                            </div>   
-
-                                            <!-- Tindakan Perbaikan Sebelumnya -->
-                                            <div class="mb-2">
-                                                <p class="text-gray-500 text-xs mb-1">Corrective Action (Previous #{{ $index + 1 }}):</p>
-                                                <div class="flex items-center gap-1">
-                                                    <p class="text-gray-600 text-sm font-semibold">Action:</p>
-                                                    <p class="text-gray-900 font-semibold text-sm">{{ $entry['tindakan'] }}</p>
-                                                </div>
-                                            </div>
-
-                                            <!-- Gambar perbaikan sebelumnya -->
-                                            @if (!empty($entry['bukti']))
-                                                <div class="mt-4">
-                                                    <p class="text-gray-700 text-sm font-semibold mb-2">Corrective Action Images</p>
-                                                    <div class="flex overflow-x-auto gap-2">
-                                                        @foreach ($entry['bukti'] as $gambar)
-                                                            <img src="{{ $gambar }}" 
-                                                                class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                                                                alt="Bukti Perbaikan"
-                                                                onclick="openModal('{{ $gambar }}')">
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
                             </div>
-                        </div>
-                    @else
-                        <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-gray-500">
-                            <p class="text-gray-600 text-sm font-semibold text-center">No corrective actions found.</p>
-                        </div>
+                        @endif
+
+                        {{-- Tampilkan tindakan_perbaikan berikutnya jika ada revisi --}}
+                        @if ($hasRevisions && count($tindakan_perbaikan) > 1)
+                            <div x-data="{ openIndex: null }" class="bg-white p-6 rounded-xl border border-red-200 mt-4 shadow-lg space-y-4">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 text-xl"></i>
+                                    <p class="text-red-600 font-semibold text-sm">This report has been revised</p>
+                                </div>
+                                
+                                <table class="w-full text-sm text-left table-fixed border border-gray-200 rounded-lg overflow-hidden">
+                                    <thead class="bg-gray-100 text-gray-700 uppercase text-[11px] tracking-wider">
+                                        <tr>
+                                            <th class="py-3 px-3 w-40">Date</th>
+                                            <th class="py-3 px-3">Revision Reason</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $combined = $revisions->values()->map(function ($rev, $index) use ($tindakan_perbaikan) {
+                                                return [
+                                                    'rev' => $rev,
+                                                    'tindakan' => $tindakan_perbaikan[$index + 1] ?? null
+                                                ];
+                                            })->reverse()->values();
+                                        @endphp
+
+                                        @foreach ($combined as $i => $item)
+                                            @php
+                                                $rev = $item['rev'];
+                                                $tindakan = $item['tindakan'];
+                                            @endphp
+
+                                            <tr 
+                                                @click="openIndex === {{ $i }} ? openIndex = null : openIndex = {{ $i }}" 
+                                                class="cursor-pointer border-b hover:bg-gray-50 transition"
+                                            >
+                                                <td class="py-2 px-3 text-gray-500 text-[11px] whitespace-nowrap align-top">
+                                                    {{ $rev->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
+                                                </td>
+                                                <td class="py-2 px-3 align-top">
+                                                    <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-2 w-full">
+                                                        <span class="text-gray-800 text-xs leading-snug break-words w-full">
+                                                            {{ $rev->alasan_reject }}
+                                                        </span>
+                                                        <svg :class="{ 'rotate-180': openIndex === {{ $i }} }"
+                                                            class="w-4 h-4 text-gray-400 transition-transform mt-1 sm:mt-0 self-end sm:self-center"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
+                                                </td>                                                
+                                            </tr>
+
+                                            <tr x-show="openIndex === {{ $i }}" x-transition>
+                                                <td colspan="2" class="bg-gray-50 px-6 py-4">
+                                                    @if ($tindakan)
+                                                        <p class="text-gray-700 text-xs font-semibold mb-1">Corrective Action</p>
+                                                        <p class="text-gray-800 text-[11px] mb-3 leading-snug break-words text-justify">
+                                                            {{ $tindakan['tindakan'] }}
+                                                        </p>
+
+                                                        @if (!empty($tindakan['bukti']))
+                                                            <p class="text-gray-700 text-xs font-semibold mb-2">Images</p>
+                                                            <div class="flex flex-wrap gap-3">
+                                                                @foreach ($tindakan['bukti'] as $img)
+                                                                    <img src="{{ $img }}" 
+                                                                        onclick="openModal('{{ $img }}')" 
+                                                                        class="w-24 h-24 object-cover rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-150" 
+                                                                        alt="Proof Image">
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    @else
+                                                        <p class="text-red-500 text-xs font-medium">No corrective action submitted for this revision.</p>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+
                     @endif
                 </div>
             </div>
@@ -352,25 +356,50 @@
                                     </div>
                                     
                                     <!-- Alasan Penolakan -->
-                                    <div x-show="revision" class="mt-4">
-                                        <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
+                                    <div x-show="revision" x-data="{ reason: '', maxLength: 255 }" class="mt-4">
+                                        <form 
+                                            :class="{ 'opacity-50 pointer-events-none': reason.length > maxLength }"
+                                            @submit="if (reason.length > maxLength) $event.preventDefault(); revision = reason.length <= maxLength ? false : true;" 
+                                            action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" 
+                                            method="POST"
+                                        >
                                             @csrf
                                             <label class="block text-gray-700 font-semibold">Revision Reason:</label>
-                                            <textarea x-model="reason" name="alasan_reject" rows="3"
-                                                class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
-                                    
+                                            <textarea
+                                                x-model="reason"
+                                                name="alasan_reject"
+                                                rows="3"
+                                                class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                                :class="{ 'border-red-500': reason.length > maxLength }"
+                                            ></textarea>
+
+                                            <!-- Karakter Counter dan Peringatan -->
+                                            <div class="mt-1 text-sm" :class="reason.length > maxLength ? 'text-red-500' : 'text-gray-500'">
+                                                <span x-text="reason.length"></span>/255 characters
+                                                <template x-if="reason.length > maxLength">
+                                                    <span class="ml-2 font-semibold">Too many characters!</span>
+                                                </template>
+                                            </div>
+
                                             <div class="flex mt-3 space-x-2">
-                                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                                <button 
+                                                    type="submit" 
+                                                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50" 
+                                                    :disabled="reason.length > maxLength"
+                                                >
                                                     Send Revision
                                                 </button>
-                                                <button type="button" @click="revision = false"
-                                                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">
+                                                <button 
+                                                    type="button" 
+                                                    @click="revision = false" 
+                                                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                                                >
                                                     Cancel
                                                 </button>
                                             </div>
                                         </form>
-                                    </div>                                
-
+                                    </div>
+                            
                                 {{-- Case: Approved dan sudah selesai --}}
                                 @elseif(in_array($laporan->status_lct, ['approved_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision', 'approved_taskbudget', 'work_permanent', 'approved_permanent','waiting_approval_permanent']) && $laporan->date_completion_temp !== null)
                                     <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg">
@@ -379,58 +408,70 @@
                                 @endif
                             
                             @elseif($laporan->tingkat_bahaya === 'Low' && $laporan->status_lct === 'waiting_approval')
-                            <div class="flex space-x-4">
-                                <!-- Approve Button -->
-                                <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" 
-                                        class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-700">
-                                        Approve
+                                <div class="flex space-x-4">
+                                    <!-- Approve Button -->
+                                    <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-700">
+                                            Approve
+                                        </button>
+                                    </form>
+                                
+                                    <!-- Revision Button -->
+                                    <button type="button" @click="revision = true"
+                                        class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md hover:bg-rose-700">
+                                        Revision
                                     </button>
-                                </form>
-                            
-                                <!-- Revision Button -->
-                                <button type="button" @click="revision = true"
-                                    class="px-5 py-2.5 bg-rose-600 text-white font-semibold rounded-lg shadow-md hover:bg-rose-700">
-                                    Revision
-                                </button>
-                            </div>
-                            
-                            <!-- Alasan Penolakan -->
-                            <div x-show="revision" class="mt-4">
-                                <form @submit="revision = false" action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" method="POST">
-                                    @csrf
-                                    <label class="block text-gray-700 font-semibold">Revision Reason:</label>
-                                    <textarea x-model="reason" name="alasan_reject" rows="3"
-                                        class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"></textarea>
-                            
-                                    <div class="flex mt-3 space-x-2">
-                                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                            Send Revision
-                                        </button>
-                                        <button type="button" @click="revision = false"
-                                            class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <!-- Status Laporan -->
-                                @if($laporan->status_lct === "approved" && $laporan->tingkat_bahaya === 'Low')
-                                    <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg flex justify-between items-center">
-                                        <p class="text-green-800 font-semibold">✅ The report has been approved.</p>
-                                        <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
-                                            @csrf 
-                                            <button type="submit" @click="closed = true"
-                                                    class="px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 cursor-pointer">
-                                                Close
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endif
-                            @endif
+                                </div>
+                                
+                                <!-- Alasan Penolakan -->
+                                <div x-show="revision" x-data="{ reason: '', maxLength: 255 }" class="mt-4">
+                                    <form 
+                                        :class="{ 'opacity-50 pointer-events-none': reason.length > maxLength }"
+                                        @submit="if (reason.length > maxLength) $event.preventDefault(); revision = reason.length <= maxLength ? false : true;" 
+                                        action="{{ route('ehs.reporting.reject', $laporan->id_laporan_lct) }}" 
+                                        method="POST"
+                                    >
+                                        @csrf
+                                        <label class="block text-gray-700 font-semibold">Revision Reason:</label>
+                                        <textarea
+                                            x-model="reason"
+                                            name="alasan_reject"
+                                            rows="3"
+                                            class="w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+                                            :class="{ 'border-red-500': reason.length > maxLength }"
+                                        ></textarea>
 
+                                        <!-- Karakter Counter dan Peringatan -->
+                                        <div class="mt-1 text-sm" :class="reason.length > maxLength ? 'text-red-500' : 'text-gray-500'">
+                                            <span x-text="reason.length"></span>/255 characters
+                                            <template x-if="reason.length > maxLength">
+                                                <span class="ml-2 font-semibold">Too many characters!</span>
+                                            </template>
+                                        </div>
+
+                                        <div class="flex mt-3 space-x-2">
+                                            <button 
+                                                type="submit" 
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50" 
+                                                :disabled="reason.length > maxLength"
+                                            >
+                                                Send Revision
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                @click="revision = false" 
+                                                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
                         @else
+                        
                             <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
                                 <p class="text-gray-700 font-semibold">🔒 The report has been closed.</p>
                             </div>

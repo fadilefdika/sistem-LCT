@@ -120,7 +120,7 @@
                 @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
                     <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
                         @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
-                            <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
+                            <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
                                 @csrf
                                 <button type="submit"
                                         class="inline-flex items-center px-4 py-2 border cursor-pointer border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
@@ -128,16 +128,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                     Approve All Tasks
-                                </button>
-                            </form>
-                        @endif
-            
-                        @if($laporan->status_lct === 'approved_permanent')
-                            <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
-                                @csrf 
-                                <button type="submit"
-                                        class="inline-flex cursor-pointer items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                    Close Report
                                 </button>
                             </form>
                         @endif
