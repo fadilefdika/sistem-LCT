@@ -35,7 +35,19 @@
                 <input type="hidden" name="deletedTasks" id="deletedTasksInput">
 
                 <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4 overflow-x-auto">
-                    <h3 class="text-lg font-semibold mb-4">Task Management and Timeline</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Task Management and Timeline</h3>
+                        @if(!$laporan->approved_temporary_by_ehs)
+                            <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full">
+                                Temporary not yet approved
+                            </span>
+                        @else
+                            <span class="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                                Temporary approved
+                            </span>
+                        @endif
+                    </div>
+                
                     <!-- Permanent Action -->
                         <div x-data="{ permanentAction: '{{ $laporan->action_permanent ?? '' }}' }" class="flex flex-col w-full max-w-lg">
                             <label for="permanent-action" class="mb-1 font-medium text-gray-700">Permanent Action:</label>

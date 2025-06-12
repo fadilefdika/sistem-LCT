@@ -14,3 +14,8 @@ Route::prefix('auth')->group(function () {
         });
     });
 });
+
+Route::get('/public-key', function () {
+    return response()->file(storage_path('app/rsa_public.pem'));
+});
+

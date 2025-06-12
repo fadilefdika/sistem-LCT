@@ -319,7 +319,7 @@ class ProgressPerbaikanController extends Controller
                     'approved_taskbudget'        => ['approved_taskbudget', 'lct_perbaikan_temporary'],
                     'work_permanent'             => ['work_permanent', 'lct_perbaikan_temporary'],
                     'revision_permanent'         => ['revision_permanent', 'lct_perbaikan_temporary'],
-                    'waiting_approval_permanent' => ['approved_permanent', 'lct_perbaikan_permanent'],
+                    'waiting_approval_permanent' => ['waiting_approval_permanent', 'lct_perbaikan_temporary'],
                 ];
 
                 if (!array_key_exists($statusLama, $statusMap)) {

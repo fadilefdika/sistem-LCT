@@ -36,11 +36,13 @@
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        {{-- Hidden redirect field --}}
         <input type="hidden" name="redirect_to" id="redirect_to" value="dashboard" />
-
+    
+        {{-- Hidden Encrypted Fields --}}
+        <input type="hidden" name="encrypted_npk" id="encrypted_npk">
+        <input type="hidden" name="encrypted_password" id="encrypted_password">
+    
         <div class="flex flex-col gap-2">
-
             {{-- NPK/Username Input --}}
             <div>
                 <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3">
@@ -51,7 +53,7 @@
                         min="0" step="1" />
                 </div>
             </div>         
-
+    
             {{-- Password Input --}}
             <div>
                 <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3 relative">
@@ -59,15 +61,12 @@
                     <input id="password" type="password" name="password" required autocomplete="current-password"
                         placeholder="Enter your password here..."
                         class="w-full bg-transparent border-4 border-[#C1dBEA] focus:border-[#C1dBEA] focus:outline-none text-base md:text-lg font-medium pr-10" />
-                    
-                    {{-- Toggle eye icon --}}
                     <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-black focus:outline-none">
                         <i id="toggle-icon" class="fa fa-eye"></i>
                     </button>
                 </div>
             </div>
-
-
+    
             {{-- Role Dropdown --}}
             <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3">
                 <i class="fa fa-user-tag text-black mr-3 text-lg"></i>
@@ -81,7 +80,7 @@
                     <option value="user">Employee</option>
                 </select>
             </div>
-
+    
             {{-- Submit --}}
             <div class="flex items-start justify-start mt-6">
                 <x-button class="text-base md:text-lg cursor-pointer px-8 py-3 md:px-10 md:py-4 bg-[#0067A9] text-white font-bold rounded-sm">
@@ -89,7 +88,7 @@
                 </x-button>
             </div>
         </div>
-
+    
         <x-validation-errors class="mt-4" />
     </form>
 
@@ -113,70 +112,105 @@
         }
     </style>
 
+    <!-- Tambahkan ini di atas semua script JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jsencrypt/bin/jsencrypt.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const roleSelect = document.getElementById('role');
             const npkInput = document.getElementById('npk_or_username');
+            const tabForm = document.getElementById('tab-form');
+            const form = document.querySelector('form');
 
-            roleSelect.addEventListener('change', function () {
-                if (this.value === 'ehs') {
+            function setRedirectTo(value) {
+                document.getElementById('redirect_to').value = value;
+            }
+
+            // Role logic
+            function handleRoleChange(role) {
+                if (role === 'ehs') {
                     npkInput.type = 'text';
                     npkInput.placeholder = 'Enter your username here...';
-                    // Hide Form Laporan tab
-                    document.getElementById('tab-form').style.display = 'none';
-
-                    // Pastikan redirect_to default ke dashboard kalau sebelumnya form aktif
+                    tabForm.style.display = 'none';
                     setRedirectTo('dashboard');
                 } else {
                     npkInput.type = 'number';
                     npkInput.placeholder = 'Enter your NPK here...';
-
-                    // Show Form Laporan tab
-                    document.getElementById('tab-form').style.display = 'inline-block';
+                    tabForm.style.display = 'inline-block';
                 }
-            });
-            
-            // Jika saat load halaman role sudah "ehs", langsung sembunyikan tab form
-            if (roleSelect.value === 'ehs') {
-                document.getElementById('tab-form').style.display = 'none';
-                setRedirectTo('dashboard');
             }
 
-            // Default tab
+            // Initial state
+            handleRoleChange(roleSelect.value);
             setRedirectTo('dashboard');
-        });
 
+            // Event when role changes
+            roleSelect.addEventListener('change', function () {
+                handleRoleChange(this.value);
+            });
+
+            // Submit handler
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const npk = npkInput.value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const res = await fetch('/api/public-key');
+                    const publicKey = await res.text();
+
+                    const encryptor = new JSEncrypt();
+                    encryptor.setPublicKey(publicKey);
+
+                    const encryptedNpk = encryptor.encrypt(npk);
+                    const encryptedPassword = encryptor.encrypt(password);
+
+                    document.getElementById('encrypted_npk').value = encryptedNpk;
+                    document.getElementById('encrypted_password').value = encryptedPassword;
+
+                    // Kosongkan input asli agar tidak ikut terkirim
+                    npkInput.value = '';
+                    document.getElementById('password').value = '';
+
+                    form.submit();
+                } catch (err) {
+                    alert("Gagal mengenkripsi data. Silakan coba lagi.");
+                    console.error("RSA Encryption Error:", err);
+                }
+            });
+        });
+        
         function setRedirectTo(tabName) {
             document.getElementById('redirect_to').value = tabName;
-
-            // Update visual style
+        
             const dashboardTab = document.getElementById('tab-dashboard');
             const formTab = document.getElementById('tab-form');
-
+        
             if (tabName === 'dashboard') {
                 dashboardTab.classList.add('text-blue-700', 'border-blue-700');
                 dashboardTab.classList.remove('text-gray-500', 'border-transparent');
-
+        
                 formTab.classList.add('text-gray-500', 'border-transparent');
                 formTab.classList.remove('text-blue-700', 'border-blue-700');
             } else {
                 formTab.classList.add('text-blue-700', 'border-blue-700');
                 formTab.classList.remove('text-gray-500', 'border-transparent');
-
+        
                 dashboardTab.classList.add('text-gray-500', 'border-transparent');
                 dashboardTab.classList.remove('text-blue-700', 'border-blue-700');
             }
         }
-
-
+        
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('toggle-icon');
             const isHidden = passwordInput.type === 'password';
-
+        
             passwordInput.type = isHidden ? 'text' : 'password';
             toggleIcon.classList.toggle('fa-eye', !isHidden);
             toggleIcon.classList.toggle('fa-eye-slash', isHidden);
         }
     </script>
+
 </x-authentication-layout>
