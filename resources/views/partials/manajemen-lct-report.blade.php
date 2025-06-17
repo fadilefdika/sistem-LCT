@@ -11,6 +11,10 @@
         
             <!-- Status Laporan -->
             @php
+            
+            $revisions = $laporan->rejectLaporan->filter(fn($item) => !empty($item->alasan_reject));
+            $hasRevisions = $revisions->isNotEmpty();
+
             $statusMapping = [
                 'In Progress' => ['in_progress', 'progress_work', 'work_permanent'],
                 'Waiting Approval' => ['waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent', 'waiting_approval_taskbudget'],
@@ -23,34 +27,45 @@
             $statusColor = 'gray';
             $statusIcon = 'fas fa-hourglass-half text-gray-500';
 
-            foreach ($statusMapping as $label => $statuses) {
-                if (in_array($laporan->status_lct, $statuses)) {
-                    $statusText = $label;
-                    switch ($label) {
-                        case 'In Progress':
-                            $statusColor = 'blue';
-                            $statusIcon = 'fas fa-hourglass-half text-blue-500';
-                            break;
-                        case 'Waiting Approval':
-                            $statusColor = 'yellow';
-                            $statusIcon = 'fas fa-hourglass-start text-yellow-500';
-                            break;
-                        case 'Approved':
-                            $statusColor = 'green';
-                            $statusIcon = 'fas fa-check-circle text-green-500';
-                            break;
-                        case 'Revision':
-                            $statusColor = 'red';
-                            $statusIcon = 'fas fa-times-circle text-red-500';
-                            break;
-                        case 'Closed':
-                            $statusColor = 'green';
-                            $statusIcon = 'ffas fa-check-circle text-green-500';
-                            break;
+            if (!empty($laporan->tingkat_bahaya) && in_array($laporan->tingkat_bahaya, ['Medium', 'High']) 
+                && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision', 'approved_taskbudget', 'temporary_revision', 'work_permanent']) 
+                && $revisions->isNotEmpty() && $laporan->approved_temporary_by_ehs == 'revise')
+            {
+                $statusText = 'Revision';
+                $statusColor = 'red';
+                $statusIcon = 'fas fa-times-circle text-red-500';
+            }
+            else {
+                foreach ($statusMapping as $label => $statuses) {
+                    if (in_array($laporan->status_lct, $statuses)) {
+                        $statusText = $label;
+                        switch ($label) {
+                            case 'In Progress':
+                                $statusColor = 'blue';
+                                $statusIcon = 'fas fa-hourglass-half text-blue-500';
+                                break;
+                            case 'Waiting Approval':
+                                $statusColor = 'yellow';
+                                $statusIcon = 'fas fa-hourglass-start text-yellow-500';
+                                break;
+                            case 'Approved':
+                                $statusColor = 'green';
+                                $statusIcon = 'fas fa-check-circle text-green-500';
+                                break;
+                            case 'Revision':
+                                $statusColor = 'red';
+                                $statusIcon = 'fas fa-times-circle text-red-500';
+                                break;
+                            case 'Closed':
+                                $statusColor = 'green';
+                                $statusIcon = 'fas fa-check-circle text-green-500';
+                                break;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
+
             @endphp
 
             <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold 
@@ -223,12 +238,8 @@
         </div>
     </div>
 
-    @php
-        $revisions = $laporan->rejectLaporan->filter(fn($item) => !empty($item->alasan_reject));
-        $hasRevisions = $revisions->isNotEmpty();
-    @endphp
 
-    @if ($laporan->status_lct === 'revision' || $laporan->tindakan_perbaikan)
+    @if (($laporan->status_lct === 'revision' && $laporan->tingkat_bahaya == "Low")|| ($laporan->status_lct === 'temporary_revision' && in_array($laporan->tingkat_bahaya, ['Medium','High'])) || $laporan->tindakan_perbaikan)
 
         {{-- Corrective Action PERTAMA (selalu tampil) --}}
         @if (!empty($tindakan_perbaikan[0]))
@@ -255,11 +266,11 @@
         @endif
 
         {{-- Tampilkan tindakan_perbaikan berikutnya jika ada revisi --}}
-        @if ($hasRevisions && count($tindakan_perbaikan) > 1)
+        @if ($hasRevisions)
             <div x-data="{ openIndex: null }" class="bg-white p-6 rounded-xl border border-red-200 mt-6 shadow-lg space-y-4">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-exclamation-circle text-red-500 text-xl"></i>
-                    <p class="text-red-600 font-semibold text-sm">This report has been revised</p>
+                    <p class="text-red-600 font-semibold text-sm">Revised Report</p>
                 </div>
 
                 <table class="w-full text-sm text-left table-fixed border border-gray-200 rounded-lg overflow-hidden">
@@ -294,9 +305,9 @@
                                 </td>
                                 <td class="py-2 px-3 align-top">
                                     <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-2 w-full">
-                                        <span class="text-gray-800 text-xs leading-snug break-words w-full">
+                                        <span class="{{ $tindakan ? 'text-gray-800' : 'text-red-500' }} text-xs leading-snug break-words w-full">
                                             {{ $rev->alasan_reject }}
-                                        </span>
+                                        </span>  
                                         <svg :class="{ 'rotate-180': openIndex === {{ $i }} }"
                                             class="w-4 h-4 text-gray-400 transition-transform mt-1 sm:mt-0 self-end sm:self-center"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">

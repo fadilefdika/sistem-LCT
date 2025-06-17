@@ -192,16 +192,16 @@
                                                     <!-- Status -->
                                                     <div class="flex flex-col">
                                                         <p class="text-xs uppercase text-gray-500 font-semibold">Status</p>
-                                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $status['color'] }}">
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-semibold text-white rounded-full {{ $status['color'] }}">
                                                             {{ $status['label'] }}
                                                         </span>
                                                     </div>
-
+                                                
                                                     <!-- Hazard Level -->
                                                     <div class="flex flex-col">
                                                         <p class="text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
-                                                        <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
-                                                            {{ $laporan->tingkat_bahaya }}
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
+                                                            {{ $laporan->tingkat_bahaya ?? 'Unknown' }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -211,16 +211,14 @@
                                                     {{ $status['tracking'] }}
                                                 </div>
 
-                                                @if($laporan->approved_temporary_by_ehs == false && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
+                                                @if($laporan->approved_temporary_by_ehs == 'pending' && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
                                                     <div class="text-[10px] text-red-600 font-medium">
-                                                        ⚠️ Awaiting EHS approval
+                                                        ⚠️ Awaiting EHS approval (temporary)
                                                     </div>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
-
-
                                     
                                     <div x-data="{ activeTab: 'finder' }">
                                         <!-- Tabs -->

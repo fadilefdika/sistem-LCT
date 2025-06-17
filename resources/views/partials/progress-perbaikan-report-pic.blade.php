@@ -191,11 +191,11 @@
                         @endif
 
                         {{-- Tampilkan tindakan_perbaikan berikutnya jika ada revisi --}}
-                        @if ($hasRevisions && count($tindakan_perbaikan) > 1)
+                        @if ($hasRevisions)
                             <div x-data="{ openIndex: null }" class="bg-white p-6 rounded-xl border border-red-200 mt-4 shadow-lg space-y-4">
                                 <div class="flex items-center gap-2">
                                     <i class="fa-solid fa-exclamation-circle text-red-500 text-xl"></i>
-                                    <p class="text-red-600 font-semibold text-sm">This report has been revised</p>
+                                    <p class="text-red-600 font-semibold text-sm">Revised Report</p>
                                 </div>
                                 
                                 <table class="w-full text-sm text-left table-fixed border border-gray-200 rounded-lg overflow-hidden">
@@ -230,9 +230,9 @@
                                                 </td>
                                                 <td class="py-2 px-3 align-top">
                                                     <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-2 w-full">
-                                                        <span class="text-gray-800 text-xs leading-snug break-words w-full">
+                                                        <span class="{{ $tindakan ? 'text-gray-800' : 'text-red-500' }} text-xs leading-snug break-words w-full">
                                                             {{ $rev->alasan_reject }}
-                                                        </span>
+                                                        </span>                                                       
                                                         <svg :class="{ 'rotate-180': openIndex === {{ $i }} }"
                                                             class="w-4 h-4 text-gray-400 transition-transform mt-1 sm:mt-0 self-end sm:self-center"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -331,13 +331,13 @@
                             @elseif(in_array($laporan->tingkat_bahaya, ['Medium', 'High']))
 
                                 {{-- Case: Waiting approval temporary --}}
-                                @if(in_array($laporan->status_lct, ['in_progress', 'progress_work','temporary_revision']))
+                                @if($laporan->approved_temporary_by_ehs == 'revise')
                                     <div class="mt-3 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-                                        <p class="text-yellow-800 font-semibold">⚠️ Laporan masih menunggu penyelesaian perbaikan dari PIC.</p>
+                                        <p class="text-yellow-800 font-semibold">⚠️ Repairs still in progress by PIC.</p>
                                     </div>
 
                                 {{-- Case: Temporary revision --}}
-                                @elseif($laporan->approved_temporary_by_ehs == false && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
+                                @elseif($laporan->approved_temporary_by_ehs == 'pending')
                                     <div class="flex space-x-4">
                                         <!-- Approve Button -->
                                         <form action="{{ route('ehs.reporting.approve', $laporan->id_laporan_lct) }}" method="POST">
@@ -401,7 +401,7 @@
                                     </div>
                             
                                 {{-- Case: Approved dan sudah selesai --}}
-                                @elseif(in_array($laporan->status_lct, ['approved_temporary', 'waiting_approval_taskbudget', 'taskbudget_revision', 'approved_taskbudget', 'work_permanent', 'approved_permanent','waiting_approval_permanent']) && $laporan->date_completion_temp !== null)
+                                @elseif($laporan->approved_temporary_by_ehs == 'approved')
                                     <div class="mt-6 p-4 bg-green-100 border border-green-400 rounded-lg">
                                         <p class="text-green-800 font-semibold">✅ The report has been approved and completed by PIC.</p>
                                     </div>

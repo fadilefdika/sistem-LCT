@@ -69,8 +69,10 @@ class BudgetApprovalController extends Controller
                 'tipe_reject' => null,
             ]);
         }
+
+        $revise = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)->where('status_lct', 'taskbudget_revision')->where('tipe_reject', 'budget_approval')->get();    
     
-        return view('pages.admin.budget-approval.show', compact('taskBudget', 'bukti_temuan', 'bukti_perbaikan'));
+        return view('pages.admin.budget-approval.show', compact('taskBudget', 'bukti_temuan', 'bukti_perbaikan','revise'));
     }
 
 

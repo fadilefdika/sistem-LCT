@@ -209,16 +209,16 @@ class ManajemenLctController extends Controller
 
     public function store(Request $request, $id_laporan_lct)
     {
+        // Autentikasi dan peran
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
             $roleName = 'ehs';
         } else {
             $user = Auth::guard('web')->user();
-            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
             $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
-        
-    // Validasi dengan try-catch untuk tangkap error validasi dan log pesan
+
+        // Validasi
         try {
             $validated = $request->validate([
                 'date_completion' => ['required', 'date'],
@@ -227,10 +227,7 @@ class ManajemenLctController extends Controller
                 'tindakan_perbaikan' => ['required', 'string', 'max:1000'],
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Log error validasi agar tahu apa yang gagal
             Log::error('Validation failed:', $e->errors());
-
-            // Jika ingin langsung kirim balik pesan error ke response (opsional)
             return back()->withErrors($e->errors())->withInput();
         }
 
@@ -238,6 +235,8 @@ class ManajemenLctController extends Controller
             DB::beginTransaction();
 
             $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();
+
+            // Upload bukti perbaikan
             $buktiPerbaikan = [];
             if ($request->hasFile('bukti_perbaikan')) {
                 foreach ($request->file('bukti_perbaikan') as $file) {
@@ -247,26 +246,31 @@ class ManajemenLctController extends Controller
                 }
             }
 
-            // Ambil data tindakan_perbaikan sebelumnya (jika ada)
+            // Tambahkan entri tindakan perbaikan terbaru
             $existing = json_decode($laporan->tindakan_perbaikan, true) ?? [];
-
-            // Tambahkan data baru
-            $newEntry = [
+            $existing[] = [
                 'tanggal' => $request->date_completion,
                 'tindakan' => $request->tindakan_perbaikan,
                 'bukti' => $buktiPerbaikan,
             ];
-            $existing[] = $newEntry;
 
-            $statusLct = ($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') 
-                ? 'waiting_approval_temporary' 
-                : 'waiting_approval';
+            // Status berdasarkan tingkat bahaya
+            if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                $statusLct = 'waiting_approval_temporary';
+                $laporan->approved_temporary_by_ehs = 'pending';
+            } else {
+                $statusLct = 'waiting_approval';
+            }
+
+            // Simpan laporan
             $laporan->update([
                 'date_completion' => $request->date_completion,
                 'status_lct' => $statusLct,
-                'tindakan_perbaikan' => json_encode($existing), // JSON lengkap
-                'bukti_perbaikan' => null, // Optional: kosongkan karena sudah masuk dalam JSON
+                'tindakan_perbaikan' => json_encode($existing),
+                'bukti_perbaikan' => null, // optional
             ]);
+
+            // Simpan riwayat revisi
             RejectLaporan::create([
                 'id_laporan_lct' => $laporan->id_laporan_lct,
                 'user_id' => $user->id,
@@ -283,18 +287,16 @@ class ManajemenLctController extends Controller
             //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
             //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
             // }
-            
 
             DB::commit();
-
             return redirect()->back()->with('success', 'The repair results have been sent to EHS.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal mengirim hasil perbaikan ke EHS: ' . $e->getMessage());
-
+            Log::error('Gagal menyimpan hasil perbaikan: ' . $e->getMessage());
             return redirect()->back()->with('error', 'An error occurred, please try again.');
         }
     }
+
 
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
@@ -305,8 +307,10 @@ class ManajemenLctController extends Controller
         Log::info('Raw estimatedBudget input:', ['value' => $request->estimatedBudget]);
 
         $estimatedBudgetRaw = $request->estimatedBudget;
-        $estimatedBudgetClean = preg_replace('/[^0-9.]/', '', $estimatedBudgetRaw);
-        $data['estimatedBudget'] = (float) $estimatedBudgetClean;
+        // Hapus semua karakter non-digit (misal: titik, koma, huruf, spasi)
+        $estimatedBudgetClean = preg_replace('/[^\d]/', '', $estimatedBudgetRaw);
+        $data['estimatedBudget'] = (int) $estimatedBudgetClean;
+
 
         Log::info('Parsed estimatedBudget:', ['value' => $data['estimatedBudget']]);
 

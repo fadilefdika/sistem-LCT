@@ -93,7 +93,7 @@ class DashboardController extends Controller
             'revision', 'taskbudget_revision', 'permanent_revision',
         ])->where('status_lct', '!=', 'closed');
 
-        $laporanNeedApprovalBudgetQuery = LaporanLct::where('status_lct', 'waiting_approval_taskbudget');
+        $laporanNeedApprovalBudgetQuery = LaporanLct::where('status_lct', 'waiting_approval_taskbudget')->orderBy('updated_at', 'desc');
 
         $laporanInProgressQuery = LaporanLct::where('status_lct', 'in_progress');
 

@@ -25,8 +25,10 @@
                 'approved_permanent' => ['label' => 'Approved (Permanent)', 'color' => 'bg-emerald-100 text-emerald-800'],
                 'waiting_approval_taskbudget' => ['label' => 'Waiting Approval (Task Budget)', 'color' => 'bg-amber-100 text-amber-800'],
                 'waiting_approval_permanent' => ['label' => 'Waiting Approval (Permanent)', 'color' => 'bg-amber-100 text-amber-800'],
+                'waiting_approval_temporary' => ['label' => 'Waiting Approval (Temporary)', 'color' => 'bg-amber-100 text-amber-800'],
                 'work_permanent' => ['label' => 'In Progress (Permanent)', 'color' => 'bg-amber-100 text-amber-800'],
                 'taskbudget_revision' => ['label' => 'Revision (Task Budget)', 'color' => 'bg-rose-100 text-rose-800'],
+                'temporary_revision' => ['label' => 'Revision (Temporary)', 'color' => 'bg-rose-100 text-rose-800'],
                 'permanent_revision' => ['label' => 'Revision (Permanent)', 'color' => 'bg-rose-100 text-rose-800'],
                 'closed' => ['label' => 'Closed', 'color' => 'bg-gray-200 text-gray-800'],
             ];

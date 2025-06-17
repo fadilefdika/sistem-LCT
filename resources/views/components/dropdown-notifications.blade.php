@@ -60,11 +60,11 @@
                     'approved_taskbudget',
                 ];
 
-                if (in_array($item->status_lct, $pendingTemporaryStatuses) && !$item->approved_temporary_by_ehs) {
+                if (in_array($item->status_lct, $pendingTemporaryStatuses) && $item->approved_temporary_by_ehs == 'pending') {
                     $item->status_lct = 'waiting_approval_temporary';
                 }
 
-                if ($item->status_lct === 'waiting_approval_temporary' && $item->approved_temporary_by_ehs) {
+                if ($item->status_lct === 'waiting_approval_temporary' && $item->approved_temporary_by_ehs == 'approved') {
                     $item->status_lct = 'approved_temporary';
                 }
 

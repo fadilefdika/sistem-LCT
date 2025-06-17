@@ -32,8 +32,8 @@
             </button>
 
             @if(in_array($laporan->status_lct, [
-                'closed', 'approved_temporary', 'approved_taskbudget', 'taskbudget_revision', 
-                'waiting_approval_taskbudget', 'approved_taskbudget', 'waiting_approval_permanent', 
+                'closed', 'approved_temporary', 'approved_taskbudget', 'taskbudget_revision', 'waiting_approval_temporary', 'temporary_revision',
+                'waiting_approval_taskbudget', 'waiting_approval_permanent', 
                 'work_permanent', 'permanent_revision', 'approved_permanent'
             ]) && $laporan->tingkat_bahaya !== 'Low')
                 <button data-tab="task-pic" class="tab-btn px-4 py-2 cursor-pointer text-gray-500">

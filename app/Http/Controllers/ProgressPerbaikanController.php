@@ -219,25 +219,25 @@ class ProgressPerbaikanController extends Controller
                     if (in_array($laporan->status_lct, ['waiting_approval_temporary', 'temporary_revision'])) {
                         $laporan->status_lct = 'approved_temporary';
                         $statusLog = 'approved_temporary';
-                        $laporan->approved_temporary_by_ehs = true;
+                        $laporan->approved_temporary_by_ehs = "approved";
                         $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'waiting_approval_taskbudget') {
                         $laporan->status_lct = 'waiting_approval_taskbudget';
                         $statusLog = 'approved_temporary';
-                        $laporan->approved_temporary_by_ehs = true;
+                        $laporan->approved_temporary_by_ehs = "approved";
                         $laporan->date_completion_temp = Carbon::now();
         
                     } elseif ($laporan->status_lct == 'taskbudget_revision') {
                         $laporan->status_lct = 'taskbudget_revision';
                         $statusLog = 'approved_temporary';
-                        $laporan->approved_temporary_by_ehs = true;
+                        $laporan->approved_temporary_by_ehs = "approved";
                         $laporan->date_completion_temp = Carbon::now();
 
                     } elseif ($laporan->status_lct == 'approved_taskbudget') {
                         $laporan->status_lct = 'approved_taskbudget';
                         $statusLog = 'approved_temporary';
-                        $laporan->approved_temporary_by_ehs = true;
+                        $laporan->approved_temporary_by_ehs = "approved";
                         $laporan->date_completion_temp = Carbon::now();
                     } elseif ($laporan->status_lct == 'waiting_approval_permanent') {
                         $laporan->status_lct = 'approved_permanent';
@@ -326,6 +326,8 @@ class ProgressPerbaikanController extends Controller
                     return response()->json(['error' => 'Status tidak valid untuk ditolak.'], 400);
                 }
 
+                $laporan->approved_temporary_by_ehs = "revise";
+
                 [$newStatus, $tipeReject] = $statusMap[$statusLama];
                 $laporan->status_lct = $newStatus;
             } else {
@@ -373,12 +375,16 @@ class ProgressPerbaikanController extends Controller
             $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
         
-        // dd("masuk close");
         $laporan = LaporanLct::where('id_laporan_lct',$id_laporan_lct)->first();
 
         if (!$laporan) {
-            return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
+            return redirect()->back()->with('error', 'Report not found.');
         }
+
+        if(($laporan->tingkat_bahaya === 'Medium' || $laporan->tingkat_bahaya === 'High') && in_array($laporan->approved_temporary_by_ehs, ['revise', 'pending','not yet']) ){
+            return redirect()->back()->with('error', 'Report has not been approved by EHS.');
+        }
+
         $laporan->status_lct = 'closed';
         $laporan->date_closed = Carbon::now();
         

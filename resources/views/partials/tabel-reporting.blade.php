@@ -198,29 +198,53 @@
                                 <td colspan="8" class="w-full bg-gray-50 px-6 py-6">
                                     <div class="w-full bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
                                         <!-- Header -->
-                                        <div class="border-b pb-4 mb-4">
-                                            <div class="flex justify-between items-center flex-wrap gap-4">
-                                                <div>
+                                        <div class="border-b pb-4 mb-6">
+                                            <div class="flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
+
+                                                <!-- Title & Report ID -->
+                                                <div class="flex-1 min-w-[200px]">
                                                     <h3 class="text-lg font-bold text-gray-800 mb-1">📝 Finding Details</h3>
-                                                    <p class="text-xs text-gray-500">Report ID: <span class="font-medium text-gray-700">{{ $laporan->id_laporan_lct }}</span></p>
+                                                    <p class="text-sm text-gray-500">
+                                                        <span class="font-semibold text-gray-600">Report ID:</span>
+                                                        <span class="text-gray-800">{{ $laporan->id_laporan_lct }}</span>
+                                                    </p>
                                                 </div>
-                                                <div class="flex gap-4">
-                                                    <div>
-                                                        <p class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Status</p>
-                                                        <span class="inline-flex px-3 py-1 text-[10px] font-semibold text-white rounded-full {{ $status['color'] }}">
-                                                            {{ $status['label'] }}
-                                                        </span>
+
+                                                <!-- Status and Hazard Info -->
+                                                <div class="flex flex-col sm:items-end min-w-[250px] w-full sm:w-auto space-y-2">
+
+                                                    <div class="flex flex-row gap-4">
+                                                        <!-- Status -->
+                                                        <div class="flex flex-col">
+                                                            <p class="text-xs uppercase text-gray-500 font-semibold">Status</p>
+                                                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $status['color'] }}">
+                                                                {{ $status['label'] }}
+                                                            </span>
+                                                        </div>
+
+                                                        <!-- Hazard Level -->
+                                                        <div class="flex flex-col">
+                                                            <p class="text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
+                                                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
+                                                                {{ $laporan->tingkat_bahaya }}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p class="text-[10px] text-gray-500 uppercase font-semibold mb-1">Hazard Level</p>
-                                                        <span class="inline-flex px-3 py-1 text-[10px] font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
-                                                            {{ $laporan->tingkat_bahaya }}
-                                                        </span>
+
+                                                    <!-- Tracking Status -->
+                                                    <div class="text-[10px] text-gray-600 font-medium mt-1">
+                                                        {{ $status['tracking'] }}
                                                     </div>
+
+                                                    @if($laporan->approved_temporary_by_ehs = 'pending' == false && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
+                                                        <div class="text-[10px] text-red-600 font-medium">
+                                                            ⚠️ Awaiting EHS approval (temporary)
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
-                                        
+                                            
 
                                         <div x-data="{ activeTab: 'finder' }">
                                             <!-- Tabs -->

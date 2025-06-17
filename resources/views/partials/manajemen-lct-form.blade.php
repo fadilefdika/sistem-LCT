@@ -126,27 +126,24 @@
                     
                 <!-- Submit button -->
                 @php
-                    $disabledStatuses = [
-                        'waiting_approval',
-                        'waiting_approval_temporary',
-                        'approved',
-                        'approved_temporary',
-                        'waiting_approval_taskbudget',
-                    ];
-                    $isDisabled = in_array($laporan->status_lct, $disabledStatuses);
+                    $isDisabled = true; // defaultnya disable
+
+                    if ($laporan->tingkat_bahaya === 'Low') {
+                        $isDisabled = !in_array($laporan->status_lct, ['revision','progress_work']);
+                    } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+                        $isDisabled = !in_array($laporan->approved_temporary_by_ehs, ['not yet','revise']);
+                    }
                 @endphp
-                
+
                 <button 
                     type="submit"
                     class="w-full mt-4 px-6 py-3 rounded-xl font-semibold text-sm text-white transition-all duration-200 ease-in-out
                         {{ $isDisabled ? 'bg-gray-400 cursor-not-allowed opacity-60' : 'bg-blue-700 hover:bg-blue-800 hover:scale-[1.02] active:scale-[0.98] focus:ring-4 focus:ring-blue-300' }}
-                        dark:{{ $isDisabled ? 'bg-gray-600 dark:opacity-60' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-800' }}
-                    "
+                        dark:{{ $isDisabled ? 'bg-gray-600 dark:opacity-60' : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-800' }}"
                     {{ $isDisabled ? 'disabled' : '' }}
                 >
                     🚀 Submit Report
                 </button>
-            
 
                 </div>
             </form>

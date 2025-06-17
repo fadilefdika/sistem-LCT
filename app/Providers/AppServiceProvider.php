@@ -85,14 +85,14 @@ class AppServiceProvider extends ServiceProvider
                           ->whereNull('first_viewed_by_ehs_at');
                     })->orWhere(function ($q) {
                         $q->where('status_lct', 'waiting_approval_temporary')
-                          ->where('approved_temporary_by_ehs', false);
+                          ->where('approved_temporary_by_ehs', 'not yet');
                     })->orWhere(function ($subSubQuery) {
                         $subSubQuery->whereIn('status_lct', [
                             'waiting_approval_taskbudget',
                             'taskbudget_revision',
                             'approved_taskbudget'
                         ])
-                        ->where('approved_temporary_by_ehs', false);
+                        ->where('approved_temporary_by_ehs', 'not yet');
                     });
                 });
             }            

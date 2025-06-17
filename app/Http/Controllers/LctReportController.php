@@ -214,6 +214,7 @@ class LctReportController extends Controller
                 'tingkat_bahaya' => $request->tingkat_bahaya,
                 'rekomendasi' => $request->rekomendasi,
                 'due_date' => $request->due_date,
+                'approved_temporary_by_ehs' => 'not yet',
                 'due_date_temp' => $request->due_date_temp,
                 'due_date_perm' => $request->due_date_perm,
                 'status_lct' => 'in_progress',

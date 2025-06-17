@@ -37,7 +37,7 @@
                 <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4 overflow-x-auto">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold">Task Management and Timeline</h3>
-                        @if(!$laporan->approved_temporary_by_ehs)
+                        @if(in_array($laporan->approved_temporary_by_ehs,['pending', 'revise', 'not yet']))
                             <span class="inline-block bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full">
                                 Temporary not yet approved
                             </span>
@@ -128,12 +128,17 @@
                             <input 
                                 type="text" 
                                 id="estimatedBudget" 
-                                name="estimatedBudget" 
-                                value="{{ old('estimatedBudget', $laporan->estimated_budget ?? '') }}" 
+                                name="estimatedBudget"
+                                @if(old('estimatedBudget') !== null)
+                                    value="{{ old('estimatedBudget') }}"
+                                @elseif(!empty($laporan->estimated_budget) && $laporan->estimated_budget > 0)
+                                    value="{{ number_format($laporan->estimated_budget, 0, ',', '.') }}"
+                                @endif
                                 class="border border-gray-300 p-2 w-1/3 rounded-lg" 
                                 placeholder="Example: 1.000.000" 
                                 required
                             >
+
                         </div>
                     </div>
 
@@ -195,11 +200,7 @@
                                 <div x-show="selectedFiles.length > 0" class="mt-4 w-full">
                                     <ul class="space-y-2">
                                         <template x-for="(file, index) in selectedFiles" :key="index">
-                                            <li 
-                                                @click="openInNewTab(file)" 
-                                                class="flex items-center justify-between p-3 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition duration-200 cursor-pointer"
-                                                :title="file.name"
-                                            >
+                                            <li @click.self="openInNewTab(file)" :title="file.name" class="flex items-center justify-between p-3 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition duration-200 cursor-default">
                                                 <div class="flex items-center space-x-3">
                                                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -207,9 +208,20 @@
                                                     </svg>
                                                     <span class="text-sm text-gray-800 truncate max-w-xs" x-text="file.name"></span>
                                                 </div>
-                                                <span class="text-xs text-gray-500" x-text="(file.size / 1024).toFixed(1) + ' KB'"></span>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-xs text-gray-500" x-text="(file.size / 1024).toFixed(1) + ' KB'"></span>
+                                                    <!-- Tombol hapus -->
+                                                    <button 
+                                                        type="button" 
+                                                        @click="removeFile(index)" 
+                                                        class="text-red-500 hover:text-red-700 text-sm"
+                                                        title="Hapus file ini"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
                                             </li>
-                                        </template>
+                                        </template>                                        
                                     </ul>
                                 </div>
 
@@ -229,39 +241,48 @@
                     <div class="flex flex-col mt-6 w-full">
                         
                         {{-- Revision history --}}
-                        @if($laporan->status_lct === 'taskbudget_revision' && $revise->isNotEmpty())
-                            <div class="mb-6 p-4 bg-gray-50 border border-gray-300 rounded shadow-sm w-full">
-                                <h4 class="text-lg font-semibold mb-3 text-gray-800">Revision Details</h4>
+                        @if( $revise->isNotEmpty())
+                            <div class="mb-6 p-4 border border-gray-200 bg-gray-50 rounded-md w-full">
+                                <h4 class="text-base font-semibold text-gray-700 mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
+                                    </svg>
+                                    Revision Details
+                                </h4>
+                        
                                 <div x-data="{ open: false }">
                                     <button 
                                         type="button"
                                         @click="open = !open" 
-                                        class="text-indigo-600 hover:text-indigo-800 focus:outline-none mb-3"
+                                        class="text-sm text-gray-600 hover:underline focus:outline-none mb-3"
                                         x-bind:aria-expanded="open.toString()"
                                     >
-                                        <span x-text="open ? 'Hide revision details' : 'Show revision details'"></span>
+                                        <span x-text="open ? 'Hide revision history' : 'Show revision history'"></span>
                                     </button>
-                
+                        
                                     <ul 
                                         x-show="open" 
                                         x-transition
-                                        class="space-y-4 max-h-64 overflow-y-auto border border-gray-200 rounded p-3 bg-white"
+                                        class="space-y-3 max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-md p-4"
                                     >
-                                    @foreach($revise->reverse() as $revision)
-                                        <li class="p-3 border border-gray-200 rounded shadow-sm">
-                                            <div class="text-sm font-medium text-gray-700">
-                                                {{ $revision->updated_at->format('d M Y H:i') }}
-                                            </div>
-                                            <div class="text-sm mt-1 text-gray-800 whitespace-pre-line">
-                                                {{ $revision->alasan_reject }}
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                
+                                        @foreach($revise->reverse()->values() as $i => $revision)
+                                            <li class="bg-gray-100 border border-gray-200 rounded-md p-3">
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <span class="text-xs font-semibold text-gray-700">Revision #{{ $i + 1 }}</span>
+                                                    <span class="text-xs text-gray-500">{{ $revision->updated_at->format('d M Y H:i') }}</span>
+                                                </div>
+                                                <div class="text-sm text-gray-800 whitespace-pre-line">
+                                                    {{ $revision->alasan_reject }}
+                                                </div>
+                                            </li>
+                                        @endforeach
                                     </ul>
                                 </div>
                             </div>
                         @endif
+                    
                 
                         {{-- Submit button di kanan --}}
                         <button 
@@ -548,35 +569,83 @@ document.querySelectorAll('.status-checkbox').forEach((checkbox) => {
         return {
             selectedFiles: [],
             error: '',
-    
-            handleFileChange(event) {
+
+            async handleFileChange(event) {
                 const files = Array.from(event.target.files);
-    
+                this.selectedFiles = [];
+
                 if (files.length > 5) {
                     this.error = 'Maksimal upload 5 file saja.';
-                    this.selectedFiles = [];
-                    event.target.value = ''; // reset input supaya bisa upload ulang
+                    event.target.value = '';
                     return;
                 } else {
                     this.error = '';
                 }
-    
-                this.selectedFiles = files;
+
+                for (const file of files) {
+                    if (file.type.startsWith('image/')) {
+                        // Kompres gambar
+                        const compressed = await this.compressImage(file);
+                        this.selectedFiles.push(compressed);
+                    } else if (file.type === 'application/pdf') {
+                        // PDF langsung masukkan
+                        this.selectedFiles.push(file);
+                    } else {
+                        this.error = 'Hanya gambar dan dokumen PDF yang diperbolehkan.';
+                    }
+                }
             },
-    
+
+            async compressImage(file) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        img.src = e.target.result;
+                    };
+
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 1024; // Atur maksimal ukuran gambar
+                        const scale = Math.min(1, maxWidth / img.width);
+
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        canvas.toBlob((blob) => {
+                            const newFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(newFile);
+                        }, 'image/jpeg', 0.7); // kualitas 0.7
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            removeFile(index) {
+                this.selectedFiles.splice(index, 1);
+            },
+
             openInNewTab(file) {
                 const url = URL.createObjectURL(file);
                 window.open(url, '_blank');
-                // Setelah open tab, revoke agar tidak memory leak
                 setTimeout(() => URL.revokeObjectURL(url), 1000 * 60);
             }
-        }
+        };
     }
+
     
     document.addEventListener('alpine:init', () => {
         Alpine.data('fileUpload', fileUpload);
     });
-    </script>
+</script>
     
 
 <script>
