@@ -54,8 +54,6 @@
             <div class="text-xs text-gray-500 dark:text-gray-400 italic uppercase mt-2">
                 {{ $displayRole }}
             </div>
-
-
                 
             </div>
         <ul>

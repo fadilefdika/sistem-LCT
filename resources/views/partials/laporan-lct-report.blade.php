@@ -4,7 +4,7 @@
     <div class="bg-white p-5 rounded-xl shadow-md border ">
         <!-- Header -->
         <h5 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            📝 Report from Finder
+            📝 Finding Report
         </h5>
         
         <!-- Garis Pemisah -->

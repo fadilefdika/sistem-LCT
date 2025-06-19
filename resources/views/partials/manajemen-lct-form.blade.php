@@ -18,12 +18,12 @@
             @php
                 if (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
                     $formTitle = ($laporan->status_lct === 'revision') 
-                        ? 'Temporary Corrective Action Revision Form to EHS' 
-                        : 'Temporary Corrective Action Report Form to EHS';
+                        ? 'Temporary Corrective Action Revision' 
+                        : 'Temporary Corrective Action Report';
                 } elseif ($laporan->tingkat_bahaya === 'Low') {
-                    $formTitle = 'Corrective Action Revision Form to EHS';
+                    $formTitle = 'Corrective Action';
                 } elseif ($laporan->status_lct === 'revision') {
-                    $formTitle = 'Corrective Action Revision Form to EHS';
+                    $formTitle = 'Corrective Action Revision';
                 }
             @endphp
 
@@ -47,9 +47,9 @@
                         <input type="text" class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" id="nama_pic" name="nama_pic" value="{{ $laporan->picUser->fullname ?? '' }}" required readonly>
                     </div>
             
-                    <!-- Repair Deadline -->
+                    <!-- Due Date -->
                     <div class="mb-4">
-                        <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Repair Deadline</label>
+                        <label for="due_date" class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                         <input 
                             type="text" 
                             class="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed" 

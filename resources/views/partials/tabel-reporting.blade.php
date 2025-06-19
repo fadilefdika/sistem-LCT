@@ -172,18 +172,17 @@
 
                                 $bukti_temuan = collect($buktiArray)->map(fn($path) => asset('storage/' . $path));
 
-                                $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
-                                $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
-           
-                                        if ($roleName === 'ehs') {
-                                        $routeName = $laporan->status_lct === 'open'
-                                                ? 'ehs.reporting.show.new'
-                                                : 'ehs.reporting.show';
-                                        } elseif ($roleName === 'pic') {
-                                            $routeName = 'admin.manajemen-lct.show';
-                                        } else {
-                                            $routeName = 'admin.reporting.show';
-                                        }
+                                $activeRole = session('active_role');
+
+                                if ($activeRole === 'ehs') {
+                                    $routeName = $laporan->status_lct === 'open'
+                                        ? 'ehs.reporting.show.new'
+                                        : 'ehs.reporting.show';
+                                } elseif ($activeRole === 'pic') {
+                                    $routeName = 'admin.manajemen-lct.show';
+                                } else {
+                                    $routeName = 'admin.reporting.show';
+                                }
 
                             @endphp
             
@@ -203,41 +202,41 @@
 
                                                 <!-- Title & Report ID -->
                                                 <div class="flex-1 min-w-[200px]">
-                                                    <h3 class="text-lg font-bold text-gray-800 mb-1">📝 Finding Details</h3>
-                                                    <p class="text-sm text-gray-500">
+                                                    <h3 class="sm:text-lg text-xs font-bold text-gray-800 mb-1">📝 Finding Details</h3>
+                                                    <p class="sm:text-sm text-[9px] text-gray-500">
                                                         <span class="font-semibold text-gray-600">Report ID:</span>
                                                         <span class="text-gray-800">{{ $laporan->id_laporan_lct }}</span>
                                                     </p>
                                                 </div>
 
                                                 <!-- Status and Hazard Info -->
-                                                <div class="flex flex-col sm:items-end min-w-[250px] w-full sm:w-auto space-y-2">
+                                                <div class="flex flex-col sm:items-end min-w-[200px] w-full sm:w-auto space-y-1 sm:space-y-2">
 
-                                                    <div class="flex flex-row gap-4">
+                                                    <div class="flex flex-row gap-2 sm:gap-4">
                                                         <!-- Status -->
                                                         <div class="flex flex-col">
-                                                            <p class="text-xs uppercase text-gray-500 font-semibold">Status</p>
-                                                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $status['color'] }}">
+                                                            <p class="text-[8px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-semibold">Status</p>
+                                                            <span class="inline-flex items-center px-2 py-0.5 text-[8px] sm:text-[9px] md:text-xs font-semibold text-white rounded-full {{ $status['color'] }}">
                                                                 {{ $status['label'] }}
                                                             </span>
                                                         </div>
 
                                                         <!-- Hazard Level -->
                                                         <div class="flex flex-col">
-                                                            <p class="text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
-                                                            <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
-                                                                {{ $laporan->tingkat_bahaya }}
+                                                            <p class="text-[8px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
+                                                            <span class="inline-flex items-center px-2 py-0.5 text-[8px] sm:text-[9px] md:text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
+                                                                {{ $laporan->tingkat_bahaya ?? 'Unknown' }}
                                                             </span>
                                                         </div>
                                                     </div>
 
                                                     <!-- Tracking Status -->
-                                                    <div class="text-[10px] text-gray-600 font-medium mt-1">
+                                                    <div class="text-[8px] sm:text-[9px] md:text-[10px] text-gray-600 font-medium mt-1">
                                                         {{ $status['tracking'] }}
                                                     </div>
 
-                                                    @if($laporan->approved_temporary_by_ehs = 'pending' == false && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
-                                                        <div class="text-[10px] text-red-600 font-medium">
+                                                    @if($laporan->approved_temporary_by_ehs == 'pending' && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
+                                                        <div class="text-[8px] sm:text-[9px] md:text-[10px] text-red-600 font-medium">
                                                             ⚠️ Awaiting EHS approval (temporary)
                                                         </div>
                                                     @endif
@@ -251,15 +250,15 @@
                                             <div class="flex border-b mb-4">
                                                 <button @click="activeTab = 'finder'" 
                                                         :class="activeTab === 'finder' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'" 
-                                                        class="px-4 py-2 text-sm font-semibold cursor-pointer">
+                                                        class="sm:px-4 sm:py-2 sm:text-sm px-3 py-1.5 text-xs font-semibold cursor-pointer">
                                                     Finder Report
                                                 </button>
 
                                                 @if(!in_array($laporan->status_lct, ['open', 'in_progress', 'progress_work']))
                                                     <button @click="activeTab = 'pic'" 
                                                             :class="activeTab === 'pic' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'" 
-                                                            class="px-4 py-2 text-sm font-semibold cursor-pointer">
-                                                        PIC Improvement
+                                                            class="sm:px-4 sm:py-2 sm:text-sm px-3 py-1.5 text-xs font-semibold cursor-pointer">
+                                                            Corrective Action
                                                     </button>
                                                 @endif
                                             </div>
@@ -269,8 +268,8 @@
                                             <div x-show="activeTab === 'finder'">
                                                 <div>
                                                     <!-- Gambar dan Detail -->
-                                                    <div class="flex flex-col lg:flex-row gap-6 w-full">
-                                                        <div class="lg:w-1/3 w-full" x-data="{
+                                                    <div class="flex flex-row gap-6 w-full">
+                                                        <div class="w-1/3" x-data="{
                                                             images: @js($bukti_temuan),
                                                             current: 0,
                                                             interval: null,
@@ -401,7 +400,7 @@
                                                 </div>
                                             </div>
                                         
-                                            <!-- PIC Improvement Section -->
+                                            <!-- Corrective Action Section -->
                                             @if(!in_array($laporan->status_lct, ['open', 'in_progress', 'progress_work']))
                                                 <div x-show="activeTab === 'pic'" class="space-y-8">
                                                     @php
@@ -433,9 +432,9 @@
                                                                 <template x-for="(tp, index) in slides" :key="index">
                                                                     <div class="min-w-full p-4 space-y-4 border rounded-md shadow-md">
                                                                         {{-- Konten sama seperti sebelumnya --}}
-                                                                        <div class="flex flex-col lg:flex-row gap-6">
+                                                                        <div class="flex flex-row gap-6 mb-2">
                                                                             <!-- Image Slider -->
-                                                                            <div class="lg:w-1/3 w-full" x-data="{
+                                                                            <div class="w-1/3" x-data="{
                                                                                 images: tp.bukti,
                                                                                 currentImg: 0,
                                                                                 interval: null,

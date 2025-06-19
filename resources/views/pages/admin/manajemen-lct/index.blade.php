@@ -8,7 +8,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <!-- Tombol Filter -->
                     <button @click="showFilter = !showFilter"
-                        class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                        class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white sm:text-sm text-xs px-3 py-1.5 sm:px-4 sm:py-2 shadow hover:bg-gray-800 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
                         </svg>
@@ -17,7 +17,7 @@
             
                     <!-- Tombol Export -->
                     <a href="{{ route('admin.manajemen-lct.export') }}" id="export-link"
-                        class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                        class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-green-500 text-white text-xs sm:text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
@@ -109,7 +109,7 @@
             
 
             <div class="bg-white p-4 rounded-xl shadow">
-                <div id="report-container">
+                <div id="report-container-manajemen">
                     @include('partials.tabel-manajemen-lct-wrapper', ['laporans' => $laporans])
                 </div>
             </div>
@@ -168,12 +168,12 @@
                     type: 'GET',
                     data: params,
                     success: function(res) {
-                        $('#report-container').html(res);
+                        $('#report-container-manajemen').html(res);
                         // Scroll ke atas tabel agar user tau data baru sudah dimuat
                         if (window.Alpine) {
-                            Alpine.initTree(document.querySelector('#report-container'));
+                            Alpine.initTree(document.querySelector('#report-container-manajemen'));
                         }
-                        $('html, body').animate({ scrollTop: $('#report-container').offset().top - 100 }, 300);
+                        $('html, body').animate({ scrollTop: $('#report-container-manajemen').offset().top - 100 }, 300);
                         updateExportLink(params);
                     },
                     error: function() {

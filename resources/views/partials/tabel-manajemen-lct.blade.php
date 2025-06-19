@@ -3,7 +3,7 @@
                             $laporanId = $laporan->id;
                         @endphp
                         <tr @click="openRow === {{ $laporanId }} ? openRow = null : openRow = {{ $laporanId }}" class="hover:bg-gray-100 cursor-pointer text-sm transition duration-200 ease-in-out">
-                            <td class="px-4 py-3 text-gray-800 w-11 text-[11px]">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3 text-gray-800 w-11 text-[11px]">{{ $laporans->firstItem() + $index }}</td>
                             <!-- Tenggat Waktu -->
                             @php
                                     $today = now();
@@ -178,62 +178,63 @@
 
                                             <!-- Title & Report ID -->
                                             <div class="flex-1 min-w-[200px]">
-                                                <h3 class="text-lg font-bold text-gray-800 mb-1">📝 Finding Details</h3>
-                                                <p class="text-sm text-gray-500">
+                                                <h3 class="sm:text-lg text-xs font-bold text-gray-800 mb-1">📝 Finding Details</h3>
+                                                <p class="sm:text-sm text-[9px] text-gray-500">
                                                     <span class="font-semibold text-gray-600">Report ID:</span>
                                                     <span class="text-gray-800">{{ $laporan->id_laporan_lct }}</span>
                                                 </p>
                                             </div>
 
                                             <!-- Status and Hazard Info -->
-                                            <div class="flex flex-col sm:items-end min-w-[250px] w-full sm:w-auto space-y-2">
+                                            <div class="flex flex-col sm:items-end min-w-[200px] w-full sm:w-auto space-y-1 sm:space-y-2">
 
-                                                <div class="flex flex-row gap-4">
+                                                <div class="flex flex-row gap-2 sm:gap-4">
                                                     <!-- Status -->
                                                     <div class="flex flex-col">
-                                                        <p class="text-xs uppercase text-gray-500 font-semibold">Status</p>
-                                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-semibold text-white rounded-full {{ $status['color'] }}">
+                                                        <p class="text-[8px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-semibold">Status</p>
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[8px] sm:text-[9px] md:text-xs font-semibold text-white rounded-full {{ $status['color'] }}">
                                                             {{ $status['label'] }}
                                                         </span>
                                                     </div>
-                                                
+
                                                     <!-- Hazard Level -->
                                                     <div class="flex flex-col">
-                                                        <p class="text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
-                                                        <span class="inline-flex items-center px-2 py-0.5 text-[9px] font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
+                                                        <p class="text-[8px] sm:text-[10px] md:text-xs uppercase text-gray-500 font-semibold">Hazard Level</p>
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[8px] sm:text-[9px] md:text-xs font-semibold text-white rounded-full {{ $bahayaColors[$laporan->tingkat_bahaya] ?? 'bg-gray-400' }}">
                                                             {{ $laporan->tingkat_bahaya ?? 'Unknown' }}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 <!-- Tracking Status -->
-                                                <div class="text-[10px] text-gray-600 font-medium mt-1">
+                                                <div class="text-[8px] sm:text-[9px] md:text-[10px] text-gray-600 font-medium mt-1">
                                                     {{ $status['tracking'] }}
                                                 </div>
 
                                                 @if($laporan->approved_temporary_by_ehs == 'pending' && in_array($laporan->status_lct, ['waiting_approval_temporary', 'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget','work_permanent']))
-                                                    <div class="text-[10px] text-red-600 font-medium">
+                                                    <div class="text-[8px] sm:text-[9px] md:text-[10px] text-red-600 font-medium">
                                                         ⚠️ Awaiting EHS approval (temporary)
                                                     </div>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
+
                                     
                                     <div x-data="{ activeTab: 'finder' }">
                                         <!-- Tabs -->
                                         <div class="flex border-b mb-4">
                                             <button @click="activeTab = 'finder'" 
                                                     :class="activeTab === 'finder' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'" 
-                                                    class="px-4 py-2 text-sm font-semibold cursor-pointer">
+                                                    class="sm:px-4 sm:py-2 sm:text-sm px-3 py-1.5 text-xs font-semibold cursor-pointer">
                                                 Finder Report
                                             </button>
 
                                             @if(!in_array($laporan->status_lct, ['open', 'in_progress', 'progress_work']))
                                                 <button @click="activeTab = 'pic'" 
                                                         :class="activeTab === 'pic' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'" 
-                                                        class="px-4 py-2 text-sm font-semibold cursor-pointer">
-                                                    PIC Improvement
+                                                        class="sm:px-4 sm:py-2 sm:text-sm px-3 py-1.5 text-xs font-semibold cursor-pointer">
+                                                        Corrective Action
                                                 </button>
                                             @endif
                                         </div>
@@ -243,8 +244,8 @@
                                         <div x-show="activeTab === 'finder'">
                                             <div>
                                                 <!-- Gambar dan Detail -->
-                                                <div class="flex flex-col lg:flex-row gap-6 w-full">
-                                                    <div class="lg:w-1/3 w-full" x-data="{
+                                                <div class="flex flex-row gap-6 w-full">
+                                                    <div class="w-1/3" x-data="{
                                                         images: @js($bukti_temuan),
                                                         current: 0,
                                                         interval: null,
@@ -350,7 +351,7 @@
                                             </div>
                                         </div>
                                     
-                                        <!-- PIC Improvement Section -->
+                                        <!-- Corrective Action Section -->
                                         @if(!in_array($laporan->status_lct, ['open', 'in_progress', 'progress_work']))
                                             <div x-show="activeTab === 'pic'" class="space-y-8">
                                                 @php
@@ -383,9 +384,9 @@
                                                             <template x-for="(tp, index) in slides" :key="index">
                                                                 <div class="min-w-full p-4 space-y-4 border rounded-md shadow-md">
                                                                     {{-- Konten sama seperti sebelumnya --}}
-                                                                    <div class="flex flex-col lg:flex-row gap-6">
+                                                                    <div class="flex flex-row gap-6 mb-2">
                                                                         <!-- Image Slider -->
-                                                                        <div class="lg:w-1/3 w-full" x-data="{
+                                                                        <div class="w-1/3" x-data="{
                                                                             images: tp.bukti,
                                                                             currentImg: 0,
                                                                             interval: null,
@@ -434,26 +435,26 @@
                                                                         <div class="lg:w-2/3 w-full grid grid-cols-2 gap-6 text-sm bg-white p-4 rounded-md shadow-sm">
                                                                             <div class="border-b border-gray-200 pb-2">
                                                                                 <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Completion Date</p>
-                                                                                <p class="text-sm text-gray-900" x-text="new Date(tp.tanggal).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) ?? '-'"></p>
+                                                                                <p class="sm:text-xs text-[11px] text-gray-900" x-text="new Date(tp.tanggal).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) ?? '-'"></p>
                                                                             </div>
                                                                             
                                                                             <div class="border-b border-gray-200 pb-2">
                                                                                 <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">
                                                                                     {{ strtolower($laporan->tingkat_bahaya) === 'low' ? 'Due Date' : 'Temporary Due Date' }}
                                                                                 </p>
-                                                                                <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
+                                                                                <p class="sm:text-xs text-[11px] text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
                                                                             </div>
                                                                             
                                                                             @if(strtolower($laporan->tingkat_bahaya) !== 'low')
-                                                                            <div class="border-b border-gray-200 pb-2">
-                                                                            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Permanent Due Date</p>
-                                                                            <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
-                                                                            </div>
+                                                                                <div class="border-b border-gray-200 pb-2">
+                                                                                    <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Permanent Due Date</p>
+                                                                                    <p class="sm:text-xs text-[11px] text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
+                                                                                </div>
                                                                             @endif
                                                                         
                                                                             <div class="border-b border-gray-200 pb-2">
                                                                             <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">PIC</p>
-                                                                            <p class="text-sm text-gray-900">{{ $laporan->picUser->fullname ?? '-' }}</p>
+                                                                            <p class="sm:text-xs text-[11px] text-gray-900">{{ $laporan->picUser->fullname ?? '-' }}</p>
                                                                             </div>
                                                                         </div>                                                                              
                                                                     </div>

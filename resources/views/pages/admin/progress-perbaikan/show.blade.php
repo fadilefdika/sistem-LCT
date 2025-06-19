@@ -24,11 +24,7 @@
         <!-- Tabs -->
         <div id="tabs" class="flex space-x-4 border-b">
             <button data-tab="user" class="tab-btn px-4 py-2 cursor-pointer text-gray-500">
-                Finder
-            </button>
-
-            <button data-tab="pic" class="tab-btn px-4 py-2 cursor-pointer text-gray-500">
-                PIC
+                Finding Report
             </button>
 
             @if(in_array($laporan->status_lct, [
@@ -47,9 +43,6 @@
             <div id="tab-user" class="tab-content">
                 @include('partials.progress-perbaikan-report-user')
             </div>
-            <div id="tab-pic" class="tab-content">
-                @include('partials.progress-perbaikan-report-pic')
-            </div>
             <div id="tab-task-pic" class="tab-content">
                 @include('partials.progress-perbaikan-task')
             </div>
@@ -57,17 +50,19 @@
     </div>
 
     <!-- Modal Preview -->
-    <div id="imageModal" class="hidden fixed inset-0 bg-black/50 bg-opacity-75 flex items-center justify-center z-60 transition-opacity duration-300">
-        <div class="relative bg-white p-1 rounded-lg shadow-lg">
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-60 transition-opacity duration-300 px-4">
+        <div class="relative bg-white p-1 rounded-lg shadow-lg max-w-full max-h-full">
             <button id="closeModalBtn"
                 class="absolute -top-4 -right-4 bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition cursor-pointer"
                 onclick="closeModal()">
                 &times;
             </button>
-            
-            <img id="modalImage" class="w-[600px] h-[500px] object-cover rounded-lg">
+
+            <img id="modalImage"
+                class="w-full max-w-[90vw] max-h-[80vh] object-contain rounded-lg" />
         </div>
     </div>
+
 </x-app-layout>
 
 <script>

@@ -1,6 +1,6 @@
 <div class="bg-white p-5 max-h-min rounded-lg shadow-lg">
     <div class="bg-primary text-black text-center py-4 px-7 rounded-t-lg">
-        <h5 class="text-xl font-bold">Finding Item Report Submission Form to PIC</h5>
+        <h5 class="text-xl font-bold">Finding Report to PIC</h5>
     </div>
 
     <div class="w-full h-[2px] bg-gray-200 px-3"></div>

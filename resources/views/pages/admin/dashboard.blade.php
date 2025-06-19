@@ -160,25 +160,28 @@
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-3">
 
                         <!-- Chart Garis: Findings per Bulan -->
-                        <div class="bg-white rounded-2xl shadow-md p-6 lg:col-span-2 relative w-full">
-                            <h2 class="text-base font-semibold text-gray-800 mb-4">Findings Per Month</h2>
-
-                            <div class="absolute top-4 right-4 w-28">
-                                <select id="month-select"
-                                    class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
-                                    @for ($m = 1; $m <= 12; $m++)
-                                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                                    @endfor
-                                </select>
+                        <div class="bg-white rounded-2xl shadow-md p-4 sm:p-6 lg:col-span-2 w-full">
+                            <!-- Header & Filter -->
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="text-base font-semibold text-gray-800">Findings Per Month</h2>
+                        
+                                <div class="w-32">
+                                    <select id="month-select"
+                                        class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
                             </div>
-
-                            <!-- Pastikan container penuh -->
-                            <div class="w-full h-[300px] relative">
+                        
+                            <!-- Chart Area (No overflow) -->
+                            <div class="w-full h-[250px] sm:h-[300px] md:h-[350px]">
                                 <canvas id="monthlyChart" class="!w-full !h-full"></canvas>
                             </div>
                         </div>
-
-
+                        
+                        
                         <!-- Chart Pie: Status Closed/Non-Closed -->
                         <div class="bg-white rounded-2xl shadow-md p-6 relative w-full">
                             <div class="flex justify-between items-start mb-4">
@@ -321,13 +324,37 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 10 // Ukuran font legend
+                            }
+                        }
+                    },
+                    tooltip: {
+                        titleFont: {
+                            size: 11 // Ukuran judul tooltip
+                        },
+                        bodyFont: {
+                            size: 10 // Ukuran isi tooltip
+                        }
+                    }
+                },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: isMonthly ? 'Months' : 'Dates'
+                            text: isMonthly ? 'Months' : 'Dates',
+                            font: {
+                                size: 9 // ukuran judul sumbu X
+                            }
                         },
                         ticks: {
+                            font: {
+                                size: 9 // ukuran label-label di sumbu X
+                            },
                             callback: function(value, index, ticks) {
                                 const label = this.getLabelForValue(value);
                                 if (isMonthly) {
@@ -343,13 +370,20 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Number of Findings'
+                            text: 'Number of Findings',
+                            font: {
+                                size: 9 // ukuran judul sumbu Y
+                            }
                         },
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            font: {
+                                size: 9 // ukuran label angka di sumbu Y
+                            }
                         }
                     }
                 }
+
             }
         });
     }

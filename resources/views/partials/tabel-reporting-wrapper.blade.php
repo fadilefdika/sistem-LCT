@@ -68,7 +68,7 @@
     
         perPageSelect.addEventListener('change', () => {
             const perPage = perPageSelect.value;
-            fetch(`{{ route('ehs.reporting.index') }}?perPage=${perPage}`, {
+            fetch(`{{ route('admin.reporting.index') }}?perPage=${perPage}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }

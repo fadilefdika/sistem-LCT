@@ -13,64 +13,64 @@
                     $bukti_temuan_urls = collect($bukti_temuan)->map(fn($path) => asset('storage/' . $path));
                 @endphp
 
-                <div class="hover:bg-gray-50 text-[11px] transition duration-200 ease-in-out">
-                    <div class="flex items-center px-3 py-2 space-x-3">
+                <div class="hover:bg-gray-50 text-[11px] transition duration-200 ease-in-out border-b px-3 py-2">
+                    <div class="flex flex-row items-start gap-3 flex-wrap">
+
                         <!-- Number -->
-                        <div class="w-8 text-center font-semibold text-gray-800">
+                        <div class="w-6 text-gray-800 font-semibold flex-shrink-0 pt-1">
                             {{ $loop->iteration }}
                         </div>
 
-                        <!-- Image -->
-                        @if($bukti_temuan_urls->isNotEmpty())
-                            <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image" class="w-16 h-16 object-cover rounded-md shadow-sm border border-gray-100">
-                        @else
-                            <div class="w-16 h-16 flex items-center justify-center bg-gray-100 text-[11px] text-gray-400 rounded-md border">
-                                No Image
-                            </div>
-                        @endif
+                        <!-- Image + Text + Action -->
+                        <div class="flex flex-1 flex-col sm:flex-row sm:items-start md:items-center gap-3 w-full">
 
-                        <!-- Text Details -->
-                        <div class="flex-1">
-                            <p class="text-gray-500 text-[11px]">Finding date: {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('F j, Y') }}</p>
-                            <p class="text-gray-800 text-[11px]">
-                                {{ $laporan->temuan_ketidaksesuaian }} found in 
-                                <br>
-                                <strong class="text-[11px]">{{ $laporan->area->nama_area }}</strong>
-                                <span class="text-gray-600 text-[11px]">— {{ $laporan->detail_area }}</span>
-                            </p>
-                        </div>
-
-                        @php
-                            // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' untuk pengguna biasa
-                            if (Auth::guard('ehs')->check()) {
-                                $user = Auth::guard('ehs')->user();
-                                $roleName = 'ehs';
-                            } else {
-                                $user = Auth::guard('web')->user();
-                                // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
-                                $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
-                            }
-                        @endphp
-                        
-                        <!-- Action -->
-                        <td class="w-20 text-right">
-                            @if (in_array($roleName, ['ehs', 'manajer', 'user']))
-                                <a href="{{ route(
-                                    $roleName === 'ehs' 
-                                        ? 'ehs.reporting.show' 
-                                        : 'admin.reporting.show', 
-                                    $laporan->id_laporan_lct
-                                ) }}" 
-                                class="text-blue-600 hover:text-blue-800 text-[11px] font-medium">
-                                    View Details
-                                </a>
+                            <!-- Image -->
+                            @if($bukti_temuan_urls->isNotEmpty())
+                                <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image"
+                                    class="w-12 h-12 object-cover rounded-md shadow-sm border border-gray-100">
                             @else
-                                <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}" 
-                                class="text-blue-600 hover:text-blue-800 text-[11px] font-medium">
-                                    View Details
-                                </a>
+                                <div class="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md border">
+                                    No Image
+                                </div>
                             @endif
-                        </td>                        
+
+                            <!-- Text Details -->
+                            <div class="flex-1 space-y-1">
+                                <p class="text-gray-500">
+                                    Finding date: {{ \Carbon\Carbon::parse($laporan->tanggal_temuan)->format('F j, Y') }}
+                                </p>
+                                <p class="text-gray-800 leading-tight">
+                                    {{ $laporan->temuan_ketidaksesuaian }} found in 
+                                    <strong>{{ $laporan->area->nama_area }}</strong>
+                                    <span class="text-gray-600">— {{ $laporan->detail_area }}</span>
+                                </p>
+                            </div>
+
+                            <!-- Action -->
+                            <div class="text-left sm:text-right pt-1 sm:pt-0 min-w-[90px]">
+                                @php
+                                    if (Auth::guard('ehs')->check()) {
+                                        $user = Auth::guard('ehs')->user();
+                                        $roleName = 'ehs';
+                                    } else {
+                                        $user = Auth::guard('web')->user();
+                                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                                    }
+                                @endphp
+
+                                @if (in_array($roleName, ['ehs', 'manajer', 'user']))
+                                    <a href="{{ route($roleName === 'ehs' ? 'ehs.reporting.show' : 'admin.reporting.show', $laporan->id_laporan_lct) }}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium">
+                                        View Details
+                                    </a>
+                                @else
+                                    <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}"
+                                    class="text-blue-600 hover:text-blue-800 font-medium">
+                                        View Details
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             @endforeach

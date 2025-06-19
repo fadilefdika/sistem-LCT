@@ -17,7 +17,7 @@
         <div class="absolute top-1 right-1 w-2 h-2 md:top-0 md:right-0 md:w-2.5 md:h-2.5 bg-red-500 border-2 border-gray-100 dark:border-gray-900 rounded-full"></div>
     </button>
 
-    <div class="origin-top-right z-10 absolute top-full min-w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1 {{ $align === 'right' ? 'right-0' : 'left-0' }} "
+    <div class="origin-top-right z-10 fixed sm:absolute top-16 sm:top-full w-[calc(100vw-2rem)] sm:min-w-80 max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700/60 py-1.5 rounded-lg shadow-lg overflow-hidden mt-1 {{ $align === 'right' ? 'right-4 sm:right-0' : 'left-4 sm:left-0' }}"
         @click.outside="open = false"
         @keydown.escape.window="open = false"
         x-show="open"
@@ -30,7 +30,6 @@
         x-cloak
     >
         <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase pt-1.5 pb-2 px-4">Notifications <span>({{ $notifikasiLCT->count() }})</span></div>
-
         @php
             $statusMapping = [
                 'open' => ['label' => 'Open (new)', 'color' => 'bg-gray-500', 'tracking' => 'Report has been created'],
@@ -74,8 +73,7 @@
                 return $item;
             })->groupBy('label_group');
         @endphp
-
-        <div class="space-y-3">
+        <div class="space-y-3 max-h-[calc(100vh-10rem)] sm:max-h-96 overflow-y-auto">
             @foreach ($notifikasiGroupedByLabel as $label => $notifications)
                 @php
                     $firstStatus = $notifications->first()->status_lct;
@@ -119,7 +117,7 @@
                                     📣 <span class="font-medium text-gray-800 dark:text-gray-100">{{ $label }}</span>
                                 </span>
                                 <span class="block text-xs text-gray-900 dark:text-gray-300">#{{ $notif->id_laporan_lct }}</span>
-                                <span class="block text-xs text-gray-600 dark:text-gray-300">Finding : {{ $notif->temuan_ketidaksesuaian }}</span>
+                                <span class="block text-xs text-gray-600 dark:text-gray-300 truncate">Finding : {{ $notif->temuan_ketidaksesuaian }}</span>
                                 <span class="block text-xs font-medium text-gray-400 dark:text-gray-500">
                                     {{ $formattedDate }} WIB
                                 </span>

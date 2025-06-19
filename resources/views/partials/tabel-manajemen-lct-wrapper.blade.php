@@ -51,7 +51,7 @@
             </div>
 
             <!-- Right side: Pagination -->
-            <div>
+            <div id="pagination-links" class="flex space-x-2">
                 {{ $laporans->withQueryString()->links() }}
             </div>
         </div>
@@ -61,11 +61,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const perPageSelect = document.getElementById('perPageSelect');
-        const wrapper = document.getElementById('report-container');
+        const wrapper = document.getElementById('report-container-manajemen');
     
         perPageSelect.addEventListener('change', () => {
             const perPage = perPageSelect.value;
-            fetch(`{{ route('ehs.reporting.index') }}?perPage=${perPage}`, {
+            fetch(`{{ route('admin.manajemen-lct.index') }}?perPage=${perPage}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }

@@ -566,7 +566,7 @@
                                             <button @click="activeTab = 'pic'" 
                                                     :class="activeTab === 'pic' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'" 
                                                     class="px-4 py-2 text-sm font-semibold cursor-pointer">
-                                                PIC Improvement
+                                                    Corrective Action
                                             </button>
                                         @endif
                                     </div>
@@ -577,7 +577,7 @@
                                         <div>
                                             <!-- Gambar dan Detail -->
                                             <div class="flex flex-col lg:flex-row gap-6 w-full">
-                                                <div class="lg:w-1/3 w-full" x-data="{
+                                                <div class="w-1/3" x-data="{
                                                     images: @js($bukti_temuan),
                                                     current: 0,
                                                     interval: null,
@@ -683,7 +683,7 @@
                                         </div>
                                     </div>
                                 
-                                    <!-- PIC Improvement Section -->
+                                    <!-- Corrective Action Section -->
                                     @if(!in_array($laporan->status_lct, ['open', 'in_progress', 'progress_work']))
                                         <div x-show="activeTab === 'pic'" class="space-y-8">
                                             @php
@@ -718,7 +718,7 @@
                                                                 {{-- Konten sama seperti sebelumnya --}}
                                                                 <div class="flex flex-col lg:flex-row gap-6">
                                                                     <!-- Image Slider -->
-                                                                    <div class="lg:w-1/3 w-full" x-data="{
+                                                                    <div class="w-1/3" x-data="{
                                                                         images: tp.bukti,
                                                                         currentImg: 0,
                                                                         interval: null,
