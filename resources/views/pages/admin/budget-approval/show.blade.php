@@ -68,7 +68,7 @@
                                 <div class="grid grid-cols-4 gap-2">
                                     @foreach ($bukti_temuan as $image)
                                         <a href="{{ $image }}" target="_blank" class="block">
-                                            <img src="{{ $image }}" alt="Finding" 
+                                            <img src="{{ $image }}" alt="Finding" loading="lazy"
                                                 class="w-full h-16 object-cover rounded-lg border hover:shadow-md transition-shadow" />
                                         </a>
                                     @endforeach
@@ -83,7 +83,7 @@
                                         @if (!empty($item->bukti) && is_array($item->bukti))
                                             @foreach ($item->bukti as $image)
                                                 <a href="{{ Storage::url($image) }}" target="_blank" class="block">
-                                                    <img src="{{ Storage::url($image) }}" alt="Corrective" 
+                                                    <img src="{{ Storage::url($image) }}" alt="Corrective" loading="lazy"
                                                         class="w-full h-16 object-cover rounded-lg border hover:shadow-md transition-shadow" />
                                                 </a>
                                             @endforeach

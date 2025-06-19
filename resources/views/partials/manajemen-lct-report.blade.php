@@ -232,7 +232,7 @@
             @foreach ($bukti_temuan->take(5) as $gambar)
                 <img src="{{ $gambar }}" 
                     class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                    alt="Bukti Temuan"
+                    alt="Bukti Temuan" loading="lazy"
                     onclick="openModal('{{ $gambar }}')">
             @endforeach
         </div>
@@ -258,7 +258,7 @@
                     <p class="text-sm font-medium text-gray-700 mb-1 mt-3">Images:</p>
                     <div class="flex overflow-x-auto gap-2">
                         @foreach ($tindakan_perbaikan[0]['bukti'] as $img)
-                            <img src="{{ $img }}" class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition" onclick="openModal('{{ $img }}')" alt="Proof">
+                            <img src="{{ $img }}" class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition" loading="lazy" onclick="openModal('{{ $img }}')" alt="Proof">
                         @endforeach
                     </div>
                 @endif
@@ -330,6 +330,7 @@
                                             <div class="flex flex-wrap gap-3">
                                                 @foreach ($tindakan['bukti'] as $img)
                                                     <img src="{{ $img }}" 
+                                                        loading="lazy"
                                                         onclick="openModal('{{ $img }}')" 
                                                         class="w-24 h-24 object-cover rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-150" 
                                                         alt="Proof Image">

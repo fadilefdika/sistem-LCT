@@ -376,7 +376,7 @@
 
                                                                         <div class="relative aspect-video rounded-md overflow-hidden border border-gray-200 mb-2">
                                                                             <template x-for="(img, idx) in images" :key="idx">
-                                                                                <img :src="img" alt="Evidence"
+                                                                                <img :src="img" alt="Evidence" loading="lazy"
                                                                                     class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
                                                                                     :class="{ 'opacity-100': idx === currentImg, 'opacity-0': idx !== currentImg }">
                                                                             </template>

@@ -289,12 +289,13 @@
                                                             prev() {
                                                                 this.current = (this.current - 1 + this.images.length) % this.images.length
                                                             }
-                                                        }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
+                                                            }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
                                                             <div class="relative aspect-video bg-gray-100 rounded-md overflow-hidden border border-gray-200">
                                                                 <template x-for="(img, index) in images" :key="index">
                                                                     <img
                                                                         :src="img"
                                                                         alt="Evidence"
+                                                                        loading="lazy"
                                                                         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
                                                                         :class="{ 'opacity-100': index === current, 'opacity-0': index !== current }"
                                                                     >
@@ -452,12 +453,12 @@
                                                                                 prev() {
                                                                                     this.currentImg = (this.currentImg - 1 + this.images.length) % this.images.length;
                                                                                 }
-                                                                            }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
-                                                                            <p class="text-center text-[10px] text-gray-500 mb-2" x-text="index === 0 ? '' : `Revision #${index}`"></p>
+                                                                                }" x-init="startSlider" @mouseenter="stopSlider" @mouseleave="startSlider">
+                                                                                <p class="text-center text-[10px] text-gray-500 mb-2" x-text="index === 0 ? '' : `Revision #${index}`"></p>
     
                                                                                 <div class="relative aspect-video rounded-md overflow-hidden border border-gray-200 mb-2">
                                                                                     <template x-for="(img, idx) in images" :key="idx">
-                                                                                        <img :src="img" alt="Evidence"
+                                                                                        <img :src="img" alt="Evidence" loading="lazy" 
                                                                                             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
                                                                                             :class="{ 'opacity-100': idx === currentImg, 'opacity-0': idx !== currentImg }">
                                                                                     </template>

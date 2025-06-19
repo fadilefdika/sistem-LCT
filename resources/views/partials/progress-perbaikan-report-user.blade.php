@@ -110,6 +110,7 @@
                         <div class="flex flex-wrap md:justify-start justify-center gap-3">
                             @foreach ($bukti_temuan->take(5) as $gambar)
                                 <img src="{{ $gambar }}" 
+                                    loading="lazy"
                                     alt="Finding Image"
                                     onclick="openModal('{{ $gambar }}')"
                                     class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform duration-200 border border-gray-200 shadow-sm" />
@@ -213,7 +214,7 @@
                             <div class="text-xs text-gray-700 font-medium mb-1">Images:</div>
                             <div class="flex flex-wrap md:justify-start justify-center gap-3">
                                 @foreach ($tindakan_perbaikan[0]['bukti'] as $img)
-                                    <img src="{{ $img }}" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform duration-200 border border-gray-200 shadow-sm" onclick="openModal('{{ $img }}')" alt="Proof">
+                                    <img src="{{ $img }}" loading="lazy" class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform duration-200 border border-gray-200 shadow-sm" onclick="openModal('{{ $img }}')" alt="Proof">
                                 @endforeach
                             </div>
                         </div>
@@ -303,6 +304,7 @@
                                                         <div class="flex flex-wrap gap-3">
                                                             @foreach ($tindakan['bukti'] as $img)
                                                                 <img src="{{ $img }}"
+                                                                    loading="lazy"
                                                                     onclick="openModal('{{ $img }}')"
                                                                     class="w-24 h-24 object-cover rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-150"
                                                                     alt="Proof Image">

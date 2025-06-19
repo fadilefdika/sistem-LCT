@@ -99,7 +99,7 @@
 
                 <img src="{{ $gambar }}" 
                     class="w-24 h-24 object-cover rounded-lg cursor-pointer hover:scale-110 transition-transform"
-                    alt="Bukti Temuan"
+                    alt="Bukti Temuan" loading="lazy"
                     onclick="openModal('{{ $gambar }}')">
             @endforeach
 
