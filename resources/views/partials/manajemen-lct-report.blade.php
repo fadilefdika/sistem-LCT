@@ -266,88 +266,92 @@
         @endif
 
         {{-- Tampilkan tindakan_perbaikan berikutnya jika ada revisi --}}
-        @if ($hasRevisions)
-            <div x-data="{ openIndex: null }" class="bg-white p-6 rounded-xl border border-red-200 mt-6 shadow-lg space-y-4">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-exclamation-circle text-red-500 text-xl"></i>
-                    <p class="text-red-600 font-semibold text-sm">Revised Report</p>
-                </div>
+        @if (($laporan->status_lct === 'revision' && $lowOrTemporaryRejects->isNotEmpty())||($laporan->tindakan_perbaikan && $lowOrTemporaryRejects->isNotEmpty()))
+            @if ($hasRevisions)
+            {{-- @php 
+                dd($lowOrTemporaryRejects->pluck('tipe_reject'));
+            @endphp     --}}
+                <div x-data="{ openIndex: null }" class="bg-white p-6 rounded-xl border border-red-200 mt-6 shadow-lg space-y-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-exclamation-circle text-red-500 text-xl"></i>
+                        <p class="text-red-600 font-semibold text-sm">Revised Report</p>
+                    </div>
 
-                <table class="w-full text-sm text-left table-fixed border border-gray-200 rounded-lg overflow-hidden">
-                    <thead class="bg-gray-100 text-gray-700 uppercase text-[11px] tracking-wider">
-                        <tr>
-                            <th class="py-3 px-3 w-40">Date</th>
-                            <th class="py-3 px-3">Revision Reason</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $combined = $revisions->values()->map(function ($rev, $index) use ($tindakan_perbaikan) {
-                                return [
-                                    'rev' => $rev,
-                                    'tindakan' => $tindakan_perbaikan[$index + 1] ?? null
-                                ];
-                            })->reverse()->values();
-                        @endphp
-
-                        @foreach ($combined as $i => $item)
+                    <table class="w-full text-sm text-left table-fixed border border-gray-200 rounded-lg overflow-hidden">
+                        <thead class="bg-gray-100 text-gray-700 uppercase text-[11px] tracking-wider">
+                            <tr>
+                                <th class="py-3 px-3 w-40">Date</th>
+                                <th class="py-3 px-3">Revision Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             @php
-                                $rev = $item['rev'];
-                                $tindakan = $item['tindakan'];
+                                $combined = $lowOrTemporaryRejects->values()->map(function ($rev, $index) use ($tindakan_perbaikan) {
+                                    return [
+                                        'rev' => $rev,
+                                        'tindakan' => $tindakan_perbaikan[$index + 1] ?? null
+                                    ];
+                                })->reverse()->values();
                             @endphp
 
-                            <tr 
-                                @click="openIndex === {{ $i }} ? openIndex = null : openIndex = {{ $i }}" 
-                                class="cursor-pointer border-b hover:bg-gray-50 transition"
-                            >
-                                <td class="py-2 px-3 text-gray-500 text-xs whitespace-nowrap align-top">
-                                    {{ $rev->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
-                                </td>
-                                <td class="py-2 px-3 align-top">
-                                    <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-2 w-full">
-                                        <span class="{{ $tindakan ? 'text-gray-800' : 'text-red-500' }} text-xs leading-snug break-words w-full">
-                                            {{ $rev->alasan_reject }}
-                                        </span>  
-                                        <svg :class="{ 'rotate-180': openIndex === {{ $i }} }"
-                                            class="w-4 h-4 text-gray-400 transition-transform mt-1 sm:mt-0 self-end sm:self-center"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
-                                </td>                                                
-                            </tr>
+                            @foreach ($combined as $i => $item)
+                                @php
+                                    $rev = $item['rev'];
+                                    $tindakan = $item['tindakan'];
+                                @endphp
 
-                            <tr x-show="openIndex === {{ $i }}" x-transition>
-                                <td colspan="2" class="bg-gray-50 px-6 py-4">
-                                    @if ($tindakan)
-                                        <p class="text-gray-700 text-xs font-semibold mb-1">Corrective Action</p>
-                                        <p class="text-gray-800 text-[11px] mb-3 leading-snug break-words text-justify">
-                                            {{ $tindakan['tindakan'] }}
-                                        </p>
+                                <tr 
+                                    @click="openIndex === {{ $i }} ? openIndex = null : openIndex = {{ $i }}" 
+                                    class="cursor-pointer border-b hover:bg-gray-50 transition"
+                                >
+                                    <td class="py-2 px-3 text-gray-500 text-xs whitespace-nowrap align-top">
+                                        {{ $rev->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
+                                    </td>
+                                    <td class="py-2 px-3 align-top">
+                                        <div class="flex flex-col sm:flex-row sm:justify-between items-start gap-2 w-full">
+                                            <span class="{{ $tindakan ? 'text-gray-800' : 'text-red-500' }} text-xs leading-snug break-words w-full">
+                                                {{ $rev->alasan_reject }}
+                                            </span>  
+                                            <svg :class="{ 'rotate-180': openIndex === {{ $i }} }"
+                                                class="w-4 h-4 text-gray-400 transition-transform mt-1 sm:mt-0 self-end sm:self-center"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </td>                                                
+                                </tr>
 
-                                        @if (!empty($tindakan['bukti']))
-                                            <p class="text-gray-700 text-xs font-semibold mb-2">Images</p>
-                                            <div class="flex flex-wrap gap-3">
-                                                @foreach ($tindakan['bukti'] as $img)
-                                                    <img src="{{ $img }}" 
-                                                        loading="lazy"
-                                                        onclick="openModal('{{ $img }}')" 
-                                                        class="w-24 h-24 object-cover rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-150" 
-                                                        alt="Proof Image">
-                                                @endforeach
-                                            </div>
+                                <tr x-show="openIndex === {{ $i }}" x-transition>
+                                    <td colspan="2" class="bg-gray-50 px-6 py-4">
+                                        @if ($tindakan)
+                                            <p class="text-gray-700 text-xs font-semibold mb-1">Corrective Action</p>
+                                            <p class="text-gray-800 text-[11px] mb-3 leading-snug break-words text-justify">
+                                                {{ $tindakan['tindakan'] }}
+                                            </p>
+
+                                            @if (!empty($tindakan['bukti']))
+                                                <p class="text-gray-700 text-xs font-semibold mb-2">Images</p>
+                                                <div class="flex flex-wrap gap-3">
+                                                    @foreach ($tindakan['bukti'] as $img)
+                                                        <img src="{{ $img }}" 
+                                                            loading="lazy"
+                                                            onclick="openModal('{{ $img }}')" 
+                                                            class="w-24 h-24 object-cover rounded-lg shadow-sm cursor-pointer hover:scale-105 transition-transform duration-150" 
+                                                            alt="Proof Image">
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        @else
+                                            <p class="text-red-500 text-xs font-medium">No corrective action submitted for this revision.</p>
                                         @endif
-                                    @else
-                                        <p class="text-red-500 text-xs font-medium">No corrective action submitted for this revision.</p>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         @endif
-
     @endif
 
 

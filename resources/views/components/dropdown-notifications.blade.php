@@ -31,48 +31,63 @@
     >
         <div class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase pt-1.5 pb-2 px-4">Notifications <span>({{ $notifikasiLCT->count() }})</span></div>
         @php
-            $statusMapping = [
-                'open' => ['label' => 'Open (new)', 'color' => 'bg-gray-500', 'tracking' => 'Report has been created'],
-                'review' => ['label' => 'Under Review', 'color' => 'bg-purple-500', 'tracking' => 'Report is under review'],
-                'in_progress' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'Not yet viewed by PIC'],
-                'progress_work' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'PIC has viewed the report'],
-                'work_permanent' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'Permanent LCT in progress'],
-                'waiting_approval' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Awaiting EHS approval'],
-                'waiting_approval_temporary' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting for temporary LCT approval from EHS'],
-                'waiting_approval_permanent' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Awaiting EHS approval'],
-                'waiting_approval_taskbudget' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting approval manager'],
-                'approved' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Approved by EHS'],
-                'approved_temporary' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Temporary approved by EHS'],
-                'approved_permanent' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Permanent approved by EHS'],
-                'approved_taskbudget' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Manager approved task & budget'],
-                'revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'PIC must revise LCT Low'],
-                'temporary_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'Temporary LCT needs revision by PIC'],
-                'permanent_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'Permanent LCT needs revision by PIC'],
-                'taskbudget_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'PIC must revise task & budget'],
-                'closed' => ['label' => 'Closed', 'color' => 'bg-green-700', 'tracking' => 'EHS closed the report'],
-            ];
+                // Ambil user & role secara konsisten
+                if (Auth::guard('ehs')->check()) {
+                    $user = Auth::guard('ehs')->user();
+                    $roleName = 'ehs';
+                } else {
+                    $user = Auth::guard('web')->user();
+                    $roleName = optional($user->roleLct->first())->name ?? 'guest';
+                }
 
-            $notifikasiGroupedByLabel = $notifikasiLCT->map(function ($item) use ($statusMapping) {
-                $pendingTemporaryStatuses = [
-                    'waiting_approval_taskbudget',
-                    'taskbudget_revision',
-                    'approved_taskbudget',
+                // Mapping status
+                $statusMapping = [
+                    'open' => ['label' => 'Open (new)', 'color' => 'bg-gray-500', 'tracking' => 'Report has been created'],
+                    'review' => ['label' => 'Under Review', 'color' => 'bg-purple-500', 'tracking' => 'Report is under review'],
+                    'in_progress' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'Not yet viewed by PIC'],
+                    'progress_work' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'PIC has viewed the report'],
+                    'work_permanent' => ['label' => 'In Progress', 'color' => 'bg-yellow-500', 'tracking' => 'Permanent LCT in progress'],
+                    'waiting_approval' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Awaiting EHS approval'],
+                    'waiting_approval_temporary' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting for temporary LCT approval from EHS'],
+                    'waiting_approval_permanent' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Awaiting EHS approval'],
+                    'waiting_approval_taskbudget' => ['label' => 'Waiting Approval', 'color' => 'bg-blue-500', 'tracking' => 'Waiting approval manager'],
+                    'approved' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Approved by EHS'],
+                    'approved_temporary' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Temporary approved by EHS'],
+                    'approved_permanent' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Permanent approved by EHS'],
+                    'approved_taskbudget' => ['label' => 'Approved', 'color' => 'bg-green-500', 'tracking' => 'Manager approved task & budget'],
+                    'revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'PIC must revise LCT Low'],
+                    'temporary_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'Temporary LCT needs revision by PIC'],
+                    'permanent_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'Permanent LCT needs revision by PIC'],
+                    'taskbudget_revision' => ['label' => 'Revision', 'color' => 'bg-red-500', 'tracking' => 'PIC must revise task & budget'],
+                    'closed' => ['label' => 'Closed', 'color' => 'bg-green-700', 'tracking' => 'EHS closed the report'],
                 ];
 
-                if (in_array($item->status_lct, $pendingTemporaryStatuses) && $item->approved_temporary_by_ehs == 'pending') {
-                    $item->status_lct = 'waiting_approval_temporary';
-                }
+                // Kelompokkan notifikasi dengan normalisasi status
+                $notifikasiGroupedByLabel = $notifikasiLCT->map(function ($item) use ($statusMapping, $roleName) {
+                    $pendingTemporaryStatuses = [
+                        'waiting_approval_taskbudget',
+                        'taskbudget_revision',
+                        'approved_taskbudget',
+                    ];
 
-                if ($item->status_lct === 'waiting_approval_temporary' && $item->approved_temporary_by_ehs == 'approved') {
-                    $item->status_lct = 'approved_temporary';
-                }
+                    // Hanya untuk EHS: ubah status jika perlu
+                    if ($roleName === 'ehs') {
+                        if (in_array($item->status_lct, $pendingTemporaryStatuses) && $item->approved_temporary_by_ehs === 'pending') {
+                            $item->status_lct = 'waiting_approval_temporary';
+                        }
 
-                $label = $statusMapping[$item->status_lct]['label'] ?? ucfirst($item->status_lct);
-                $item->label_group = $label;
+                        if ($item->status_lct === 'waiting_approval_temporary' && $item->approved_temporary_by_ehs === 'approved') {
+                            $item->status_lct = 'approved_temporary';
+                        }
+                    }
 
-                return $item;
-            })->groupBy('label_group');
-        @endphp
+                    // Ambil label sesuai mapping atau fallback
+                    $item->label_group = $statusMapping[$item->status_lct]['label'] ?? ucfirst(str_replace('_', ' ', $item->status_lct));
+
+                    return $item;
+                })->groupBy('label_group');
+            @endphp
+
         <div class="space-y-3 max-h-[calc(100vh-10rem)] sm:max-h-96 overflow-y-auto">
             @foreach ($notifikasiGroupedByLabel as $label => $notifications)
                 @php

@@ -1,24 +1,44 @@
 <x-app-layout>
+        @php
+            $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+            $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+                  
+            if ($roleName === 'ehs') {
+                $routeName = 'ehs.reporting.index';
+            } elseif ($roleName === 'pic') {
+                $routeName = 'admin.manajemen-lct.index';
+            } else {
+                $routeName = 'admin.reporting.index';
+            }
+        @endphp
 
     <div x-data="{ activeTab: 'laporan' }" class="px-0 md:px-5 pt-2 pb-8">
         <!-- Tabs -->
-        <div class="flex space-x-4 border-b">
-            <button @click="activeTab = 'laporan'" 
-                    :class="activeTab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                    class="px-4 py-2 focus:outline-none cursor-pointer">
-                LCT Report
-            </button>
-
-            @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, [
-                'waiting_approval_temporary','temporary_revision','approved_temporary',
-                'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget',
-                'work_permanent','waiting_approval_permanent','permanent_revision','approved_permanent']))
-                <button @click="activeTab = 'task-and-timeline'" 
-                        :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
-                        class="px-4 py-2 focus:outline-none cursor-pointer">
-                    Task & Timeline
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-4 border-b">
+                <button @click="activeTab = 'laporan'" 
+                        :class="activeTab === 'laporan' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                        class="px-4 py-2 text-[10px] sm:text-sm focus:outline-none cursor-pointer">
+                    LCT Report
                 </button>
-            @endif
+
+                @if(in_array($laporan->tingkat_bahaya, ['Medium', 'High']) && in_array($laporan->status_lct, [
+                    'waiting_approval_temporary','temporary_revision','approved_temporary',
+                    'waiting_approval_taskbudget','taskbudget_revision','approved_taskbudget',
+                    'work_permanent','waiting_approval_permanent','permanent_revision','approved_permanent','closed']))
+                    <button @click="activeTab = 'task-and-timeline'" 
+                            :class="activeTab === 'task-and-timeline' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-gray-500'"
+                            class="px-4 py-2 text-[10px] sm:text-sm focus:outline-none cursor-pointer">
+                        Task & Timeline
+                    </button>
+                @endif
+            </div>
+
+            <a href="{{ route($routeName) }}"
+                class="inline-flex items-center px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-blue-500 border border-blue-500 rounded-md font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                 Back
+             </a>
+             
         </div>
 
         <!-- Tab Content -->

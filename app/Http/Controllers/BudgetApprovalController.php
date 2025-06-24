@@ -17,10 +17,76 @@ use Illuminate\Support\Facades\Mail;
 
 class BudgetApprovalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.admin.budget-approval.index');
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $role = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+    
+        $sortField = $request->get('sortField', 'created_at');
+        $sortDirection = $request->get('sortDirection', 'desc');
+        $perPage = $request->get('perPage', 10);
+    
+        $query = LaporanLct::select([
+            'id', 
+            'id_laporan_lct',
+            'user_id',
+            'pic_id',
+            'status_lct',
+            'tingkat_bahaya',
+            'estimated_budget',
+            'departemen_id',
+            'created_at'
+        ])
+        ->with([
+            'picUser',
+            'tasks:id,id_laporan_lct,created_at',
+        ])
+        ->whereIn('status_lct', [
+            'waiting_approval_taskbudget',
+            'taskbudget_revision',
+            'work_permanent',
+            'approved_taskbudget',
+            'waiting_approval_permanent',
+            'permanent_revision',
+            'approved_permanent'
+        ]);
+    
+    
+        if ($role === 'manajer') {
+            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+            $query->where('departemen_id', $departemenId ?? 0); // 0 biar kosong
+        }
+        
+        $taskBudget = $query
+            ->orderByRaw("
+                CASE 
+                    WHEN status_lct = 'waiting_approval_taskbudget' THEN 1
+                    WHEN status_lct = 'taskbudget_revision' THEN 2
+                    WHEN status_lct = 'work_permanent' THEN 3
+                    WHEN status_lct = 'approved_taskbudget' THEN 4
+                    WHEN status_lct = 'waiting_approval_permanent' THEN 5
+                    WHEN status_lct = 'permanent_revision' THEN 6
+                    WHEN status_lct = 'approved_permanent' THEN 7
+                    ELSE 99
+                END
+            ")
+            ->orderBy($sortField, $sortDirection)
+            ->paginate($perPage);
+    
+    
+            if ($request->ajax()) {
+                return view('partials.tabel-budget-approval-wrapper', compact('taskBudget'));
+            }
+            
+    
+        return view('pages.admin.budget-approval.index', compact('taskBudget'));
     }
+    
 
     public function show($id_laporan_lct)
     {
@@ -70,10 +136,48 @@ class BudgetApprovalController extends Controller
             ]);
         }
 
-        $revise = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)->where('status_lct', 'taskbudget_revision')->where('tipe_reject', 'budget_approval')->get();    
+        $combined = $this->combineBudgetApprovalAndResponse($id_laporan_lct);
     
-        return view('pages.admin.budget-approval.show', compact('taskBudget', 'bukti_temuan', 'bukti_perbaikan','revise'));
+        $lowOrTemporaryRejects = $taskBudget->rejectLaporan->filter(function($item) {
+            return in_array($item->tipe_reject, ['lct_perbaikan_low', 'lct_perbaikan_temporary']);
+        });
+        
+        $budgetApprovalRejects = $taskBudget->rejectLaporan->filter(function($item) {
+            return $item->tipe_reject === 'budget_approval';
+        }); 
+
+        return view('pages.admin.budget-approval.show', [
+            'taskBudget' => $taskBudget,
+            'bukti_temuan' => $bukti_temuan,
+            'bukti_perbaikan' => $bukti_perbaikan,
+            'combined' => $combined,
+            'lowOrTemporaryRejects' => $lowOrTemporaryRejects,
+            'budgetApprovalRejects' => $budgetApprovalRejects,
+        ]);
     }
+
+    private function combineBudgetApprovalAndResponse($id_laporan_lct)
+    {
+        $budget_approvals = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
+            ->where('tipe_reject', 'budget_approval')
+            ->orderBy('created_at')
+            ->get();
+
+        $pic_responses = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
+            ->where('tipe_reject', 'pic_response')
+            ->orderBy('created_at')
+            ->get();
+
+        return $budget_approvals->map(function ($approval) use ($pic_responses) {
+            $response = $pic_responses
+                ->firstWhere(fn($resp) => $resp->created_at->greaterThan($approval->created_at));
+            return [
+                'rev' => $approval,
+                'pic_message' => $response?->alasan_reject
+            ];
+        })->reverse()->values();
+    }
+
 
 
 
@@ -134,8 +238,7 @@ class BudgetApprovalController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.budget-approval-history.index')
-                            ->with('success', 'Budget request has been approved.');
+            return redirect()->back()->with('success', 'Budget request has been approved.');
                             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -173,7 +276,7 @@ class BudgetApprovalController extends Controller
                 'user_id'        => $user->id,
                 'role'           => $roleName,
                 'alasan_reject'  => $request->alasan_reject,
-                'tipe_reject'    => $request->tipe_reject ?? 'budget_approval',
+                'tipe_reject'    => 'budget_approval',
                 'status_lct'     => 'taskbudget_revision', // status saat ini untuk histori
             ]);
 
@@ -182,13 +285,15 @@ class BudgetApprovalController extends Controller
                 'status_lct' => 'taskbudget_revision',
             ]);
 
+            // dd($laporan);
+
             DB::commit();
 
-            // Ambil alasan reject terbaru
-            $alasanReject = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
-                ->where('tipe_reject', 'budget_approval')
-                ->latest()
-                ->first();
+            // // Ambil alasan reject terbaru
+            // $alasanReject = RejectLaporan::where('id_laporan_lct', $id_laporan_lct)
+            //     ->where('tipe_reject', 'budget_approval')
+            //     ->latest()
+            //     ->first();
 
             // Kirim email ke PIC
             // try {

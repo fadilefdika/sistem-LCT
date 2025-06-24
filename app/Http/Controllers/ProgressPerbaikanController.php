@@ -172,8 +172,15 @@ class ProgressPerbaikanController extends Controller
             $laporan->save();
         }
         
+        $lowOrTemporaryRejects = $laporan->rejectLaporan->filter(function($item) {
+            return in_array($item->tipe_reject, ['lct_perbaikan_low', 'lct_perbaikan_temporary']);
+        });
         
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted'));
+        $budgetApprovalRejects = $laporan->rejectLaporan->filter(function($item) {
+            return $item->tipe_reject === 'budget_approval';
+        });        
+
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects'));
     }
 
 

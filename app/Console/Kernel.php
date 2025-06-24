@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('laporan:reminder')->dailyAt('08:00');
+        $schedule->command('laporan:reminder')->everyMinute();
+        $schedule->command('laporan:mark-overdue')->everyMinute();
     }
 
     /**

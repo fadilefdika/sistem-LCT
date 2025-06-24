@@ -1,4 +1,4 @@
-<div class="w-full mx-auto bg-[#F3F4F6] h-full pb-36 pt-3 overflow-y-auto max-w-full px-3 max-h-[calc(100vh)] [&::-webkit-scrollbar]:w-1
+<div class="w-full mx-auto bg-[#F3F4F6] h-full pb-36 pt-2 overflow-y-auto max-w-full px-3 max-h-[calc(100vh)] [&::-webkit-scrollbar]:w-1
             [&::-webkit-scrollbar-track]:rounded-full
             [&::-webkit-scrollbar-track]:bg-gray-100
             [&::-webkit-scrollbar-thumb]:rounded-full

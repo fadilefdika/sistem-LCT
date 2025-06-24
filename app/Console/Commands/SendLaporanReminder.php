@@ -20,69 +20,65 @@ class SendLaporanReminder extends Command
     {
         parent::__construct();
     }
+
     public function handle()
     {
-        $today = Carbon::today();
-    
-        // Mendefinisikan tanggal pengingat
-        $reminderDates = [
-            'reminder_2' => $today->copy()->addDays(2), // 2 hari sebelum due date
-            'reminder_1' => $today->copy()->addDay(),   // 1 hari sebelum due date
-            'due_today' => $today->copy(),               // Due date hari ini
-        ];
-    
-        foreach ($reminderDates as $label => $targetDate) {
-            $laporans = LaporanLct::whereDate('due_date', $targetDate)
+        Log::info('[laporan:reminder] Command started at ' . now());
+
+        try {
+            $today = Carbon::today();
+
+            $reminderDates = [
+                'reminder_2' => $today->copy()->addDays(2),
+                'reminder_1' => $today->copy()->addDay(),
+                'due_today' => $today->copy(),
+            ];
+
+            foreach ($reminderDates as $label => $targetDate) {
+                $laporans = LaporanLct::whereDate('due_date', $targetDate)
+                    ->whereIn('status_lct', ['in_progress', 'review', 'progress_work'])
+                    ->whereNull('date_completion')
+                    ->with('picUser', 'departemenPic.departemen')
+                    ->get();
+
+                Log::info("[laporan:reminder] Found {$laporans->count()} reports for {$label} on {$targetDate}.");
+
+                foreach ($laporans as $laporan) {
+                    Mail::to('efdika1102@gmail.com')->send(new ReminderLaporan($laporan, $label));
+                    Log::info("[laporan:reminder] Reminder email queued for Laporan ID {$laporan->id} ({$label}).");
+                }
+            }
+
+            $overdueLaporans = LaporanLct::whereDate('due_date', '<', $today)
                 ->whereIn('status_lct', ['in_progress', 'review', 'progress_work'])
                 ->whereNull('date_completion')
                 ->with('picUser', 'departemenPic.departemen')
                 ->get();
-    
-            Log::info("Found {$laporans->count()} reports for {$label}.");
-    
-            foreach ($laporans as $laporan) {
-                // Kirim email ke PIC jika laporan sesuai dengan label pengingat
-                if ($label == 'reminder_2' || $label == 'reminder_1' || $label == 'due_today') {
-                    // Mail::to($laporan->picUser->email)
-                    //     ->send(new ReminderLaporan($laporan, $label));
-                    Mail::to('efdika1102@gmail.com')
-                    ->queue(new ReminderLaporan($laporan, $label));
+
+            Log::info("[laporan:reminder] Found {$overdueLaporans->count()} overdue reports.");
+
+            foreach ($overdueLaporans as $laporan) {
+                if ($today->diffInDays($laporan->due_date) >= 2 && $laporan->tingkat_bahaya == 'low') {
+                    $manager = optional(optional($laporan->departemenPic)->departemen)->user_id;
+
+                    if ($manager) {
+                        $managerEmail = User::find($manager)?->email ?? null;
+                        Mail::to('efdika1102@gmail.com')->send(new ReminderLaporan($laporan, 'overdue_manager'));
+                        Log::info("[laporan:reminder] Manager email queued for overdue Laporan ID {$laporan->id}.");
+                    }
                 }
+
+                Mail::to('efdika1102@gmail.com')->send(new ReminderLaporan($laporan, 'overdue'));
+                Log::info("[laporan:reminder] Overdue email queued for PIC of Laporan ID {$laporan->id_laporan_lct}.");
             }
-        }
-    
-        // Laporan yang sudah overdue (sebelum hari ini)
-        $overdueLaporans = LaporanLct::whereDate('due_date', '<', $today)
-            ->whereIn('status_lct', ['in_progress', 'review', 'progress_work'])
-            ->whereNull('date_completion')
-            ->with('picUser', 'departemenPic.departemen')
-            ->get();
-    
-        foreach ($overdueLaporans as $laporan) {
-            // Cek laporan yang sudah overdue dan terlambat lebih dari 2 hari serta tingkat bahaya 'low'
-            if ($today->diffInDays($laporan->due_date) >= 2 && $laporan->tingkat_bahaya == 'low') {
-                // Ambil data atasan PIC dari tabel lct_departement
-                $departemenPic = $laporan->departemenPic;
-                $departemen = $departemenPic ? $departemenPic->departemen : null;
-                $manager = $departemen ? $departemen->user_id : null;
-    
-                if ($manager) {
-                    // Ambil email manajer dari tabel users
-                    $managerEmail = User::find($manager)->email;
-    
-                    // Kirim email kepada manajer (atasan PIC) untuk laporan overdue
-                    Mail::to('efdika1102@gmail.com')
-                    ->queue(new ReminderLaporan($laporan, $label));
-                    // Mail::to($managerEmail)
-                    //     ->send(new ReminderLaporan($laporan, 'overdue_manager'));
-                }
-            }
-    
-            // Kirim email pengingat kepada PIC untuk laporan overdue
-            // Mail::to($laporan->picUser->email)
-            //     ->send(new ReminderLaporan($laporan, 'overdue'));
-            Mail::to('efdika1102@gmail.com')
-                    ->queue(new ReminderLaporan($laporan, $label));
+
+            Log::info('[laporan:reminder] Command finished successfully.');
+        } catch (\Throwable $e) {
+            Log::error('[laporan:reminder] ERROR: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
         }
     }
     

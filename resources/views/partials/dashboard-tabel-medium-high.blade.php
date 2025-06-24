@@ -26,7 +26,7 @@
 
                             <!-- Image -->
                             @if($bukti_temuan_urls->isNotEmpty())
-                                <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image"
+                                <img src="{{ $bukti_temuan_urls->first() }}" alt="Evidence Image" loading="lazy"
                                     class="w-12 h-12 object-cover rounded-md shadow-sm border border-gray-100">
                             @else
                                 <div class="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-400 rounded-md border">

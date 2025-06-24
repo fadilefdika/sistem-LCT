@@ -132,6 +132,7 @@
                         $isDisabled = !in_array($laporan->status_lct, ['revision','progress_work']);
                     } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
                         $isDisabled = !in_array($laporan->approved_temporary_by_ehs, ['not yet','revise']);
+                        // dd($laporan->approved_temporary_by_ehs);
                     }
                 @endphp
 

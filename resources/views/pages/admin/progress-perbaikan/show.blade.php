@@ -17,25 +17,42 @@
 @php
     // Tentukan default tab, misal 'user' atau sesuai kebutuhan
     $defaultTab = request('tab', 'user');
+    
+            $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+            $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+                  
+            if ($roleName === 'ehs') {
+                $routeName = 'ehs.reporting.index';
+            } elseif ($roleName === 'pic') {
+                $routeName = 'admin.manajemen-lct.index';
+            } else {
+                $routeName = 'admin.reporting.index';
+            }
 @endphp
 
 <x-app-layout>
     <div class="px-0 md:px-5 pt-2">
         <!-- Tabs -->
-        <div id="tabs" class="flex space-x-4 border-b">
-            <button data-tab="user" class="tab-btn px-4 py-2 cursor-pointer text-gray-500">
-                Finding Report
-            </button>
-
-            @if(in_array($laporan->status_lct, [
-                'closed', 'approved_temporary', 'approved_taskbudget', 'taskbudget_revision', 'waiting_approval_temporary', 'temporary_revision',
-                'waiting_approval_taskbudget', 'waiting_approval_permanent', 
-                'work_permanent', 'permanent_revision', 'approved_permanent'
-            ]) && $laporan->tingkat_bahaya !== 'Low')
-                <button data-tab="task-pic" class="tab-btn px-4 py-2 cursor-pointer text-gray-500">
-                    Task PIC
+        <div class="flex justify-between items-center">
+            <div id="tabs" class="flex space-x-4 border-b">
+                <button data-tab="user" class="tab-btn sm:px-4 sm:py-2 px-3 py-1.5 text-xs sm:text-base cursor-pointer text-gray-500">
+                    Finding Report
                 </button>
-            @endif
+
+                @if(in_array($laporan->status_lct, [
+                    'closed', 'approved_temporary', 'approved_taskbudget', 'taskbudget_revision', 'waiting_approval_temporary', 'temporary_revision',
+                    'waiting_approval_taskbudget', 'waiting_approval_permanent', 
+                    'work_permanent', 'permanent_revision', 'approved_permanent'
+                ]) && $laporan->tingkat_bahaya !== 'Low')
+                    <button data-tab="task-pic" class="tab-btn sm:px-4 sm:py-2 px-3 py-1.5 text-xs sm:text-base cursor-pointer text-gray-500">
+                        Task PIC
+                    </button>
+                @endif
+            </div>
+            <a href="{{ route($routeName) }}"
+                    class="inline-flex items-center px-3 py-1 sm:px-4 sm:py-1.5 text-xs sm:text-sm bg-blue-500 border border-blue-500 rounded-md font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                Back
+            </a>
         </div>
 
         <!-- Tab Content -->

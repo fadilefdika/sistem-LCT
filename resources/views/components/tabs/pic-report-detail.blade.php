@@ -3,14 +3,14 @@
     <div class="md:hidden flex border-b border-gray-200 sticky top-0 z-10 bg-white dark:bg-gray-800">
         <button 
             id="tab-report" 
-            class="flex-1 py-3 px-4 font-medium text-center border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
+            class="flex-1 sm:py-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-center border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
             onclick="switchTab('report')"
         >
-            Laporan EHS
+            Report EHS
         </button>
         <button 
             id="tab-form" 
-            class="flex-1 py-3 px-4 font-medium text-center border-b-2 border-transparent text-gray-500 dark:text-gray-400"
+            class="flex-1 sm:py-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-center border-b-2 border-transparent text-gray-500 dark:text-gray-400"
             onclick="switchTab('form')"
         >
             Form Temuan
@@ -18,7 +18,7 @@
     </div>
 
     @if($laporan->status_lct == 'waiting_approval_temporary')
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4 shadow-sm">
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-2 shadow-sm">
             <div class="flex items-start gap-2">
                 <svg class="w-5 h-5 mt-1 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -37,8 +37,8 @@
         <!-- Card Laporan dari EHS -->
         <div 
             id="report-content"
-            class="relative max-w-full bg-[#F3F4F6] p-3 overflow-y-auto flex-grow min-h-0
-                {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }}
+            class="relative max-w-full bg-[#F3F4F6] p-3 overflow-y-auto flex-grow min-h-0 pb-20
+                {{-- {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }} --}}
                 [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -55,8 +55,8 @@
         <!-- Form Laporan Temuan -->
         <div 
             id="form-content"
-            class="relative max-w-full bg-[#F3F4F6] shadow-md p-3 overflow-y-auto flex-grow min-h-0
-                {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }}
+            class="relative max-w-full bg-[#F3F4F6] shadow-md p-3 overflow-y-auto flex-grow min-h-0 pb-20
+                {{-- {{ $laporan->status_lct == 'waiting_approval_temporary' ? 'pb-36' : 'pb-20' }} --}}
                 [&::-webkit-scrollbar]:w-1
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -98,7 +98,7 @@
                         </div>
                         <a href="{{ route($routeName, $laporan->id_laporan_lct) }}">
                             <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
-                                <i class="fas fa-history mr-2"></i>View History
+                                History
                             </button>
                         </a>
                     </div>

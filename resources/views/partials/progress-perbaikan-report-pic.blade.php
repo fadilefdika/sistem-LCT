@@ -500,7 +500,7 @@
                                     </div>
                                     <a href="{{ route($routeName, $laporan->id_laporan_lct) }}">
                                         <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 cursor-pointer">
-                                            <i class="fas fa-history mr-2"></i>View History
+                                            History
                                         </button>
                                     </a>
                                 </div>
