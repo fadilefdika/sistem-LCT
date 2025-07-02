@@ -3,18 +3,26 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\AreaLct;
+use App\Models\Kategori;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
+use App\Models\LctDepartement;
+use App\Mail\CloseNotification;
+use App\Exports\LaporanLctExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\AreaLct;
-use App\Models\Kategori;
-use App\Models\LctDepartement;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\LaporanLctExport;
+use PhpOffice\PhpPresentation\IOFactory;
+use PhpOffice\PhpPresentation\Shape\Table;
+use PhpOffice\PhpPresentation\Style\Color;
+use PhpOffice\PhpPresentation\PhpPresentation;
+use PhpOffice\PhpPresentation\Style\Alignment;
+use PhpOffice\PhpPresentation\Shape\Drawing\File as DrawingFile;
 
 class ProgressPerbaikanController extends Controller
 {
@@ -40,7 +48,7 @@ class ProgressPerbaikanController extends Controller
         $statusGroups = [
             'Open' => ['open'],
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
-            'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
+            // 'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
             'Overdue' => ['overdue'],
         ];
@@ -1052,6 +1060,209 @@ class ProgressPerbaikanController extends Controller
 
 
         return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
+    }
+
+    public function exportPpt()
+    {
+        $statusMapping = [
+            'open' => ['label' => 'Open (new)'],
+            'review' => ['label' => 'Under Review'],
+            'in_progress' => ['label' => 'In Progress'],
+            'progress_work' => ['label' => 'In Progress'],
+            'work_permanent' => ['label' => 'In Progress'],
+            'waiting_approval' => ['label' => 'Waiting Approval'],
+            'waiting_approval_temporary' => ['label' => 'Waiting Approval (temporary)'],
+            'waiting_approval_permanent' => ['label' => 'Waiting Approval'],
+            'waiting_approval_taskbudget' => ['label' => 'Waiting Approval (budget)'],
+            'approved' => ['label' => 'Approved'],
+            'approved_temporary' => ['label' => 'Approved (temporary)'],
+            'approved_permanent' => ['label' => 'Approved'],
+            'approved_taskbudget' => ['label' => 'Approved (budget)'],
+            'revision' => ['label' => 'Revision'],
+            'temporary_revision' => ['label' => 'Revision (temporary)'],
+            'permanent_revision' => ['label' => 'Revision'],
+            'taskbudget_revision' => ['label' => 'Revision (budget)'],
+            'closed' => ['label' => 'Closed'],
+        ];
+        try {
+            $laporans = LaporanLct::with('picUser', 'kategori', 'area')->whereDate('created_at', now()->toDateString())->get();
+            // dd($laporans);
+            $ppt = new PhpPresentation();
+            
+            foreach ($laporans as $laporan) {
+
+                // BUAT SLIDE BARU
+                $slide = $ppt->createSlide();
+
+                // --- JUDUL ---
+                $title = $slide->createRichTextShape()
+                    ->setHeight(50)
+                    ->setWidth(400)
+                    ->setOffsetX(20)
+                    ->setOffsetY(20);
+                $title->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+                $run = $title->createTextRun('SAFETY PATROL REPORT');
+                $run->getFont()->setBold(true)->setSize(24)->setColor(new Color(Color::COLOR_BLACK));
+
+                // --- TABEL KIRI ---
+                $tableLeft = new Table(2);
+                $tableLeft->setWidth(460)->setOffsetX(20)->setOffsetY(80);
+
+                $observationDateRaw = $laporan->tanggal_temuan ?? $laporan->created_at;
+                $observationDate = Carbon::parse($observationDateRaw)->format('F d, Y');
+
+                $leftData = [
+                    "Observation No/Location" => $laporan->area->nama_area . ' ('.$laporan->detail_area .')' ?? '-',
+                    "Observation date" => $observationDate,
+                    "Responsibility (PIC)" => $laporan->picUser->fullname ?? '-',
+                    "Risk Hazard" => $laporan->tingkat_bahaya ?? '-',
+                    "Finding Item" => $laporan->temuan_ketidaksesuaian ?? '-',
+                ];
+
+                foreach ($leftData as $header => $value) {
+                    $row = $tableLeft->createRow();
+                    $row->setHeight(30);
+
+                    $cell1 = $row->getCell(0);
+                    $cell1->createTextRun('  ' . $header);
+
+                    $cell2 = $row->getCell(1);
+                    $cell2->createTextRun('  ' . $value);
+                }
+
+                $slide->addShape($tableLeft);
+
+                // --- TABEL KANAN ---
+                $tableRight = new Table(2);
+                $tableRight->setWidth(460)->setOffsetX(490)->setOffsetY(30);
+
+                // Tentukan label dan value untuk Due Date
+                $dueDateLabel = 'Due Date';
+                $dueDateLabelCompletion = 'Date of Completion';
+                if (in_array($laporan->tingkat_bahaya, ['High', 'Medium'])) {
+                    $dueDateLabel = 'Due Date (Temporary)';
+                    $dueDateLabelCompletion = 'Date of Completion (Temporary)';
+                }
+                $dueDateValue = $laporan->due_date ? Carbon::parse($laporan->due_date)->format('d F Y') : '-';
+
+
+                // Tentukan Date of Completion Permanent
+                $dateCompletionPermanent = '-';
+                if (in_array($laporan->tingkat_bahaya, ['High', 'Medium'])) {
+                    $dateCompletionPermanent = $laporan->date_completion_perm ? Carbon::parse($laporan->date_completion_perm)->format('d F Y') : '-';
+                }
+
+                $dateCompletionPermanent = $laporan->date_completion ? Carbon::parse($laporan->date_completion)->format('d F Y') : '-';
+                // Susun array rightData
+                $rightData = [
+                    "Category" => $laporan->kategori->nama_kategori ?? '-',
+                    $dueDateLabel => $dueDateValue,
+                    $dueDateLabelCompletion => $dateCompletionPermanent ?? '-',
+                    "Status" => $statusMapping[$laporan->status_lct]['label'] ?? '-',
+                    "Recommendation" => $laporan->rekomendasi ?? '-',
+                    "Action Permanent (if medium & high risk)" => $laporan->action_permanent ?? '-',
+                    "Date of Completion Permanent" => $dateCompletionPermanent,
+                ];
+                
+                foreach ($rightData as $header => $value) {
+                    $row = $tableRight->createRow();
+                    $row->setHeight(30);
+
+                    $cell1 = $row->getCell(0);
+                    $cell1->createTextRun('  ' . $header);
+
+                    $cell2 = $row->getCell(1);
+                    $cell2->createTextRun('  ' . $value);
+                }
+
+                $slide->addShape($tableRight);
+
+                // --- TABEL BAWAH (BEFORE / AFTER) ---
+                $tableBottom = new Table(2);
+                $tableBottom->setWidth(920)->setOffsetX(20)->setOffsetY(325);
+
+                $headerRow = $tableBottom->createRow();
+                $headerRow->setHeight(40);
+
+                $beforeCell = $headerRow->getCell(0);
+                $beforeCell->createTextRun(' BEFORE');
+
+                $afterCell = $headerRow->getCell(1);
+                $afterCell->createTextRun(' AFTER');
+
+                $imageRow = $tableBottom->createRow();
+                $imageRow->setHeight(320);
+
+                // Pastikan path benar
+                $bukti = json_decode($laporan->bukti_temuan, true);
+                $firstBuktiTemuan = $bukti[0] ?? null;
+                $beforeCellImg = $imageRow->getCell(0);
+                if ($firstBuktiTemuan) {
+                    $beforePath = storage_path('app/public/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $firstBuktiTemuan));
+
+                    if (file_exists($beforePath)) {
+                        $img = new DrawingFile();
+                        $img->setPath($beforePath)
+                            ->setWidth(320)
+                            ->setHeight(200)
+                            ->setOffsetX(70)  
+                            ->setOffsetY(420); 
+
+                        $slide->addShape($img);  // Bukan ke cell, tapi ke slide
+                    } else {
+                        $beforeCellImg->createTextRun('Before Image Not Found');
+                    }
+                }
+
+                // Decode JSON tindakan_perbaikan
+                $tindakanPerbaikan = json_decode($laporan->tindakan_perbaikan, true);
+                // Default jika tidak ada
+                $afterPath = null;
+
+                // Cek jika array valid dan ada data
+                if (is_array($tindakanPerbaikan) && !empty($tindakanPerbaikan)) {
+                    // Ambil tindakan paling baru (terakhir)
+                    $latestTindakan = end($tindakanPerbaikan);
+                    
+                    if (isset($latestTindakan['bukti'][0])) {
+                        // Path file
+                        $afterPath = storage_path('app/public/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $latestTindakan['bukti'][0]));
+                    }
+                }
+
+                // Tambahkan ke cell
+                $afterCellImg = $imageRow->getCell(1);
+                if ($afterPath && file_exists($afterPath)) {
+                    $img = new DrawingFile();
+                    $img->setPath($afterPath)
+                            ->setWidth(320)
+                            ->setHeight(200)
+                            ->setOffsetX(530)  
+                            ->setOffsetY(420);
+                    $slide->addShape($img); // Perlu ditambahkan ke slide, karena Cell tidak mendukung addShape
+                } else {
+                    $afterCellImg->createTextRun('After Image Not Found');
+                }
+
+                $slide->addShape($tableBottom);
+            }
+
+            // EXPORT
+            $writer = IOFactory::createWriter($ppt, 'PowerPoint2007');
+            $fileName = 'laporan_safety_patrol_' . date('Ymd_His') . '.pptx';
+            $filePath = storage_path('app/public/' . $fileName);
+
+            if (!file_exists(dirname($filePath))) {
+                mkdir(dirname($filePath), 0755, true);
+            }
+
+            $writer->save($filePath);
+
+            return response()->download($filePath)->deleteFileAfterSend(true);
+        } catch (Exception $e) {
+            \Log::error('PowerPoint Export Error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to generate PowerPoint file: ' . $e->getMessage()], 500);
+        }
     }
 
     public function getRevisiData(Request $request)

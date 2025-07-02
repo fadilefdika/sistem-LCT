@@ -37,7 +37,7 @@ class ManajemenLctController extends Controller
 
         $statusGroups = [
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
-            'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
+            // 'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
             'Overdue' => ['overdue'],
         ];
@@ -450,7 +450,7 @@ class ManajemenLctController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->back()->with('success', 'Task & Budget updated successfully.');
+            return redirect()->back()->with('success', 'Action permanent updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in submitTaskBudget', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);

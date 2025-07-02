@@ -238,7 +238,7 @@ class BudgetApprovalController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', 'Budget request has been approved.');
+            return redirect()->back()->with('success', 'Permanent action has been approved.');
                             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -305,7 +305,7 @@ class BudgetApprovalController extends Controller
             // }
             
 
-            return redirect()->back()->with('success', 'Budget request needs revision.');
+            return redirect()->back()->with('success', 'Permanent action needs revision.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error rejecting budget request: ' . $e->getMessage());

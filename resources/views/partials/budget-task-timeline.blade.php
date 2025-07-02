@@ -51,7 +51,7 @@
                 
                     <!-- Permanent Action -->
                         <div x-data="{ permanentAction: '{{ $laporan->action_permanent ?? '' }}' }" class="flex flex-col w-full max-w-lg">
-                            <label for="permanent-action" class="mb-1 font-medium text-gray-700 text-sm">Permanent Action:</label>
+                            <label for="permanent-action" class="mb-1 font-medium text-gray-700 text-sm">Title Permanent Action:</label>
                             <textarea 
                                 id="permanent-action"
                                 x-model="permanentAction" 
@@ -113,7 +113,7 @@
                                 </template>
                               </tbody>
                             </table>
-                          </div>
+                        </div>
                           
 
                     <div class="mt-4 p-4 bg-gray-100 rounded-lg">
@@ -323,6 +323,7 @@
                                     Submit
                                 </button>
                             @endif
+
                         </div>
                 </div>
             </form>

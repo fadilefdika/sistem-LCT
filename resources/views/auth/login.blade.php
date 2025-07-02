@@ -43,6 +43,20 @@
         <input type="hidden" name="encrypted_password" id="encrypted_password">
     
         <div class="flex flex-col gap-2">
+            {{-- Role Dropdown --}}
+            <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3">
+                <i class="fa fa-user-tag text-black mr-3 text-lg"></i>
+                <select name="role" id="role"
+                    class="w-full bg-transparent border-0 outline-none text-base md:text-lg font-medium appearance-none"
+                    required>
+                    <option value="">-- Select Role --</option>
+                    <option value="ehs">EHS</option>
+                    <option value="manajer">Manager</option>
+                    <option value="pic">PIC</option>
+                    <option value="user">Employee</option>
+                </select>
+            </div>
+            
             {{-- NPK/Username Input --}}
             <div>
                 <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3">
@@ -66,21 +80,6 @@
                     </button>
                 </div>
             </div>
-    
-            {{-- Role Dropdown --}}
-            <div class="flex items-center bg-[#C1dBEA] text-black rounded-lg shadow-sm px-4 py-3">
-                <i class="fa fa-user-tag text-black mr-3 text-lg"></i>
-                <select name="role" id="role"
-                    class="w-full bg-transparent border-0 outline-none text-base md:text-lg font-medium appearance-none"
-                    required>
-                    <option value="">-- Select Role --</option>
-                    <option value="ehs">EHS</option>
-                    <option value="manajer">Manager</option>
-                    <option value="pic">PIC</option>
-                    <option value="user">Employee</option>
-                </select>
-            </div>
-    
             {{-- Submit --}}
             <div class="flex items-start justify-start mt-6">
                 <x-button class="text-base md:text-lg cursor-pointer px-8 py-3 md:px-10 md:py-4 bg-[#0067A9] text-white font-bold rounded-sm">

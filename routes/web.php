@@ -124,8 +124,7 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
         // Route::get('/chart/overdue', [ProgressPerbaikanController::class, 'chartOverdue']);
 
         Route::get('/reporting/export', [ProgressPerbaikanController::class, 'exportExcel'])->name('export');
-
-
+        Route::get('/reporting/export-ppt', [ProgressPerbaikanController::class, 'exportPpt'])->name('export-ppt');
 
     });
 

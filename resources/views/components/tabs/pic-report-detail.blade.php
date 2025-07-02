@@ -25,9 +25,12 @@
                         d="M13 16h-1v-4h-1m1-4h.01M12 8v.01M12 12v.01M12 16v.01M12 20h.01M8 12h.01M16 12h.01M12 4h.01M4 12h.01M20 12h.01"/>
                 </svg>
                 <div>
-                    <p class="font-semibold">Action Required</p>
-                    <p>Click the <strong>"Task & Timeline"</strong> tab to complete the permanent action task and provide the estimated budget immediately.</p>
-                </div>                                              
+                    <p class="font-semibold text-sm">Action Required</p>
+                    <p class="text-xs">
+                        Click the <strong>"Task & Timeline"</strong> tab to complete the permanent action task and provide the estimated budget immediately.
+                    </p>
+                </div>
+                                                              
             </div>
         </div>
     @endif

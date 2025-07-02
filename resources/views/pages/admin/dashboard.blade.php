@@ -61,7 +61,7 @@
                 if ($isEhs) $tableCount += 2;
                 if ($isManajer) $tableCount += 1;
                 if ($isUser) $tableCount += 1;
-                if ($isPic) $tableCount += 1;
+                if ($isPic) $tableCount += 2;
             
                 $gridColsClass = $tableCount > 1 ? 'lg:grid-cols-2' : 'lg:grid-cols-1';
             @endphp
@@ -117,23 +117,56 @@
                     @endif
 
                     @if($isPic)
-                        <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                        {{-- <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
                             <h2 class="text-base font-semibold mb-2">Unread Reports</h2>
                             <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
                                 @include('partials.dashboard-tabel', [
                                     'laporans' => $laporanInProgress
                                 ])
                             </div>
+                        </div> --}}
+
+                        @php
+                            $totalTasks = $correctiveLowCount + $revisionLowCount + $temporaryInProgressCount + $revisionTemporaryCount + $revisionBudgetCount + $permanentWorkCount;
+                        @endphp
+
+                        <div class="p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div class="mb-5">
+                                <h2 class="text-xl font-semibold text-gray-800">Tasks Overview</h2>
+                                <p class="text-sm text-gray-500 mt-1">You have <span class="font-semibold text-blue-600">{{ $totalTasks }}</span> tasks to complete</p>
+                            </div>
+
+                            <ul class="space-y-2">
+                                @php
+                                    $taskLinks = [
+                                        ['count' => $correctiveLowCount, 'label' => 'Corrective Action (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'in_progress,progress_work']],
+                                        ['count' => $revisionLowCount, 'label' => 'Revision (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'revision']],
+                                        ['count' => $temporaryInProgressCount, 'label' => 'Temporary Action (Medium/High Risk)', 'params' => ['riskLevel' => 'medium', 'statusLct' => 'in_progress,progress_work']],
+                                        ['count' => $revisionTemporaryCount, 'label' => 'Revision - Temporary', 'params' => ['statusLct' => 'temporary_revision']],
+                                        ['count' => $revisionBudgetCount, 'label' => 'Revision - Budget', 'params' => ['statusLct' => 'taskbudget_revision']],
+                                        ['count' => $permanentWorkCount, 'label' => 'Permanent Action (Working)', 'params' => ['statusLct' => 'work_permanent']],
+                                    ];
+                                @endphp
+
+                                @foreach ($taskLinks as $task)
+                                    <li>
+                                        <a href="{{ route('admin.manajemen-lct.index', $task['params']) }}" class="flex justify-between items-center px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-150">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-6 h-6 text-gray-800 text-sm flex items-center justify-center font-medium">{{ $task['count'] }}</div>
+                                                <span class="text-gray-700 text-sm">{{ $task['label'] }}</span>
+                                            </div>
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
-                    @endif
 
-                </div>
+                        
 
-
-                <!-- Tabel Reports Section (Overdue & Medium-High Risk) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4 items-start">
-                    
-                    <!-- Overdue Reports Table -->
+                        <!-- Overdue Reports Table -->
                     <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
                         <h2 class="text-base font-semibold mb-2">Overdue Reports</h2>
                         <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
@@ -142,13 +175,30 @@
                             ])
                         </div>
                     </div>
-                    
+                    @endif
+
+                </div>
+
+
+                <!-- Tabel Reports Section (Overdue & Medium-High Risk) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-4 items-start">
+
                     <!-- Medium & High Hazard Reports Table -->
                     <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
                         <h2 class="text-base font-semibold mb-2">Medium & High Hazard Reports</h2>
                         <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
                             @include('partials.dashboard-tabel-medium-high',[
                                 'laporans' => $laporanMediumHigh
+                            ])
+                        </div>
+                    </div>
+
+                    <!-- Overdue Reports Table -->
+                    <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
+                        <h2 class="text-base font-semibold mb-2">Low Hazard Reports</h2>
+                        <div class="overflow-auto max-h-[600px]"> <!-- ditingkatkan -->
+                            @include('partials.dashboard-tabel-medium-high', [
+                                'laporans' => $laporanLow
                             ])
                         </div>
                     </div>
