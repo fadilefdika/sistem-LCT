@@ -31,7 +31,7 @@
 @endphp
 
 <x-app-layout>
-    <div class="px-0 md:px-5 pt-2">
+    <div class="px-0 md:px-4 pt-2">
         <!-- Tabs -->
         <div class="flex justify-between items-center px-2">
             <div id="tabs" class="flex space-x-4 border-b">

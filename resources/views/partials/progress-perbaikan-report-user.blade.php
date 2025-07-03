@@ -338,6 +338,9 @@
             
                 // Tentukan role yang tidak diizinkan
                 $notAllowed = in_array($roleName, ['user', 'manajer', 'pic']);
+                $tingkatBahaya = $laporan->tingkat_bahaya ?? '';
+                $statusLct = $laporan->status_lct ?? '';
+                $approvedByEhs = $laporan->approved_temporary_by_ehs ?? '';
             @endphp
             
             <div class="bg-white p-6 rounded-lg shadow-lg w-full mx-auto">
@@ -361,7 +364,14 @@
 
                         @if($notAllowed)
                             <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
-                                <p class="text-gray-700 font-semibold">⚠️ You cannot take action on this report.</p>
+                                @if(
+                                    ($tingkatBahaya === 'low' && $statusLct !== 'closed') ||
+                                    (in_array($tingkatBahaya, ['medium', 'high']) && $approvedByEhs !== 'approved')
+                                )
+                                    <p class="text-gray-700 font-semibold">⚠️ Report not yet approved by EHS</p>
+                                @else
+                                    <p class="text-gray-700 font-semibold">✅ Report already approved by EHS</p>
+                                @endif
                             </div>
 
                         @elseif(in_array($laporan->tingkat_bahaya, ['Medium', 'High']))

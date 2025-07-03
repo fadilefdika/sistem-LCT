@@ -12,7 +12,7 @@
             }
         @endphp
 
-    <div x-data="{ activeTab: 'laporan' }" class="px-0 md:px-5 pt-2 pb-8">
+    <div x-data="{ activeTab: 'laporan' }" class="px-0 md:px-4 pt-2 pb-8">
         <!-- Tabs -->
         <div class="flex justify-between items-center">
             <div class="flex space-x-4 border-b">

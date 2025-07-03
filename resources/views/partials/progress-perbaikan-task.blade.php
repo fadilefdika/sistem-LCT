@@ -6,12 +6,13 @@
                 [&::-webkit-scrollbar-thumb]:bg-gray-300
                 dark:[&::-webkit-scrollbar-track]:bg-slate-700
                 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
-<div class="w-full px-4 sm:px-6 lg:px-8">
+<div class="w-full px-4 sm:px-6">
     <!-- Header Section -->
-    <div class="flex justify-between items-center mb-6 pt-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6 pt-6">
+        <!-- Judul dan Deskripsi -->
         <div>
-            <h1 class="text-2xl font-semibold text-gray-800 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Approved Tasks List
@@ -36,108 +37,100 @@
             $label = $statusMap[$status]['label'] ?? ucfirst(str_replace('_', ' ', $status));
             $color = $statusMap[$status]['color'] ?? 'bg-gray-100 text-gray-800';
         @endphp
-
-        <div class="flex items-center space-x-2">
+        <!-- Badge Status -->
+        <div class="md:mt-0">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $color }}">
                 {{ $label }}
             </span>
         </div>
-
     </div>
+
 
     <!-- Main Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        @if($laporan->tasks->isEmpty())
-            <div class="text-center py-12">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                <h3 class="mt-2 text-lg font-medium text-gray-700">No tasks created yet</h3>
-                <p class="mt-1 text-sm text-gray-500 max-w-md mx-auto">The SVP has not created any tasks for this report.</p>
-            </div>
-        @else
-            <!-- Table Header -->
-            <div class="grid grid-cols-12 gap-4 bg-gray-50 px-6 py-4 border-b border-gray-100">
-                <div class="col-span-1 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">#</div>
-                <div class="col-span-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Task Name</div>
-                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">PIC</div>
-                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Due Date</div>
-                <div class="col-span-2 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Status</div>
-                <div class="col-span-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</div>
-            </div>
-            
-            <!-- Table Rows -->
-            <div class="divide-y divide-gray-100">
-                @foreach($laporan->tasks as $index => $task)
-                    <div class="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors duration-150">
-                        <div class="col-span-1 text-xs text-gray-500 text-center">{{ $index + 1 }}</div>
-                        <div class="col-span-4">
-                            <div class="font-medium text-xs text-gray-800">{{ $task->task_name }}</div>
+    <div class="bg-white p-3 rounded-lg shadow-lg w-full mx-auto">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            @if($laporan->tasks->isEmpty())
+                <div class="text-center py-12">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <h3 class="mt-2 text-lg font-medium text-gray-700">No tasks created yet</h3>
+                    <p class="mt-1 text-sm text-gray-500 max-w-md mx-auto">The SVP has not created any tasks for this report.</p>
+                </div>
+            @else
+                <div class="overflow-x-auto w-full">
+                    <table class="min-w-full text-sm text-left text-gray-700">
+                        <thead class="bg-gray-50 text-[11px] text-gray-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-center">#</th>
+                                <th class="px-4 py-3">Task Name</th>
+                                <th class="px-4 py-3">PIC</th>
+                                <th class="px-4 py-3">Due Date</th>
+                                <th class="px-4 py-3 text-center">Status</th>
+                                <th class="px-4 py-3">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($laporan->tasks as $index => $task)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3 text-center">{{ $index + 1 }}</td>
+                                    <td class="px-4 py-3 font-medium">{{ $task->task_name }}</td>
+                                    <td class="px-4 py-3 flex items-center gap-2">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
+                                            {{ substr($task->pic->user->fullname, 0, 1) }}
+                                        </div>
+                                        <span>{{ $task->pic->user->fullname }}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div>{{ \Carbon\Carbon::parse($task->due_date)->translatedFormat('M j, Y') }}</div>
+                                        <div class="{{ $task->due_date < now() && $task->status != 'completed' ? 'text-rose-500' : 'text-gray-500' }}">
+                                            @if($task->due_date < now() && $task->status != 'completed')
+                                                Overdue
+                                            @else
+                                                {{ \Carbon\Carbon::parse($task->due_date)->diffForHumans() }}
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {{ $task->status == 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
+                                            {{ $task->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : '' }}
+                                            {{ $task->status == 'completed' ? 'bg-emerald-100 text-emerald-800' : '' }}">
+                                            {{ str_replace('_', ' ', ucfirst($task->status)) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 truncate" title="{{ $task->notes ?? 'No notes' }}">
+                                        {{ $task->notes ?? '-' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+        
+                {{-- Action Buttons --}}
+                @if(Auth::guard('ehs')->check())
+                    @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
+                        <div class="bg-gray-50 px-4 py-4 border-t border-gray-100 flex justify-end space-x-3">
+                            @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
+                                <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Approve All Tasks
+                                    </button>
+                                </form>
+                            @endif
                         </div>
-                        <div class="col-span-2 flex items-center">
-                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                                {{ substr($task->pic->user->fullname, 0, 1) }}
-                            </div>
-                            <div class="ml-3">
-                                <div class="text-xs font-medium text-gray-800">{{ $task->pic->user->fullname }}</div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 flex items-center">
-                            <div>
-                                @php
-                                    \Carbon\Carbon::setLocale('en');
-                                @endphp
-
-                                <div class="text-xs text-gray-800">
-                                    {{ \Carbon\Carbon::parse($task->due_date)->translatedFormat('M j, Y') }}
-                                </div>
-
-                                <div class="text-xs {{ $task->due_date < now() && $task->status != 'completed' ? 'text-rose-500' : 'text-gray-500' }}">
-                                    @if($task->due_date < now() && $task->status != 'completed')
-                                        Overdue
-                                    @else
-                                        {{ \Carbon\Carbon::parse($task->due_date)->diffForHumans() }}
-                                    @endif
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-span-2 flex items-center justify-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        {{ $task->status == 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
-                                        {{ $task->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : '' }}
-                                        {{ $task->status == 'completed' ? 'bg-emerald-100 text-emerald-800' : '' }}">
-                                {{ str_replace('_', ' ', ucfirst($task->status)) }}
-                            </span>
-                        </div>
-                        <div class="col-span-1 text-xs text-gray-500 truncate" title="{{ $task->notes ?? 'No notes' }}">
-                            {{ $task->notes ?? '-' }}
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Action Buttons -->
-            @if(Auth::guard('ehs')->check())
-                @if(in_array($laporan->status_lct, ['approved_taskbudget','waiting_approval_permanent', 'approved_permanent']))
-                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end space-x-3">
-                        @if($laporan->status_lct === 'waiting_approval_permanent' && $allTasksCompleted)
-                            <form action="{{ route('ehs.reporting.close', $laporan->id_laporan_lct) }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                        class="inline-flex items-center px-4 py-2 border cursor-pointer border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Approve All Tasks
-                                </button>
-                            </form>
-                        @endif
-                    </div>
+                    @endif
                 @endif
             @endif
-        @endif
+        </div>
     </div>
+
 
     <!-- Status Notification -->
     @if(in_array($laporan->status_lct, ['approved_taskbudget', 'approved_permanent', 'closed']))

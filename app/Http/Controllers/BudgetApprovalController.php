@@ -107,7 +107,7 @@ class BudgetApprovalController extends Controller
             'rejectLaporan'
         ])
         ->where('id_laporan_lct', $id_laporan_lct)
-        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision'])
+        ->whereIn('status_lct', ['waiting_approval_taskbudget', 'approved_taskbudget', 'taskbudget_revision','work_permanent','waiting_approval_permanent','closed'])
         ->first();
     
         if (!$taskBudget) {
