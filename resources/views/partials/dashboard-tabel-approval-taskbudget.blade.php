@@ -3,9 +3,9 @@
         <thead class="bg-gray-100 text-gray-700 uppercase tracking-wide">
             <tr>
                 <th class="px-4 py-2 text-left">No</th>
-                <th class="px-4 py-2 text-left">PIC</th>
+                <th class="px-4 py-2 text-left">Report Number</th>
+                <th class="px-4 py-2 text-left">Area</th>
                 <th class="px-4 py-2 text-left">Hazard Level</th>
-                <th class="px-4 py-2 text-left">Total Amount</th>
                 <th class="px-4 py-2 text-left">Submission Date</th>
                 <th class="px-4 py-2 text-left">Budget Status</th>
                 <th class="px-4 py-2 text-center">Actions</th>
@@ -15,11 +15,11 @@
             @forelse($laporans as $index => $budget)
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-4 py-2 text-gray-800">{{ $index + 1 }}</td>
-                    <td class="px-4 py-2 text-gray-800">{{ $budget->picUser->fullname ?? '-' }}</td>
-                    <td class="px-4 py-2 text-gray-800">{{ $budget->tingkat_bahaya }}</td>
+                    <td class="px-4 py-2 text-gray-800">{{ $budget->id_laporan_lct }}</td>
                     <td class="px-4 py-2 text-gray-900 font-semibold">
-                        Rp {{ number_format($budget->estimated_budget, 0, ',', '.') }}
+                        {{ $budget->area->nama_area ?? '-' }}
                     </td>
+                    <td class="px-4 py-2 text-gray-800">{{ $budget->tingkat_bahaya }}</td>
                     <td class="px-4 py-2 text-gray-800">
                         @if($budget->tasks->isNotEmpty())
                             {{ \Carbon\Carbon::parse($budget->tasks->first()->created_at)->locale('en')->translatedFormat('M d, Y') }}
@@ -29,8 +29,8 @@
                     </td>
                     @php
                         $statusMapping = [
-                            'waiting_approval_taskbudget' => 'Waiting for Activity Approval',
-                            'taskbudget_revision' => 'Task & Budget Revision Needed',
+                            'waiting_approval_taskbudget' => 'Waiting Approval',
+                            'taskbudget_revision' => 'Revision Needed',
                             'approved_taskbudget' => 'Budget Approved',
                             'work_permanent' => 'Budget Approved',
                             'waiting_approval_permanent' => 'Budget Approved',

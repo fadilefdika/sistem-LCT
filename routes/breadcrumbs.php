@@ -40,25 +40,25 @@ Breadcrumbs::for('ehs laporan-lct.show', function (BreadcrumbTrail $trail, $lapo
     $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('ehs.reporting.show.new', $laporan));
 });
 
-// activity approval
+// permanent action
 Breadcrumbs::for('budget-approval', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Approval', route('admin.budget-approval.index'));
+    $trail->push('Permanent Action', route('admin.budget-approval.index'));
 });
 
-// activity approval detail
+// permanent action detail
 Breadcrumbs::for('budget-approval.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval');
-    $trail->push("Activity Approval #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
+    $trail->push("Permanent Action #{$laporan->id_laporan_lct}", route('admin.budget-approval.show', $laporan));
 });
 
-// activity approval history
+// permanent action history
 Breadcrumbs::for('budget-approval-history', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Activity Approval History', route('admin.budget-approval-history.index'));
+    $trail->push('Permanent Action History', route('admin.budget-approval-history.index'));
 });
 
-// activity approval history detail
+// permanent action history detail
 Breadcrumbs::for('budget-approval-history.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('budget-approval-history');
     $trail->push("History Approval #{$laporan->id_laporan_lct}", route('admin.budget-approval-history.show', $laporan));
@@ -99,6 +99,18 @@ Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('manajemen-lct.show', function (BreadcrumbTrail $trail, $laporan) {
     $trail->parent('manajemen-lct');
     $trail->push("LCT Report #{$laporan->id_laporan_lct}", route('admin.manajemen-lct.show', $laporan));
+});
+
+// laporan perbaikan lct
+Breadcrumbs::for('finding-followup', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Finding Follow Up', route('admin.finding-followup.index'));
+});
+
+// laporan perbaikan lct detail
+Breadcrumbs::for('finding-followup.show', function (BreadcrumbTrail $trail, $laporan) {
+    $trail->parent('finding-followup');
+    $trail->push("Finding Follow Up #{$laporan->id_laporan_lct}", route('admin.finding-followup.show', $laporan));
 });
 
 // laporan riwayat lct

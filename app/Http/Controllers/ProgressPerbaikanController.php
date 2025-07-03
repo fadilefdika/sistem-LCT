@@ -60,39 +60,39 @@ class ProgressPerbaikanController extends Controller
             ->where('status_lct', '!=', 'closed')
             ->get();
 
-        foreach ($laporanList as $laporan) {
-            $overdue = false;
+        // foreach ($laporanList as $laporan) {
+        //     $overdue = false;
 
-            if ($laporan->tingkat_bahaya === 'Low') {
-                if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
-                    $overdue = true;
-                }
-            } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
-                if (
-                    is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
-                ) {
-                    // Safety net jika due_date_temp tidak digunakan
-                    $overdue = true;
-                } elseif (
-                    !is_null($laporan->due_date_temp) &&
-                    is_null($laporan->due_date_perm) &&
-                    Carbon::parse($laporan->due_date_temp)->lt($now)
-                ) {
-                    $overdue = true;
-                } elseif (
-                    !is_null($laporan->due_date_perm) &&
-                    is_null($laporan->date_completion) &&
-                    Carbon::parse($laporan->due_date_perm)->lt($now)
-                ) {
-                    $overdue = true;
-                }
-            }
+        //     if ($laporan->tingkat_bahaya === 'Low') {
+        //         if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
+        //             $overdue = true;
+        //         }
+        //     } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
+        //         if (
+        //             is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
+        //         ) {
+        //             // Safety net jika due_date_temp tidak digunakan
+        //             $overdue = true;
+        //         } elseif (
+        //             !is_null($laporan->due_date_temp) &&
+        //             is_null($laporan->due_date_perm) &&
+        //             Carbon::parse($laporan->due_date_temp)->lt($now)
+        //         ) {
+        //             $overdue = true;
+        //         } elseif (
+        //             !is_null($laporan->due_date_perm) &&
+        //             is_null($laporan->date_completion) &&
+        //             Carbon::parse($laporan->due_date_perm)->lt($now)
+        //         ) {
+        //             $overdue = true;
+        //         }
+        //     }
 
-            if ($overdue) {
-                $laporan->first_overdue_date = $now;
-                $laporan->save();
-            }
-        }
+        //     if ($overdue) {
+        //         $laporan->first_overdue_date = $now;
+        //         $laporan->save();
+        //     }
+        // }
         $query = $this->buildLaporanQuery($request, $user, $role);
         $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
 

@@ -123,7 +123,7 @@
             
             <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all duration-300 w-full">
                 <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2 mb-6">
-                    <i class="fas fa-info-circle text-base"></i> Report From PIC
+                    <i class="fas fa-info-circle text-base"></i> Improvement From PIC
                 </h3>
             
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -199,11 +199,11 @@
                         </div>
                     </div>
             
-                    {{-- Initial Corrective Action --}}
+                    {{-- Temporary Corective Action --}}
                     @if (!empty($tindakan_perbaikan[0]))
                     <div class="space-y-3">
                         <div class="flex items-center gap-2 text-xs font-semibold text-green-600">
-                            <i class="fas fa-wrench text-lg"></i> Initial Corrective Action
+                            <i class="fas fa-wrench text-lg"></i> Temporary Corective Action
                         </div>
                         <div>
                             <div class="text-xs text-gray-700 font-medium mb-1">Action:</div>
@@ -337,7 +337,7 @@
                 }
             
                 // Tentukan role yang tidak diizinkan
-                $notAllowed = in_array($roleName, ['user', 'manajer']);
+                $notAllowed = in_array($roleName, ['user', 'manajer', 'pic']);
             @endphp
             
             <div class="bg-white p-6 rounded-lg shadow-lg w-full mx-auto">

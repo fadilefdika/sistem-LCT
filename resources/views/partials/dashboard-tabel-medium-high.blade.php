@@ -83,9 +83,27 @@
                                 <span class="font-medium text-[10px]">Category:</span> {{ $tampilKategori ?? '-' }} |
                                 <span class="font-medium text-[10px]">Area:</span> {{ $laporan->area->nama_area ?? '-' }}
                             </div>
-
+                            @php
+                                if (Auth::guard('ehs')->check()) {
+                                    $user = Auth::guard('ehs')->user();
+                                    $roleName = 'ehs';
+                                } else {
+                                    $user = Auth::guard('web')->user();
+                                    // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                                    $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                                }
+            
+                            
+                                if ($roleName === 'ehs') {
+                                    $routeName = 'ehs.reporting.show';
+                                } elseif ($roleName === 'pic') {
+                                    $routeName = 'admin.manajemen-lct.show';
+                                } else {
+                                    $routeName = 'admin.reporting.show';
+                                }
+                            @endphp
                             <div>
-                                <a href="{{ route('admin.manajemen-lct.show', $laporan->id_laporan_lct) }}"
+                                <a href="{{ route($routeName, $laporan->id_laporan_lct) }}"
                                     class="text-blue-600 hover:text-blue-800 font-medium text-[10px]">
                                     Details 
                                 </a>

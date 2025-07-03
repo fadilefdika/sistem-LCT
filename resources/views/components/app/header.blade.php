@@ -25,7 +25,7 @@
                     @endif
 
 
-                    <!-- Breadcrumbs -->
+                <!-- Breadcrumbs -->
                 <div class="block">
                     @if (Route::currentRouteName() === 'admin.dashboard')
                         {{ Breadcrumbs::render('dashboard') }}
@@ -43,6 +43,10 @@
                         {{ Breadcrumbs::render('manajemen-lct') }}
                     @elseif (Route::currentRouteName() === 'admin.manajemen-lct.show')
                         {{ Breadcrumbs::render('manajemen-lct.show', $laporan) }}
+                    @elseif (Route::currentRouteName() === 'admin.finding-followup.index')
+                        {{ Breadcrumbs::render('finding-followup') }}
+                    @elseif (Route::currentRouteName() === 'admin.finding-followup.show')
+                        {{ Breadcrumbs::render('finding-followup.show', $laporan) }}
                     @elseif(Route::currentRouteName() === 'admin.reporting.index')
                         {{ Breadcrumbs::render('progress-perbaikan') }}
                     @elseif(Route::currentRouteName() === 'admin.reporting.show')

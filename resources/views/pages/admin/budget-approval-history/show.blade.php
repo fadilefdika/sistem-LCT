@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-800">Activity Approval Detail History</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">Waiting Approval Detail History</h2>
                     <p class="text-sm text-gray-600 flex items-center">
                         Submitted on {{ $taskBudget->created_at->format('F j, Y') }}
                     </p>

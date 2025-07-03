@@ -50,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
             }else if ($route && $route->getName() === 'admin.manajemen-lct.show') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
+            }else if ($route && $route->getName() === 'admin.finding-followup.show') {
+                $id_laporan_lct = $route->parameter('id_laporan_lct');
+                $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();
             }else if ($route && $route->getName() === 'admin.reporting.show') {
                 $id_laporan_lct = $route->parameter('id_laporan_lct');
                 $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->with('user')->first();

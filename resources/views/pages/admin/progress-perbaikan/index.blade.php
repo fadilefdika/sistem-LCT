@@ -1,157 +1,157 @@
 <x-app-layout>
   <section class="p-3">
     <div class="mx-auto max-w-screen-2xl">
-      <div class="p-2 relative">
-          
-      <div class="overflow-visible">
-          <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
-              @php
-                     if (Auth::guard('ehs')->check()) {
-                        $user = Auth::guard('ehs')->user();
-                        $roleName = 'ehs';
-                    } else {
-                        $user = Auth::guard('web')->user();
-                        // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
-                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
-                    }
-                  $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
-              @endphp
-
-            <div x-data="{ showFilter: false }" class="mb-5">
-
-                <!-- Top Bar -->
-                <div class="flex justify-between items-center flex-wrap gap-3">
-                <!-- Filter Button -->
-                <div>
-                    <button @click="showFilter = !showFilter"
-                    class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
-                    </svg>
-                    Filter
-                    </button>
-                </div>
+        <div class="p-2 relative">
             
-                <!-- Export Button -->
-                @if($roleName === 'ehs')
+        <div class="overflow-visible">
+            <div class="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
+                @php
+                        if (Auth::guard('ehs')->check()) {
+                            $user = Auth::guard('ehs')->user();
+                            $roleName = 'ehs';
+                        } else {
+                            $user = Auth::guard('web')->user();
+                            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                        }
+                    $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
+                @endphp
+
+                <div x-data="{ showFilter: false }" class="mb-5">
+
+                    <!-- Top Bar -->
+                    <div class="flex justify-between items-center flex-wrap gap-3">
+                    <!-- Filter Button -->
                     <div>
-                        <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-link" 
-                            class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
-                            Export PPT
-                        </a>
-                        <a href="{{ route('ehs.reporting.export') }}" id="export-link" 
-                            class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                            </svg>
-                            Export Excel
-                        </a>
-                        
+                        <button @click="showFilter = !showFilter"
+                        class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
+                        </svg>
+                        Filter
+                        </button>
                     </div>
-                @endif
-                </div>
-            
-                <!-- Filter Form Section (Hidden by default) -->
-                <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-4">
-
-                    <h2 class="text-sm font-semibold text-gray-800">Filter Options</h2>
-
-                    <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-
-                        <!-- Date Range -->
+                
+                    <!-- Export Button -->
+                    @if($roleName === 'ehs')
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Date Range</label>
-                            <input type="text" name="daterange" id="kt_daterangepicker_4"
-                                class="w-full rounded-md border-gray-300 text-xs p-2"
-                                placeholder="All Time" autocomplete="off">
-                            <input type="hidden" name="tanggalAwal" id="tanggalAwal">
-                            <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
-                        </div>                       
-
-                        <!-- Hazard Level -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Hazard Level</label>
-                            <select name="riskLevel" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="">All Levels</option>
-                                <option value="Low" {{ request('riskLevel') == 'Low' ? 'selected' : '' }}>Low</option>
-                                <option value="Medium" {{ request('riskLevel') == 'Medium' ? 'selected' : '' }}>Medium</option>
-                                <option value="High" {{ request('riskLevel') == 'High' ? 'selected' : '' }}>High</option>
-                            </select>
-                        </div>
-
-                        <!-- LCT Status -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">LCT Status</label>
-                            <select name="statusLct" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="">All Statuses</option>
-                                @foreach ($statusGroups as $label => $statuses)
-                                    <option value="{{ implode(',', $statuses) }}"
-                                        {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
-                                        {{ $label }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Department -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Department</label>
-                            <select name="departemenId" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="">All Depts</option>
-                                @foreach ($departments as $id => $nama)
-                                    <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
-                                        {{ $nama }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Category -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
-                            <select name="categoryId" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="">All Category</option>
-                                @foreach ($categories as $id => $nama)
-                                    <option value="{{ $id }}" {{ request('categoryId') == $id ? 'selected' : '' }}>
-                                        {{ $nama }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Area -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-500 mb-1">Area</label>
-                            <select name="areaId" class="w-full rounded-md border-gray-300 text-xs p-2">
-                                <option value="">All Areas</option>
-                                @foreach ($areas as $id => $nama)
-                                    <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
-                                        {{ $nama }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-4 xl:col-span-5">
-                            <button type="submit"
-                                class="px-4 py-2 text-xs font-medium rounded-md bg-black text-white hover:bg-gray-900 focus:outline-none">
-                                Apply
-                            </button>
-                            <a href="{{ route($routePrefix . '.reporting.index') }}"
-                                class="px-4 py-2 text-xs font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none">
-                                Reset
+                            <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-link" 
+                                class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Export PPT
                             </a>
+                            <a href="{{ route('ehs.reporting.export') }}" id="export-link" 
+                                class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Export Excel
+                            </a>
+                            
                         </div>
-                    </form>
+                    @endif
+                    </div>
+                
+                    <!-- Filter Form Section (Hidden by default) -->
+                    <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-4">
+
+                        <h2 class="text-sm font-semibold text-gray-800">Filter Options</h2>
+
+                        <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+
+                            <!-- Date Range -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Date Range</label>
+                                <input type="text" name="daterange" id="kt_daterangepicker_4"
+                                    class="w-full rounded-md border-gray-300 text-xs p-2"
+                                    placeholder="All Time" autocomplete="off">
+                                <input type="hidden" name="tanggalAwal" id="tanggalAwal">
+                                <input type="hidden" name="tanggalAkhir" id="tanggalAkhir">
+                            </div>                       
+
+                            <!-- Hazard Level -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Hazard Level</label>
+                                <select name="riskLevel" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                    <option value="">All Levels</option>
+                                    <option value="Low" {{ request('riskLevel') == 'Low' ? 'selected' : '' }}>Low</option>
+                                    <option value="Medium" {{ request('riskLevel') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                                    <option value="High" {{ request('riskLevel') == 'High' ? 'selected' : '' }}>High</option>
+                                </select>
+                            </div>
+
+                            <!-- LCT Status -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">LCT Status</label>
+                                <select name="statusLct" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                    <option value="">All Statuses</option>
+                                    @foreach ($statusGroups as $label => $statuses)
+                                        <option value="{{ implode(',', $statuses) }}"
+                                            {{ request('statusLct') == implode(',', $statuses) ? 'selected' : '' }}>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Department -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Department</label>
+                                <select name="departemenId" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                    <option value="">All Depts</option>
+                                    @foreach ($departments as $id => $nama)
+                                        <option value="{{ $id }}" {{ request('departemenId') == $id ? 'selected' : '' }}>
+                                            {{ $nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Category -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                                <select name="categoryId" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                    <option value="">All Category</option>
+                                    @foreach ($categories as $id => $nama)
+                                        <option value="{{ $id }}" {{ request('categoryId') == $id ? 'selected' : '' }}>
+                                            {{ $nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Area -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Area</label>
+                                <select name="areaId" class="w-full rounded-md border-gray-300 text-xs p-2">
+                                    <option value="">All Areas</option>
+                                    @foreach ($areas as $id => $nama)
+                                        <option value="{{ $id }}" {{ request('areaId') == $id ? 'selected' : '' }}>
+                                            {{ $nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-4 xl:col-span-5">
+                                <button type="submit"
+                                    class="px-4 py-2 text-xs font-medium rounded-md bg-black text-white hover:bg-gray-900 focus:outline-none">
+                                    Apply
+                                </button>
+                                <a href="{{ route($routePrefix . '.reporting.index') }}"
+                                    class="px-4 py-2 text-xs font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none">
+                                    Reset
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
 
       @php
@@ -216,11 +216,8 @@
                             <canvas id="departmentChart"></canvas>
                         </div>
                     </div>
-
                 </div>
             </div>
-            
-
         </div>
       @endif
 

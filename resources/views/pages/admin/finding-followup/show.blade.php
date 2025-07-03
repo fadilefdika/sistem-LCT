@@ -24,7 +24,7 @@
             if ($roleName === 'ehs') {
                 $routeName = 'ehs.reporting.index';
             } elseif ($roleName === 'pic') {
-                $routeName = 'admin.manajemen-lct.index';
+                $routeName = 'admin.finding-followup.index';
             } else {
                 $routeName = 'admin.reporting.index';
             }

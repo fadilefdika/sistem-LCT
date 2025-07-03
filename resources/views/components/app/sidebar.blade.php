@@ -166,17 +166,34 @@
 
                     <!-- Manajemen LCT -->
                     @if(in_array(session('active_role'), ['pic']))
-                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
-                        <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.manajemen-lct.index') }}">
-                            <div class="flex items-center">
-                                <svg class="shrink-0 fill-current @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                                    <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
-                                </svg>
-                                
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">LCT Management</span>
-                            </div>
-                        </a>
-                    </li>
+                        <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
+                            <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.manajemen-lct.index') }}">
+                                <div class="flex items-center">
+                                    <svg class="shrink-0 fill-current @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                        <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
+                                    </svg>
+                                    
+                                    <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">LCT Management</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('finding-followup') || Request::is('finding-followup/*')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
+                            <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('finding-followup') || Request::is('finding-followup/*')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.finding-followup.index') }}">
+                                <div class="flex items-center">
+                                    <svg class="shrink-0 @if(Request::is('finding-followup') || Request::is('finding-followup/*')) text-[#048cfb] @else text-gray-400 dark:text-gray-900 @endif"
+                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
+                                                 M9 5a2 2 0 012-2h2a2 2 0 012 2
+                                                 M9 12h6
+                                                 M9 16h6" />
+                                    </svg>
+
+                                    <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('finding-followup') || Request::is('finding-followup/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Finding Follow Up</span>
+                                </div>
+                            </a>
+                        </li>
+                        
                     @endif
 
                     <!-- Pengajuan Anggaran -->
@@ -187,7 +204,7 @@
                                 <svg class="shrink-0 fill-current @if(Request::is('budget-approval') || Request::is('budget-approval/*')){{ 'text-[#048cfb]' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                                     <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
                                 </svg>
-                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('budget-approval') || Request::is('budget-approval/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Activity Approval</span>
+                                <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('budget-approval') || Request::is('budget-approval/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Waiting Approval</span>
                             </div>
                         </a>
                     </li>

@@ -171,7 +171,7 @@
                             <div class="bg-white p-4 rounded-lg border border-green-300 mt-3 shadow-md">
                                 <div class="flex items-center space-x-2 mb-2">
                                     <i class="fa-solid fa-wrench text-green-600 text-lg"></i>
-                                    <p class="text-gray-700 text-xs font-semibold">Initial Corrective Action</p>
+                                    <p class="text-gray-700 text-xs font-semibold">Temporary Corective Action</p>
                                 </div>
 
                                 <div class="mb-2">
@@ -290,7 +290,7 @@
             }
         
             // Tentukan role yang tidak diizinkan
-            $notAllowed = in_array($roleName, ['user', 'manajer']);
+            $notAllowed = in_array($roleName, ['user', 'manajer', 'pic']);
         @endphp
     
 

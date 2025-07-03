@@ -130,39 +130,47 @@
                             $totalTasks = $correctiveLowCount + $revisionLowCount + $temporaryInProgressCount + $revisionTemporaryCount + $revisionBudgetCount + $permanentWorkCount;
                         @endphp
 
-                        <div class="p-6 bg-white rounded-xl shadow-sm border border-gray-200">
-                            <div class="mb-5">
-                                <h2 class="text-xl font-semibold text-gray-800">Tasks Overview</h2>
-                                <p class="text-sm text-gray-500 mt-1">You have <span class="font-semibold text-blue-600">{{ $totalTasks }}</span> tasks to complete</p>
-                            </div>
+                    <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+                        <div class="mb-3">
+                            <h2 class="text-sm font-semibold text-gray-800">Tasks Overview</h2>
+                            @if ($totalTasks > 0)
+                                <p class="text-xs text-gray-500 mt-1">
+                                    You have <span class="font-semibold text-blue-600">{{ $totalTasks }}</span> tasks to complete
+                                </p>
+                            @endif
+                        </div>
 
-                            <ul class="space-y-2">
-                                @php
-                                    $taskLinks = [
-                                        ['count' => $correctiveLowCount, 'label' => 'Corrective Action (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'in_progress,progress_work']],
-                                        ['count' => $revisionLowCount, 'label' => 'Revision (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'revision']],
-                                        ['count' => $temporaryInProgressCount, 'label' => 'Temporary Action (Medium/High Risk)', 'params' => ['riskLevel' => 'medium', 'statusLct' => 'in_progress,progress_work']],
-                                        ['count' => $revisionTemporaryCount, 'label' => 'Revision - Temporary', 'params' => ['statusLct' => 'temporary_revision']],
-                                        ['count' => $revisionBudgetCount, 'label' => 'Revision - Budget', 'params' => ['statusLct' => 'taskbudget_revision']],
-                                        ['count' => $permanentWorkCount, 'label' => 'Permanent Action (Working)', 'params' => ['statusLct' => 'work_permanent']],
-                                    ];
-                                @endphp
+                        <ul class="space-y-1">
+                            @php
+                                $taskLinks = [
+                                    ['count' => $correctiveLowCount, 'label' => 'Corrective Action (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'in_progress,progress_work']],
+                                    ['count' => $revisionLowCount, 'label' => 'Revision (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'revision']],
+                                    ['count' => $temporaryInProgressCount, 'label' => 'Temporary Action (Medium/High Risk)', 'params' => ['riskLevel' => 'medium', 'statusLct' => 'in_progress,progress_work']],
+                                    ['count' => $revisionTemporaryCount, 'label' => 'Revision - Temporary', 'params' => ['statusLct' => 'temporary_revision']],
+                                    ['count' => $revisionBudgetCount, 'label' => 'Revision - Budget', 'params' => ['statusLct' => 'taskbudget_revision']],
+                                    ['count' => $permanentWorkCount, 'label' => 'Permanent Action (Working)', 'params' => ['statusLct' => 'work_permanent']],
+                                ];
+                            @endphp
 
-                                @foreach ($taskLinks as $task)
+                            @foreach ($taskLinks as $task)
+                                @if ($task['count'] > 0)
                                     <li>
-                                        <a href="{{ route('admin.manajemen-lct.index', $task['params']) }}" class="flex justify-between items-center px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-150">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-6 h-6 text-gray-800 text-sm flex items-center justify-center font-medium">{{ $task['count'] }}</div>
-                                                <span class="text-gray-700 text-sm">{{ $task['label'] }}</span>
+                                        <a href="{{ route('admin.manajemen-lct.index', $task['params']) }}"
+                                        class="flex justify-between items-center px-3 mb-2 text-xs rounded-mdtransition duration-150">
+                                            <div class="flex items-center">
+                                                <div class="w-5 text-gray-600 text-xs flex items-center justify-center font-semibold">{{ $task['count'] }}</div>
+                                                <span class="text-gray-600">{{ $task['label'] }}</span>
                                             </div>
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            {{-- <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            </svg> --}}
                                         </a>
                                     </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                                @endif
+                            @endforeach
+                        </ul>
+                    </div>
+
 
                         
 

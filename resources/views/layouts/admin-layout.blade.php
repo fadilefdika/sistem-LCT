@@ -72,10 +72,11 @@
                 x-ref="contentarea"
                 :class="{ 
                     'overflow-hidden': ['admin.reporting.show.new','admin.manajemen-lct.show',
-                            'ehs.reporting.show.new','admin.reporting.show','ehs.reporting.show'].includes(page), 
+                            'ehs.reporting.show.new','admin.reporting.show','admin.finding-followup.show','ehs.reporting.show'].includes(page), 
                     'overflow-y-auto': [
                             'admin.dashboard',
                             'admin.reporting.index',
+                            'admin.finding-followup.index',
                             'admin.reporting.history',
                             'admin.manajemen-lct.history',
                             'admin.budget-approval.history',

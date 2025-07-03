@@ -37,7 +37,7 @@
 
                 <div class="bg-white px-6 pt-6 pb-6 rounded-lg shadow-lg mb-4 overflow-x-auto">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">Task Management and Timeline</h3>
+                        <h3 class="text-lg font-semibold">Permanent Action</h3>
                         @if(in_array($laporan->approved_temporary_by_ehs,['pending', 'revise', 'not yet']))
                             <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1 rounded-full">
                                 Temporary not yet approved
