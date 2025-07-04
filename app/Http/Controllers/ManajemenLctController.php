@@ -60,8 +60,6 @@ class ManajemenLctController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-       
-
         if ($request->ajax()) {
             // Ini penting! Return partial yang hanya bagian isi
             return view('partials.tabel-manajemen-lct-wrapper', compact('laporans'))->render();
@@ -462,18 +460,55 @@ class ManajemenLctController extends Controller
 
         $query = LaporanLct::query()
             ->where(function ($q) use ($picId, $laporanTaskIds) {
-                $q->where('pic_id', $picId)
-                ->orWhereIn('id_laporan_lct', $laporanTaskIds);
+                $q->where('pic_id', $picId); // Main PIC
+                
+                // Task-only dengan status khusus
+                $q->orWhere(function ($subQ) use ($picId, $laporanTaskIds) {
+                    $subQ->whereIn('id_laporan_lct', $laporanTaskIds)
+                        ->where('pic_id', '!=', $picId)
+                        ->whereIn('status_lct', ['approved_taskbudget', 'closed']);
+                });
             })
-            ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
             ->select('*', DB::raw("
                 CASE 
                     WHEN pic_id = $picId THEN 0 
                     ELSE 1 
                 END as is_task_only
-            "));
+            "))
+            ->with('picUser', 'kategori', 'area');
 
-        // Filter tambahan dari request
+            if ($request->boolean('is_task_only')) {
+                
+                return LaporanLct::query()
+                    ->whereIn('id_laporan_lct', $laporanTaskIds)
+                    ->where('pic_id', '!=', $picId)
+                    ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
+                    ->with('picUser', 'kategori', 'area')
+                    ->select('*', DB::raw("
+                        CASE 
+                            WHEN pic_id = $picId THEN 0 
+                            ELSE 1 
+                        END as is_task_only
+                    "));
+            }
+            
+
+        // === FILTER TAMBAHAN ===
+        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
+            $query->whereBetween('tanggal_temuan', [
+                \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay(),
+                \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay()
+            ]);
+        }
+
+        if ($request->filled('areaId')) {
+            $query->where('area_id', $request->areaId);
+        }
+
+        if ($request->filled('categoryId')) {
+            $query->where('kategori_id', $request->categoryId);
+        }
+
         if ($request->filled('riskLevel')) {
             $query->where('tingkat_bahaya', $request->riskLevel);
         }
@@ -507,23 +542,7 @@ class ManajemenLctController extends Controller
             });
         }
 
-        if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $query->whereBetween('tanggal_temuan', [
-                \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay(),
-                \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay()
-            ]);
-        }
-
-        if ($request->filled('categoryId')) {
-            $query->where('kategori_id', $request->categoryId);
-        }
-
-        if ($request->filled('areaId')) {
-            $query->where('area_id', $request->areaId);
-        }
-
         return $query;
     }
-
 
 }

@@ -200,9 +200,17 @@ class DashboardController extends Controller
         $revisionTemporaryCount = 0;
         $revisionBudgetCount = 0;
         $permanentWorkCount = 0;
+        $todos = 0;
+        
 
         if ($roleName === 'pic') {
             $picId = Pic::where('user_id', $user->id)->value('id');
+            $taskOnlyCount = LaporanLct::whereHas('tasks', function ($q) use ($picId) {
+                $q->where('pic_id', $picId);
+            })
+            ->where('pic_id', '!=', $picId)
+            ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
+            ->count();
         
             if ($picId) {
                 $todoCounts = PicTodoService::getTodosCountOnlyFor($picId);
@@ -214,8 +222,13 @@ class DashboardController extends Controller
                 $revisionTemporaryCount = $todoCounts['revisionTemporary'];
                 $revisionBudgetCount = $todoCounts['revisionBudget'];
                 $permanentWorkCount = $todoCounts['permanentWork'];
+                $todos = [
+                    'taskOnly' => [
+                        'total' => $taskOnlyCount
+                    ]
+                ];
             } else {
-                $correctiveLowCount = $revisionLowCount = $temporaryInProgressCount = $revisionTemporaryCount = $revisionBudgetCount = $permanentWorkCount = 0;
+                $correctiveLowCount = $revisionLowCount = $temporaryInProgressCount = $revisionTemporaryCount = $revisionBudgetCount = $permanentWorkCount = $todos = 0;
             }
         }
         
@@ -253,6 +266,7 @@ class DashboardController extends Controller
             'revisionTemporaryCount' => $revisionTemporaryCount,
             'revisionBudgetCount' => $revisionBudgetCount,
             'permanentWorkCount' => $permanentWorkCount,
+            'todos' => $todos
         ]);
     }
 

@@ -8,7 +8,7 @@ class PicTodoService
 {
     public static function getTodosCountOnlyFor($picId)
     {
-        return [
+        $mainPicCounts = [
             'correctiveLow' => LaporanLct::where('tingkat_bahaya', 'low')
                 ->whereIn('status_lct', ['in_progress', 'progress_work'])
                 ->where('pic_id', $picId)
@@ -36,7 +36,27 @@ class PicTodoService
                 ->where('pic_id', $picId)
                 ->count(),
         ];
+
+        // Hitung untuk task-only (id_laporan_lct di lct_tasks, tapi bukan PIC utama)
+        $taskOnlyLaporanIds = \App\Models\LctTasks::where('pic_id', $picId)
+            ->pluck('id_laporan_lct')
+            ->toArray();
+
+        $mainLaporanIds = LaporanLct::where('pic_id', $picId)->pluck('id_laporan_lct')->toArray();
+        $filteredTaskOnlyIds = array_diff($taskOnlyLaporanIds, $mainLaporanIds);
+
+        $taskOnlyCount = LaporanLct::whereIn('id_laporan_lct', $filteredTaskOnlyIds)
+            ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
+            ->count();
+
+        $mainPicCounts['taskOnly'] = [
+            'total' => $taskOnlyCount,
+            'ids' => $filteredTaskOnlyIds,
+        ];
+
+        return $mainPicCounts;
     }
+
 
     
 }

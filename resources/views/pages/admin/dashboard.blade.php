@@ -127,8 +127,17 @@
                         </div> --}}
 
                         @php
-                            $totalTasks = $correctiveLowCount + $revisionLowCount + $temporaryInProgressCount + $revisionTemporaryCount + $revisionBudgetCount + $permanentWorkCount;
+                            $taskOnlyTotal = $todos['taskOnly']['total'] ?? 0;
+
+                            $totalTasks = $correctiveLowCount
+                                + $revisionLowCount
+                                + $temporaryInProgressCount
+                                + $revisionTemporaryCount
+                                + $revisionBudgetCount
+                                + $permanentWorkCount
+                                + $taskOnlyTotal;
                         @endphp
+
 
                     <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
                         <div class="mb-3">
@@ -149,26 +158,28 @@
                                     ['count' => $revisionTemporaryCount, 'label' => 'Revision - Temporary', 'params' => ['statusLct' => 'temporary_revision']],
                                     ['count' => $revisionBudgetCount, 'label' => 'Revision - Budget', 'params' => ['statusLct' => 'taskbudget_revision']],
                                     ['count' => $permanentWorkCount, 'label' => 'Permanent Action (Working)', 'params' => ['statusLct' => 'work_permanent']],
+                                    // Tambahkan task only sebagai salah satu item biasa
+                                    ['count' => $taskOnlyTotal, 'label' => 'Permanent Action (Task Only)', 'params' => ['is_task_only' => 'true']],
                                 ];
                             @endphp
 
+                        
+                            {{-- Bagian untuk laporan PIC utama --}}
                             @foreach ($taskLinks as $task)
                                 @if ($task['count'] > 0)
                                     <li>
                                         <a href="{{ route('admin.manajemen-lct.index', $task['params']) }}"
-                                        class="flex justify-between items-center px-3 mb-2 text-xs rounded-mdtransition duration-150">
+                                            class="flex justify-between items-center px-3 mb-2 text-xs rounded-md transition duration-150">
                                             <div class="flex items-center">
                                                 <div class="w-5 text-gray-600 text-xs flex items-center justify-center font-semibold">{{ $task['count'] }}</div>
                                                 <span class="text-gray-600">{{ $task['label'] }}</span>
                                             </div>
-                                            {{-- <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                            </svg> --}}
                                         </a>
                                     </li>
                                 @endif
                             @endforeach
                         </ul>
+                        
                     </div>
 
 
