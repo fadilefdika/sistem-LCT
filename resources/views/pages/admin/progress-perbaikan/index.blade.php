@@ -35,7 +35,7 @@
                     <!-- Export Button -->
                     @if($roleName === 'ehs')
                         <div>
-                            <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-link" 
+                            <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-ppt-link" 
                                 class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -375,6 +375,7 @@
                         }
                         $('html, body').animate({ scrollTop: $('#report-container').offset().top - 100 }, 300);
                         updateExportLink(params);
+                        updateExportPptLink(params);
                     },
                     error: function() {
                         alert('Gagal mengambil data.');
@@ -388,6 +389,13 @@
                 const exportUrl = "{{ route('ehs.reporting.export') }}" + (queryString ? '?' + queryString : '');
                 $('#export-link').attr('href', exportUrl);
             }
+
+            function updateExportPptLink(filters) {
+                const queryString = new URLSearchParams(filters).toString();
+                const exportPptUrl = "{{ route('ehs.reporting.export-ppt') }}" + (queryString ? '?' + queryString : '');
+                $('#export-ppt-link').attr('href', exportPptUrl);
+            }
+
                     
             // Submit filter via AJAX
             $('form').on('submit', function(e) {

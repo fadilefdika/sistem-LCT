@@ -63,6 +63,8 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
     // Form Laporan LCT
     Route::get('/report-form', [UserController::class, 'index'])->name('report-form');  
     Route::post('/laporan-lct/store', [LctReportController::class, 'store'])->name('laporan-lct.store');
+    Route::put('/laporan/{id}', [LctReportController::class, 'update'])->name('laporan-lct.update');
+
 
     // Progress Perbaikan
     Route::prefix('reporting')->name('admin.reporting.')->group(function () {

@@ -49,39 +49,6 @@ class ManajemenLctController extends Controller
             ->where('status_lct', '!=', 'closed')
             ->get();
 
-        foreach ($laporanList as $laporan) {
-            $overdue = false;
-
-            if ($laporan->tingkat_bahaya === 'Low') {
-                if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
-                    $overdue = true;
-                }
-            } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
-                if (
-                    is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
-                ) {
-                    // Safety net jika due_date_temp tidak digunakan
-                    $overdue = true;
-                } elseif (
-                    !is_null($laporan->due_date_temp) &&
-                    is_null($laporan->due_date_perm) &&
-                    Carbon::parse($laporan->due_date_temp)->lt($now)
-                ) {
-                    $overdue = true;
-                } elseif (
-                    !is_null($laporan->due_date_perm) &&
-                    is_null($laporan->date_completion) &&
-                    Carbon::parse($laporan->due_date_perm)->lt($now)
-                ) {
-                    $overdue = true;
-                }
-            }
-
-            if ($overdue) {
-                $laporan->first_overdue_date = $now;
-                $laporan->save();
-            }
-        }
         $query = $this->buildLaporanQuery($request, $user, 'pic');
         $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
 
@@ -487,20 +454,24 @@ class ManajemenLctController extends Controller
         return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
     }
 
+
     private function buildLaporanQuery(Request $request, $user, $role)
     {
-        $query = LaporanLct::query();
+        $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+        $laporanTaskIds = \App\Models\LctTasks::where('pic_id', $picId)->pluck('id_laporan_lct');
 
-        // Filter berdasarkan role
-        if ($role === 'user') {
-            $query->where('user_id', $user->id);
-        } elseif ($role === 'manajer') {
-            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
-            $query->where('departemen_id', $departemenId);
-        } elseif (!in_array($role, ['ehs'])) {
-            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
-            $query->where('pic_id', $picId);
-        }
+        $query = LaporanLct::query()
+            ->where(function ($q) use ($picId, $laporanTaskIds) {
+                $q->where('pic_id', $picId)
+                ->orWhereIn('id_laporan_lct', $laporanTaskIds);
+            })
+            ->whereIn('status_lct', ['approved_taskbudget', 'closed'])
+            ->select('*', DB::raw("
+                CASE 
+                    WHEN pic_id = $picId THEN 0 
+                    ELSE 1 
+                END as is_task_only
+            "));
 
         // Filter tambahan dari request
         if ($request->filled('riskLevel')) {
@@ -521,13 +492,13 @@ class ManajemenLctController extends Controller
                                 ->whereDate('due_date', '<', $today)
                                 ->whereNull('date_completion');
                         })
-                        ->orWhere(function ($mediumHighTemp) use ($today) {
-                            $mediumHighTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                        ->orWhere(function ($midTemp) use ($today) {
+                            $midTemp->whereIn('tingkat_bahaya', ['Medium', 'High'])
                                 ->whereDate('due_date_temp', '<', $today)
                                 ->whereNull('date_completion_temp');
                         })
-                        ->orWhere(function ($mediumHighPerm) use ($today) {
-                            $mediumHighPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                        ->orWhere(function ($midPerm) use ($today) {
+                            $midPerm->whereIn('tingkat_bahaya', ['Medium', 'High'])
                                 ->whereDate('due_date_perm', '<', $today)
                                 ->whereNull('date_completion');
                         });
@@ -537,9 +508,10 @@ class ManajemenLctController extends Controller
         }
 
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
-            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+            $query->whereBetween('tanggal_temuan', [
+                \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay(),
+                \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay()
+            ]);
         }
 
         if ($request->filled('categoryId')) {
@@ -552,4 +524,6 @@ class ManajemenLctController extends Controller
 
         return $query;
     }
+
+
 }

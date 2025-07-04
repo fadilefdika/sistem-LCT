@@ -331,7 +331,7 @@
                                 <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
                                     @if(
                                         ($tingkatBahaya === 'low' && $statusLct !== 'closed') ||
-                                        (in_array($tingkatBahaya, ['medium', 'high']) && $approvedByEhs !== 'approved')
+                                        (in_array($tingkatBahaya, ['medium', 'high']) && $approvedByEhs == 'approved')
                                     )
                                         <p class="text-gray-700 font-semibold">⚠️ Report not yet approved by EHS</p>
                                     @else

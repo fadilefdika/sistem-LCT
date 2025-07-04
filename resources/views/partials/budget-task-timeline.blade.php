@@ -414,16 +414,17 @@
 
                                         
                                         <td class="px-4 py-2">
-                                            <label class="flex items-center space-x-2 cursor-pointer">
+                                            <label class="flex items-center space-x-2 {{ $laporan->is_task_only ? 'cursor-not-allowed' : 'cursor-pointer' }}">
                                                 <input type="checkbox"
                                                     data-task-id="{{ $task['id'] }}"
                                                     class="status-checkbox form-checkbox h-5 w-5 text-green-600"
-                                                    {{ $task['status'] == 'completed' ? 'checked' : '' }}>
+                                                    {{ $task['status'] == 'completed' ? 'checked' : '' }}
+                                                    {{ $laporan->is_task_only ? 'disabled' : '' }}>
                                                 <span class="text-sm text-gray-700">
-                                                    {{ $task['status'] == 'completed' ? '✅ Completed' : '⏳ Pending' }}
+                                                    {{ $task['status'] == 'completed' ? 'Completed' : 'Pending' }}
                                                 </span>
                                             </label>
-                                        </td>
+                                        </td>                                        
                                     </tr>
                                     @endif
                                 @endforeach

@@ -40,10 +40,22 @@
             </div>
         
             <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition w-full">
-                <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2 mb-6">
-                    <i class="fas fa-info-circle text-base"></i> Report From Finder
-                </h3>
-            
+                <div class="flex justify-between">
+                    <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2 mb-6">
+                        <i class="fas fa-info-circle text-base"></i> Report From Finder
+                    </h3>
+                  
+                    @if($laporan->status_lct === 'open' && $laporan->user_id == auth()->user()->id)
+                        <div class="flex justify-end mb-4">
+                            <button id="openEditModal"
+                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded text-xs cursor-pointer flex items-center gap-1 shadow-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                     {{-- Informasi Teks --}}
                     <div class="space-y-5">
@@ -362,11 +374,12 @@
                 <div x-data="{ revision: false, reason: '', closed: false }">
                     @if($laporan->status_lct !== 'closed')   
 
+                   
                         @if($notAllowed)
                             <div class="mt-3 p-4 bg-gray-200 border border-gray-400 rounded-lg">
                                 @if(
-                                    ($tingkatBahaya === 'low' && $statusLct !== 'closed') ||
-                                    (in_array($tingkatBahaya, ['medium', 'high']) && $approvedByEhs !== 'approved')
+                                    ($tingkatBahaya === 'Low' && $statusLct !== 'closed') ||
+                                    (in_array($tingkatBahaya, ['Medium', 'High']) && $approvedByEhs !== 'approved') || $statusLct == 'open'
                                 )
                                     <p class="text-gray-700 font-semibold">⚠️ Report not yet approved by EHS</p>
                                 @else
@@ -564,3 +577,128 @@
         
     </div>
 </div>
+
+<div id="editModal" class="fixed inset-0 z-70 hidden bg-black/40 flex items-center justify-center overflow-y-auto px-4 py-10">
+    <div class="bg-white rounded-lg w-full max-w-4xl mx-auto p-8 shadow-xl relative transform transition-all duration-300 scale-100">
+
+        <h2 class="text-lg font-semibold text-gray-800 mb-6">Edit Finding Data</h2>
+
+        <form action="{{ route('laporan-lct.update', $laporan->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Finding Date -->
+                <div class="relative">
+                    <label class="text-sm font-medium">Finding Date</label>
+                    <input 
+                        type="date" 
+                        name="tanggal_temuan" 
+                        id="tanggal-temuan"
+                        class="form-input mt-1 block w-full cursor-pointer" 
+                        value="{{ $laporan->tanggal_temuan }}" 
+                        required
+                    >
+                </div>
+                
+
+                <!-- Area -->
+                <div>
+                    <label class="text-sm font-medium">Area</label>
+                    <select name="area_id" class="form-select mt-1 block w-full" required>
+                        @foreach($areaList as $area)
+                            <option value="{{ $area->id }}" {{ $laporan->area_id == $area->id ? 'selected' : '' }}>
+                                {{ $area->nama_area }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Detail Area -->
+                <div>
+                    <label class="text-sm font-medium">Detail Area</label>
+                    <input type="text" name="detail_area" class="form-input mt-1 block w-full"
+                        value="{{ $laporan->detail_area }}" required>
+                </div>
+
+                <!-- Kategori -->
+                <div>
+                    <label class="text-sm font-medium">Kategori</label>
+                    <select name="kategori_id" class="form-select mt-1 block w-full" required>
+                        @foreach($kategoriList as $kategori)
+                            <option value="{{ $kategori->id }}" {{ $laporan->kategori_id == $kategori->id ? 'selected' : '' }}>
+                                {{ $kategori->nama_kategori }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Rekomendasi (full width) -->
+                <div class="md:col-span-2">
+                    <label class="text-sm font-medium">Safety Recommendation</label>
+                    <textarea name="rekomendasi_safety" rows="4" class="form-textarea mt-1 block w-full"
+                        required>{{ $laporan->rekomendasi_safety }}</textarea>
+                </div>
+            </div>
+
+            <!-- Tombol -->
+            <div class="flex justify-end mt-8">
+                <button type="button" id="closeEditModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm mr-2 cursor-pointer">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm cursor-pointer">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const openBtn = document.getElementById('openEditModal');
+        const closeBtn = document.getElementById('closeEditModal');
+        const modal = document.getElementById('editModal');
+
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            });
+        }
+
+        // Optional: close modal on outside click
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputDate = document.getElementById('tanggal-temuan');
+
+        // Menambahkan event agar saat div di klik, input akan focus
+        inputDate.addEventListener('click', function () {
+            this.showPicker?.(); // untuk browser yang support
+        });
+
+        // Fallback untuk beberapa browser agar bisa juga dari keyboard
+        inputDate.parentElement.addEventListener('click', function () {
+            inputDate.focus();
+            inputDate.showPicker?.();
+        });
+    });
+</script>

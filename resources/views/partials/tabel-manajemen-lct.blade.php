@@ -4,6 +4,14 @@
                         @endphp
                         <tr @click="openRow === {{ $laporanId }} ? openRow = null : openRow = {{ $laporanId }}" class="hover:bg-gray-100 cursor-pointer text-sm transition duration-200 ease-in-out">
                             <td class="px-4 py-3 text-gray-800 w-11 text-[11px]">{{ $laporans->firstItem() + $index }}</td>
+                            <td class="px-4 py-3 text-gray-800 w-11 text-[11px]">
+                                @if ($laporan->is_task_only)
+                                    <span>Task Only</span>
+                                @else
+                                    <span>Main PIC</span>
+                                @endif
+                            </td>
+                            
                             <!-- Tenggat Waktu -->
                             @php
                                     $today = now();

@@ -38,7 +38,6 @@ class ProgressPerbaikanController extends Controller
             // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
             $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
-        
 
         // Data dropdown filter
         $departments = \App\Models\LctDepartement::whereNull('deleted_at')->pluck('nama_departemen', 'id');
@@ -60,49 +59,9 @@ class ProgressPerbaikanController extends Controller
             ->where('status_lct', '!=', 'closed')
             ->get();
 
-        // foreach ($laporanList as $laporan) {
-        //     $overdue = false;
-
-        //     if ($laporan->tingkat_bahaya === 'Low') {
-        //         if (is_null($laporan->date_completion) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)) {
-        //             $overdue = true;
-        //         }
-        //     } elseif (in_array($laporan->tingkat_bahaya, ['Medium', 'High'])) {
-        //         if (
-        //             is_null($laporan->due_date_temp) && $laporan->due_date && Carbon::parse($laporan->due_date)->lt($now)
-        //         ) {
-        //             // Safety net jika due_date_temp tidak digunakan
-        //             $overdue = true;
-        //         } elseif (
-        //             !is_null($laporan->due_date_temp) &&
-        //             is_null($laporan->due_date_perm) &&
-        //             Carbon::parse($laporan->due_date_temp)->lt($now)
-        //         ) {
-        //             $overdue = true;
-        //         } elseif (
-        //             !is_null($laporan->due_date_perm) &&
-        //             is_null($laporan->date_completion) &&
-        //             Carbon::parse($laporan->due_date_perm)->lt($now)
-        //         ) {
-        //             $overdue = true;
-        //         }
-        //     }
-
-        //     if ($overdue) {
-        //         $laporan->first_overdue_date = $now;
-        //         $laporan->save();
-        //     }
-        // }
         $query = $this->buildLaporanQuery($request, $user, $role);
         $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
-
-        // dd(
-        //     $query->toSql(),
-        //     $query->getBindings(),
-        //     $query->count()
-        // );
         
-
         $perPage = $request->input('perPage', 10);
 
         $laporans = $query
@@ -139,7 +98,7 @@ class ProgressPerbaikanController extends Controller
         ]);
             
     }
-
+ 
 
     public function show($id_laporan_lct)
     {
@@ -169,6 +128,10 @@ class ProgressPerbaikanController extends Controller
         // Cek apakah semua task sudah selesai
         $tasks = $laporan->tasks;
 
+        $kategoriList = Kategori::all(); // Ambil semua kategori dari tabel
+
+        $areaList = AreaLct::all();
+
         $allTasksCompleted = $tasks->isNotEmpty() && $tasks->every(fn($task) => $task->status === 'completed');
 
         if (
@@ -188,7 +151,7 @@ class ProgressPerbaikanController extends Controller
             return $item->tipe_reject === 'budget_approval';
         });        
 
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects'));
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList'));
     }
 
 
@@ -1062,7 +1025,7 @@ class ProgressPerbaikanController extends Controller
         return Excel::download(new LaporanLctExport($laporans), 'laporan_lct_' . now()->format('Ymd_His') . '.xlsx');
     }
 
-    public function exportPpt()
+    public function exportPpt(Request $request)
     {
         $statusMapping = [
             'open' => ['label' => 'Open (new)'],
@@ -1085,8 +1048,19 @@ class ProgressPerbaikanController extends Controller
             'closed' => ['label' => 'Closed'],
         ];
         try {
-            $laporans = LaporanLct::with('picUser', 'kategori', 'area')->whereDate('created_at', now()->toDateString())->get();
-            // dd($laporans);
+           // Ambil user dan role
+            if (Auth::guard('ehs')->check()) {
+                $user = Auth::guard('ehs')->user();
+                $role = 'ehs';
+            } else {
+                $user = Auth::guard('web')->user();
+                $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+            }
+
+            // Gunakan buildLaporanQuery agar query sama dengan Excel
+            $query = $this->buildLaporanQuery($request, $user, $role);
+            $laporans = $query->with('picUser', 'kategori', 'area')->get();
+
             $ppt = new PhpPresentation();
             
             foreach ($laporans as $laporan) {
@@ -1112,7 +1086,7 @@ class ProgressPerbaikanController extends Controller
                 $observationDate = Carbon::parse($observationDateRaw)->format('F d, Y');
 
                 $leftData = [
-                    "Observation No/Location" => $laporan->area->nama_area . ' ('.$laporan->detail_area .')' ?? '-',
+                    "Observation No/Location" => $laporan->area->nama_area ?? '-' . ' ('.$laporan->detail_area .')' ?? '-',
                     "Observation date" => $observationDate,
                     "Responsibility (PIC)" => $laporan->picUser->fullname ?? '-',
                     "Risk Hazard" => $laporan->tingkat_bahaya ?? '-',
@@ -1194,7 +1168,9 @@ class ProgressPerbaikanController extends Controller
                 $imageRow->setHeight(320);
 
                 // Pastikan path benar
-                $bukti = json_decode($laporan->bukti_temuan, true);
+                $bukti = is_array($laporan->bukti_temuan)
+                    ? $laporan->bukti_temuan
+                    : json_decode($laporan->bukti_temuan, true);
                 $firstBuktiTemuan = $bukti[0] ?? null;
                 $beforeCellImg = $imageRow->getCell(0);
                 if ($firstBuktiTemuan) {
@@ -1215,7 +1191,10 @@ class ProgressPerbaikanController extends Controller
                 }
 
                 // Decode JSON tindakan_perbaikan
-                $tindakanPerbaikan = json_decode($laporan->tindakan_perbaikan, true);
+                $tindakanPerbaikan = is_array($laporan->tindakan_perbaikan)
+                    ? $laporan->tindakan_perbaikan
+                    : json_decode($laporan->tindakan_perbaikan, true);
+
                 // Default jika tidak ada
                 $afterPath = null;
 

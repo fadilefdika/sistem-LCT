@@ -126,4 +126,19 @@ class LaporanLct extends Model
         return $this->belongsTo(LctDepartement::class, 'departemen_id');
     }
 
+    public function getIsTaskOnlyAttribute()
+    {
+        $userId = auth()->id();
+        $picId = \App\Models\Pic::where('user_id', $userId)->value('id');
+
+        // Jika user adalah PIC utama → bukan task-only
+        if ($this->pic_id == $picId) {
+            return false;
+        }
+
+        // Jika bukan PIC utama tapi ada di task → task-only
+        return $this->tasks()->where('pic_id', $picId)->exists();
+    }
+
+
 }

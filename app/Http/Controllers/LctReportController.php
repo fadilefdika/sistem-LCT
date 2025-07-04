@@ -171,6 +171,60 @@ class LctReportController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan, silakan coba lagi.');
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        Log::info("Memulai proses update laporan ID: $id", [
+            'request_data' => $request->all(),
+        ]);
+
+        $laporan = LaporanLct::find($id);
+
+        if (!$laporan) {
+            Log::error("Laporan tidak ditemukan", ['id' => $id]);
+            return back()->with('error', 'Laporan tidak ditemukan.');
+        }
+
+        if ($laporan->status_lct !== 'open') {
+            Log::warning("Laporan tidak dapat diubah karena status bukan 'open'", [
+                'laporan_id' => $id,
+                'status_lct' => $laporan->status_lct,
+            ]);
+            return back()->with('error', 'This report is no longer editable.');
+        }
+
+        // Langsung gunakan ID
+        $kategori = Kategori::find($request->kategori_id);
+        if (!$kategori) {
+            Log::error("Kategori tidak ditemukan", ['kategori_id' => $request->kategori_id]);
+            return redirect()->back()->with('error', 'Kategori tidak valid.');
+        }
+
+        $area = AreaLct::find($request->area_id);
+        if (!$area) {
+            Log::error("Area tidak ditemukan", ['area_id' => $request->area_id]);
+            return redirect()->back()->with('error', 'Area tidak valid.');
+        }
+
+        $updateData = [
+            'tanggal_temuan' => $request->tanggal_temuan,
+            'area_id' => $area->id,
+            'detail_area' => $request->detail_area,
+            'kategori_id' => $kategori->id,
+            'rekomendasi_safety' => $request->rekomendasi_safety,
+        ];
+
+        $laporan->update($updateData);
+
+        Log::info("Laporan berhasil diperbarui", [
+            'laporan_id' => $laporan->id,
+            'updated_data' => $updateData,
+        ]);
+
+        return back()->with('success', 'Laporan berhasil diperbarui.');
+    }
+
+
     
 
     // dari ehs ke pic

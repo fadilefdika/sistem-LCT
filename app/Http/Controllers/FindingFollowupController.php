@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AreaLct;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use App\Models\LaporanLct;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +47,10 @@ class FindingFollowupController extends Controller
             return abort(404, 'Laporan tidak ditemukan');
         }
 
+        $kategoriList = Kategori::all(); // Ambil semua kategori dari tabel
+
+        $areaList = AreaLct::all();
+
         // Ambil bukti temuan & perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
         $tindakan_perbaikan = collect(json_decode($laporan->tindakan_perbaikan, true))->map(function ($entry) {
@@ -76,7 +82,7 @@ class FindingFollowupController extends Controller
             return $item->tipe_reject === 'budget_approval';
         });        
 
-        return view('pages.admin.finding-followup.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects'));
+        return view('pages.admin.finding-followup.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList'));
     }
 
     public function table()

@@ -1,4 +1,4 @@
-<div class="w-full max-h-[calc(100vh)] pb-20 overflow-y-auto 
+<div class="w-full max-h-[calc(100vh)] pb-32 overflow-y-auto 
                 [&::-webkit-scrollbar]:w-2
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -75,22 +75,19 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3 text-center">{{ $index + 1 }}</td>
                                     <td class="px-4 py-3 font-medium">{{ $task->task_name }}</td>
-                                    <td class="px-4 py-3 flex items-center gap-2">
-                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold">
-                                            {{ substr($task->pic->user->fullname, 0, 1) }}
-                                        </div>
-                                        <span>{{ $task->pic->user->fullname }}</span>
-                                    </td>
                                     <td class="px-4 py-3">
-                                        <div>{{ \Carbon\Carbon::parse($task->due_date)->translatedFormat('M j, Y') }}</div>
+                                        <span class="text-xs">{{ $task->pic->user->fullname }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-[10px]">
+                                        <div>{{ \Carbon\Carbon::parse($task->due_date)->locale('en')->isoFormat('MMM D, YYYY') }}</div>
                                         <div class="{{ $task->due_date < now() && $task->status != 'completed' ? 'text-rose-500' : 'text-gray-500' }}">
                                             @if($task->due_date < now() && $task->status != 'completed')
                                                 Overdue
                                             @else
-                                                {{ \Carbon\Carbon::parse($task->due_date)->diffForHumans() }}
+                                                {{ \Carbon\Carbon::parse($task->due_date)->locale('en')->diffForHumans() }}
                                             @endif
                                         </div>
-                                    </td>
+                                    </td>                                    
                                     <td class="px-4 py-3 text-center">
                                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             {{ $task->status == 'pending' ? 'bg-amber-100 text-amber-800' : '' }}
