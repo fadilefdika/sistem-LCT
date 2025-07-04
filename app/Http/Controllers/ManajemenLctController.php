@@ -510,8 +510,10 @@ class ManajemenLctController extends Controller
         }
 
         if ($request->filled('riskLevel')) {
-            $query->where('tingkat_bahaya', $request->riskLevel);
+            $riskLevels = explode(',', $request->riskLevel);
+            $query->whereIn('tingkat_bahaya', $riskLevels);
         }
+        
 
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);

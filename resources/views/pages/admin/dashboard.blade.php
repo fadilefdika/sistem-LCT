@@ -154,7 +154,7 @@
                                 $taskLinks = [
                                     ['count' => $correctiveLowCount, 'label' => 'Corrective Action (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'in_progress,progress_work']],
                                     ['count' => $revisionLowCount, 'label' => 'Revision (Low Risk)', 'params' => ['riskLevel' => 'low', 'statusLct' => 'revision']],
-                                    ['count' => $temporaryInProgressCount, 'label' => 'Temporary Action (Medium/High Risk)', 'params' => ['riskLevel' => 'medium', 'statusLct' => 'in_progress,progress_work']],
+                                    ['count' => $temporaryInProgressCount, 'label' => 'Temporary Action (Medium/High Risk)', 'params' => ['riskLevel' => 'medium,high', 'statusLct' => 'in_progress,progress_work']],
                                     ['count' => $revisionTemporaryCount, 'label' => 'Revision - Temporary', 'params' => ['statusLct' => 'temporary_revision']],
                                     ['count' => $revisionBudgetCount, 'label' => 'Revision - Budget', 'params' => ['statusLct' => 'taskbudget_revision']],
                                     ['count' => $permanentWorkCount, 'label' => 'Permanent Action (Working)', 'params' => ['statusLct' => 'work_permanent']],
@@ -333,22 +333,28 @@
 
                     <!-- Chart Department -->
                     @if($isEhs)
-                        <div class="grid grid-cols-1 mt-4">
-                            <div class="bg-white rounded-2xl shadow-md p-6 relative">
-                                <h2 class="text-base font-semibold text-gray-800 mb-4">Findings by Department</h2>
-                                <div class="absolute top-6 right-6 w-40">
+                    <div class="grid grid-cols-1 mt-4">
+                        <div class="bg-white rounded-2xl shadow-md p-6">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                                <h2 class="text-base font-semibold text-gray-800">
+                                    Findings by Department
+                                </h2>
+                                <div class="w-full sm:w-40">
                                     <select id="month-department" class="w-full px-2 py-1 rounded border border-gray-300 bg-white text-xs focus:ring focus:ring-blue-400">
                                         @for ($m = 1; $m <= 12; $m++)
                                             <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
                                         @endfor
                                     </select>
                                 </div>
-                                <div class="h-[300px]">
-                                    <canvas id="departmentChart"></canvas>
-                                </div>
+                            </div>
+
+                            <div class="h-[300px]">
+                                <canvas id="departmentChart"></canvas>
                             </div>
                         </div>
+                    </div>
                     @endif
+
                 @endif
             </div>
         </div>
