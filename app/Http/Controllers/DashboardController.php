@@ -276,29 +276,50 @@ class DashboardController extends Controller
             $year = $request->input('year');
             $month = $request->input('month');
 
+            // Deteksi user dan role
+            if (Auth::guard('ehs')->check()) {
+                $user = Auth::guard('ehs')->user();
+                $roleName = 'ehs';
+            } else {
+                $user = Auth::guard('web')->user();
+                $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+            }
+
+            // Awal query
+            $query = LaporanLct::query();
+
+            // Filter role untuk manajer: hanya departemennya sendiri
+            if ($roleName === 'manajer') {
+                $deptId = LctDepartement::where('user_id', $user->id)->value('id');
+                if ($deptId) {
+                    $query->where('departemen_id', $deptId);
+                } else {
+                    // Tidak punya dept -> kosongkan data
+                    $query->whereRaw('1 = 0');
+                }
+            }
+            // EHS tidak difilter, bisa melihat semua data
+
+            // Filter by tahun & bulan
             if ($month) {
-                // Per hari, sumbu X tanggal
-                $data = LaporanLct::whereYear('created_at', $year)
+                $query->whereYear('created_at', $year)
                     ->whereMonth('created_at', $month)
                     ->selectRaw('CAST(created_at AS DATE) as date, COUNT(*) as total')
                     ->groupByRaw('CAST(created_at AS DATE)')
-                    ->orderByRaw('CAST(created_at AS DATE)')
-                    ->get();
-
-                // Membuat labels sebagai tanggal
+                    ->orderByRaw('CAST(created_at AS DATE)');
+                
+                $data = $query->get();
                 $labels = $data->pluck('date');
             } else {
-                // Per bulan, sumbu X bulan
-                $data = LaporanLct::whereYear('created_at', $year)
+                $query->whereYear('created_at', $year)
                     ->selectRaw('MONTH(created_at) as month_num, COUNT(*) as total')
                     ->groupByRaw('MONTH(created_at)')
-                    ->orderByRaw('MONTH(created_at)')
-                    ->get();
+                    ->orderByRaw('MONTH(created_at)');
 
-                // Membuat labels sebagai nama bulan
-                $labels = $data->pluck('month_num')->map(function ($m) {
-                    return \Carbon\Carbon::create()->month((int) $m)->format('F');
-                });
+                $data = $query->get();
+                $labels = $data->pluck('month_num')->map(fn($m) =>
+                    \Carbon\Carbon::create()->month((int)$m)->format('F')
+                );
             }
 
             return response()->json([
@@ -312,7 +333,6 @@ class DashboardController extends Controller
         }
     }
 
-
     public function getAreaChartData(Request $request)
     {
         $year = $request->input('year');
@@ -321,7 +341,16 @@ class DashboardController extends Controller
         // Ambil semua nama area
         $allAreas = DB::table('lct_area')->pluck('nama_area');
 
-        // Query laporan
+        // Deteksi role & user
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+
+        // Base query laporan
         $query = DB::table('lct_laporan')
             ->join('lct_area', 'lct_laporan.area_id', '=', 'lct_area.id')
             ->select(
@@ -335,11 +364,23 @@ class DashboardController extends Controller
             $query->whereMonth('lct_laporan.created_at', $month);
         }
 
+        // Filter berdasarkan role
+        if ($roleName === 'manajer') {
+            $deptId = DB::table('lct_departement')->where('user_id', $user->id)->value('id');
+            if ($deptId) {
+                $query->where('lct_laporan.departemen_id', $deptId);
+            } else {
+                // Tidak punya departemen → tidak boleh lihat apa-apa
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        // Jalankan query dan kelola hasilnya
         $reportData = $query->groupBy('lct_area.nama_area')
             ->get()
             ->keyBy('area');
 
-        // Gabungkan dengan semua area
+        // Gabungkan dengan semua area (biar semua area tetap muncul meskipun 0)
         $areaStatusCounts = $allAreas->mapWithKeys(function ($area) use ($reportData) {
             if ($reportData->has($area)) {
                 return [$area => [
@@ -356,6 +397,8 @@ class DashboardController extends Controller
 
         return response()->json(['areaStatusCounts' => $areaStatusCounts]);
     }
+
+
     public function getCategoryChartData(Request $request)
     {
         $year = $request->input('year');
@@ -364,9 +407,18 @@ class DashboardController extends Controller
         // Ambil semua kategori
         $allCategory = DB::table('lct_kategori')->pluck('nama_kategori');
 
+        // Deteksi role & user
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+
         // Query laporan
         $query = DB::table('lct_laporan')
-            ->join('lct_kategori', 'lct_laporan.kategori_id', '=', 'lct_kategori.id') // Pastikan join dengan kategori
+            ->join('lct_kategori', 'lct_laporan.kategori_id', '=', 'lct_kategori.id')
             ->select(
                 'lct_kategori.nama_kategori as kategori',
                 DB::raw("SUM(CASE WHEN lct_laporan.status_lct = 'closed' THEN 1 ELSE 0 END) AS closed_count"),
@@ -378,11 +430,22 @@ class DashboardController extends Controller
             $query->whereMonth('lct_laporan.created_at', $month);
         }
 
+        // Filter berdasarkan role
+        if ($roleName === 'manajer') {
+            $deptId = DB::table('lct_departement')->where('user_id', $user->id)->value('id');
+            if ($deptId) {
+                $query->where('lct_laporan.departemen_id', $deptId);
+            } else {
+                // Tidak punya departemen → tidak dapat akses data
+                $query->whereRaw('1 = 0');
+            }
+        }
+
         $reportData = $query->groupBy('lct_kategori.nama_kategori')
             ->get()
             ->keyBy('kategori');
 
-        // Map data laporan dengan kategori yang ada
+        // Gabungkan semua kategori agar tetap tampil walau nilainya nol
         $categoryStatusCounts = $allCategory->mapWithKeys(function ($kategori) use ($reportData) {
             if ($reportData->has($kategori)) {
                 return [$kategori => [
@@ -397,23 +460,33 @@ class DashboardController extends Controller
             }
         });
 
-        // Siapkan categoryAliases untuk digunakan di chart
+        // Ganti alias jika nama kategori terlalu panjang
         $categoryAliases = $allCategory->mapWithKeys(function ($kategori) {
             return [$kategori => $kategori === '5S (Seiri, Seiton, Seiso, Seiketsu, dan Shitsuke)' ? '5S' : $kategori];
         });
-        
 
         return response()->json([
             'categoryStatusCounts' => $categoryStatusCounts,
-            'categoryAliases' => $categoryAliases // Kirimkan categoryAliases ke frontend
+            'categoryAliases' => $categoryAliases,
         ]);
     }
+
 
     public function getStatusChartData(Request $request)
     {
         $year = $request->input('year');
         $month = $request->input('month');
 
+        // Deteksi user dan role
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+
+        // Query dasar
         $query = DB::table('lct_laporan');
 
         if ($year) {
@@ -424,71 +497,107 @@ class DashboardController extends Controller
             $query->whereMonth('created_at', $month);
         }
 
+        // Filter berdasarkan role
+        if ($roleName === 'manajer') {
+            $deptId = DB::table('lct_departement')->where('user_id', $user->id)->value('id');
+            if ($deptId) {
+                $query->where('departemen_id', $deptId);
+            } else {
+                // Jika manajer tidak punya departemen, tampilkan 0 semua
+                return response()->json([
+                    'statusCounts' => [
+                        'open' => 0,
+                        'closed' => 0,
+                        'in_progress' => 0
+                    ]
+                ]);
+            }
+        }
+
+        // Ambil data status
         $counts = $query
             ->select(
                 DB::raw("SUM(CASE WHEN status_lct = 'open' THEN 1 ELSE 0 END) as [open]"),
-                DB::raw("SUM(CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END) as [closed]"), // <-- disini 'closed'
+                DB::raw("SUM(CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END) as [closed]"),
                 DB::raw("SUM(CASE WHEN status_lct = 'in_progress' THEN 1 ELSE 0 END) as [in_progress]")
             )
             ->first();
 
-
-        // Cek jika null
-        if (!$counts) {
-            $counts = (object)[
-                'open' => 0,
-                'closed' => 0,
-                'in_progress' => 0
-            ];
-        }
-
         return response()->json([
             'statusCounts' => [
                 'open' => $counts->open ?? 0,
-                'closed' => $counts->closed ?? 0,  // ini sesuai alias
+                'closed' => $counts->closed ?? 0,
                 'in_progress' => $counts->in_progress ?? 0
             ]
         ]);
     }
 
+
     public function getDepartmentChartData(Request $request)
     {
         $year = $request->input('year');
         $month = $request->input('month');
-    
+
+        // Deteksi user dan role
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } else {
+            $user = Auth::guard('web')->user();
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+
         // Ambil semua departemen
         $departemenList = DB::table('lct_departement')->pluck('nama_departemen', 'id');
-    
+
         // Query temuan per departemen
         $query = DB::table('lct_laporan')
             ->select('departemen_id', DB::raw('COUNT(*) as total'))
             ->groupBy('departemen_id');
-    
+
         if ($year) {
             $query->whereYear('created_at', $year);
         }
-    
+
         if ($month) {
             $query->whereMonth('created_at', $month);
         }
-    
+
+        // Tambahkan filter untuk role manajer
+        if ($roleName === 'manajer') {
+            $deptId = DB::table('lct_departemen')->where('user_id', $user->id)->value('id');
+            if ($deptId) {
+                $query->where('departemen_id', $deptId);
+            } else {
+                // Jika tidak ada departemen, kembalikan semua 0
+                return response()->json(['data' => collect([])]);
+            }
+        }
+
         $laporanData = $query->get()->keyBy('departemen_id');
-    
-        // Bangun data lengkap berdasarkan semua departemen
-        $chartData = $departemenList->map(function ($nama, $id) use ($laporanData) {
-            return [
-                'label' => $nama,
-                'value' => $laporanData[$id]->total ?? 0
-            ];
-        })->values(); // reset index agar array numerik
-    
+
+        // Bangun data chart
+        $chartData = $departemenList->map(function ($nama, $id) use ($laporanData, $roleName) {
+            if ($roleName === 'manajer') {
+                // Untuk manajer, hanya tampilkan departemennya sendiri
+                return $laporanData->has($id) ? [
+                    'label' => $nama,
+                    'value' => $laporanData[$id]->total
+                ] : null;
+            } else {
+                // Untuk EHS: tampilkan semua
+                return [
+                    'label' => $nama,
+                    'value' => $laporanData[$id]->total ?? 0
+                ];
+            }
+        })->filter()->values(); // Buang null dan reset index
+
         return response()->json([
             'data' => $chartData
         ]);
     }
+
     
-
-
-
     
 }

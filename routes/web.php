@@ -73,6 +73,8 @@ Route::middleware(['auth', 'verified', 'role:pic,manajer,user'])->group(function
         Route::get('/{id_laporan_lct}', [ProgressPerbaikanController::class, 'show'])->name('show');
         Route::get('/lct/{id_laporan_lct}', [LctReportController::class, 'show'])->name('show.new');
         Route::get('/{id_laporan_lct}/history', [ProgressPerbaikanController::class, 'history'])->name('history');
+        
+        Route::get('/reporting/export', [ProgressPerbaikanController::class, 'exportExcel'])->name('export');
         Route::get('/paginated', [ProgressPerbaikanController::class, 'getPaginatedData'])->name('paginated');
     });
 

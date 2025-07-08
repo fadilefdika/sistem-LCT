@@ -66,7 +66,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M9 14l2 2 4-4m0-3V5a2 2 0 00-2-2H6a2 2 0 00-2 2v14a2 2 0 002 2h6"></path>
                             </svg>
-                            <p class="text-xs">No budget request data available.</p>
+                            <p class="text-xs">No budget request need to approve.</p>
                         </div>
                     </td>
                 </tr>

@@ -21,44 +21,54 @@
 
                     <!-- Top Bar -->
                     <div class="flex justify-between items-center flex-wrap gap-3">
-                    <!-- Filter Button -->
-                    <div>
-                        <button @click="showFilter = !showFilter"
-                        class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
-                        </svg>
-                        Filter
-                        </button>
-                    </div>
-                
-                    <!-- Export Button -->
-                    @if($roleName === 'ehs')
+                        <!-- Filter Button -->
                         <div>
-                            <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-ppt-link" 
-                                class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                                Export PPT
-                            </a>
-                            <a href="{{ route('ehs.reporting.export') }}" id="export-link" 
-                                class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
-                                </svg>
-                                Export Excel
-                            </a>
-                            
+                            <button @click="showFilter = !showFilter"
+                            class="inline-flex items-center cursor-pointer gap-2 rounded-lg bg-black text-white text-sm px-4 py-2 shadow hover:bg-gray-800 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 14.414V20a1 1 0 01-1.447.894l-4-2A1 1 0 019 18v-3.586L3.293 6.707A1 1 0 013 6V4z" />
+                            </svg>
+                            Filter
+                            </button>
                         </div>
-                    @endif
+                    
+                        <!-- Export Button -->
+                        @if(in_array($roleName, ['ehs', 'manajer']))
+                            <div>
+                                @if($roleName === 'ehs')
+                                    <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-ppt-link" 
+                                        class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Export PPT
+                                    </a>
+                                    <a href="{{ route('ehs.reporting.export', request()->query()) }}" id="export-link" 
+                                        class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Export Excel
+                                    </a>
+                                @elseif($roleName === 'manajer')
+                                    <a href="{{ route('admin.reporting.export',request()->query()) }}" id="export-link" 
+                                        class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Export Excell
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+
                     </div>
                 
                     <!-- Filter Form Section (Hidden by default) -->
                     <div x-show="showFilter" x-transition x-cloak class="bg-white border border-gray-300 shadow rounded-lg p-4 mt-3 space-y-4">
 
                         <h2 class="text-sm font-semibold text-gray-800">Filter Options</h2>
-
+                        
                         <form method="GET" action="{{ route($routePrefix . '.reporting.index') }}"
                             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 
@@ -384,9 +394,11 @@
             }
 
             // Fungsi untuk update href export Excel
+            const exportBaseUrl = "{{ route($routePrefix . '.reporting.export') }}";
+
             function updateExportLink(filters) {
                 const queryString = new URLSearchParams(filters).toString();
-                const exportUrl = "{{ route('ehs.reporting.export') }}" + (queryString ? '?' + queryString : '');
+                const exportUrl = exportBaseUrl + (queryString ? '?' + queryString : '');
                 $('#export-link').attr('href', exportUrl);
             }
 

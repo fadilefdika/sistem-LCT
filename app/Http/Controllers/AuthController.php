@@ -138,6 +138,10 @@ class AuthController extends Controller
         $request->session()->regenerate();
         session(['active_role' => $role]);
 
+        if ($role === 'user') {
+            return redirect()->route('admin.reporting.index');
+        }
+        
         return redirect()->route(
             $redirectTo === 'form' ? 'report-form' : 'admin.dashboard'
         );

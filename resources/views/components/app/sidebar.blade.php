@@ -76,7 +76,7 @@
                 </h3>
                 <ul class="mt-3 flex flex-col gap-2">
                     <!-- Dashboard -->
-                    @if(in_array(session('active_role'), ['manajer', 'user','pic']))
+                    @if(in_array(session('active_role'), ['manajer','pic']))
                     <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r @if(Request::is('dashboard')){{ 'from-[#048cfb]/[0.12] to-[#048cfb]/[0.04]' }}@endif">
                         <a class="block text-gray-700 dark:text-gray-100 truncate transition @if(!Request::is('dashboard')){{ 'hover:text-gray-900 ' }}@endif" href="{{ route('admin.dashboard') }}">
                                 <div class="flex items-center">
@@ -173,7 +173,7 @@
                                         <path d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z"/>
                                     </svg>
                                     
-                                    <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">LCT Management</span>
+                                    <span class="text-xs font-light ml-4 lg:opacity-100 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 @if(Request::is('manajemen-lct') || Request::is('manajemen-lct/*')){{ 'text-gray-900' }}@else{{ 'text-gray-400 dark:text-gray-900' }}@endif">Reporting</span>
                                 </div>
                             </a>
                         </li>

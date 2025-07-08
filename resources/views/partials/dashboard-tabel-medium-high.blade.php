@@ -4,7 +4,7 @@
             <div class="flex flex-col items-center justify-center px-4 py-8 text-gray-500">
                 <i class="fa-solid fa-face-smile text-3xl mb-2"></i>
                 <p class="text-[11px] font-medium">All in good condition 🎉</p>
-                <p class="text-[11px] text-gray-400">There are no reports at this time. Enjoy your day!</p>
+                <p class="text-[11px] text-gray-400">No reports at this time. Good job!</p>
             </div>
         @else
             @foreach($laporans as $laporan)

@@ -92,7 +92,7 @@ Breadcrumbs::for('ehs progress-perbaikan.show', function (BreadcrumbTrail $trail
 // laporan perbaikan lct
 Breadcrumbs::for('manajemen-lct', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('LCT Management', route('admin.manajemen-lct.index'));
+    $trail->push('Reporting', route('admin.manajemen-lct.index'));
 });
 
 // laporan perbaikan lct detail

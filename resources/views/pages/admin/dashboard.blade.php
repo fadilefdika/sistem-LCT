@@ -17,7 +17,7 @@
                 </div>
                 
                 <div class="bg-green-600 text-white p-4 rounded-lg shadow-lg">
-                    <h3 class="font-medium text-white/80">Resolved</h3>
+                    <h3 class="font-medium text-white/80">Closed</h3>
                     <p class="text-3xl font-bold">{{$resolved}}</p>
                     <div class="text-sm mt-2 {{ $resolvedChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
                         {{ $resolvedChange >= 0 ? '↑' : '↓' }} {{ abs($resolvedChange) }}% from last month
@@ -274,7 +274,6 @@
                                 </div>
 
                                 <!-- Legend Manual (Optional Enhancement) -->
-                                <div id="statusDetails" class="text-sm space-y-1 mt-4 lg:mt-0 lg:ml-6">
                                 <div class="text-sm space-y-2 hidden lg:block">
                                     <div class="flex items-center gap-2">
                                         <span class="w-3 h-3 rounded-full bg-[#FFC107]"></span>
@@ -292,7 +291,6 @@
                                         <span class="w-3 h-3 rounded-full bg-[#0069AA]"></span>
                                         <span>Overdue</span>
                                     </div>
-                                </div>
                                 </div>
                             </div>
                         </div>
