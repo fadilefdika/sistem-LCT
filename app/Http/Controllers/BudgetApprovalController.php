@@ -178,9 +178,6 @@ class BudgetApprovalController extends Controller
         })->reverse()->values();
     }
 
-
-
-
     public function showHistory($id_laporan_lct)
     {
         $taskBudget = LaporanLct::with([

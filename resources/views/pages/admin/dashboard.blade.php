@@ -274,6 +274,7 @@
                                 </div>
 
                                 <!-- Legend Manual (Optional Enhancement) -->
+                                <div id="statusDetails" class="text-sm space-y-1 mt-4 lg:mt-0 lg:ml-6">
                                 <div class="text-sm space-y-2 hidden lg:block">
                                     <div class="flex items-center gap-2">
                                         <span class="w-3 h-3 rounded-full bg-[#FFC107]"></span>
@@ -291,6 +292,7 @@
                                         <span class="w-3 h-3 rounded-full bg-[#0069AA]"></span>
                                         <span>Overdue</span>
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -721,7 +723,6 @@
         fetchCategoryChartData(year, currentMonth);
     });
 
-
     
     let statusChart;
 
@@ -731,10 +732,16 @@
 
         const ctx = canvas.getContext('2d');
 
-        if (typeof statusChart !== 'undefined' && statusChart){ 
+        // Destroy chart sebelumnya
+        if (statusChart) {
             statusChart.destroy();
         }
 
+        // Label status dan warnanya
+        const labels = ['Open', 'Closed', 'In Progress', 'Overdue'];
+        const colors = ['#FFC107', '#4CAF50', '#2196F3', '#0069AA'];
+
+        // Ambil nilai-nilai dari statusCounts
         const dataValues = [
             Number(statusCounts.open) || 0,
             Number(statusCounts.closed) || 0,
@@ -743,19 +750,44 @@
         ];
 
         const total = dataValues.reduce((a, b) => a + b, 0);
+        const percentages = dataValues.map(v => total ? ((v / total) * 100).toFixed(1) : '0.0');
 
+        // Inject ke #statusDetails
+        const detailsContainer = document.getElementById('statusDetails');
+        if (detailsContainer) {
+            detailsContainer.innerHTML = ''; // Kosongkan
+
+            labels.forEach((label, i) => {
+                detailsContainer.innerHTML += `
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full" style="background-color: ${colors[i]}"></span>
+                            <span>${label}</span>
+                        </div>
+                        <div class="text-right font-medium">
+                            ${dataValues[i]} / ${total} × 100 = ${percentages[i]}%
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Tambahkan total
+            detailsContainer.innerHTML += `
+                <div class="flex justify-between pt-1 mt-2 border-t text-xs text-gray-500">
+                    <span>Total</span>
+                    <span>${total}</span>
+                </div>
+            `;
+        }
+
+        // Render Chart.js
         statusChart = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: ['Open', 'Closed', 'In Progress', 'Overdue'],
+                labels: labels,
                 datasets: [{
                     data: dataValues,
-                    backgroundColor: [
-                        '#FFC107',   // Open
-                        '#4CAF50',   // Closed
-                        '#2196F3',   // In Progress
-                        '#0069AA'    // Overdue
-                    ],
+                    backgroundColor: colors,
                     borderWidth: 4,
                     borderColor: '#fff',
                     hoverOffset: 8
@@ -778,7 +810,7 @@
                         }
                     },
                     datalabels: {
-                        formatter: (value, context) => {
+                        formatter: (value) => {
                             return total ? (value / total * 100).toFixed(1) + '%' : '0%';
                         },
                         color: '#000',
@@ -803,42 +835,41 @@
     }
 
 
+    function fetchStatusChartData(year, month) {
+        const url = userRole === 'ehs' ? '/ehs/dashboard/status-chart-data' : '/dashboard/status-chart-data';
 
-        function fetchStatusChartData(year, month) {
-            const url = userRole === 'ehs' ? '/ehs/dashboard/status-chart-data' : '/dashboard/status-chart-data';
-
-            $.ajax({
-                url: url,
-                data: { year, month },
-                success: function (res) {
-                    renderStatusChart(res.statusCounts);
-                },
-                error: function (xhr) {
-                    console.error('Error fetching status chart data:', xhr.responseText);
-                }
-            });
-        }
-
-        $('#month-select-status').change(function () {
-            const now = new Date();
-            const year = now.getFullYear(); // Tahun sekarang otomatis
-            const month = $(this).val();
-            fetchStatusChartData(year, month);
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const now = new Date();
-            const year = now.getFullYear();
-            const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-
-            const monthSelect = document.getElementById('month-select-status');
-            if (monthSelect) {
-                monthSelect.value = currentMonth;
+        $.ajax({
+            url: url,
+            data: { year, month },
+            success: function (res) {
+                renderStatusChart(res.statusCounts);
+            },
+            error: function (xhr) {
+                console.error('Error fetching status chart data:', xhr.responseText);
             }
-
-            fetchStatusChartData(year, currentMonth);
         });
+    }
+
+$('#month-select-status').change(function () {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = $(this).val();
+    fetchStatusChartData(year, month);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const now = new Date();
+    const year = now.getFullYear();
+    const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+
+    const monthSelect = document.getElementById('month-select-status');
+    if (monthSelect) {
+        monthSelect.value = currentMonth;
+    }
+
+    fetchStatusChartData(year, currentMonth);
+});
+
 
         let departmentChart;
 
