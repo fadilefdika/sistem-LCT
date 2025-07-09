@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pic;
 use App\Models\User;
+use App\Models\UserRoleLct;
 use Illuminate\Http\Request;
 use App\Models\LctDepartement;
 use App\Models\LctDepartemenPic;
@@ -35,6 +36,24 @@ class RoleDataController extends Controller
             // Jika user belum terdaftar di lct_pic, tambahkan terlebih dahulu
             if (!$pic) {
                 $pic = Pic::create(['user_id' => $request->user_id]);
+            }
+            
+            $hasRole = UserRoleLct::where('model_id', $request->user_id)
+                ->where('model_type', User::class)
+                ->where('role_id', 2)
+                ->exists();
+
+            if (!$hasRole) {
+                // Jika belum, tambahkan role PIC
+                UserRoleLct::create([
+                    'model_id' => $request->user_id,
+                    'model_type' => User::class,
+                    'role_id' => 2,
+                ]);
+
+                Log::info('Role PIC ditambahkan untuk user', ['user_id' => $request->user_id]);
+            } else {
+                Log::info('User sudah memiliki role PIC', ['user_id' => $request->user_id]);
             }
 
             // Cek apakah PIC sudah ada di departemen tersebut

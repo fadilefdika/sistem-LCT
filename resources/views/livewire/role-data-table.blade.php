@@ -324,8 +324,7 @@
             let url = picId ? `${baseUrl}/${picId}` : baseUrl;
             let method = picId ? "PUT" : "POST";
 
-            console.log("Data sebelum dikirim:");
-            formData.forEach((value, key) => console.log(key, value)); // Menampilkan data FormData
+            // formData.forEach((value, key) => console.log(key, value)); // Menampilkan data FormData
 
     
             try {
@@ -334,7 +333,7 @@
                     body: formData
                 };
 
-                console.log(options);
+                // console.log(options);
 
                 if (method === "PUT") {
                     let jsonData = {};

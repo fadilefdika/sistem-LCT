@@ -37,14 +37,10 @@ class ManajemenLctController extends Controller
 
         $statusGroups = [
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
-            // 'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
             'Overdue' => ['overdue'],
         ];
 
-        $now = Carbon::now();
-
-        // Ambil semua laporan yang belum pernah dicatat overdue
         $laporanList = LaporanLct::whereNull('first_overdue_date')
             ->where('status_lct', '!=', 'closed')
             ->get();
@@ -54,25 +50,46 @@ class ManajemenLctController extends Controller
 
         $perPage = $request->input('perPage', 10);
 
+        $allowedSorts = [
+            'Type' => 'type',
+            'due_date' => 'due_date',
+            'completion_date' => 'date_completion',
+            'area' => DB::raw('(SELECT nama_area FROM lct_area WHERE lct_area.id = lct_laporan.area_id)'),
+            'tingkat_bahaya' => DB::raw("CASE 
+                                            WHEN tingkat_bahaya IS NULL THEN 0
+                                            WHEN tingkat_bahaya = 'Low' THEN 1
+                                            WHEN tingkat_bahaya = 'Medium' THEN 2
+                                            WHEN tingkat_bahaya = 'High' THEN 3
+                                            ELSE 4
+                                        END"),
+            'progress_status' => 'status_lct',
+        ];
+
+        $sortBy = request('sort_by');
+        $sortColumn = $allowedSorts[$sortBy] ?? 'created_at';
+        $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
+
+        // ✅ Final Query tanpa duplikat
         $laporans = $query
             ->orderBy('order_type')
+            ->orderBy($sortColumn, $sortOrder)
             ->orderByDesc('updated_at')
             ->paginate($perPage)
             ->withQueryString();
 
         if ($request->ajax()) {
-            // Ini penting! Return partial yang hanya bagian isi
             return view('partials.tabel-manajemen-lct-wrapper', compact('laporans'))->render();
         }
 
         return view('pages.admin.manajemen-lct.index', [
-            'laporans' => $laporans, 
+            'laporans' => $laporans,
             'statusGroups' => $statusGroups,
-            'areas'=>$areas,
+            'areas' => $areas,
             'categories' => $categories,
-        
         ]);
     }
+
+
 
     public function show($id_laporan_lct)
     {

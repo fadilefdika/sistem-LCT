@@ -13,7 +13,8 @@ class UserRoleLct extends Model
     protected $table = 'lct_user_roles'; // Nama tabel
 
     protected $fillable = [
-        'user_id', 
+        'model_id',
+        'model_type',
         'role_id'
     ];
 

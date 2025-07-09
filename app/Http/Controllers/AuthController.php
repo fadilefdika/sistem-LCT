@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\EhsUser;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -107,7 +107,9 @@ class AuthController extends Controller
             'pic' => 2,
             'manajer' => 4,
         ];
+
         $expectedRoleId = $roleMapping[$role];
+        
 
         $user = User::with('roleLct')->where('npk', $npk)->first();
 

@@ -535,7 +535,7 @@ Alpine.data('taskData', () => ({
     },
 
     validatePicId(index) {
-        console.log("Validasi PIC:", this.tasks[index].picId);
+        // console.log("Validasi PIC:", this.tasks[index].picId);
         if (!this.tasks[index].picId) {
             console.warn(`Task ${index + 1}: PIC belum dipilih!`);
         }
@@ -577,7 +577,7 @@ document.querySelectorAll('.status-checkbox').forEach((checkbox) => {
             }
 
             const data = await response.json();
-            console.log("Status updated:", data);
+            // console.log("Status updated:", data);
 
             // Update label teks sesuai status
             const label = this.closest('label').querySelector('span');

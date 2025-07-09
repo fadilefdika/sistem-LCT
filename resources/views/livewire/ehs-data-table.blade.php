@@ -222,7 +222,7 @@
                     });
                 }
             } catch (error) {
-                console.log("Error saving ehs:", error);
+                // console.log("Error saving ehs:", error);
                 Swal.fire({
                     title: "Failed!",
                     text: "Failed to save data.",

@@ -54,21 +54,37 @@ class ProgressPerbaikanController extends Controller
 
         $now = Carbon::now();
 
-        // Ambil semua laporan yang belum pernah dicatat overdue
-        $laporanList = LaporanLct::whereNull('first_overdue_date')
-            ->where('status_lct', '!=', 'closed')
-            ->get();
 
         $query = $this->buildLaporanQuery($request, $user, $role);
         $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
         
         $perPage = $request->input('perPage', 10);
-
+        $allowedSorts = [
+            'finding_date' => 'tanggal_temuan',
+            'due_date' => 'due_date',
+            'pic_name' => DB::raw("ISNULL((SELECT fullname COLLATE Latin1_General_CI_AS FROM users WHERE users.id = lct_laporan.pic_id), '')"),
+            'tingkat_bahaya' => DB::raw("
+                CASE 
+                    WHEN tingkat_bahaya IS NULL THEN 0
+                    WHEN tingkat_bahaya = 'Low' THEN 1
+                    WHEN tingkat_bahaya = 'Medium' THEN 2
+                    WHEN tingkat_bahaya = 'High' THEN 3
+                    ELSE 4
+                END
+            "),
+            'progress_status' => 'status_lct',
+        ];
+        
+        $sortBy = request('sort_by');
+        $sortColumn = $allowedSorts[$sortBy] ?? 'created_at';
+        $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
         $laporans = $query
             ->orderBy('order_type')
+            ->orderBy($sortColumn, $sortOrder) // ← Tambahkan ini
             ->orderByDesc('updated_at')
             ->paginate($perPage)
             ->withQueryString();
+
 
 
         // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
@@ -1081,11 +1097,14 @@ class ProgressPerbaikanController extends Controller
                 // --- TABEL KIRI ---
                 $tableLeft = new Table(2);
                 $tableLeft->setWidth(460)->setOffsetX(20)->setOffsetY(80);
+                $col1Width = 140; // Label
+                $col2Width = 320; // Value
 
                 $observationDateRaw = $laporan->tanggal_temuan ?? $laporan->created_at;
                 $observationDate = Carbon::parse($observationDateRaw)->format('F d, Y');
 
                 $leftData = [
+                    "No LCT" => $laporan->id_laporan_lct,
                     "Observation No/Location" => $laporan->area->nama_area ?? '-' . ' ('.$laporan->detail_area .')' ?? '-',
                     "Observation date" => $observationDate,
                     "Responsibility (PIC)" => $laporan->picUser->fullname ?? '-',
@@ -1098,9 +1117,11 @@ class ProgressPerbaikanController extends Controller
                     $row->setHeight(30);
 
                     $cell1 = $row->getCell(0);
+                    $cell1->setWidth($col1Width);
                     $cell1->createTextRun('  ' . $header);
 
                     $cell2 = $row->getCell(1);
+                    $cell2->setWidth($col2Width);
                     $cell2->createTextRun('  ' . $value);
                 }
 
@@ -1143,9 +1164,11 @@ class ProgressPerbaikanController extends Controller
                     $row->setHeight(30);
 
                     $cell1 = $row->getCell(0);
+                    $cell1->setWidth($col1Width);
                     $cell1->createTextRun('  ' . $header);
 
                     $cell2 = $row->getCell(1);
+                    $cell2->setWidth($col2Width);
                     $cell2->createTextRun('  ' . $value);
                 }
 
