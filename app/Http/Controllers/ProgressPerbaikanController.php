@@ -54,15 +54,20 @@ class ProgressPerbaikanController extends Controller
 
         $now = Carbon::now();
 
-
         $query = $this->buildLaporanQuery($request, $user, $role);
-        $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+        // JOIN agar bisa sort pakai fullname dari user
+        $query->leftJoin('lct_pic', 'lct_laporan.pic_id', '=', 'lct_pic.id')
+                ->leftJoin('users', 'users.id', '=', 'lct_pic.user_id');
+
+
+        $query->select('lct_laporan.*','users.fullname',DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+                
         
         $perPage = $request->input('perPage', 10);
         $allowedSorts = [
             'finding_date' => 'tanggal_temuan',
             'due_date' => 'due_date',
-            'pic_name' => DB::raw("ISNULL((SELECT fullname COLLATE Latin1_General_CI_AS FROM users WHERE users.id = lct_laporan.pic_id), '')"),
+            'pic_name' => 'users.fullname',
             'tingkat_bahaya' => DB::raw("
                 CASE 
                     WHEN tingkat_bahaya IS NULL THEN 0
@@ -73,15 +78,16 @@ class ProgressPerbaikanController extends Controller
                 END
             "),
             'progress_status' => 'status_lct',
+            'created_at' => 'lct_laporan.created_at',
         ];
         
         $sortBy = request('sort_by');
-        $sortColumn = $allowedSorts[$sortBy] ?? 'created_at';
+        $sortColumn = $allowedSorts[$sortBy] ?? 'lct_laporan.created_at';
         $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
         $laporans = $query
             ->orderBy('order_type')
             ->orderBy($sortColumn, $sortOrder) // ← Tambahkan ini
-            ->orderByDesc('updated_at')
+            ->orderByDesc('lct_laporan.updated_at')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -1004,6 +1010,12 @@ class ProgressPerbaikanController extends Controller
                     break;
             }
         }
+
+        $query->with([
+            'area',
+            'kategori',
+            'picc.user'
+        ]);
 
         return $query;
     }

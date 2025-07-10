@@ -41,39 +41,39 @@ class ManajemenLctController extends Controller
             'Overdue' => ['overdue'],
         ];
 
-        $laporanList = LaporanLct::whereNull('first_overdue_date')
-            ->where('status_lct', '!=', 'closed')
-            ->get();
-
-        $query = $this->buildLaporanQuery($request, $user, 'pic');
-        $query->select('*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
-
+        $query = $this->buildLaporanQuery($request, $user, 'pic')
+            ->with('area', 'kategori', 'picUser') // Eager load relasi
+            ->select('lct_laporan.*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+        
         $perPage = $request->input('perPage', 10);
 
         $allowedSorts = [
             'Type' => 'type',
             'due_date' => 'due_date',
             'completion_date' => 'date_completion',
-            'area' => DB::raw('(SELECT nama_area FROM lct_area WHERE lct_area.id = lct_laporan.area_id)'),
+        
+            // Gunakan kolom relasi area untuk sorting (harus eager loaded)
+            'area' => DB::raw("(SELECT nama_area FROM lct_area WHERE lct_area.id = lct_laporan.area_id)"),
+        
             'tingkat_bahaya' => DB::raw("CASE 
-                                            WHEN tingkat_bahaya IS NULL THEN 0
-                                            WHEN tingkat_bahaya = 'Low' THEN 1
-                                            WHEN tingkat_bahaya = 'Medium' THEN 2
-                                            WHEN tingkat_bahaya = 'High' THEN 3
-                                            ELSE 4
-                                        END"),
+                WHEN tingkat_bahaya IS NULL THEN 0
+                WHEN tingkat_bahaya = 'Low' THEN 1
+                WHEN tingkat_bahaya = 'Medium' THEN 2
+                WHEN tingkat_bahaya = 'High' THEN 3
+                ELSE 4 END"),
+                
             'progress_status' => 'status_lct',
+            'created_at' => 'lct_laporan.created_at', // penting!
         ];
-
+        
         $sortBy = request('sort_by');
-        $sortColumn = $allowedSorts[$sortBy] ?? 'created_at';
+        $sortColumn = $allowedSorts[$sortBy] ?? 'lct_laporan.created_at';
         $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
-
-        // ✅ Final Query tanpa duplikat
+        
         $laporans = $query
             ->orderBy('order_type')
             ->orderBy($sortColumn, $sortOrder)
-            ->orderByDesc('updated_at')
+            ->orderByDesc('lct_laporan.updated_at') // alias eksplisit
             ->paginate($perPage)
             ->withQueryString();
 
@@ -475,7 +475,7 @@ class ManajemenLctController extends Controller
         $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
         $laporanTaskIds = \App\Models\LctTasks::where('pic_id', $picId)->pluck('id_laporan_lct');
 
-        $query = LaporanLct::query()
+        $query = LaporanLct::with('picUser', 'kategori', 'area')
             ->where(function ($q) use ($picId, $laporanTaskIds) {
                 $q->where('pic_id', $picId); // Main PIC
                 

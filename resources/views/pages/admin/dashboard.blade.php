@@ -4,42 +4,79 @@
         <div class="mx-auto max-w-screen-2xl">
             <div class="container mx-auto">
 
-                 <!-- Top Section - Cards and Key Metrics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <!-- Summary Cards -->
-                <div class="bg-blue-600 text-white p-4 rounded-lg shadow-lg">
-                    <h3 class="font-medium text-white/80">Total Findings</h3>
-                    <p class="text-3xl font-bold">{{$totalFindings}}</p>
-                    <div class="text-sm mt-2 {{ $totalFindingsChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
-                        {{ $totalFindingsChange >= 0 ? '↑' : '↓' }} {{ abs($totalFindingsChange) }}% from last month
-                    </div>
+                <!-- Top Section - Cards and Key Metrics -->
+                @php
+                    $startOfMonth = \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d');
+                    $endOfMonth = \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d');
+
+                    if (Auth::guard('ehs')->check()) {
+                        $user = Auth::guard('ehs')->user();
+                        $roleName = 'ehs';
+                    } else {
+                        $user = Auth::guard('web')->user();
+                        // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
+                        $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+                    }
+
+                
+                    if ($roleName === 'ehs') {
+                        $routeName = 'ehs.reporting.index';
+                    } elseif ($roleName === 'pic') {
+                        $routeName = 'admin.manajemen-lct.index';
+                    } else {
+                        $routeName = 'admin.reporting.index';
+                    }
+                @endphp
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                     
+                    <!-- Total Findings -->
+                    <a href="{{ route($routeName, ['tanggalAwal' => $startOfMonth, 'tanggalAkhir' => $endOfMonth]) }}">
+                        <div class="bg-blue-600 text-white p-4 rounded-lg shadow-lg hover:opacity-90 transition">
+                            <h3 class="font-medium text-white/80">Total Findings</h3>
+                            <p class="text-3xl font-bold">{{ $totalFindings }}</p>
+                            <div class="text-sm mt-2 text-white/70">
+                                {{ $totalFindingsChange >= 0 ? '↑' : '↓' }} {{ abs($totalFindingsChange) }}% from last month
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Closed -->
+                    <a href="{{ route($routeName, ['tanggalAwal' => $startOfMonth, 'tanggalAkhir' => $endOfMonth, 'statusLct' => 'closed']) }}">
+                        <div class="bg-green-600 text-white p-4 rounded-lg shadow-lg hover:opacity-90 transition">
+                            <h3 class="font-medium text-white/80">Closed</h3>
+                            <p class="text-3xl font-bold">{{ $resolved }}</p>
+                            <div class="text-sm mt-2 text-white/70">
+                                {{ $resolvedChange >= 0 ? '↑' : '↓' }} {{ abs($resolvedChange) }}% from last month
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Overdue -->
+                    <a href="{{ route($routeName, ['tanggalAwal' => $startOfMonth, 'tanggalAkhir' => $endOfMonth, 'overdue' => 'true']) }}">
+                        <div class="bg-amber-500 text-white p-4 rounded-lg shadow-lg hover:opacity-90 transition">
+                            <h3 class="font-medium text-white/80">Overdue</h3>
+                            <p class="text-3xl font-bold">{{ $overdue }}</p>
+                            <div class="text-sm mt-2 text-white/70">
+                                {{ $overdueChange >= 0 ? '↑' : '↓' }} {{ abs($overdueChange) }}% from last month
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- High Risk -->
+                    <a href="{{ route($routeName, ['tanggalAwal' => $startOfMonth, 'tanggalAkhir' => $endOfMonth, 'riskLevel' => 'high']) }}">
+                        <div class="bg-red-600 text-white p-4 rounded-lg shadow-lg hover:opacity-90 transition">
+                            <h3 class="font-medium text-white/80">High Risk</h3>
+                            <p class="text-3xl font-bold">{{ $highRisk }}</p>
+                            <div class="text-sm mt-2 text-white/70">
+                                {{ $highRiskChange >= 0 ? '↑' : '↓' }} {{ abs($highRiskChange) }}% from last month
+                            </div>
+                        </div>
+                    </a>
+
                 </div>
+
                 
-                <div class="bg-green-600 text-white p-4 rounded-lg shadow-lg">
-                    <h3 class="font-medium text-white/80">Closed</h3>
-                    <p class="text-3xl font-bold">{{$resolved}}</p>
-                    <div class="text-sm mt-2 {{ $resolvedChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
-                        {{ $resolvedChange >= 0 ? '↑' : '↓' }} {{ abs($resolvedChange) }}% from last month
-                    </div>
-                </div>
-                
-                <div class="bg-amber-500 text-white p-4 rounded-lg shadow-lg">
-                    <h3 class="font-medium text-white/80">Overdue</h3>
-                    <p class="text-3xl font-bold">{{$overdue}}</p>
-                    <div class="text-sm mt-2 {{ $overdueChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
-                        {{ $overdueChange >= 0 ? '↑' : '↓' }} {{ abs($overdueChange) }}% from last month
-                    </div>
-                </div>
-                
-                <div class="bg-red-600 text-white p-4 rounded-lg shadow-lg">
-                    <h3 class="font-medium text-white/80">High Risk</h3>
-                    <p class="text-3xl font-bold">{{$highRisk}}</p>
-                    <div class="text-sm mt-2 {{ $highRiskChange >= 0 ? 'text-white-200' : 'text-white-200' }}">
-                        {{ $highRiskChange >= 0 ? '↑' : '↓' }} {{ abs($highRiskChange) }}% from last month
-                    </div>
-                </div>
-            </div>
 
             @php
                 // Ambil role aktif dari session, fallback ke relasi jika tidak ada
@@ -117,14 +154,6 @@
                     @endif
 
                     @if($isPic)
-                        {{-- <div class="p-4 bg-white rounded-lg shadow-md flex flex-col">
-                            <h2 class="text-base font-semibold mb-2">Unread Reports</h2>
-                            <div class="overflow-auto h-auto"> <!-- Height diseragamkan -->
-                                @include('partials.dashboard-tabel', [
-                                    'laporans' => $laporanInProgress
-                                ])
-                            </div>
-                        </div> --}}
 
                         @php
                             $taskOnlyTotal = $todos['taskOnly']['total'] ?? 0;
@@ -137,7 +166,6 @@
                                 + $permanentWorkCount
                                 + $taskOnlyTotal;
                         @endphp
-
 
                     <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
                         <div class="mb-3">
@@ -181,7 +209,6 @@
                         </ul>
                         
                     </div>
-
 
                         
 

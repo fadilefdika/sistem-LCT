@@ -495,10 +495,10 @@
                                                                                 </div>
                                                                                 
                                                                                 @if(strtolower($laporan->tingkat_bahaya) !== 'low')
-                                                                                <div class="border-b border-gray-200 pb-2">
-                                                                                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Permanent Due Date</p>
-                                                                                <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
-                                                                                </div>
+                                                                                    <div class="border-b border-gray-200 pb-2">
+                                                                                        <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Permanent Due Date</p>
+                                                                                        <p class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($laporan->due_date)->format('d M Y') }}</p>
+                                                                                    </div>
                                                                                 @endif
                                                                             
                                                                                 <div class="border-b border-gray-200 pb-2">

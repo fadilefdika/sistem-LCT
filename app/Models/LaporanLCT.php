@@ -83,6 +83,11 @@ class LaporanLct extends Model
         return $this->belongsTo(User::class, 'pic_id', 'id');
     }
 
+    public function picc()
+    {
+        return $this->belongsTo(Pic::class, 'pic_id');
+    }
+
     // Relasi ke users melalui lct_pic
     public function picUser()
     {
