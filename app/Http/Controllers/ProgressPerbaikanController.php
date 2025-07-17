@@ -939,13 +939,17 @@ class ProgressPerbaikanController extends Controller
     }
 
 
+
+
     private function buildLaporanQuery(Request $request, $user, $role)
     {
         $query = LaporanLct::query();
 
-        // Filter berdasarkan role
+        // dd($request->all());
+
+        // --- FILTER BERDASARKAN ROLE ---
         if ($role === 'user') {
-            $query->where('user_id', $user->id);
+            $query->where('lct_pic.user_id', $user->id);
         } elseif ($role === 'manajer') {
             $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
             $query->where('departemen_id', $departemenId);
@@ -954,6 +958,7 @@ class ProgressPerbaikanController extends Controller
             $query->where('pic_id', $picId);
         }
 
+        // --- FILTER-FILTER TAMBAHAN ---
         if ($request->filled('riskLevel')) {
             $query->where('tingkat_bahaya', $request->riskLevel);
         }
@@ -961,24 +966,18 @@ class ProgressPerbaikanController extends Controller
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
             $today = now();
-        
+
             $query->where(function ($q) use ($statuses, $today) {
-                // Filter out 'overdue' from the normal status filter
                 $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
-        
-                // If there are other statuses, filter by them
                 if (count($statusFilters) > 0) {
                     $q->whereIn('status_lct', $statusFilters);
                 }
-        
-                // If 'overdue' is requested, filter by first_overdue_date (non-null means overdue)
                 if (in_array('overdue', array_map('strtolower', $statuses))) {
                     $q->orWhereNotNull('first_overdue_date');
                 }
             });
-        }        
-        
-        
+        }
+
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
             $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
@@ -996,6 +995,8 @@ class ProgressPerbaikanController extends Controller
         if ($request->filled('areaId')) {
             $query->where('area_id', $request->areaId);
         }
+
+        // GROUP BY Format
         $groupByFormat = null;
         if ($request->filled('groupBy')) {
             switch ($request->groupBy) {
@@ -1017,8 +1018,30 @@ class ProgressPerbaikanController extends Controller
             'picc.user'
         ]);
 
+        if ($request->overdue == 'true') {
+            $startOfMonth = now()->startOfMonth();
+            $endOfMonth = now()->endOfMonth();
+        
+            $query->whereBetween('lct_laporan.created_at', [$startOfMonth, $endOfMonth])
+                  ->where('status_lct', '!=', 'closed')
+                  ->where(function ($q) {
+                      $q->where(function ($qq) {
+                          $qq->where('tingkat_bahaya', 'Low')
+                             ->whereNull('date_completion')
+                             ->whereDate('due_date', '<', now());
+                      })->orWhere(function ($qq) {
+                          $qq->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                             ->whereNull('date_completion')
+                             ->whereDate('due_date', '<', now());
+                      });
+                  });
+        }
+        
+
+        // dd("buildLaporanQuery",$query->toSql(), $query->getBindings());
         return $query;
     }
+
 
 
     public function getPaginatedData(Request $request)

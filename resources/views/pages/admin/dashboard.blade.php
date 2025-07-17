@@ -53,7 +53,7 @@
                     </a>
 
                     <!-- Overdue -->
-                    <a href="{{ route($routeName, ['tanggalAwal' => $startOfMonth, 'tanggalAkhir' => $endOfMonth, 'overdue' => 'true']) }}">
+                    <a href="{{ route($routeName, ['overdue' => 'true']) }}">
                         <div class="bg-amber-500 text-white p-4 rounded-lg shadow-lg hover:opacity-90 transition">
                             <h3 class="font-medium text-white/80">Overdue</h3>
                             <p class="text-3xl font-bold">{{ $overdue }}</p>

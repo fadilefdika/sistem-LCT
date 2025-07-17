@@ -231,6 +231,8 @@ class DashboardController extends Controller
                 $correctiveLowCount = $revisionLowCount = $temporaryInProgressCount = $revisionTemporaryCount = $revisionBudgetCount = $permanentWorkCount = $todos = 0;
             }
         }
+
+        // dd("Dashboard",$overdue->toSql(), $overdue->getBindings());
         
 
 
