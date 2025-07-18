@@ -87,7 +87,6 @@ class ProgressPerbaikanController extends Controller
         $laporans = $query
             ->orderBy('order_type')
             ->orderBy($sortColumn, $sortOrder) // ← Tambahkan ini
-            ->orderByDesc('lct_laporan.updated_at')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -943,13 +942,13 @@ class ProgressPerbaikanController extends Controller
 
     private function buildLaporanQuery(Request $request, $user, $role)
     {
-        $query = LaporanLct::query();
+        $query = LaporanLct::orderBy('updated_at', 'desc');
 
         // dd($request->all());
 
         // --- FILTER BERDASARKAN ROLE ---
         if ($role === 'user') {
-            $query->where('lct_pic.user_id', $user->id);
+            $query->where('lct_laporan.user_id', $user->id);
         } elseif ($role === 'manajer') {
             $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
             $query->where('departemen_id', $departemenId);
