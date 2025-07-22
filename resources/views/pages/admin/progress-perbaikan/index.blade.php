@@ -232,7 +232,7 @@
       @endif
 
     <div class="bg-white p-4 rounded-xl shadow">
-        <div id="report-container">
+        <div id="report-container-report">
             @include('partials.tabel-reporting-wrapper', ['laporans' => $laporans])
         </div>
     </div>
@@ -378,12 +378,12 @@
                     type: 'GET',
                     data: params,
                     success: function(res) {
-                        $('#report-container').html(res);
+                        $('#report-container-report').html(res);
                         // Scroll ke atas tabel agar user tau data baru sudah dimuat
                         if (window.Alpine) {
-                            Alpine.initTree(document.querySelector('#report-container'));
+                            Alpine.initTree(document.querySelector('#report-container-report'));
                         }
-                        $('html, body').animate({ scrollTop: $('#report-container').offset().top - 100 }, 300);
+                        $('html, body').animate({ scrollTop: $('#report-container-report').offset().top - 100 }, 300);
                         updateExportLink(params);
                         updateExportPptLink(params);
                     },

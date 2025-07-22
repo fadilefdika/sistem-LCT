@@ -35,7 +35,6 @@ class ProgressPerbaikanController extends Controller
             $role = 'ehs';
         } else {
             $user = Auth::guard('web')->user();
-            // Ambil dari session terlebih dahulu, fallback ke relasi jika tidak ada
             $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
         }
 
@@ -47,28 +46,29 @@ class ProgressPerbaikanController extends Controller
         $statusGroups = [
             'Open' => ['open'],
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
-            // 'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
+            'Waiting Approval' => [
+                'waiting_approval', 'waiting_approval_temporary', 'waiting_approval_permanent', 'waiting_approval_taskbudget'
+            ],
+            'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
             'Overdue' => ['overdue'],
         ];
 
-        $now = Carbon::now();
-
         $query = $this->buildLaporanQuery($request, $user, $role);
+
         // JOIN agar bisa sort pakai fullname dari user
         $query->leftJoin('lct_pic', 'lct_laporan.pic_id', '=', 'lct_pic.id')
-                ->leftJoin('users', 'users.id', '=', 'lct_pic.user_id');
+            ->leftJoin('users', 'users.id', '=', 'lct_pic.user_id');
 
+        $query->select('lct_laporan.*', 'users.fullname', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
 
-        $query->select('lct_laporan.*','users.fullname',DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
-                
-        
         $perPage = $request->input('perPage', 10);
+
         $allowedSorts = [
-            'finding_date' => 'tanggal_temuan',
-            'due_date' => 'due_date',
-            'pic_name' => 'users.fullname',
-            'tingkat_bahaya' => DB::raw("
+            'finding_date'     => 'tanggal_temuan',
+            'due_date'         => 'due_date',
+            'pic_name'         => 'users.fullname',
+            'tingkat_bahaya'   => DB::raw("
                 CASE 
                     WHEN tingkat_bahaya IS NULL THEN 0
                     WHEN tingkat_bahaya = 'Low' THEN 1
@@ -77,49 +77,43 @@ class ProgressPerbaikanController extends Controller
                     ELSE 4
                 END
             "),
-            'progress_status' => 'status_lct',
-            'created_at' => 'lct_laporan.created_at',
+            'progress_status'  => 'status_lct',
+            'created_at'       => 'lct_laporan.created_at',
         ];
-        
-        $sortBy = request('sort_by');
-        $sortColumn = $allowedSorts[$sortBy] ?? 'lct_laporan.created_at';
-        $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
-        $laporans = $query
-            ->orderBy('order_type')
-            ->orderBy($sortColumn, $sortOrder) // ← Tambahkan ini
-            ->paginate($perPage)
-            ->withQueryString();
 
+        $sortBy = $request->input('sort_by');
+        $sortOrder = $request->input('sort_order', 'asc');
 
+        $query->orderBy('order_type');
 
-        // ================== TAMBAHAN UNTUK DATA GRAFIK ==================
+        if ($sortBy && array_key_exists($sortBy, $allowedSorts)) {
+            $query->orderBy($allowedSorts[$sortBy], $sortOrder);
+        } else {
+            $query->orderByDesc('lct_laporan.updated_at'); // Fallback default
+        }
 
-        // Query base untuk statistik, sama filter seperti query utama tapi tanpa paginate dan filter open
-        $baseQuery = $this->buildLaporanQuery($request, $user, $role);
+        $laporans = $query->paginate($perPage)->withQueryString();
 
+        // Statistik grafik
         $availableYears = LaporanLct::selectRaw('YEAR(tanggal_temuan) as year')
-        ->distinct()
-        ->orderByDesc('year')
-        ->pluck('year');
-    
-    
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
 
         if ($request->ajax()) {
-            // Ini penting! Return partial yang hanya bagian isi
             return view('partials.tabel-reporting-wrapper', compact('laporans'))->render();
         }
-        
+
         return view('pages.admin.progress-perbaikan.index', [
             'laporans' => $laporans,
             'statusGroups' => $statusGroups,
             'areas' => $areas,
-            'departments' => $departments,
             'categories' => $categories,
+            'departments' => $departments,
             'availableYears' => $availableYears,
         ]);
-            
     }
- 
+
 
     public function show($id_laporan_lct)
     {
@@ -942,47 +936,88 @@ class ProgressPerbaikanController extends Controller
 
     private function buildLaporanQuery(Request $request, $user, $role)
     {
-        $query = LaporanLct::orderBy('updated_at', 'desc');
+        $query = LaporanLct::query();
 
-        // dd($request->all());
+        $today = now();
 
-        // --- FILTER BERDASARKAN ROLE ---
-        if ($role === 'user') {
-            $query->where('lct_laporan.user_id', $user->id);
-        } elseif ($role === 'manajer') {
-            $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
-            $query->where('departemen_id', $departemenId);
-        } elseif (!in_array($role, ['ehs'])) {
-            $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
-            $query->where('pic_id', $picId);
+        // === Filter by Role ===
+        switch ($role) {
+            case 'user':
+                $query->where('lct_laporan.user_id', $user->id);
+                break;
+            case 'manajer':
+                $departemenId = \App\Models\LctDepartement::where('user_id', $user->id)->value('id');
+                $query->where('departemen_id', $departemenId);
+                break;
+            default:
+                if (!in_array($role, ['ehs'])) {
+                    $picId = \App\Models\Pic::where('user_id', $user->id)->value('id');
+                    $query->where('pic_id', $picId);
+                }
         }
 
-        // --- FILTER-FILTER TAMBAHAN ---
+        // === Filter Risk Level ===
         if ($request->filled('riskLevel')) {
             $query->where('tingkat_bahaya', $request->riskLevel);
         }
 
+        // === Filter Status LCT & Overdue ===
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
-            $today = now();
+            $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+            $includeOverdue = in_array('overdue', array_map('strtolower', $statuses));
 
-            $query->where(function ($q) use ($statuses, $today) {
-                $statusFilters = array_filter($statuses, fn($s) => strtolower($s) !== 'overdue');
+            $query->where(function ($q) use ($statusFilters, $includeOverdue, $today) {
+                // Status selain overdue
                 if (count($statusFilters) > 0) {
                     $q->whereIn('status_lct', $statusFilters);
                 }
-                if (in_array('overdue', array_map('strtolower', $statuses))) {
-                    $q->orWhereNotNull('first_overdue_date');
+
+                // Status overdue
+                if ($includeOverdue) {
+                    $q->orWhere(function ($subQuery) use ($today) {
+                        // Hilangkan syarat first_overdue_date sementara agar semua overdue masuk
+                        // $subQuery->whereNotNull('first_overdue_date')
+
+                        $subQuery->where('status_lct', '!=', 'closed')
+                            ->where(function ($inner) use ($today) {
+                                $inner->where(function ($low) use ($today) {
+                                        $low->where('tingkat_bahaya', 'Low')
+                                            ->whereDate('due_date', '<', $today)
+                                            ->whereNull('date_completion');
+                                    })
+                                    ->orWhere(function ($temp) use ($today) {
+                                        $temp->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                            ->whereDate('due_date_temp', '<', $today)
+                                            ->whereNull('date_completion_temp');
+                                    })
+                                    ->orWhere(function ($perm) use ($today) {
+                                        $perm->whereIn('tingkat_bahaya', ['Medium', 'High'])
+                                            ->whereDate('due_date_perm', '<', $today)
+                                            ->whereNull('date_completion');
+                                    });
+                            });
+                    });
                 }
             });
+
+            // Debug log
+            Log::debug('Filtered status_lct values:', ['statusLct' => $request->statusLct]);
+            Log::debug('Current SQL for status_lct filtering:', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+            ]);
         }
 
+
+        // === Filter Tanggal Temuan ===
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
             $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
             $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
         }
 
+        // === Filter Tambahan ===
         if ($request->filled('departemenId')) {
             $query->where('departemen_id', $request->departemenId);
         }
@@ -995,20 +1030,15 @@ class ProgressPerbaikanController extends Controller
             $query->where('area_id', $request->areaId);
         }
 
-        // GROUP BY Format
+        // === Optional Group By (Hanya pengaturan format, belum digunakan) ===
         $groupByFormat = null;
         if ($request->filled('groupBy')) {
-            switch ($request->groupBy) {
-                case 'daily':
-                    $groupByFormat = '%Y-%m-%d';
-                    break;
-                case 'monthly':
-                    $groupByFormat = '%Y-%m';
-                    break;
-                case 'yearly':
-                    $groupByFormat = '%Y';
-                    break;
-            }
+            $groupByFormat = match ($request->groupBy) {
+                'daily' => '%Y-%m-%d',
+                'monthly' => '%Y-%m',
+                'yearly' => '%Y',
+                default => null
+            };
         }
 
         $query->with([
@@ -1036,8 +1066,6 @@ class ProgressPerbaikanController extends Controller
                   });
         }
         
-
-        // dd("buildLaporanQuery",$query->toSql(), $query->getBindings());
         return $query;
     }
 

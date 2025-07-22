@@ -2,7 +2,7 @@
     <section class="p-3 sm:p-5">
         <div x-data="{ openRow: null }">
             <div class="mx-auto max-w-screen-2xl">
-                <div id="report-container">
+                <div id="report-container-followup">
                     @include('partials.tabel-finding-followup-wrapper', ['laporans' => $laporans])
                 </div>
             </div>
@@ -10,7 +10,7 @@
         
         <script>
             function attachPaginationListeners() {
-                const wrapper = document.getElementById('report-container');
+                const wrapper = document.getElementById('report-container-followup');
                 const links = wrapper.querySelectorAll('#pagination-links a');
 
                 links.forEach(link => {
@@ -36,7 +36,7 @@
 
             function attachPerPageListener() {
                 const perPageSelect = document.getElementById('perPageSelect');
-                const wrapper = document.getElementById('report-container');
+                const wrapper = document.getElementById('report-container-followup');
 
                 if (perPageSelect) {
                     perPageSelect.addEventListener('change', () => {

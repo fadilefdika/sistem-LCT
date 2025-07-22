@@ -102,31 +102,29 @@
 </div>
 
 
+@php
+    $user = Auth::guard('ehs')->check() ? Auth::guard('ehs')->user() : Auth::guard('web')->user();
+    $roleName = Auth::guard('ehs')->check() ? 'ehs' : (optional($user->roleLct->first())->name ?? 'guest');
+@endphp
+
 <script>
+    const userRole = "{{ $roleName }}";
+
+    // Tentukan baseUrl sesuai role
+    const baseUrl = userRole === 'ehs'
+        ? "{{ route('ehs.reporting.index') }}"
+        : "{{ route('admin.reporting.index') }}";
+
     document.addEventListener('DOMContentLoaded', () => {
         const perPageSelect = document.getElementById('perPageSelect');
-        const wrapper = document.getElementById('report-container');
+        const wrapper = document.getElementById('report-container-report');
 
-        // AJAX untuk perPage
-        perPageSelect.addEventListener('change', () => {
-            const perPage = perPageSelect.value;
-            fetch(`{{ route('admin.reporting.index') }}?perPage=${perPage}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                wrapper.innerHTML = html;
-            });
-        });
-
-        // AJAX untuk sorting
-        document.addEventListener('click', function (e) {
-            const target = e.target.closest('a');
-            if (target && target.href.includes('sort_by=')) {
-                e.preventDefault();
-                fetch(target.href, {
+        // Handler untuk perubahan jumlah data per halaman
+        if (perPageSelect) {
+            perPageSelect.addEventListener('change', () => {
+                const perPage = perPageSelect.value;
+                const url = `${baseUrl}?perPage=${perPage}`;
+                fetch(url, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
@@ -135,7 +133,34 @@
                 .then(html => {
                     wrapper.innerHTML = html;
                 });
+            });
+        }
+
+        // Handler untuk klik sorting
+        document.addEventListener('click', function (e) {
+            const target = e.target.closest('a');
+            if (target && target.href.includes('sort_by=')) {
+                e.preventDefault();
+                console.log('Fetching sorted data from:', target.href); // Log URL yang difetch
+
+                fetch(target.href, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    console.log('Fetch status:', response.status); // Log status response
+                    return response.text();
+                })
+                .then(html => {
+                    wrapper.innerHTML = html;
+                    console.log('Sorting applied and content updated.');
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
             }
         });
     });
 </script>
+

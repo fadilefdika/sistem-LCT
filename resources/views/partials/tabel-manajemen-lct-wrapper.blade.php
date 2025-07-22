@@ -120,17 +120,27 @@
             const target = e.target.closest('a');
             if (target && target.href.includes('sort_by=')) {
                 e.preventDefault();
+                console.log('Fetching sorted data from:', target.href); // Log URL yang difetch
+
                 fetch(target.href, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.text())
+                .then(response => {
+                    console.log('Fetch status:', response.status); // Log status response
+                    return response.text();
+                })
                 .then(html => {
                     wrapper.innerHTML = html;
+                    console.log('Sorting applied and content updated.');
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
                 });
             }
         });
+
     });
 
     

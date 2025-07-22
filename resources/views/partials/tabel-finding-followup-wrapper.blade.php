@@ -1,4 +1,4 @@
-<div class="p-4 border rounded-xl shadow-sm bg-white mb-4 relative" id="report-container">
+<div class="p-4 border rounded-xl shadow-sm bg-white mb-4 relative" id="report-container-followup">
     <!-- Header Section -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Findings Report</h2>

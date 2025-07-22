@@ -37,9 +37,12 @@ class ManajemenLctController extends Controller
 
         $statusGroups = [
             'In Progress' => ['in_progress', 'progress_work', 'waiting_approval'],
+            // 'Approved' => ['approved', 'approved_temporary', 'approved_taskbudget'],
             'Closed' => ['closed'],
             'Overdue' => ['overdue'],
         ];
+
+        $now = Carbon::now();
 
         $query = $this->buildLaporanQuery($request, $user, 'pic')
             ->with('area', 'kategori', 'picUser') // Eager load relasi
@@ -67,29 +70,29 @@ class ManajemenLctController extends Controller
         ];
         
         $sortBy = request('sort_by');
-        $sortColumn = $allowedSorts[$sortBy] ?? 'lct_laporan.created_at';
-        $sortOrder = request('sort_order') === 'desc' ? 'desc' : 'asc';
+        $sortColumn = $allowedSorts[$sortBy] ?? 'lct_laporan.updated_at';
+        $sortOrder = $request->input('sort_order', $sortBy ? 'asc' : 'desc');
         
         $laporans = $query
             ->orderBy('order_type')
             ->orderBy($sortColumn, $sortOrder)
-            ->orderByDesc('lct_laporan.updated_at') // alias eksplisit
+            // ->orderByDesc('lct_laporan.updated_at') // alias eksplisit
             ->paginate($perPage)
             ->withQueryString();
 
         if ($request->ajax()) {
+            // Ini penting! Return partial yang hanya bagian isi
             return view('partials.tabel-manajemen-lct-wrapper', compact('laporans'))->render();
         }
 
         return view('pages.admin.manajemen-lct.index', [
-            'laporans' => $laporans,
+            'laporans' => $laporans, 
             'statusGroups' => $statusGroups,
-            'areas' => $areas,
+            'areas'=>$areas,
             'categories' => $categories,
+        
         ]);
     }
-
-
 
     public function show($id_laporan_lct)
     {
@@ -530,7 +533,6 @@ class ManajemenLctController extends Controller
             $riskLevels = explode(',', $request->riskLevel);
             $query->whereIn('tingkat_bahaya', $riskLevels);
         }
-        
 
         if ($request->filled('statusLct')) {
             $statuses = explode(',', $request->statusLct);
