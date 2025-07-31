@@ -43,9 +43,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logoutAll');
 // Route::post('/login-ehs', [EhsController::class, 'login']);
 
 // Setelah login memilih tujuan
-Route::middleware(['auth', 'verified','role:user,pic,manajer'])->group(function () {
-    Route::get('/choose-destination-user', fn () => view('pages.choose-destination'))->name('choose-destination-user');
-});
+// Route::middleware(['auth', 'verified','role:user,pic,manajer'])->group(function () {
+//     Route::get('/choose-destination-user', fn () => view('pages.choose-destination'))->name('choose-destination-user');
+// });
 
 Route::middleware(['auth:ehs', 'verified','role:ehs'])->group(function () {
     Route::get('/choose-destination-ehs', fn () => view('pages.choose-destination'))->name('choose-destination-ehs');

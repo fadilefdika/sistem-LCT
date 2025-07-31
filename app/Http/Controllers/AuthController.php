@@ -49,6 +49,11 @@ class AuthController extends Controller
             ])->withInput();
         }
 
+        // Validasi redirect_to hanya untuk URL internal
+        if ($redirectTo && !str_starts_with($redirectTo, '/')) {
+            $redirectTo = null;
+        }        
+
         // Validasi NPK/username format
         if ($role === 'ehs') {
             if (!is_string($decryptedNpk) || empty($decryptedNpk)) {
@@ -93,9 +98,10 @@ class AuthController extends Controller
             $request->session()->regenerate();
             session(['active_role' => 'ehs']);
 
-            return redirect()->route(
-                $redirectTo === 'form' ? 'ehs.report-form' : 'ehs.dashboard'
-            );
+            // Redirect dinamis
+            if ($redirectTo) return redirect()->to($redirectTo);
+
+            return redirect()->route('ehs.dashboard');
         }
 
         /**
@@ -110,7 +116,6 @@ class AuthController extends Controller
 
         $expectedRoleId = $roleMapping[$role];
         
-
         $user = User::with('roleLct')->where('npk', $npk)->first();
 
         if (!$user) {
@@ -140,14 +145,17 @@ class AuthController extends Controller
         $request->session()->regenerate();
         session(['active_role' => $role]);
 
+        // 🔁 Redirect ke halaman tujuan jika tersedia
+        if ($redirectTo) return redirect()->to($redirectTo);
+
+        // 🔁 Fallback default berdasarkan role
         if ($role === 'user') {
             return redirect()->route('admin.reporting.index');
         }
-        
-        return redirect()->route(
-            $redirectTo === 'form' ? 'report-form' : 'admin.dashboard'
-        );
+
+        return redirect()->route('admin.dashboard');
     }
+
 
     public function logout(Request $request)
     {

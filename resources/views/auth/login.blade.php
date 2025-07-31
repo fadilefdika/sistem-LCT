@@ -36,7 +36,7 @@
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
-        <input type="hidden" name="redirect_to" id="redirect_to" value="dashboard" />
+        <input type="hidden" name="redirect_to" id="redirect_to" value="{{ request('redirect_to', 'dashboard') }}">
     
         {{-- Hidden Encrypted Fields --}}
         <input type="hidden" name="encrypted_npk" id="encrypted_npk">
@@ -141,7 +141,14 @@
 
             // Initial state
             handleRoleChange(roleSelect.value);
-            setRedirectTo('dashboard');
+            // Ambil dari URL query string jika ada
+            const params = new URLSearchParams(window.location.search);
+            const redirectTo = params.get('redirect_to');
+            if (redirectTo) {
+                setRedirectTo(redirectTo);
+            } else {
+                setRedirectTo('dashboard'); // fallback default
+            }
 
             // Event when role changes
             roleSelect.addEventListener('change', function () {

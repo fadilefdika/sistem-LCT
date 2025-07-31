@@ -19,16 +19,27 @@ class RouteServiceProvider extends ServiceProvider
     {
         // Cek jika user terautentikasi dengan guard 'web'
         if (Auth::guard('web')->check()) {
-            return route('choose-destination-user'); // Arahkan ke choose-destination-user
+            $user = Auth::guard('web')->user();
+            $roleIds = $user->roleLct->pluck('id')->toArray();
+
+            if (in_array(2, $roleIds)) {
+                return route('admin.dashboard'); // PIC
+            }
+
+            if (in_array(4, $roleIds)) {
+                return route('admin.dashboard'); // Manager
+            }
+
+            return route('admin.reporting.index'); // User biasa
         }
 
         // Cek jika user terautentikasi dengan guard 'ehs'
         if (Auth::guard('ehs')->check()) {
-            return route('choose-destination-ehs'); // Arahkan ke choose-destination-ehs
+            return route('choose-destination-ehs');
         }
 
         // Jika tidak ada user yang terautentikasi, redirect ke halaman login
-        return '/';
+        return route('login');
     }
 
     /**

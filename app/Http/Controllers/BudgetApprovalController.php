@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LctTasks;
 use App\Models\LaporanLct;
 use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
 use App\Mail\RevisiLaporanLCT;
 use App\Models\BudgetApproval;
+use App\Models\LctDepartement;
 use App\Mail\TaskBudgetApproved;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -223,15 +225,24 @@ class BudgetApprovalController extends Controller
                 'tipe_reject'    => null,
             ]);
 
-            // Kirim email ke user yang bersangkutan\
-            // try {
-            //     Mail::to('efdika1102@gmail.com')->send(new TaskBudgetApproved($laporan));
-            //     Log::info('Email berhasil dikirim.');
-            // } catch (\Exception $mailException) {
-            //     Log::error('Gagal mengirim email', ['error' => $mailException->getMessage()]);
-            //     return redirect()->back()->with('error', 'Email gagal dikirim. Namun data sudah tersimpan.');
-            // }
-            
+            $tasks = LctTasks::with('pic.user')
+                ->where('id_laporan_lct', $id_laporan_lct)
+                ->get();
+
+            // Cek dulu sebelum kirim email
+            // dd([
+            //     'laporan' => $laporan,
+            //     'tasks' => $tasks,
+            //     'emails' => $tasks->map(fn($task) => $task->pic->user->email ?? null)->filter()->values()
+            // ]);
+
+            // Kirim email ke masing-masing PIC
+            foreach ($tasks as $task) {
+                if ($task->pic && $task->pic->user && $task->pic->user->email) {
+                    Mail::to('efdika1102@gmail.com')->send(new \App\Mail\TaskAssignedToPic($task));
+                    // Mail::to($task->pic->user->email)->send(new \App\Mail\TaskAssignedToPic($task));
+                }
+            }
 
             DB::commit();
 
