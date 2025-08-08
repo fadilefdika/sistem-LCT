@@ -26,7 +26,7 @@ class LaporanDikirimKePic extends Mailable
      */
     public function build()
     {
-        return $this->subject('🔧 LCT Repair Result Report')
+        return $this->subject('🚨 New Findings Reported – [EHSight]')
                 ->view('emails.laporan_ke_pic');
     }
 }
