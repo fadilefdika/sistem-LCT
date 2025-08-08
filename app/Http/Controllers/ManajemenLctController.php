@@ -434,6 +434,15 @@ class ManajemenLctController extends Controller
                 'tipe_reject' => $tipeReject,
             ]);
 
+            $managerEmail = $laporan->departemen?->user?->email ?? null;
+
+            
+            if ($managerEmail) {
+                // Kirim email
+                Mail::to('fadilefd1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
+                // Mail::to($managerEmail)->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
+            }
+
             DB::commit();
             return redirect()->back()->with('success', 'Action permanent updated successfully.');
         } catch (\Exception $e) {

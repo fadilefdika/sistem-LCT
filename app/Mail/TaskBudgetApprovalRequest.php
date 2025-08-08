@@ -2,13 +2,14 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 use App\Models\LaporanLct;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class TaskBudgetApprovalRequest extends Mailable
 {
@@ -21,11 +22,12 @@ class TaskBudgetApprovalRequest extends Mailable
     {
         $this->laporan = $laporan;
         $this->tasks = $tasks;
+        
     }
-
+    
     public function build()
     {
-        return $this->subject('📝 Budget Approval Request - LCT Report')
+        return $this->subject('📝 Budget Approval Request – Finding Reports [EHSight]')
             ->markdown('emails.task_budget_approval');
     }
 }

@@ -129,6 +129,7 @@
                         <td style="font-size: 14px; color: #555;">
                             <p>Best regards,</p>
                             <p>EHSight System</p>
+                            <p>Spot it. Report it. Track it. Fix it</p>
                         </td>
                     </tr>
                 </table>
