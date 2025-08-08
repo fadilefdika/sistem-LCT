@@ -16,7 +16,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        
+        <x-head.tinymce-config/>
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -102,6 +102,7 @@
 
                             'ehs.master-data.department-data.index',
                             'ehs.master-data.role-data.index',
+                            'ehs.master-data.email.create',
                             'ehs.master-data.category-data.index',
                             'ehs.master-data.area-data.index'
                         ].includes(page)

@@ -13,13 +13,15 @@ class ReminderLaporan extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $laporan;
+    public $laporans;
     public $status;
+    public $recipientType; // 'PIC' atau 'Manager'
 
-    public function __construct($laporan, $status)
+    public function __construct($laporans, $status, $recipientType)
     {
-        $this->laporan = $laporan;
+        $this->laporans = is_array($laporans) ? collect($laporans) : $laporans;
         $this->status = $status;
+        $this->recipientType = $recipientType;
     }
 
     public function build()
@@ -27,5 +29,4 @@ class ReminderLaporan extends Mailable
         return $this->subject('Reminder: LCT Report ' . ucfirst(str_replace('_', ' ', $this->status)))
                     ->view('emails.reminder_laporan');
     }
-
 }

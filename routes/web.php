@@ -17,6 +17,7 @@ use App\Http\Controllers\{
     BudgetApprovalController,
     DepartmentDataController,
     EhsDahboardController,
+    EmailTemplateController,
     ProgressPerbaikanController,
     FindingFollowupController
 };
@@ -187,6 +188,15 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
             Route::post('/', [AreaLctController::class, 'store'])->name('store');
             Route::put('/{id}', [AreaLctController::class, 'update'])->name('update');
             Route::delete('/{id}', [AreaLctController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('email')->name('ehs.master-data.email.')->group(function () {
+            Route::get('/', [EmailTemplateController::class, 'index'])->name('index');
+            Route::post('/', [EmailTemplateController::class, 'store'])->name('store');
+            Route::get('/create', [EmailTemplateController::class, 'create'])->name('create');
+            Route::get('/{id}/edit', [EmailTemplateController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [EmailTemplateController::class, 'update'])->name('update');
+            Route::delete('/{id}', [EmailTemplateController::class, 'destroy'])->name('destroy');
         });
     });
 });

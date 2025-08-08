@@ -1,6 +1,15 @@
+@php
+    // $recipientType dari Mailable sudah diteruskan ke view
+    // Pastikan huruf kecil untuk konsistensi perbandingan
+    $roleName = strtolower($recipientType);
+
+    $routeName = ($roleName === 'pic') ? 'manajemen-lct' : (($roleName === 'manager') ? 'reporting' : 'manajemen-lct');
+@endphp
+
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
     <meta charset="UTF-8">
     <title>LCT Report Reminder</title>
 </head>
@@ -8,86 +17,118 @@
     <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
         <tr>
             <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; padding: 32px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
+                <table width="700" cellpadding="0" cellspacing="0" 
+                    style="background-color: #ffffff; border-radius: 8px; padding: 32px; 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
                     <tr>
                         <td align="center" style="padding-bottom: 24px;">
                             <h2 style="margin: 0; font-size: 24px; color: #222;">
                                 @switch($status)
-                                    @case('reminder_2') ⏳ Reminder: 2 Days Before Due Date @break
-                                    @case('reminder_1') ⏳ Reminder: 1 Day Before Due Date @break
-                                    @case('due_today') 🚨 Reminder: Due Today @break
-                                    @case('overdue') ⚠️ Overdue Notice @break
-                                    @case('overdue_manager') ❗ Manager Alert: Overdue Report more than 2 Days @break
+                                    @case('reminder_2') ⏳ Reminder: Finding Report Due in 2 Days - [EHSight] @break
+                                    @case('reminder_1') ⏳ Reminder: Finding Report Due in 1 Day - [EHSight] @break
+                                    @case('due_today') 🚨 Reminder: Finding Report Due Today - [EHSight] @break
+                                    @case('overdue') ⚠️ Overdue Notice: Finding Report Past Due Date - [EHSight] @break
+                                    @case('overdue_manager') ❗ Manager Alert: Finding Report Overdue More Than 2 Days - [EHSight] @break
                                 @endswitch
                             </h2>
                         </td>
-                    </tr>
+                    </tr> 
 
                     <tr>
                         <td style="padding-bottom: 24px; font-size: 16px; line-height: 1.6;">
                             @if ($status === 'overdue_manager')
-                                <p>Dear <strong>Manager</strong>,</p>
+                                <p>Dear <strong>{{ $laporans->first()->departemen->user->fullname ?? 'User' }}</strong>,</p>
                                 <p>
                                     This is to inform you that your assigned PIC,
-                                    <strong>{{ $laporan->picUser->fullname ?? 'Unknown PIC' }}</strong>,
-                                    has not resolved their LCT report which has been overdue for <strong>2 or more days</strong>.
+                                    <strong>{{ $laporans->first()->picUser->fullname ?? 'Unknown PIC' }}</strong>,
+                                    has not resolved their Finding which has been overdue for <strong>2 or more days</strong>.
                                 </p>
                                 <p>
                                     Please follow up with the PIC to ensure timely resolution of this issue.
                                 </p>
                             @else
-                                <p>Dear <strong>{{ $laporan->picUser->fullname ?? 'User' }}</strong>,</p>
+                                <p>Dear <strong>{{ $laporans->first()->picUser->fullname ?? 'User' }}</strong>,</p>
                                 @switch($status)
                                     @case('reminder_2')
-                                        <p>This is a friendly reminder that your LCT report is due in <strong>2 days</strong>.</p>
+                                        <p>This is a reminder that your Finding is due in <strong>2 days</strong>.</p>
+                                        <p>Please complete and submit it through <strong>EHSight</strong> before the deadline.</p>
                                         @break
                                     @case('reminder_1')
-                                        <p>This is a reminder that your LCT report is due <strong>tomorrow</strong>.</p>
+                                        <p>This is a reminder that your Finding is due <strong>tomorrow</strong>.</p>
+                                        <p>Please complete and submit it through <strong>EHSight</strong> before the deadline.</p>
                                         @break
                                     @case('due_today')
-                                        <p>Your LCT report is <strong>due today</strong>. Please ensure it is completed without delay.</p>
+                                        <p>Your Finding is <strong>due today</strong>. Please ensure it is completed without delay.</p>
+                                        <p>Please complete and submit it through <strong>EHSight</strong> before the deadline.</p>
                                         @break
                                     @case('overdue')
-                                        <p><strong>Attention:</strong> Your LCT report is <strong>overdue</strong>. Immediate action is required.</p>
+                                        <p>Your Finding is <strong>overdue</strong>. Immediate action is required.</p>
+                                        <p>Please complete and submit it through <strong>EHSight</strong> as soon as possible.</p>
                                         @break
-                                @endswitch
+                                @endswitch                            
                             @endif
                         </td>
                     </tr>
 
                     <tr>
                         <td style="padding-bottom: 20px; font-size: 15px; line-height: 1.5;">
-                            <p><strong>Finding:</strong> {{ $laporan->temuan_ketidaksesuaian }}</p>
-
-                            @php
-                                $displayDueDate = $laporan->tingkat_bahaya === 'Low'
-                                    ? $laporan->due_date
-                                    : ($laporan->status_lct === 'work_permanent'
-                                        ? $laporan->due_date_perm
-                                        : $laporan->due_date_temp);
-                            @endphp
-
-                            <p><strong>Due Date:</strong> {{ \Carbon\Carbon::parse($displayDueDate)->format('d M Y') }}</p>
-                            <p><strong>Hazard Level:</strong> {{ ucfirst($laporan->tingkat_bahaya) }}</p>
-                            @if ($status === 'overdue_manager')
-                            <p><strong>PIC Name:</strong> {{ $laporan->picUser->fullname ?? '-' }}</p>
-                            <p><strong>PIC Email:</strong> {{ $laporan->picUser->email ?? '-' }}</p>
-                            @endif
+                            <table width="100%" cellpadding="6" cellspacing="0" border="1" 
+                                style="border-collapse: collapse; border-color: #ddd; font-size: 14px;">
+                                <thead style="background-color: #f4f4f4;">
+                                    <tr>
+                                        <th align="center">No</th>
+                                        <th align="center">No ID</th>
+                                        <th align="center">Hazard Level</th>
+                                        <th align="center">Area</th>
+                                        <th align="center">Category</th>
+                                        @if ($status === 'overdue_manager')
+                                            <th align="center">PIC</th>
+                                        @endif
+                                        {{-- Hapus kolom Action --}}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($laporans as $index => $laporan)
+                                        @php
+                                            $url = url("/{$routeName}/{$laporan->id_laporan_lct}");
+                                            if (!auth()->check()) {
+                                                $path = "/{$routeName}/{$laporan->id_laporan_lct}";
+                                                $url = route('login') . '?redirect_to=' . urlencode($path);
+                                            }
+                                        @endphp
+                                        <tr>
+                                            <td align="center">{{ $index + 1 }}</td>
+                                            <td align="center">
+                                                <a href="{{ $url }}">
+                                                    {{ $laporan->id_laporan_lct }}
+                                                </a>
+                                            </td>
+                                            <td align="center">{{ ucfirst($laporan->tingkat_bahaya) }}</td>
+                                            <td>{{ $laporan->area }} - {{ $laporan->detail_area }}</td>
+                                            <td>{{ $laporan->kategori->nama_kategori }}</td>
+                                            @if ($status === 'overdue_manager')
+                                                <td>{{ $laporan->picUser->fullname ?? '-' }}</td>
+                                            @endif
+                                            {{-- Kolom Action dihapus --}}
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                
+                            </table>
                         </td>
                     </tr>
 
                     <tr>
-                        <td align="center" style="padding: 30px 0;">
-                            <a href="{{ url('/manajemen-lct/' . $laporan->id_laporan_lct) }}"
-                               style="background-color: #007B55; color: #fff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                                View Report
-                            </a>
+                        <td>
+                            <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                                If the report has already been submitted, please ignore this message.
+                            </p>
                         </td>
                     </tr>
-
                     <tr>
-                        <td style="font-size: 14px; color: #555; text-align: center;">
-                            <p>Thank you,<br><strong>LCT System</strong></p>
+                        <td style="font-size: 14px; color: #555;">
+                            <p>Best regards,</p>
+                            <p>EHSight System</p>
                         </td>
                     </tr>
                 </table>
@@ -99,5 +140,4 @@
         </tr>
     </table>
 </body>
-
 </html>
