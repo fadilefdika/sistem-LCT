@@ -56,6 +56,10 @@ class ProgressPerbaikanController extends Controller
 
         $query = $this->buildLaporanQuery($request, $user, $role);
 
+        if ($request->filled('id_laporan_lct')) {
+            $query->where('lct_laporan.id_laporan_lct', $request->id_laporan_lct);
+        }        
+
         // JOIN agar bisa sort pakai fullname dari user
         $query->leftJoin('lct_pic', 'lct_laporan.pic_id', '=', 'lct_pic.id')
             ->leftJoin('users', 'users.id', '=', 'lct_pic.user_id');

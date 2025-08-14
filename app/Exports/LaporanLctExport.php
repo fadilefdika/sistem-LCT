@@ -25,30 +25,43 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
 
     public function map($laporan): array
     {
+        // Ambil gambar pertama dari bukti_temuan
         $bukti_temuan_array = is_string($laporan->bukti_temuan)
             ? json_decode($laporan->bukti_temuan, true)
             : (is_array($laporan->bukti_temuan) ? $laporan->bukti_temuan : []);
 
         $bukti_temuan = '-';
         if (!empty($bukti_temuan_array[0])) {
+            $url = asset('storage/' . $bukti_temuan_array[0]);
             $bukti_temuan = '=HYPERLINK("' . asset('storage/' . $bukti_temuan_array[0]) . '", "Lihat Gambar")';
         }
 
-        $bukti_perbaikan_array = is_string($laporan->bukti_perbaikan)
-            ? json_decode($laporan->bukti_perbaikan, true)
-            : (is_array($laporan->bukti_perbaikan) ? $laporan->bukti_perbaikan : []);
+        // Ambil data tindakan_perbaikan
+        $tindakan_perbaikan_array = is_string($laporan->tindakan_perbaikan)
+            ? json_decode($laporan->tindakan_perbaikan, true)
+            : (is_array($laporan->tindakan_perbaikan) ? $laporan->tindakan_perbaikan : []);
 
+        // Default
         $bukti_perbaikan = '-';
-        if (!empty($bukti_perbaikan_array[0])) {
-            $bukti_perbaikan = '=HYPERLINK("' . asset('storage/' . $bukti_perbaikan_array[0]) . '", "Lihat Gambar")';
-        }
 
+        // Cek apakah array tidak kosong
+        if (!empty($tindakan_perbaikan_array)) {
+            // Ambil elemen terakhir (revisi terbaru)
+            $last_tindakan = end($tindakan_perbaikan_array);
+
+            // Pastikan ada field 'bukti' dan ambil file pertama
+            if (!empty($last_tindakan['bukti'][0])) {
+                $filePath = $last_tindakan['bukti'][0];
+                $bukti_perbaikan = '=HYPERLINK("' . asset('storage/' . $filePath) . '", "Lihat Gambar")';
+            }
+        }
+        
         $tingkatBahaya = strtolower($laporan->tingkat_bahaya);
         $today = Carbon::now();
 
         $due_date = null;
         $due_date_temp = '-';
-        $due_date_perm = null;
+        $due_date_perm = '-';
         $date_completion = '-';
         $date_completion_temp = '-';
         $date_completion_perm = '-';
@@ -81,25 +94,25 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
         return [
             $laporan->id_laporan_lct,
             $laporan->tanggal_temuan,
+            $overdueDays,
+            $laporan->area->nama_area ?? '-',
+            $laporan->detail_area ?? '-',
             $laporan->temuan_ketidaksesuaian ?? '-',
             $bukti_temuan,
             $laporan->tingkat_bahaya ?? '-',
             $laporan->kategori->nama_kategori ?? '-',
-            $laporan->area->nama_area ?? '-',
-            $laporan->detail_area ?? '-',
             ucwords(str_replace('_', ' ', $laporan->status_lct)),
             $laporan->picUser->fullname ?? '-',
             $laporan->departemen->user->fullname ?? '-',
             $laporan->departemen->nama_departemen ?? '-',
             $due_date ? $due_date->format('Y-m-d') : '-',
             $due_date_temp,
-            $due_date_perm ? $due_date_perm->format('Y-m-d') : '-',
+            $due_date_perm,
             $date_completion,
             $date_completion_temp,
             $date_completion_perm,
             $laporan->estimated_budget ?? '-',
             $bukti_perbaikan,
-            $overdueDays,
         ];
     }
 
@@ -108,25 +121,25 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
         return [
             'ID LCT',
             'Tanggal Temuan',
+            'Days Overdue',
+            'Lokasi Temuan',
+            'Detail Lokasi',
             'Temuan',
             'Foto Temuan',
             'Tingkat Bahaya',
             'Jenis Temuan',
-            'Lokasi Temuan',
-            'Detail Lokasi',
             'Status',
             'PIC',
             'Manager',
             'Departemen',
             'Due Date (Low)',
             'Due Date Temporary',
-            'Date Date Permanent',
+            'Due Date Permanent',
             'Date of Completion (Low)',
             'Date of Completion Temporary',
             'Date of Completion Permanent',
             'Estimated Budget',
             'Foto Closed',
-            'Days Overdue',
         ];
     }
 }
