@@ -5,26 +5,51 @@
         <p class="text-sm text-gray-500 mt-1">Comprehensive list of reported findings</p>
     </div>
 
+    @php
+        // Tentukan user dan role
+        if (Auth::guard('ehs')->check()) {
+            $user = Auth::guard('ehs')->user();
+            $roleName = 'ehs';
+        } elseif (Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+            // Ambil role dari session dulu, jika tidak ada fallback ke relasi user
+            $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        } else {
+            $user = null;
+            $roleName = 'guest';
+        }
+
+        // Tentukan prefix route
+        $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
+    @endphp
+
     <!-- Search Form -->
-    <form method="GET" action="{{ route('ehs.reporting.index') }}" class="flex items-center gap-2 mb-4">
-        <input type="text" 
+    <form method="GET" action="{{ route($routePrefix.'.reporting.index') }}" class="flex items-center gap-2 mb-4">
+        <input 
+            type="text" 
             name="id_laporan_lct" 
             placeholder="Cari ID Laporan"
             value="{{ request('id_laporan_lct') }}"
-            class="w-52 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs text-gray-700 bg-white">
+            class="w-52 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs text-gray-700 bg-white"
+        >
 
-        <button type="submit" 
-                class="px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 transition">
+        <button 
+            type="submit" 
+            class="px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 transition"
+        >
             Cari
         </button>
 
         @if(request()->has('id_laporan_lct'))
-            <a href="{{ route('ehs.reporting.index') }}" 
-            class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition">
+            <a 
+                href="{{ route($routePrefix.'.reporting.index') }}" 
+                class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition"
+            >
                 Reset
             </a>
         @endif
     </form>
+
     
     
     <!-- Table Container -->

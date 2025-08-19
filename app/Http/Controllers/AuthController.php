@@ -117,17 +117,18 @@ class AuthController extends Controller
         $expectedRoleId = $roleMapping[$role];
         
         $user = User::with('roleLct')->where('npk', $npk)->first();
-
+        
         if (!$user) {
             return back()->withErrors([
                 'npk_or_username' => 'NPK tidak ditemukan.',
-            ])->withInput();
-        }
-
-        if ($user->roleLct->isEmpty()) {
-            $user->roleLct()->attach(1); // Default ke user biasa
-            $user->load('roleLct');
-        }
+                ])->withInput();
+            }
+            
+            if ($user->roleLct->isEmpty()) {
+                $user->roleLct()->attach(1); // Default ke user biasa
+                $user->load('roleLct');
+            }
+            // dd($user, $user->load);
 
         if (!$user->roleLct->contains('id', $expectedRoleId)) {
             return back()->withErrors([

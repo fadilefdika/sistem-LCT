@@ -47,6 +47,10 @@ class ManajemenLctController extends Controller
         $query = $this->buildLaporanQuery($request, $user, 'pic')
             ->with('area', 'kategori', 'picUser') // Eager load relasi
             ->select('lct_laporan.*', DB::raw("CASE WHEN status_lct = 'closed' THEN 1 ELSE 0 END as order_type"));
+
+            if ($request->filled('id_laporan_lct')) {
+                $query->where('lct_laporan.id_laporan_lct', $request->id_laporan_lct);
+            }        
         
         $perPage = $request->input('perPage', 10);
 

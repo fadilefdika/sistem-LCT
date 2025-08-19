@@ -79,15 +79,13 @@ class LaporanLctExport implements FromCollection, WithHeadings, WithMapping, Sho
         // Days Overdue logic
         $overdueDays = '-';
         if ($tingkatBahaya === 'low' && $due_date instanceof \Carbon\Carbon) {
-            // Jangan hitung jika sudah selesai (ada date_completion)
-            if (empty($laporan->date_completion)) {
-                $overdueDays = $due_date->lt($today) ? (int) $due_date->diffInDays($today) : 0;
-            }
+            $overdueDays = $due_date->lt($today)
+                ? (int) $due_date->diffInDays($today)
+                : 0;
         } elseif (in_array($tingkatBahaya, ['medium', 'high']) && $due_date_perm instanceof \Carbon\Carbon) {
-            // Jangan hitung jika sudah selesai (ada date_completion_perm)
-            if (empty($laporan->date_completion_perm)) {
-                $overdueDays = $due_date_perm->lt($today) ? (int) $due_date_perm->diffInDays($today) : 0;
-            }
+            $overdueDays = $due_date_perm->lt($today)
+                ? (int) $due_date_perm->diffInDays($today)
+                : 0;
         }
 
 

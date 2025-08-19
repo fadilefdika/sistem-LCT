@@ -3,6 +3,28 @@
         <h2 class="text-2xl font-bold text-gray-800">Findings Report</h2>
         <p class="text-sm text-gray-500 mt-1">Comprehensive list of reported findings</p>
     </div>
+
+    <!-- Search Form -->
+    <form method="GET" action="{{ route('admin.manajemen-lct.index') }}" class="flex items-center gap-2 mb-4">
+        <input type="text" 
+            name="id_laporan_lct" 
+            placeholder="Cari ID Laporan"
+            value="{{ request('id_laporan_lct') }}"
+            class="w-52 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs text-gray-700 bg-white">
+
+        <button type="submit" 
+                class="px-3 py-1 bg-gray-800 text-white text-xs rounded hover:bg-gray-700 transition">
+            Cari
+        </button>
+
+        @if(request()->has('id_laporan_lct'))
+            <a href="{{ route('admin.manajemen-lct.index') }}" 
+            class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition">
+                Reset
+            </a>
+        @endif
+    </form>
+
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <!-- Table Controls -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">

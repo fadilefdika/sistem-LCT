@@ -21,7 +21,7 @@ use PhpOffice\PhpPresentation\IOFactory;
 use PhpOffice\PhpPresentation\Shape\Table;
 use PhpOffice\PhpPresentation\Style\Color;
 use PhpOffice\PhpPresentation\PhpPresentation;
-use PhpOffice\PhpPresentation\Style\Alignment;
+use PhpOffice\PhpPresentation\Style\Alignment; 
 use PhpOffice\PhpPresentation\Shape\Drawing\File as DrawingFile;
 
 class ProgressPerbaikanController extends Controller
