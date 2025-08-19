@@ -94,66 +94,80 @@ class RoleDataController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'department_id' => 'required|exists:lct_departement,id',
-                'user_id' => 'required|exists:users,id',
-            ]);
+{
+    try {
+        $request->validate([
+            'department_id' => 'required|exists:lct_departement,id',
+            'user_id' => 'required|exists:users,id',
+        ]);
 
-            // Cari data relasi PIC dan Departemen berdasarkan ID
-            $picRelation = LctDepartemenPic::find($id);
-
-            if (!$picRelation) {
-                return response()->json(['message' => 'Data PIC tidak ditemukan!'], 404);
-            }
-
-            // Cari PIC lama yang akan digantikan
-            $oldPic = Pic::find($picRelation->pic_id);
-
-            if ($oldPic) {
-                // Pastikan hanya melakukan soft delete jika PIC lama ada
-                if ($oldPic->deleted_at === null) {
-                    $oldPic->update([
-                        'deleted_at' => now(),
-                        'updated_at' => now()
-                    ]);
-                    return response()->json(['message' => 'PIC lama berhasil diperbarui dan dihapus secara sementara.'], 200);
-                } else {
-                    return response()->json(['message' => 'PIC lama sudah dihapus sebelumnya.'], 200);
-                }
-            } else {
-                return response()->json(['message' => 'PIC yang terhubung dengan ID ini tidak ditemukan.'], 404);
-            }            
-            
-            // Periksa apakah user_id yang baru sudah terdaftar sebagai PIC
-            $existingPic = Pic::where('user_id', $request->user_id)->first();
-            Log::info("PIC baru ditemukan atau belum:", ['existingPic' => $existingPic]);
-
-            // Jika belum ada, buat PIC baru
-            if (!$existingPic) {
-                $newPic = Pic::create([
-                    'user_id' => $request->user_id
-                ]);
-                Log::info("PIC baru berhasil dibuat dengan ID: " . $newPic->id);
-            } else {
-                $newPic = $existingPic;
-                Log::info("Menggunakan PIC yang sudah ada dengan ID: " . $newPic->id);
-            }
-
-            // Update hubungan di pivot table dengan PIC baru
-            $picRelation->update([
-                'pic_id' => $newPic->id,
-                'departemen_id' => $request->department_id
-            ]);
-            Log::info("Relasi LctDepartemenPic berhasil diperbarui dengan pic_id: " . $newPic->id);
-
-            return response()->json(['message' => 'PIC berhasil diperbarui!'], 200);
-        } catch (\Exception $e) {
-            Log::error("Error updating PIC: " . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error', 'message' => $e->getMessage()], 500);
+        $picRelation = LctDepartemenPic::find($id);
+        if (!$picRelation) {
+            return response()->json(['message' => 'Data PIC tidak ditemukan!'], 404);
         }
+
+        $newUserId = $request->user_id;
+
+        // Cari PIC lama dan lakukan soft delete
+        $oldPic = Pic::find($picRelation->pic_id);
+        if ($oldPic && $oldPic->deleted_at === null) {
+            $oldPic->update([
+                'deleted_at' => now(),
+                'updated_at' => now()
+            ]);
+            Log::info("PIC lama di-soft delete", ['pic_id' => $oldPic->id]);
+        }
+
+        // Cek apakah user baru sudah ada sebagai PIC
+        $existingPic = Pic::where('user_id', $newUserId)->first();
+        if (!$existingPic) {
+            $newPic = Pic::create([
+                'user_id' => $newUserId
+            ]);
+            Log::info("PIC baru dibuat", ['pic_id' => $newPic->id]);
+        } else {
+            $newPic = $existingPic;
+            Log::info("Menggunakan PIC yang sudah ada", ['pic_id' => $newPic->id]);
+        }
+
+        // Update pivot table dengan PIC baru
+        $picRelation->update([
+            'pic_id'        => $newPic->id,
+            'departemen_id' => $request->department_id
+        ]);
+        Log::info("Pivot LctDepartemenPic diperbarui", [
+            'departemen_id' => $request->department_id,
+            'pic_id'        => $newPic->id
+        ]);
+
+        // Tambahkan role Manager untuk user baru
+        $hasRole = UserRoleLct::where('model_id', $newUserId)
+            ->where('model_type', User::class)
+            ->where('role_id', 2)
+            ->exists();
+
+        if (!$hasRole) {
+            UserRoleLct::create([
+                'model_id' => $newUserId,
+                'model_type' => User::class,
+                'role_id' => 2,
+            ]);
+            Log::info('Role Manager ditambahkan', ['user_id' => $newUserId]);
+        } else {
+            Log::info('User sudah punya role Manager', ['user_id' => $newUserId]);
+        }
+
+        return response()->json(['message' => 'PIC berhasil diperbarui!'], 200);
+
+    } catch (\Exception $e) {
+        Log::error("Error updating PIC: " . $e->getMessage());
+        return response()->json([
+            'error'   => 'Internal Server Error',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     
     public function destroy($id)

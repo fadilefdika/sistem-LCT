@@ -1260,8 +1260,11 @@ class ProgressPerbaikanController extends Controller
                 $bukti = is_array($laporan->bukti_temuan)
                     ? $laporan->bukti_temuan
                     : json_decode($laporan->bukti_temuan, true);
+
                 $firstBuktiTemuan = $bukti[0] ?? null;
+
                 $beforeCellImg = $imageRow->getCell(0);
+                
                 if ($firstBuktiTemuan) {
                     $beforePath = storage_path('app/public/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $firstBuktiTemuan));
 
