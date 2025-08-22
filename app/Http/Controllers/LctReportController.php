@@ -307,6 +307,71 @@ class LctReportController extends Controller
         }
     }
 
+    public function editAssignToPic(Request $request, $id_laporan_lct)
+    {
+        $validator = Validator::make($request->all(), [
+            'departemen_id' => 'required|integer|exists:lct_departement,id',
+            'pic_id' => 'required|integer|exists:lct_pic,id',
+            'due_date' => 'required|date|after_or_equal:today',
+        ]);
+    
+        if ($validator->fails()) {
+            Log::warning('Failed validation while reassigning LCT report', [
+                'user_id' => auth()->id(),
+                'errors' => $validator->errors()->all(),
+                'input' => $request->all(),
+            ]);
+    
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
+        try {
+            DB::beginTransaction();
+    
+            // dd($id_laporan_lct);
+            $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->first();
+    
+            $laporan->update([
+                'departemen_id' => $request->departemen_id,
+                'pic_id' => $request->pic_id,
+                'due_date' => $request->due_date,
+                'first_viewed_by_pic_at' => null,
+                'status_lct' => 'in_progress',
+            ]);
+    
+            RejectLaporan::create([
+                'id_laporan_lct' => $laporan->id_laporan_lct,
+                'user_id' => auth()->id(),
+                'role' => 'ehs',
+                'status_lct' => 'in_progress',
+                'alasan_reject' => null,
+                'tipe_reject' => 'reassigned',
+            ]);
+    
+            DB::commit();
+    
+            Log::info('LCT report reassigned successfully', [
+                'user_id' => auth()->id(),
+                'laporan_id' => $laporan->id_laporan_lct,
+            ]);
+    
+            // Redirect dengan SweetAlert (di blade nanti cek session 'success')
+            return redirect()->back()->with('success', 'Report successfully reassigned to PIC.');
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+    
+            Log::error('Failed to reassign LCT report', [
+                'user_id' => auth()->id(),
+                'laporan_id' => $id_laporan_lct,
+                'error' => $e->getMessage(),
+            ]);
+    
+            return redirect()->back()->with('error', 'Failed to reassign report. Please try again.');
+        }
+    }
+
+
     public function closed(Request $request, $id_laporan_lct)
     {
         $laporan = LaporanLct::where('id_laporan_lct', $id_laporan_lct)->firstOrFail();

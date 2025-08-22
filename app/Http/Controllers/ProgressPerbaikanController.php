@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\RejectLaporan;
 use App\Models\LctDepartement;
 use App\Mail\CloseNotification;
+use App\Models\LctDepartemenPic;
 use App\Exports\LaporanLctExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -146,10 +147,10 @@ class ProgressPerbaikanController extends Controller
         });
         // Cek apakah semua task sudah selesai
         $tasks = $laporan->tasks;
-
         $kategoriList = Kategori::all(); // Ambil semua kategori dari tabel
-
         $areaList = AreaLct::all();
+        $departemens = LctDepartement::all();
+        $picDepartemen=LctDepartemenPic::with(['departemen','pic.user'])->get();
 
         $allTasksCompleted = $tasks->isNotEmpty() && $tasks->every(fn($task) => $task->status === 'completed');
 
@@ -170,7 +171,7 @@ class ProgressPerbaikanController extends Controller
             return $item->tipe_reject === 'budget_approval';
         });        
 
-        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList'));
+        return view('pages.admin.progress-perbaikan.show', compact('laporan', 'departemens', 'bukti_temuan', 'picDepartemen', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList','departemens'));
     }
 
 

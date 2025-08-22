@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\AreaLct;
 use App\Models\Kategori;
-use Illuminate\Http\Request;
 use App\Models\LaporanLct;
+use Illuminate\Http\Request;
+use App\Models\LctDepartement;
+use App\Models\LctDepartemenPic;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class FindingFollowupController extends Controller
@@ -51,6 +54,9 @@ class FindingFollowupController extends Controller
 
         $areaList = AreaLct::all();
 
+        $departemens = LctDepartement::all();
+        $picDepartemen=LctDepartemenPic::with(['departemen','pic.user'])->get();
+
         // Ambil bukti temuan & perbaikan
         $bukti_temuan = collect(json_decode($laporan->bukti_temuan, true))->map(fn($path) => asset('storage/' . $path));
         $tindakan_perbaikan = collect(json_decode($laporan->tindakan_perbaikan, true))->map(function ($entry) {
@@ -82,7 +88,7 @@ class FindingFollowupController extends Controller
             return $item->tipe_reject === 'budget_approval';
         });        
 
-        return view('pages.admin.finding-followup.show', compact('laporan', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList'));
+        return view('pages.admin.finding-followup.show', compact('laporan','departemens','picDepartemen', 'bukti_temuan', 'tindakan_perbaikan', 'allTasksCompleted', 'lowOrTemporaryRejects', 'budgetApprovalRejects','kategoriList','areaList'));
     }
 
     public function table()

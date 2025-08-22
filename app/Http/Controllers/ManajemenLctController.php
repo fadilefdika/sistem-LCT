@@ -125,20 +125,36 @@ class ManajemenLctController extends Controller
         }
     
         // Logika ketika role adalah 'pic' dan belum pernah melihat laporan
-        if ($roleName === 'pic' && !$laporan->first_viewed_by_pic_at) {
-            // Catat waktu pertama kali PIC melihat laporan
-            $laporan->update(['first_viewed_by_pic_at' => now()]);
-    
-            // Log pengiriman laporan ke EHS (sebagai contoh: pertama kali dilihat)
-            RejectLaporan::create([
-                'id_laporan_lct' => $laporan->id_laporan_lct,
-                'user_id' => $user->id,
-                'role' => $roleName,
-                'status_lct' => 'progress_work',  // Status pengiriman laporan
-                'alasan_reject' => null,  
-                'tipe_reject' => null,  
-            ]);
+        if ($roleName === 'pic') {
+            // Hanya kalau user ini memang PIC yang ditugaskan
+            if ($laporan->pic_id == $user->id) {
+                // Cek apakah PIC ini sudah tercatat pernah melihat
+                $alreadyLogged = RejectLaporan::where('id_laporan_lct', $laporan->id_laporan_lct)
+                    ->where('user_id', $user->id)
+                    ->where('role', 'pic')
+                    ->where('tipe_reject', 'pic_viewed')
+                    ->exists();
+
+                if (!$alreadyLogged) {
+                    // Catat waktu lihat pertama kali oleh PIC ini
+                    $laporan->update([
+                        'first_viewed_by_pic_at' => now(),
+                        'status_lct' => 'progress_work',
+                    ]);
+
+                    // Tambahkan ke log
+                    RejectLaporan::create([
+                        'id_laporan_lct' => $laporan->id_laporan_lct,
+                        'user_id' => $user->id,
+                        'role' => $roleName,
+                        'status_lct' => 'progress_work',
+                        'alasan_reject' => null,
+                        'tipe_reject' => 'pic_viewed', // tipe log khusus
+                    ]);
+                }
+            }
         }
+
     
         // Jika status laporan 'in_progress', perbarui menjadi 'progress_work'
         if ($laporan->status_lct === 'in_progress') {

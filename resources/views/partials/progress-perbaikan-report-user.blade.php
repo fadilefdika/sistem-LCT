@@ -134,9 +134,22 @@
             
             
             <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-all duration-300 w-full">
-                <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2 mb-6">
-                    <i class="fas fa-info-circle text-base"></i> Improvement From PIC
-                </h3>
+                {{-- Tombol Edit PIC --}}
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-sm font-semibold text-blue-600 flex items-center gap-2">
+                        <i class="fas fa-info-circle text-base"></i> Improvement From PIC
+                    </h3>
+                
+                    @if(in_array($laporan->status_lct, ['in_progress','progress_work']))
+                        <button 
+                            type="button" 
+                            onclick="document.getElementById('editPicModal').classList.remove('hidden')" 
+                            class="bg-blue-500 text-white px-3 py-1 text-xs rounded-md shadow hover:bg-yellow-600 transition">
+                            <i class="fas fa-edit"></i> Edit PIC
+                        </button>
+                    @endif
+                </div>
+                
             
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     @php
@@ -336,6 +349,66 @@
                     @endif
                 @endif
             </div>
+
+            {{-- Modal Edit PIC --}}
+            <div id="editPicModal" class="fixed inset-0 flex items-center justify-center z-70 hidden bg-black/40">
+                <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
+                    
+                    {{-- Tombol Close --}}
+                    <button 
+                        type="button" 
+                        onclick="document.getElementById('editPicModal').classList.add('hidden')" 
+                        class="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                        ✕
+                    </button>
+
+                    <h2 class="text-lg font-semibold mb-4 text-blue-600">Edit Assignment PIC</h2>
+
+                    <form id="editPicForm" action="{{ route('ehs.laporan-lct.editAssignToPic', $laporan->id_laporan_lct) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <!-- Dropdown Department -->
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Department <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select 
+                                id="departemenSelect"
+                                name="departemen_id"
+                                class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                required>
+                                <option value="{{ old('departemen_id', $laporan->departemen_id) }}">Select a Department</option>
+                            </select>
+                        </div>
+                        <p id="errorDepartemen" class="hidden text-red-500 text-xs mt-1">Please Select a Department.</p>
+                    
+                        <!-- Dropdown PIC -->
+                        <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">PIC <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select 
+                                id="picSelect"
+                                name="pic_id"
+                                class="w-full px-4 py-2 border border-black rounded-md bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                                required>
+                                <option value="{{ old('pic_id', $laporan->pic_id) }}">Select a PIC</option>
+                            </select>
+                        </div>
+                        <p id="errorPic" class="hidden text-red-500 text-xs mt-1">Please Select a PIC.</p>
+
+                        {{-- Due Date --}}
+                        <div class="mb-4 mt-4">
+                            <label for="due_date" class="block text-sm font-medium">Due Date</label>
+                            <input type="date" name="due_date" id="due_date"
+                                class="form-input w-full"
+                                value="{{ old('due_date', $laporan->due_date ? \Carbon\Carbon::parse($laporan->due_date)->format('Y-m-d') : '') }}">
+                        </div>
+
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                            Update Assignment
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
 
             @php
                 // Cek apakah pengguna menggunakan guard 'ehs' atau 'web' (untuk pengguna biasa)
@@ -682,6 +755,91 @@
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
+        });
+    });
+</script> 
+
+<!-- Skrip untuk Dropdown -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const departemenSelect = document.getElementById("departemenSelect");
+        const picSelect = document.getElementById("picSelect");
+        const errorDepartemen = document.getElementById("errorDepartemen");
+        const errorPic = document.getElementById("errorPic");
+        const form = document.getElementById("editPicForm");
+
+        const departemens = @json($departemens);
+        const allPics = @json($picDepartemen);
+
+        // Populate dropdown department
+        departemens.forEach(dept => {
+            const option = document.createElement("option");
+            option.value = dept.id;
+            option.textContent = dept.nama_departemen ?? dept.name;
+
+            // Set selected jika id sama dengan value lama
+            if (dept.id == "{{ old('departemen_id', $laporan->departemen_id) }}") {
+                option.selected = true;
+            }
+
+            departemenSelect.appendChild(option);
+        });
+
+
+        /// Populate PIC dropdown sesuai departemen terpilih
+        function populatePIC(selectedDepartemen) {
+            picSelect.innerHTML = '<option value="">Select a PIC</option>';
+
+            if (selectedDepartemen) {
+                const filteredPics = allPics
+                    .filter(pic => pic.departemen_id == selectedDepartemen)
+                    .map(pic => ({
+                        id: pic.pic.id,
+                        fullname: pic.pic.user.fullname
+                    }));
+
+                filteredPics.forEach(pic => {
+                    const option = document.createElement("option");
+                    option.value = pic.id;
+                    option.textContent = pic.fullname;
+
+                    // Set selected jika sesuai laporan
+                    if (pic.id == "{{ old('pic_id', $laporan->pic_id) }}") {
+                        option.selected = true;
+                    }
+
+                    picSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Trigger populatePIC saat halaman load sesuai departemen terpilih
+        populatePIC(departemenSelect.value);
+
+        // Event ketika departemen berubah
+        departemenSelect.addEventListener("change", function () {
+            populatePIC(this.value);
+        });
+
+        // Validasi form submit
+        form.addEventListener("submit", function (e) {
+            let valid = true;
+
+            if (!departemenSelect.value) {
+                errorDepartemen.classList.remove("hidden");
+                valid = false;
+            } else {
+                errorDepartemen.classList.add("hidden");
+            }
+
+            if (!picSelect.value) {
+                errorPic.classList.remove("hidden");
+                valid = false;
+            } else {
+                errorPic.classList.add("hidden");
+            }
+
+            if (!valid) e.preventDefault();
         });
     });
 </script>

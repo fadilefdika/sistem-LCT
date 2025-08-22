@@ -172,7 +172,7 @@ class DashboardController extends Controller
         $thisMonth = [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()];
         $lastMonth = [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()];
 
-        $monthlyQuery = fn ($range) => $applyRoleFilter(LaporanLct::whereBetween('created_at', $range));
+        $monthlyQuery = fn ($range) => $applyRoleFilter(LaporanLct::whereBetween('tanggal_temuan', $range));
 
         $totalFindings = $monthlyQuery($thisMonth)->count();
         $resolved = $monthlyQuery($thisMonth)->where('status_lct', 'closed')->count();

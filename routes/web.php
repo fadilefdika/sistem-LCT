@@ -144,6 +144,7 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
     });
 
     Route::post('/laporan-lct/{id_laporan_lct}/assign', [LctReportController::class, 'assignToPic'])->name('ehs.laporan-lct.assignToPic');
+    Route::put('/laporan-lct/{id_laporan_lct}/edit-assign', [LctReportController::class, 'editAssignToPic'])->name('ehs.laporan-lct.editAssignToPic');
 
     Route::prefix('reporting/{id_laporan_lct}')->name('ehs.reporting.')->group(function () {
         Route::post('/approve', [ProgressPerbaikanController::class, 'approveLaporan'])->name('approve');
