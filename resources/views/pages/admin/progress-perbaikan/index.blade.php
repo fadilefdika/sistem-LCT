@@ -15,6 +15,8 @@
                             $roleName = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
                         }
                     $routePrefix = $roleName === 'ehs' ? 'ehs' : 'admin';
+                    $tanggalAwal = request('tanggalAwal');
+                    $tanggalAkhir = request('tanggalAkhir');
                 @endphp
 
                 <div x-data="{ showFilter: false }" class="mb-5">
@@ -299,32 +301,6 @@
     @endphp
 
     <script>
-        const userRole = "{{ $roleName }}";
-
-        let baseUrl;
-        if (userRole === 'ehs') {
-            baseUrl = "{{ route('ehs.reporting.paginated') }}";
-        } else if (userRole === 'manajer') {
-            baseUrl = "{{ route('admin.reporting.paginated') }}";
-        }
-
-        document.getElementById('perPageSelect').addEventListener('change', function () {
-            const perPage = this.value;
-            fetch(`${baseUrl}?perPage=${perPage}`)
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById('laporanTableBody').innerHTML = data.data;
-                })
-                .catch(error => {
-                    console.error('Gagal mengambil data laporan:', error);
-                });
-        });
-    </script>
-
-    <script>
         $(document).ready(function () {
             function clearRange() {
                 $("#kt_daterangepicker_4").val("All Time");
@@ -368,114 +344,107 @@
         });
     </script>
 
+<script>
+    $(document).ready(function () {
     
-    <script>
-        $(document).ready(function() {
-        
-            function fetchData(params = {}) {
-                $.ajax({
-                    url: "{{ route($routePrefix . '.reporting.index') }}",
-                    type: 'GET',
-                    data: params,
-                    success: function(res) {
-                        $('#report-container-report').html(res);
-                        // Scroll ke atas tabel agar user tau data baru sudah dimuat
-                        if (window.Alpine) {
-                            Alpine.initTree(document.querySelector('#report-container-report'));
-                        }
-                        $('html, body').animate({ scrollTop: $('#report-container-report').offset().top - 100 }, 300);
-                        updateExportLink(params);
-                        updateExportPptLink(params);
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data.');
+        // === Init state ===
+        let currentFilters = {
+            // kalau ada param request -> pakai, kalau tidak -> kosong
+            tanggalAwal: "{{ $tanggalAwal ?? '' }}",
+            tanggalAkhir: "{{ $tanggalAkhir ?? '' }}",
+            perPage: $('#perPageSelect').val() || 10,
+        };
+    
+        function fetchData(params = {}) {
+            currentFilters = { ...currentFilters, ...params };
+    
+            $.ajax({
+                url: "{{ route($routePrefix . '.reporting.index') }}",
+                type: 'GET',
+                data: currentFilters,
+                success: function (res) {
+                    $('#report-container-report').html(res);
+    
+                    if (window.Alpine) {
+                        Alpine.initTree(document.querySelector('#report-container-report'));
                     }
-                });
-            }
-
-            // Fungsi untuk update href export Excel
-            const exportBaseUrl = "{{ route($routePrefix . '.reporting.export') }}";
-
-            function updateExportLink(filters) {
-                const queryString = new URLSearchParams(filters).toString();
-                const exportUrl = exportBaseUrl + (queryString ? '?' + queryString : '');
-                $('#export-link').attr('href', exportUrl);
-            }
-
-            function updateExportPptLink(filters) {
-                const queryString = new URLSearchParams(filters).toString();
-                const exportPptUrl = "{{ route('ehs.reporting.export-ppt') }}" + (queryString ? '?' + queryString : '');
-                $('#export-ppt-link').attr('href', exportPptUrl);
-            }
-
-                    
-            // Submit filter via AJAX
-            $('form').on('submit', function(e) {
-                e.preventDefault();
-
-                let params = $(this).serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-
-                // Tambahkan perPage jika ada
-                params.perPage = $('#perPageSelect').val() || 10;
-
-                // Hitung durasi range tanggal untuk tentukan groupBy
+    
+                    $('html, body').animate(
+                        { scrollTop: $('#report-container-report').offset().top - 100 },
+                        300
+                    );
+    
+                    updateExportLink(currentFilters);
+                    updateExportPptLink(currentFilters);
+                },
+                error: function () {
+                    alert('Gagal mengambil data.');
+                }
+            });
+        }
+    
+        // === Update Export Link ===
+        const exportBaseUrl = "{{ route($routePrefix . '.reporting.export') }}";
+        function updateExportLink(filters) {
+            const queryString = new URLSearchParams(filters).toString();
+            $('#export-link').attr('href', exportBaseUrl + (queryString ? '?' + queryString : ''));
+        }
+    
+        const exportPptBaseUrl = "{{ route('ehs.reporting.export-ppt') }}";
+        function updateExportPptLink(filters) {
+            const queryString = new URLSearchParams(filters).toString();
+            $('#export-ppt-link').attr('href', exportPptBaseUrl + (queryString ? '?' + queryString : ''));
+        }
+    
+        function getFormParams() {
+            let params = $('form').serializeArray().reduce((obj, item) => {
+                obj[item.name] = item.value;
+                return obj;
+            }, {});
+    
+            params.perPage = $('#perPageSelect').val() || 10;
+    
+            // Hitung durasi range (kalau ada)
+            if (params.tanggalAwal && params.tanggalAkhir) {
                 const start = moment(params.tanggalAwal);
                 const end = moment(params.tanggalAkhir);
                 const monthsDiff = end.diff(start, 'months', true);
-
-                if (monthsDiff >= 6) {
-                    params.groupBy = 'month'; // jika lebih dari atau sama dengan 6 bulan
-                } else {
-                    params.groupBy = 'date'; // default
-                }
-
-                // Kirim ke semua chart & tabel
-                fetchData(params);
-                loadStatusChart(params);
-                loadCategoryChart(params);
-                loadAreaChart(params);
-                loadDepartmentChart(params);
-                loadFindingData(params);
-            });
-
-                    
-            // Handle pagination click (delegated event karena link dinamis)
-            $(document).on('click', '#pagination-links a', function(e) {
-                e.preventDefault();
-        
-                let url = new URL($(this).attr('href'), window.location.origin);
-                let params = Object.fromEntries(url.searchParams.entries());
-        
-                // Ambil filter dari form juga supaya tetap konsisten
-                let formParams = $('form').serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-        
-                // Gabungkan params
-                params = {...formParams, ...params};
-        
-                fetchData(params);
-            });
-        
-            // Ganti perPage lewat select dropdown
-            $(document).on('change', '#perPageSelect', function() {
-                let params = $('form').serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-        
-                params.perPage = $(this).val();
-        
-                fetchData(params);
-            });
-        
+                params.groupBy = monthsDiff >= 6 ? 'month' : 'date';
+            }
+    
+            return params;
+        }
+    
+        // Submit filter
+        $('form').on('submit', function (e) {
+            e.preventDefault();
+            const params = getFormParams();
+            fetchData(params);
+    
+            loadStatusChart(params);
+            loadCategoryChart(params);
+            loadAreaChart(params);
+            loadDepartmentChart(params);
+            loadFindingData(params);
         });
+    
+        // Pagination
+        $(document).on('click', '#pagination-links a', function (e) {
+            e.preventDefault();
+            let url = new URL($(this).attr('href'), window.location.origin);
+            let params = { ...currentFilters, ...Object.fromEntries(url.searchParams.entries()) };
+            fetchData(params);
+        });
+    
+        // Per page select
+        $(document).on('change', '#perPageSelect', function () {
+            fetchData({ perPage: $(this).val() });
+        });
+    
+    });
     </script>
-        
+    
+    
     
 
 </x-app-layout>

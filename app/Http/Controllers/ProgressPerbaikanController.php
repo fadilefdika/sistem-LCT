@@ -30,6 +30,16 @@ class ProgressPerbaikanController extends Controller
     
     public function index(Request $request)
     {
+        // Log semua parameter request
+        Log::info('Reporting Request Params', $request->all());
+
+        // Log deteksi ajax
+        if ($request->ajax()) {
+            Log::info('Request ini datang dari AJAX');
+        } else {
+            Log::info('Request ini datang dari normal page load');
+        }
+
         // Ambil user dan role sesuai guard
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
@@ -111,6 +121,8 @@ class ProgressPerbaikanController extends Controller
 
         return view('pages.admin.progress-perbaikan.index', [
             'laporans' => $laporans,
+            'startOfMonth' => now()->startOfMonth(),
+            'endOfMonth' => now()->endOfMonth(),
             'statusGroups' => $statusGroups,
             'areas' => $areas,
             'categories' => $categories,
@@ -1018,9 +1030,24 @@ class ProgressPerbaikanController extends Controller
         // === Filter Tanggal Temuan ===
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
             $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
-            $query->whereBetween('tanggal_temuan', [$startDate, $endDate]);
+            $endDate   = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+
+            Log::info("Filter tanggal dipakai", [
+                'start' => $startDate->toDateTimeString(),
+                'end'   => $endDate->toDateTimeString()
+            ]);
+
+            $query->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('tanggal_temuan', [$startDate, $endDate])
+                ->orWhere(function ($qq) use ($startDate, $endDate) {
+                    $qq->whereNull('tanggal_temuan')
+                        ->whereBetween('lct_laporan.created_at', [$startDate, $endDate]);
+                });
+            });
         }
+
+
+        
 
         // === Filter Tambahan ===
         if ($request->filled('departemenId')) {

@@ -17,7 +17,11 @@
             Cari
         </button>
 
-        @if(request()->has('id_laporan_lct'))
+        @php
+            $isThisMonth = request('tanggalAwal') === now()->startOfMonth()->format('Y-m-d')
+                && request('tanggalAkhir') === now()->endOfMonth()->format('Y-m-d');
+        @endphp
+        @if(request()->has('id_laporan_lct') || $isThisMonth)
             <a href="{{ route('admin.manajemen-lct.index') }}" 
             class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition">
                 Reset
@@ -125,18 +129,6 @@
         const perPageSelect = document.getElementById('perPageSelect');
         const wrapper = document.getElementById('report-container-manajemen');
     
-        perPageSelect.addEventListener('change', () => {
-            const perPage = perPageSelect.value;
-            fetch(`{{ route('admin.manajemen-lct.index') }}?perPage=${perPage}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                wrapper.innerHTML = html;
-            });
-        });
         // AJAX untuk sorting
         document.addEventListener('click', function (e) {
             const target = e.target.closest('a');

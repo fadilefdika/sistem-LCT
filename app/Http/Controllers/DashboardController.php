@@ -43,7 +43,7 @@ class DashboardController extends Controller
         };
 
         // Fungsi bantu ambil laporan overdue
-        $ambilOverdue = function () use ($applyRoleFilter) {
+        $ambilOverdue = function () use ($applyRoleFilter) { 
             $baseQuery = LaporanLct::where('due_date', '<', now())
                 ->where('status_lct', '!=', 'closed')
                 ->where(fn ($q) => $q->whereNull('date_completion')->orWhereColumn('date_completion', '>', 'due_date'));
@@ -232,9 +232,6 @@ class DashboardController extends Controller
             }
         }
 
-        // dd("Dashboard",$overdue->toSql(), $overdue->getBindings());
-        
-
 
         return view('pages.admin.dashboard', [
             'layout' => 'layouts.admin',
@@ -261,6 +258,7 @@ class DashboardController extends Controller
             'resolvedChange' => $change($resolved, $lastMonthResolved),
             'overdueChange' => $change($overdue, $lastMonthOverdue),
             'highRiskChange' => $change($highRisk, $lastMonthHighRisk),
+
             // Todo Count
             'correctiveLowCount' => $correctiveLowCount,
             'revisionLowCount' => $revisionLowCount,

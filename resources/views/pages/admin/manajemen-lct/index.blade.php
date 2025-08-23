@@ -162,83 +162,91 @@
     <script>
         $(document).ready(function() {
         
+            // === Inisialisasi state filter ===
+            let currentFilters = {
+                tanggalAwal: "{{ request('tanggalAwal', now()->startOfMonth()->format('Y-m-d')) }}",
+                tanggalAkhir: "{{ request('tanggalAkhir', now()->endOfMonth()->format('Y-m-d')) }}",
+                perPage: $('#perPageSelect').val() || 10,
+                // Bisa tambahkan filter default lain jika perlu
+            };
+        
+            // === Core function untuk fetch data ===
             function fetchData(params = {}) {
+                currentFilters = { ...currentFilters, ...params };
+        
                 $.ajax({
                     url: "{{ route('admin.manajemen-lct.index') }}",
                     type: 'GET',
-                    data: params,
+                    data: currentFilters,
                     success: function(res) {
                         $('#report-container-manajemen').html(res);
-                        // Scroll ke atas tabel agar user tau data baru sudah dimuat
+        
                         if (window.Alpine) {
                             Alpine.initTree(document.querySelector('#report-container-manajemen'));
                         }
+        
                         $('html, body').animate({ scrollTop: $('#report-container-manajemen').offset().top - 100 }, 300);
-                        updateExportLink(params);
+        
+                        updateExportLink(currentFilters);
                     },
                     error: function() {
                         alert('Gagal mengambil data.');
                     }
                 });
             }
-
-            // Fungsi untuk update href export Excel
+        
+            // === Update Export Link ===
             function updateExportLink(filters) {
                 const queryString = new URLSearchParams(filters).toString();
                 const exportUrl = "{{ route('admin.manajemen-lct.export') }}" + (queryString ? '?' + queryString : '');
                 $('#export-link').attr('href', exportUrl);
             }
-                    
-            // Submit filter via AJAX
-            $('form').on('submit', function(e) {
-                e.preventDefault();
-
-                let params = $(this).serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-
-                params.perPage = $('#perPageSelect').val() || 10;
-
-                fetchData(params);         // update tabel
-                loadFindingData(params);   // update chart
-                loadStatusChart(params);
-                loadCategoryChart(params);
-                loadAreaChart(params);
-                loadDepartmentChart(params);
-            });
-                    
-            // Handle pagination click (delegated event karena link dinamis)
-            $(document).on('click', '#pagination-links a', function(e) {
-                e.preventDefault();
         
-                let url = new URL($(this).attr('href'), window.location.origin);
-                let params = Object.fromEntries(url.searchParams.entries());
-        
-                // Ambil filter dari form juga supaya tetap konsisten
-                let formParams = $('form').serializeArray().reduce((obj, item) => {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-        
-                // Gabungkan params
-                params = {...formParams, ...params};
-        
-                fetchData(params);
-            });
-        
-            // Ganti perPage lewat select dropdown
-            $(document).on('change', '#perPageSelect', function() {
+            // === Ambil filter dari form jadi object ===
+            function getFormParams() {
                 let params = $('form').serializeArray().reduce((obj, item) => {
                     obj[item.name] = item.value;
                     return obj;
                 }, {});
         
-                params.perPage = $(this).val();
+                params.perPage = $('#perPageSelect').val() || 10;
         
+                // Pastikan tanggal default tersimpan
+                if (!params.tanggalAwal) params.tanggalAwal = currentFilters.tanggalAwal;
+                if (!params.tanggalAkhir) params.tanggalAkhir = currentFilters.tanggalAkhir;
+        
+                return params;
+            }
+        
+            // === Submit filter form ===
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                const params = getFormParams();
+                fetchData(params);
+        
+                // Update chart jika ada
+                loadFindingData(currentFilters);
+                loadStatusChart(currentFilters);
+                loadCategoryChart(currentFilters);
+                loadAreaChart(currentFilters);
+                loadDepartmentChart(currentFilters);
+            });
+        
+            // === Pagination click (delegated) ===
+            $(document).on('click', '#pagination-links a', function(e) {
+                e.preventDefault();
+                let url = new URL($(this).attr('href'), window.location.origin);
+                let params = { ...currentFilters, ...Object.fromEntries(url.searchParams.entries()) };
                 fetchData(params);
             });
         
+            // === Change perPage select ===
+            $(document).on('change', '#perPageSelect', function() {
+                currentFilters.perPage = $(this).val();
+                fetchData(currentFilters);
+            });
+        
         });
-    </script>
+        </script>
+        
 </x-app-layout>

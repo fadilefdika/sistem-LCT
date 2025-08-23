@@ -40,7 +40,12 @@
             Cari
         </button>
 
-        @if(request()->has('id_laporan_lct'))
+        @php
+            $isThisMonth = request('tanggalAwal') === now()->startOfMonth()->format('Y-m-d')
+                && request('tanggalAkhir') === now()->endOfMonth()->format('Y-m-d');
+        @endphp
+
+        @if(request()->has('id_laporan_lct') || $isThisMonth)
             <a 
                 href="{{ route($routePrefix.'.reporting.index') }}" 
                 class="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300 transition"
@@ -48,6 +53,7 @@
                 Reset
             </a>
         @endif
+
     </form>
 
     
@@ -166,22 +172,22 @@
         const perPageSelect = document.getElementById('perPageSelect');
         const wrapper = document.getElementById('report-container-report');
 
-        // Handler untuk perubahan jumlah data per halaman
-        if (perPageSelect) {
-            perPageSelect.addEventListener('change', () => {
-                const perPage = perPageSelect.value;
-                const url = `${baseUrl}?perPage=${perPage}`;
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    wrapper.innerHTML = html;
-                });
-            });
-        }
+        // // Handler untuk perubahan jumlah data per halaman
+        // if (perPageSelect) {
+        //     perPageSelect.addEventListener('change', () => {
+        //         const perPage = perPageSelect.value;
+        //         const url = `${baseUrl}?perPage=${perPage}`;
+        //         fetch(url, {
+        //             headers: {
+        //                 'X-Requested-With': 'XMLHttpRequest'
+        //             }
+        //         })
+        //         .then(response => response.text())
+        //         .then(html => {
+        //             wrapper.innerHTML = html;
+        //         });
+        //     });
+        // }
 
         // Handler untuk klik sorting
         document.addEventListener('click', function (e) {

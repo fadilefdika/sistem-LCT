@@ -94,6 +94,8 @@ class ManajemenLctController extends Controller
             'statusGroups' => $statusGroups,
             'areas'=>$areas,
             'categories' => $categories,
+            'startOfMonth' => now()->startOfMonth(),
+            'endOfMonth' => now()->endOfMonth(),
         
         ]);
     }
@@ -544,10 +546,21 @@ class ManajemenLctController extends Controller
 
         // === FILTER TAMBAHAN ===
         if ($request->filled('tanggalAwal') && $request->filled('tanggalAkhir')) {
-            $query->whereBetween('tanggal_temuan', [
-                \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay(),
-                \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay()
+            $startDate = \Carbon\Carbon::parse($request->tanggalAwal)->startOfDay();
+            $endDate   = \Carbon\Carbon::parse($request->tanggalAkhir)->endOfDay();
+
+            Log::info("Filter tanggal dipakai", [
+                'start' => $startDate->toDateTimeString(),
+                'end'   => $endDate->toDateTimeString()
             ]);
+
+            $query->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('tanggal_temuan', [$startDate, $endDate])
+                ->orWhere(function ($qq) use ($startDate, $endDate) {
+                    $qq->whereNull('tanggal_temuan')
+                        ->whereBetween('lct_laporan.created_at', [$startDate, $endDate]);
+                });
+            });
         }
 
         if ($request->filled('areaId')) {
