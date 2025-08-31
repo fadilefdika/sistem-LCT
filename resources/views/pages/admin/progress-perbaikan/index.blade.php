@@ -38,7 +38,7 @@
                         @if(in_array($roleName, ['ehs', 'manajer']))
                             <div>
                                 @if($roleName === 'ehs')
-                                    <a href="{{ route('ehs.reporting.export-ppt') }}" id="export-ppt-link" 
+                                    <a href="{{ route('ehs.reporting.export-pdf') }}" id="export-pdf-link" 
                                         class="inline-flex items-center px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg shadow hover:bg-green-600 transition">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <path d="M4 4v16c0 .55.45 1 1 1h14a1 1 0 0 0 1-1V4m-4 4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -390,10 +390,10 @@
             $('#export-link').attr('href', exportBaseUrl + (queryString ? '?' + queryString : ''));
         }
     
-        const exportPptBaseUrl = "{{ route('ehs.reporting.export-ppt') }}";
+        const exportPptBaseUrl = "{{ route('ehs.reporting.export-pdf') }}";
         function updateExportPptLink(filters) {
             const queryString = new URLSearchParams(filters).toString();
-            $('#export-ppt-link').attr('href', exportPptBaseUrl + (queryString ? '?' + queryString : ''));
+            $('#export-pdf-link').attr('href', exportPptBaseUrl + (queryString ? '?' + queryString : ''));
         }
     
         function getFormParams() {

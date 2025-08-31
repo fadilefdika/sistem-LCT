@@ -98,13 +98,11 @@ Route::middleware(['auth', 'verified', 'role:pic'])->prefix('manajemen-lct')->na
     Route::get('/reporting/export', [ProgressPerbaikanController::class, 'exportExcel'])->name('export');
 });
 
-Route::middleware(['auth', 'verified', 'role:pic'])->prefix('finding-followup')->name('admin.finding-followup.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:pic,manajer'])->prefix('finding-followup')->name('admin.finding-followup.')->group(function () {
     Route::get('/', [FindingFollowupController::class, 'index'])->name('index');
     Route::get('/tabel', [FindingFollowupController::class, 'table'])->name('table');
     Route::get('/{id_laporan_lct}', [FindingFollowupController::class, 'show'])->name('show');
-    Route::post('/{id_laporan_lct}/store', [FindingFollowupController::class, 'store'])->name('store');
-    // Route::delete('/{id_laporan_lct}/attachment/{index}', [ManajemenLctController::class, 'deleteAttachment'])->name('deleteAttachment');
-
+   
 });
 
 // =================== ROUTE UNTUK EHS ===================
@@ -140,6 +138,7 @@ Route::prefix('ehs')->middleware(['auth:ehs', 'verified', 'role:ehs'])->group(fu
 
         Route::get('/reporting/export', [ProgressPerbaikanController::class, 'exportExcel'])->name('export');
         Route::get('/reporting/export-ppt', [ProgressPerbaikanController::class, 'exportPpt'])->name('export-ppt');
+        Route::get('/reporting/export-pdf', [ProgressPerbaikanController::class, 'exportPdf'])->name('export-pdf');
 
     });
 

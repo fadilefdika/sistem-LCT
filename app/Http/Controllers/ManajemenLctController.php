@@ -352,6 +352,7 @@ class ManajemenLctController extends Controller
 
     public function submitTaskBudget(Request $request, $id_laporan_lct)
     {
+        // dd($request->all());
         if (Auth::guard('ehs')->check()) {
             $user = Auth::guard('ehs')->user();
             $roleName = 'ehs';
@@ -459,11 +460,11 @@ class ManajemenLctController extends Controller
             $managerEmail = $laporan->departemen?->user?->email ?? null;
 
             
-            if ($managerEmail) {
-                // Kirim email
-                Mail::to('fadilefd1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
-                // Mail::to($managerEmail)->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
-            }
+            // if ($managerEmail) {
+            //     // Kirim email
+            //     Mail::to('fadilefd1102@gmail.com')->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
+            //     // Mail::to($managerEmail)->send(new TaskBudgetApprovalRequest($laporan, $submittedTasks));
+            // }
 
             DB::commit();
             return redirect()->back()->with('success', 'Action permanent updated successfully.');

@@ -15,6 +15,7 @@ use App\Exports\LaporanLctExport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1363,6 +1364,51 @@ class ProgressPerbaikanController extends Controller
             return response()->json(['error' => 'Failed to generate PowerPoint file: ' . $e->getMessage()], 500);
         }
     }
+
+    public function exportPdf(Request $request)
+    {
+        $statusMapping = [
+            'open' => ['label' => 'Open (new)'],
+            'review' => ['label' => 'Under Review'],
+            'in_progress' => ['label' => 'In Progress'],
+            'progress_work' => ['label' => 'In Progress'],
+            'work_permanent' => ['label' => 'In Progress'],
+            'waiting_approval' => ['label' => 'Waiting Approval'],
+            'waiting_approval_temporary' => ['label' => 'Waiting Approval (temporary)'],
+            'waiting_approval_permanent' => ['label' => 'Waiting Approval'],
+            'waiting_approval_taskbudget' => ['label' => 'Waiting Approval (budget)'],
+            'approved' => ['label' => 'Approved'],
+            'approved_temporary' => ['label' => 'Approved (temporary)'],
+            'approved_permanent' => ['label' => 'Approved'],
+            'approved_taskbudget' => ['label' => 'Approved (budget)'],
+            'revision' => ['label' => 'Revision'],
+            'temporary_revision' => ['label' => 'Revision (temporary)'],
+            'permanent_revision' => ['label' => 'Revision'],
+            'taskbudget_revision' => ['label' => 'Revision (budget)'],
+            'closed' => ['label' => 'Closed'],
+        ];
+
+        // Ambil user & role (sama seperti di PPT)
+        if (auth('ehs')->check()) {
+            $user = auth('ehs')->user();
+            $role = 'ehs';
+        } else {
+            $user = auth()->user();
+            $role = session('active_role') ?? optional($user->roleLct->first())->name ?? 'guest';
+        }
+
+        // Query laporan
+        $query = $this->buildLaporanQuery($request, $user, $role);
+        $laporans = $query->with('picUser', 'kategori', 'area')->get();
+        // dd($laporans);
+
+        // Render view ke PDF
+        $pdf = Pdf::loadView('pdf.pdf', compact('laporans', 'statusMapping'))
+            ->setPaper('A4', 'landscape'); // biar mirip 16:9
+
+        return $pdf->download('laporan_safety_patrol_' . date('Ymd_His') . '.pdf');
+    }
+
 
     public function getRevisiData(Request $request)
     {

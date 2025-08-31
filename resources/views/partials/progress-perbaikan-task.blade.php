@@ -1,4 +1,4 @@
-<div class="w-full max-h-[calc(100vh)] pb-32 overflow-y-auto 
+<div class="w-full max-h-[calc(100vh)] pb-32 overflow-y-auto px-4 sm:px-6
                 [&::-webkit-scrollbar]:w-2
                 [&::-webkit-scrollbar-track]:rounded-full
                 [&::-webkit-scrollbar-track]:bg-gray-100
@@ -6,7 +6,7 @@
                 [&::-webkit-scrollbar-thumb]:bg-gray-300
                 dark:[&::-webkit-scrollbar-track]:bg-slate-700
                 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
-<div class="w-full px-4 sm:px-6">
+<div class="w-full px-4 sm:px-6 bg-white rounded-xl pb-3">
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-0 mb-6 pt-6">
         <!-- Judul dan Deskripsi -->
@@ -46,8 +46,31 @@
     </div>
 
 
+    <!-- Permanent Action & Estimated Budget Card -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 mb-6">
+       <!-- Permanent Action -->
+       <div class="mb-4">
+           <h3 class="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
+               Permanent Action
+           </h3>
+           <p class="text-sm text-gray-800 leading-relaxed">
+               {{ $laporan->action_permanent ?? '-' }}
+           </p>
+       </div>
+
+       <!-- Estimated Budget -->
+       <div>
+           <h3 class="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
+               Estimated Budget
+           </h3>
+           <p class="text-sm font-semibold text-blue-900">
+               Rp {{ number_format($laporan->estimated_budget, 0, ',', '.') }}
+           </p>
+       </div>
+   </div>
     <!-- Main Card -->
     <div class="bg-white p-3 rounded-lg shadow-lg w-full mx-auto">
+
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             @if($laporan->tasks->isEmpty())
                 <div class="text-center py-12">
